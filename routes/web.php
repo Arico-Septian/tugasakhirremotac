@@ -6,6 +6,41 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/login','auth.login');
+Route::view('/register','auth.register');
+
+use App\Http\Controllers\AuthController;
+
+
+// halaman login
+Route::get('/login',function(){
+return view('auth.login');
+});
+
+// proses login
+Route::post('/login',[AuthController::class,'login']);
+
+
+// halaman register
+Route::get('/register',function(){
+return view('auth.register');
+});
+
+// proses register
+Route::post('/register',[AuthController::class,'register']);
+
+
+// logout
+Route::get('/logout',[AuthController::class,'logout']);
+
+
+// dashboard
+Route::get('/dashboard',function(){
+
+return view('dashboard.dashboard');
+
+})->middleware('auth');
+
 Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
 });

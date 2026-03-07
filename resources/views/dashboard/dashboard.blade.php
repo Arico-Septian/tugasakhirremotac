@@ -86,6 +86,7 @@ margin:5px;
 <a href="/ac-temp/server1/1/24"><button class="temp">24°</button></a>
 <a href="/ac-temp/server1/1/26"><button class="temp">26°</button></a>
 
+<a href="/logout">Logout</a>
 </div>
 
 </body>
