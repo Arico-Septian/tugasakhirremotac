@@ -39,9 +39,37 @@
 
 <td>
 
-<a href="/ac/{{$ac->id}}/on">Turn ON</a>
+<!-- POWER -->
+<a href="/ac/{{$ac->id}}/on">ON</a>
 
-<a href="/ac/{{$ac->id}}/off">Turn OFF</a>
+<a href="/ac/{{$ac->id}}/off">OFF</a>
+
+<br><br>
+
+<!-- TEMPERATURE -->
+Temp:
+
+<a href="/ac/{{$ac->id}}/temp/20">20</a>
+
+<a href="/ac/{{$ac->id}}/temp/22">22</a>
+
+<a href="/ac/{{$ac->id}}/temp/24">24</a>
+
+<a href="/ac/{{$ac->id}}/temp/26">26</a>
+
+<br><br>
+
+<!-- MODE -->
+
+Mode:
+
+<a href="/ac/{{$ac->id}}/mode/cool">Cool</a>
+
+<a href="/ac/{{$ac->id}}/mode/heat">Heat</a>
+
+<a href="/ac/{{$ac->id}}/mode/fan">Fan</a>
+
+<a href="/ac/{{$ac->id}}/mode/auto">Auto</a>
 
 </td>
 

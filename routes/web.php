@@ -215,3 +215,5 @@ Route::post('/rooms/{id}/ac',[AcUnitController::class,'store']);
 use App\Http\Controllers\AcControlController;
 Route::get('/ac/{id}/on',[AcControlController::class,'powerOn']);
 Route::get('/ac/{id}/off',[AcControlController::class,'powerOff']);
+Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
+Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);

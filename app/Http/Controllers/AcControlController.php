@@ -33,4 +33,34 @@ public function powerOff($id)
     return back();
 
     }
+
+public function setTemp($id,$value)
+    {
+
+    $status = AcStatus::firstOrCreate(
+    ['ac_unit_id'=>$id]
+    );
+
+    $status->set_temperature = $value;
+
+    $status->save();
+
+    return back();
+
+    }
+
+public function setMode($id,$mode)
+{
+
+    $status = AcStatus::firstOrCreate(
+    ['ac_unit_id'=>$id]
+    );
+
+    $status->mode = strtoupper($mode);
+
+    $status->save();
+
+    return back();
+
+    }
 }

@@ -21,4 +21,9 @@ public function room()
     {
     return $this->belongsTo(Room::class);
     }
+
+public function status()
+    {
+    return $this->hasOne(AcStatus::class);
+    }
 }
