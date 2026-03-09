@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class AcUnit extends Model
+{
+
+protected $fillable = [
+        'room_id',
+        'ac_number',
+        'name',
+        'brand',
+        'location',
+        'ip_ir',
+        'is_active'
+    ];
+
+public function room()
+    {
+    return $this->belongsTo(Room::class);
+    }
+}

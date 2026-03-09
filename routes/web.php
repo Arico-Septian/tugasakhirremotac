@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -9,8 +8,8 @@ Route::get('/', function () {
 Route::view('/login','auth.login');
 Route::view('/register','auth.register');
 
-use App\Http\Controllers\AuthController;
 
+use App\Http\Controllers\AuthController;
 // halaman login
 Route::get('/login',function(){
 return view('auth.login');
@@ -19,7 +18,6 @@ return view('auth.login');
 // proses login
 Route::post('/login',[AuthController::class,'login']);
 
-
 // halaman register
 Route::get('/register',function(){
 return view('auth.register');
@@ -27,10 +25,13 @@ return view('auth.register');
 
 // proses register
 Route::post('/register',[AuthController::class,'register']);
+
 // logout
 Route::get('/logout',[AuthController::class,'logout']);
 
 
+
+// Setting manual langsung di browser
 use App\Services\MqttService;
 Route::get('/set-room/{room}', function ($room) {
 
@@ -185,3 +186,32 @@ Route::get('/ac-temp/{room}/{id}/{temp}', function ($room,$id,$temp){
 
     return "Temperatur diubah";
 });
+
+
+// setting melalui dashboard
+use App\Http\Controllers\DashboardController;
+Route::middleware(['auth'])->group(function(){
+
+    Route::get('/dashboard',[DashboardController::class,'index']);
+
+});
+
+
+use App\Http\Controllers\AcUnitController;
+Route::get('/dashboard/ac-control',[AcUnitController::class,'index']);
+
+
+use App\Http\Controllers\RoomController;
+Route::get('/rooms',[RoomController::class,'index']);
+Route::post('/rooms',[RoomController::class,'store']);
+
+Route::get('/rooms', [RoomController::class, 'index']);
+Route::post('/rooms/add', [RoomController::class, 'store']);
+
+Route::get('/rooms/{id}/ac',[AcUnitController::class,'index']);
+Route::post('/rooms/{id}/ac',[AcUnitController::class,'store']);
+
+
+use App\Http\Controllers\AcControlController;
+Route::get('/ac/{id}/on',[AcControlController::class,'powerOn']);
+Route::get('/ac/{id}/off',[AcControlController::class,'powerOff']);
