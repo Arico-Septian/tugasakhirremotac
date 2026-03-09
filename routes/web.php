@@ -11,7 +11,6 @@ Route::view('/register','auth.register');
 
 use App\Http\Controllers\AuthController;
 
-
 // halaman login
 Route::get('/login',function(){
 return view('auth.login');
@@ -41,9 +40,11 @@ return view('dashboard.dashboard');
 
 })->middleware('auth');
 
-Route::get('/dashboard', function () {
-    return view('dashboard.dashboard');
-});
+
+
+
+
+
 
 use App\Services\MqttService;
 Route::get('/set-room/{room}', function ($room) {

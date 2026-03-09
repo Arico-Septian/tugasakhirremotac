@@ -14,14 +14,23 @@ class AuthController extends Controller
 public function login(Request $request)
 {
 
-$credentials = $request->only('email','password');
+$request->validate([
+'name' => 'required',
+'password' => 'required'
+]);
+
+$credentials = $request->only('name','password');
 
 if(Auth::attempt($credentials))
 {
+
+$request->session()->regenerate();
+
 return redirect('/dashboard');
+
 }
 
-return back()->with('error','Email atau password salah');
+return back()->with('error','Username atau password salah');
 
 }
 
@@ -30,12 +39,16 @@ return back()->with('error','Email atau password salah');
 public function register(Request $request)
 {
 
-$user = User::create([
+$request->validate([
+'name' => 'required|min:3|max:20|unique:users',
+'email' => 'required|email|unique:users',
+'password' => 'required|min:6|confirmed'
+]);
 
+$user = User::create([
 'name'=>$request->name,
 'email'=>$request->email,
 'password'=>Hash::make($request->password)
-
 ]);
 
 Auth::login($user);
@@ -44,12 +57,15 @@ return redirect('/dashboard');
 
 }
 
-
 // LOGOUT
-public function logout()
+public function logout(Request $request)
 {
 
 Auth::logout();
+
+$request->session()->invalidate();
+
+$request->session()->regenerateToken();
 
 return redirect('/login');
 
