@@ -27,23 +27,8 @@ return view('auth.register');
 
 // proses register
 Route::post('/register',[AuthController::class,'register']);
-
-
 // logout
 Route::get('/logout',[AuthController::class,'logout']);
-
-
-// dashboard
-Route::get('/dashboard',function(){
-
-return view('dashboard.dashboard');
-
-})->middleware('auth');
-
-
-
-
-
 
 
 use App\Services\MqttService;
