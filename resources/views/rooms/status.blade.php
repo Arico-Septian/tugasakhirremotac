@@ -119,19 +119,7 @@ class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
 
 <i class="fa-solid fa-snowflake"></i>
-<span class="menu-text">AC Units Control</span>
-
-</a>
-
-</li>
-
-<li>
-
-<a href="/logout"
-class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50">
-
-<i class="fa-solid fa-right-from-bracket"></i>
-<span class="menu-text">Logout</span>
+<span class="menu-text">Status AC Units </span>
 
 </a>
 

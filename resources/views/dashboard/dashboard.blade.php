@@ -167,6 +167,18 @@ class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 
 </li>
 
+<li>
+
+<a href="/users"
+class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+
+<i class="fa-solid fa-users"></i>
+<span class="menu-text">User Management</span>
+
+</a>
+
+</li>
+
 </ul>
 
 </div>

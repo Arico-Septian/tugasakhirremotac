@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
-use Illuminate\Http\Request;
 
 class AcControlController extends Controller
 {

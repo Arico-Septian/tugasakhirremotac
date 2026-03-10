@@ -231,3 +231,8 @@ Route::delete('/rooms/{id}', [RoomController::class,'destroy']);
 Route::delete('/ac/{id}', [AcUnitController::class,'destroy']);
 
 Route::get('/rooms/{id}/status', [RoomController::class,'status']);
+
+use App\Http\Controllers\UserController;
+Route::get('/users',[UserController::class,'index']);
+Route::post('/users',[UserController::class,'store']);
+Route::delete('/users/{id}',[UserController::class,'destroy']);
