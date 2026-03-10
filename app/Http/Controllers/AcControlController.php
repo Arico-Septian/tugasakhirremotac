@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
+use Illuminate\Http\Request;
 
 class AcControlController extends Controller
 {
@@ -63,5 +64,21 @@ public function togglePower($id)
         $status->save();
 
         return back();
+    }
+
+public function setSchedule(Request $request,$id)
+    {
+
+        $status = AcStatus::firstOrCreate(
+        ['ac_unit_id'=>$id]
+    );
+
+        $status->timer_on = $request->timer_on;
+        $status->timer_off = $request->timer_off;
+
+        $status->save();
+
+        return back();
+
     }
 }

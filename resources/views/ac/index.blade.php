@@ -352,6 +352,35 @@ Auto
 
 </div>
 
+<form action="/ac/{{$ac->id}}/schedule" method="POST" class="mt-4">
+
+@csrf
+
+<div class="grid grid-cols-2 gap-3">
+
+<div>
+<label class="text-sm text-gray-500">ON Time</label>
+<input type="time" name="timer_on"
+class="w-full border rounded-lg p-2">
+</div>
+
+<div>
+<label class="text-sm text-gray-500">OFF Time</label>
+<input type="time" name="timer_off"
+class="w-full border rounded-lg p-2">
+</div>
+
+</div>
+
+<button
+class="mt-3 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
+
+Set Timer
+
+</button>
+
+</form>
+
 </div>
 
 
