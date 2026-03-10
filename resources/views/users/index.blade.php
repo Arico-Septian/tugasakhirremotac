@@ -168,20 +168,6 @@ class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
 </div>
 
 
-
-<!-- SEARCH -->
-
-<div class="card mb-6">
-
-<input
-type="text"
-placeholder="Search user..."
-class="border p-3 rounded-lg w-full">
-
-</div>
-
-
-
 <!-- USER TABLE -->
 
 <div class="card overflow-x-auto">
