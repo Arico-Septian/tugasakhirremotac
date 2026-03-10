@@ -14,13 +14,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <style>
 
-/* ===== GLOBAL ===== */
-
 body{
 font-family: ui-sans-serif,system-ui;
 }
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 
 .sidebar{
 transition:all .3s ease;
@@ -42,7 +40,7 @@ display:none;
 justify-content:center;
 }
 
-/* ===== CONTENT SHIFT ===== */
+/* CONTENT SHIFT */
 
 .main-content{
 margin-left:260px;
@@ -53,7 +51,7 @@ transition:all .3s ease;
 margin-left:100px;
 }
 
-/* ===== CARD STYLE ===== */
+/* CARD */
 
 .stat-card{
 background:white;
@@ -68,7 +66,7 @@ transform:translateY(-4px);
 box-shadow:0 15px 35px rgba(0,0,0,0.08);
 }
 
-/* ===== ROOM CARD ===== */
+/* ROOM CARD */
 
 .room-card{
 background:white;
@@ -83,7 +81,7 @@ transform:translateY(-6px);
 box-shadow:0 20px 40px rgba(0,0,0,0.08);
 }
 
-/* ===== ICON BOX ===== */
+/* ICON */
 
 .icon-box{
 width:40px;
@@ -95,7 +93,7 @@ justify-content:center;
 background:#f3f4f6;
 }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 
 @media(max-width:900px){
 
@@ -129,10 +127,8 @@ class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-
 <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
 <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
-
 <i class="fa-solid fa-layer-group"></i>
 <span class="menu-text">AC System</span>
-
 </h2>
 
 <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
@@ -144,39 +140,27 @@ class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-
 <ul class="space-y-3">
 
 <li>
-
 <a href="/dashboard"
 class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100">
-
 <i class="fa-solid fa-chart-pie"></i>
 <span class="menu-text">Dashboard</span>
-
 </a>
-
 </li>
 
 <li>
-
 <a href="/rooms"
 class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-
 <i class="fa-solid fa-server"></i>
 <span class="menu-text">Manage Rooms</span>
-
 </a>
-
 </li>
 
 <li>
-
 <a href="/users"
 class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-
 <i class="fa-solid fa-users"></i>
 <span class="menu-text">User Management</span>
-
 </a>
-
 </li>
 
 </ul>
@@ -192,26 +176,39 @@ class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 
 <!-- HEADER -->
 
-<header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+<header class="sticky top-0 bg-white border-b px-10 py-6 flex items-center justify-between shadow-sm">
 
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-6">
 
-<button class="lg:hidden text-xl" onclick="toggleSidebar()">
+<button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
 <i class="fa-solid fa-bars"></i>
 </button>
 
-<h1 class="text-2xl font-bold text-gray-800">
+<div>
+
+<h1 class="text-3xl font-bold text-gray-800">
 Centralized AC Management
 </h1>
+
+<p class="text-sm text-gray-400">
+Server Room Cooling Control System
+</p>
+
+</div>
 
 </div>
 
 
 <div class="flex items-center gap-6">
 
-<span id="systemStatus" class="text-green-500 text-sm font-semibold">
-● System Online
-</span>
+<div id="systemStatus"
+class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
+
+<span class="w-2 h-2 bg-green-500 rounded-full"></span>
+
+System Online
+
+</div>
 
 
 <!-- PROFILE -->
@@ -219,15 +216,18 @@ Centralized AC Management
 <div class="relative">
 
 <button onclick="toggleProfile()"
-class="flex items-center gap-3 bg-white border px-3 py-1.5 rounded-xl shadow-sm hover:bg-gray-50 transition">
+class="flex items-center gap-3 bg-white border px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 transition">
 
-<div class="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
+<div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+
 {{ strtoupper(substr(Auth::user()->name,0,1)) }}
+
 </div>
+
 
 <div class="text-left hidden md:block">
 
-<p class="text-sm font-semibold text-gray-700">
+<p class="text-sm font-semibold text-gray-800">
 {{ Auth::user()->name }}
 </p>
 
@@ -243,18 +243,22 @@ class="flex items-center gap-3 bg-white border px-3 py-1.5 rounded-xl shadow-sm 
 
 
 <div id="profileMenu"
-class="hidden absolute right-0 mt-3 w-48 bg-white border shadow-lg rounded-xl p-2">
+class="hidden absolute right-0 mt-3 w-52 bg-white border shadow-lg rounded-xl p-2">
 
 <a href="/profile"
 class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+
 <i class="fa-solid fa-user"></i>
 Profile
+
 </a>
 
 <a href="/logout"
 class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 text-red-500">
+
 <i class="fa-solid fa-right-from-bracket"></i>
 Logout
+
 </a>
 
 </div>
@@ -283,7 +287,7 @@ Logout
 
 <div>
 
-<p class="text-gray-500 text-sm">Total Rooms</p>
+<p class="text-gray-500 text-sm">Rooms</p>
 <h2 class="text-3xl font-bold">{{$rooms->count()}}</h2>
 
 </div>
@@ -304,7 +308,7 @@ Logout
 
 <div>
 
-<p class="text-gray-500 text-sm">Total AC Units</p>
+<p class="text-gray-500 text-sm">AC Units</p>
 <h2 class="text-3xl font-bold">{{$totalAc}}</h2>
 
 </div>
@@ -346,7 +350,7 @@ Logout
 
 <div>
 
-<p class="text-gray-500 text-sm">Total Users</p>
+<p class="text-gray-500 text-sm">Users</p>
 <h2 class="text-3xl font-bold">{{$users}}</h2>
 
 </div>
@@ -472,72 +476,6 @@ function toggleProfile(){
 document.getElementById("profileMenu").classList.toggle("hidden")
 
 }
-
-/* ===============================
-   SYSTEM STATUS DASHBOARD
-================================ */
-
-function updateStatusOnline(){
-
-let status=document.getElementById("systemStatus")
-
-status.innerHTML="● System Online"
-status.className="text-green-500 text-sm font-semibold"
-
-}
-
-function updateStatusOffline(){
-
-let status=document.getElementById("systemStatus")
-
-status.innerHTML="● System Offline"
-status.className="text-red-500 text-sm font-semibold"
-
-}
-
-/* cek koneksi browser */
-
-window.addEventListener("online",updateStatusOnline)
-window.addEventListener("offline",updateStatusOffline)
-
-/* cek koneksi server */
-
-function checkServer(){
-
-if(!navigator.onLine){
-
-updateStatusOffline()
-return
-
-}
-
-fetch('/system-check',{cache:"no-store"})
-.then(res=>{
-
-if(res.ok){
-
-updateStatusOnline()
-
-}else{
-
-updateStatusOffline()
-
-}
-
-})
-.catch(()=>{
-
-updateStatusOffline()
-
-})
-
-}
-
-/* cek setiap 5 detik */
-
-setInterval(checkServer,5000)
-
-checkServer()
 
 </script>
 
