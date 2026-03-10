@@ -214,24 +214,47 @@ Centralized AC Management
 </span>
 
 
+<!-- PROFILE -->
+
 <div class="relative">
 
 <button onclick="toggleProfile()"
-class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
+class="flex items-center gap-3 bg-white border px-3 py-1.5 rounded-xl shadow-sm hover:bg-gray-50 transition">
 
-A
+<div class="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
+{{ strtoupper(substr(Auth::user()->name,0,1)) }}
+</div>
+
+<div class="text-left hidden md:block">
+
+<p class="text-sm font-semibold text-gray-700">
+{{ Auth::user()->name }}
+</p>
+
+<p class="text-xs text-gray-400">
+{{ Auth::user()->role ?? 'Administrator' }}
+</p>
+
+</div>
+
+<i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
 
 </button>
 
+
 <div id="profileMenu"
-class="hidden absolute right-0 mt-3 w-40 bg-white shadow rounded-xl p-2">
+class="hidden absolute right-0 mt-3 w-48 bg-white border shadow-lg rounded-xl p-2">
+
+<a href="/profile"
+class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+<i class="fa-solid fa-user"></i>
+Profile
+</a>
 
 <a href="/logout"
-class="flex items-center gap-2 text-red-500 hover:bg-red-50 p-2 rounded">
-
+class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 text-red-500">
 <i class="fa-solid fa-right-from-bracket"></i>
 Logout
-
 </a>
 
 </div>

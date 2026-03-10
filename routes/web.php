@@ -238,3 +238,5 @@ Route::post('/users',[UserController::class,'store']);
 Route::delete('/users/{id}',[UserController::class,'destroy']);
 
 Route::post('/ac/{id}/schedule',[AcControlController::class,'setSchedule']);
+
+Route::get('/profile',[App\Http\Controllers\UserController::class,'profile']);
