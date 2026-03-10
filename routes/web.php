@@ -217,3 +217,14 @@ Route::get('/ac/{id}/on',[AcControlController::class,'powerOn']);
 Route::get('/ac/{id}/off',[AcControlController::class,'powerOff']);
 Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
 Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
+
+
+Route::get('/rooms', [RoomController::class,'index']);
+Route::post('/rooms', [RoomController::class,'store']);
+Route::get('/rooms/{id}/ac', [AcUnitController::class,'index']);
+Route::post('/rooms/{id}/ac', [AcUnitController::class,'store']);
+
+Route::delete('/rooms/{id}', [RoomController::class,'destroy']);
+Route::delete('/ac/{id}', [AcUnitController::class,'destroy']);
+
+Route::get('/rooms/{id}/status', [RoomController::class,'status']);

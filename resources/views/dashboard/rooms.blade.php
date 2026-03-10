@@ -1,45 +1,139 @@
-<h1>Room Management</h1>
+<!DOCTYPE html>
+<html>
+<head>
 
-<a href="/dashboard">Back Dashboard</a>
+<title>Room Management</title>
 
-<br><br>
+<script src="https://cdn.tailwindcss.com"></script>
 
-<h3>Add Room</h3>
+</head>
 
-<form method="POST" action="/rooms/add">
+<body class="bg-gray-100">
 
-@csrf
+<div class="flex">
 
-<input type="text" name="name" placeholder="Room Name">
+<!-- SIDEBAR -->
 
-<button type="submit">Add Room</button>
+<div class="w-64 bg-white h-screen shadow-lg p-6">
 
-</form>
+<h2 class="text-xl font-bold mb-8 text-blue-600">
+Centralized AC
+</h2>
 
-<br><br>
+<ul class="space-y-4">
 
-<table border="1">
+<li class="text-gray-600 hover:text-blue-600">
+<a href="/dashboard">Dashboard</a>
+</li>
 
-<tr>
-<th>ID</th>
-<th>Room Name</th>
-<th>Action</th>
-</tr>
+<li class="font-semibold text-blue-600">
+Manage Rooms
+</li>
+
+<li>
+<a href="/logout" class="text-red-500">Logout</a>
+</li>
+
+</ul>
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+
+<div class="flex-1 p-10">
+
+<div class="flex justify-between items-center mb-8">
+
+<h1 class="text-2xl font-bold">
+Room Management
+</h1>
+
+<button onclick="openModal()"
+class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+
++ Add Room
+
+</button>
+
+</div>
+
+
+<!-- ROOM GRID -->
+
+<div class="grid grid-cols-3 gap-6">
 
 @foreach($rooms as $room)
 
-<tr>
+<a href="/rooms/{{$room->id}}/ac">
 
-<td>{{ $room->id }}</td>
+<div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition">
 
-<td>{{ $room->name }}</td>
+<h2 class="text-lg font-bold mb-2">
+{{$room->name}}
+</h2>
 
-<td>
-<a href="/rooms/{{ $room->id }}/ac">Manage AC</a>
-</td>
+<p class="text-gray-500 mb-4">
+{{$room->acUnits->count()}} AC Units
+</p>
 
-</tr>
+<div class="bg-green-100 text-green-600 p-2 rounded">
+
+View Details
+
+</div>
+
+</div>
+
+</a>
 
 @endforeach
 
-</table>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MODAL ADD ROOM -->
+
+<div id="modal"
+class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+
+<div class="bg-white p-6 rounded-xl w-96">
+
+<h2 class="text-xl font-bold mb-4">
+Add Room
+</h2>
+
+<form method="POST" action="/rooms">
+
+@csrf
+
+<input type="text"
+name="name"
+placeholder="Room Name"
+class="border p-2 w-full mb-4 rounded">
+
+<button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+Add Room
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script>
+
+function openModal(){
+document.getElementById('modal').classList.remove('hidden')
+}
+
+</script>
+
+</body>
+</html>

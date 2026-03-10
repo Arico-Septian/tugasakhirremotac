@@ -122,7 +122,7 @@ A
 
 <!-- STATISTICS -->
 
-<div class="grid grid-cols-4 gap-6 mb-12">
+<div class="grid grid-cols-5 gap-6 mb-12">
 
 <!-- ROOMS -->
 
@@ -143,6 +143,30 @@ A
 </div>
 
 <i class="fa-solid fa-server text-3xl text-blue-500"></i>
+
+</div>
+
+</div>
+
+<!-- TOTAL AC UNITS -->
+
+<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+
+<div class="flex justify-between items-center">
+
+<div>
+
+<p class="text-gray-500">Total AC Units</p>
+
+<h2 class="text-4xl font-bold text-indigo-600">
+
+{{$totalAc}}
+
+</h2>
+
+</div>
+
+<i class="fa-solid fa-snowflake text-3xl text-indigo-500"></i>
 
 </div>
 
@@ -278,7 +302,7 @@ Total : {{$room->acUnits->count()}} units
 
 </div>
 
-<a href="/rooms/{{$room->id}}/ac">
+<a href="/rooms/{{$room->id}}/status">
 
 <button class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-xl hover:opacity-90">
 

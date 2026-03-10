@@ -8,31 +8,28 @@ use App\Models\Room;
 
 class AcUnitController extends Controller
 {
-
 public function index($room_id)
-{
-
-$room = Room::findOrFail($room_id);
-
-$acs = AcUnit::where('room_id',$room_id)->get();
-
-return view('ac.index',compact('room','acs'));
-
-}
-
+    {
+        $room = Room::findOrFail($room_id);
+        $acs = AcUnit::where('room_id',$room_id)->get();
+    return view('ac.index',compact('room','acs'));
+    }
 
 public function store(Request $request,$room_id)
-{
-
-AcUnit::create([
-'room_id'=>$room_id,
-'ac_number'=>$request->ac_number,
-'name'=>$request->name,
-'brand'=>$request->brand
-]);
-
-return back();
-
-}
-
+    {
+        AcUnit::create([
+        'room_id'=>$room_id,
+        'ac_number'=>$request->ac_number,
+        'name'=>$request->name,
+        'brand'=>$request->brand
+    ]);
+    return back();
+    }
+public function destroy($id)
+    {
+    $ac = AcUnit::findOrFail($id);
+    $room_id = $ac->room_id;
+    $ac->delete();
+    return redirect('/rooms/'.$room_id.'/ac');
+    }
 }
