@@ -187,6 +187,9 @@ Route::get('/ac-temp/{room}/{id}/{temp}', function ($room,$id,$temp){
     return "Temperatur diubah";
 });
 
+Route::get('/system-check', function () {
+    return response()->json(['status' => 'online']);
+});
 
 // setting melalui dashboard
 use App\Http\Controllers\DashboardController;
@@ -216,6 +219,7 @@ Route::get('/ac/{id}/on',[AcControlController::class,'powerOn']);
 Route::get('/ac/{id}/off',[AcControlController::class,'powerOff']);
 Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
 Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
+Route::post('/ac/{id}/toggle',[AcControlController::class,'togglePower']);
 
 
 Route::get('/rooms', [RoomController::class,'index']);

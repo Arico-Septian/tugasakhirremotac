@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Manage Rooms</title>
 
@@ -9,47 +12,110 @@
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+<style>
+
+/* ===== SIDEBAR ===== */
+
+.sidebar{
+transition:all .3s ease;
+}
+
+.sidebar.close{
+width:80px;
+}
+
+.sidebar.close .menu-text{
+display:none;
+}
+
+.sidebar.close ul li a{
+justify-content:center;
+}
+
+/* ===== CONTENT SHIFT ===== */
+
+.main-content{
+margin-left:260px;
+transition:all .3s ease;
+}
+
+.sidebar.close + .main-content{
+margin-left:100px;
+}
+
+/* ===== ROOM CARD ===== */
+
+.room-card{
+background:white;
+border-radius:20px;
+padding:24px;
+box-shadow:0 10px 25px rgba(0,0,0,0.05);
+transition:all .25s ease;
+}
+
+.room-card:hover{
+transform:translateY(-6px);
+box-shadow:0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* ===== MODAL ===== */
+
+.modal-bg{
+background:rgba(0,0,0,0.35);
+backdrop-filter:blur(4px);
+}
+
+</style>
+
 </head>
 
-<body class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen">
-
-<div class="flex">
+<body class="bg-gray-50">
 
 <!-- SIDEBAR -->
 
-<div class="w-64 bg-white shadow-xl h-screen p-6 border-r">
+<div id="sidebar"
+class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
 
-<h2 class="text-2xl font-bold mb-10 text-blue-600 flex items-center gap-2">
+<div class="flex justify-between items-center pb-5 mb-8 border-b">
+
+<h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+
 <i class="fa-solid fa-layer-group"></i>
-Centralized AC
+<span class="menu-text">AC System</span>
+
 </h2>
 
-<ul class="space-y-5">
+<button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+<i class="fa-solid fa-bars"></i>
+</button>
+
+</div>
+
+
+<ul class="space-y-3">
 
 <li>
+
 <a href="/dashboard"
-class="flex items-center gap-2 text-blue-600 bg-blue-100 p-3 rounded-xl font-semibold">
+class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 
 <i class="fa-solid fa-chart-pie"></i>
-Dashboard
+<span class="menu-text">Dashboard</span>
 
 </a>
-</li>
-
-<li class="flex items-center gap-2 font-semibold text-gray-700">
-
-<i class="fa-solid fa-server"></i>
-Manage Rooms
 
 </li>
 
 <li>
-<a href="/logout"
-class="flex items-center gap-2 text-red-500">
 
-<i class="fa-solid fa-right-from-bracket"></i>
-Logout
+<a href="/rooms"
+class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+
+<i class="fa-solid fa-server"></i>
+<span class="menu-text">Manage Rooms</span>
+
 </a>
+
 </li>
 
 </ul>
@@ -57,82 +123,91 @@ Logout
 </div>
 
 
-<!-- MAIN CONTENT -->
 
-<div class="flex-1 p-10">
+<!-- MAIN -->
 
-<div class="flex justify-between items-center mb-10">
+<div class="main-content min-h-screen flex flex-col">
 
-<h1 class="text-3xl font-bold text-gray-800">
+
+<!-- HEADER -->
+
+<header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+
+<h1 class="text-2xl font-bold text-gray-800">
 Room Management
 </h1>
 
 <button onclick="openModal()"
-class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition">
+class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
 
 + Add Room
 
 </button>
 
-</div>
+</header>
+
+
+
+<!-- CONTENT -->
+
+<div class="p-8">
 
 
 <!-- ROOM GRID -->
 
-<div class="grid grid-cols-3 gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
 @foreach($rooms as $room)
 
-<div class="bg-white/80 backdrop-blur-xl shadow-xl rounded-3xl p-6 hover:shadow-2xl hover:scale-[1.02] transition border">
+<div class="room-card">
 
-<div class="flex justify-between items-center mb-3">
+<div class="flex justify-between mb-3">
 
-<h2 class="text-xl font-bold">
+<h2 class="text-lg font-semibold">
 {{$room->name}}
 </h2>
 
-<i class="fa-solid fa-server text-blue-500 text-xl"></i>
+<i class="fa-solid fa-server text-gray-400"></i>
 
 </div>
 
-<p class="text-gray-500 mb-4">
+
+<p class="text-gray-500 text-sm mb-4">
 Total : {{$room->acUnits->count()}} units
 </p>
 
-<!-- ACTIVE -->
 
-<div class="bg-green-100 text-green-700 p-3 rounded-xl mb-2 flex justify-between">
+<div class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
 
 <span>Active Units</span>
 
-<span class="font-bold">
+<span class="font-semibold">
 {{$room->acUnits->where('status','ON')->count()}}
 </span>
 
 </div>
 
-<!-- INACTIVE -->
 
-<div class="bg-gray-100 text-gray-600 p-3 rounded-xl mb-4 flex justify-between">
+<div class="bg-gray-100 text-gray-600 p-3 rounded-lg mb-4 flex justify-between text-sm">
 
 <span>Inactive Units</span>
 
-<span class="font-bold">
+<span class="font-semibold">
 {{$room->acUnits->where('status','OFF')->count()}}
 </span>
 
 </div>
 
-<!-- BUTTONS -->
 
 <div class="flex gap-3">
 
 <a href="/rooms/{{$room->id}}/ac"
-class="flex-1 text-center bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-xl hover:opacity-90">
+class="flex-1 text-center bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
 
 View Details
 
 </a>
+
 
 <form action="/rooms/{{$room->id}}" method="POST" class="flex-1">
 
@@ -140,8 +215,8 @@ View Details
 @method('DELETE')
 
 <button
-onclick="return confirm('Are you sure delete this room?')"
-class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl">
+onclick="return confirm('Delete this room?')"
+class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
 
 Delete
 
@@ -162,12 +237,13 @@ Delete
 </div>
 
 
-<!-- MODAL ADD ROOM -->
+
+<!-- MODAL -->
 
 <div id="modal"
-class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+class="hidden fixed inset-0 modal-bg flex items-center justify-center">
 
-<div class="bg-white p-8 rounded-2xl w-96 shadow-xl">
+<div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
 
 <h2 class="text-xl font-bold mb-5">
 Add New Room
@@ -180,10 +256,10 @@ Add New Room
 <input type="text"
 name="name"
 placeholder="Room Name"
-class="border p-3 w-full mb-4 rounded-lg">
+class="border p-3 w-full mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
 <button
-class="bg-gradient-to-r from-blue-500 to-purple-500 text-white w-full py-2 rounded-lg">
+class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
 
 Create Room
 
@@ -196,10 +272,15 @@ Create Room
 </div>
 
 
+
 <script>
 
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("close")
+}
+
 function openModal(){
-document.getElementById('modal').classList.remove('hidden')
+document.getElementById("modal").classList.remove("hidden")
 }
 
 </script>
