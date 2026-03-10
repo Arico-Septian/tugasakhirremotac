@@ -196,7 +196,6 @@ Route::middleware(['auth'])->group(function(){
 
 });
 
-
 use App\Http\Controllers\AcUnitController;
 Route::get('/dashboard/ac-control',[AcUnitController::class,'index']);
 

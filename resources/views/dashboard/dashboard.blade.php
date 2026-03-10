@@ -14,13 +14,13 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 </head>
 
-<body class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen">
+<body class="bg-gradient-to-br from-sky-100 via-white to-purple-100 min-h-screen">
 
 <div class="flex">
 
 <!-- SIDEBAR -->
 
-<div class="w-64 bg-white/70 backdrop-blur-xl shadow-xl h-screen p-6 border-r">
+<div class="w-64 bg-white shadow-2xl h-screen p-6 border-r">
 
 <h2 class="text-2xl font-bold text-blue-600 mb-10 flex items-center gap-2">
 
@@ -30,15 +30,14 @@ Centralized AC
 
 </h2>
 
-<ul class="space-y-4">
+<ul class="space-y-5">
 
 <li>
 
 <a href="/dashboard"
-class="flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-3 rounded-lg font-semibold">
+class="flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-3 rounded-xl font-semibold">
 
 <i class="fa-solid fa-chart-pie"></i>
-
 Dashboard
 
 </a>
@@ -48,10 +47,9 @@ Dashboard
 <li>
 
 <a href="/rooms"
-class="flex items-center gap-2 hover:text-blue-600">
+class="flex items-center gap-2 hover:text-blue-600 transition">
 
 <i class="fa-solid fa-server"></i>
-
 Manage Rooms
 
 </a>
@@ -59,15 +57,6 @@ Manage Rooms
 </li>
 
 <li>
-
-<a href="/dashboard/ac-control"
-class="flex items-center gap-2 hover:text-blue-600">
-
-<i class="fa-solid fa-snowflake"></i>
-
-AC Units Control
-
-</a>
 
 </li>
 
@@ -77,7 +66,6 @@ AC Units Control
 class="flex items-center gap-2 text-red-500">
 
 <i class="fa-solid fa-right-from-bracket"></i>
-
 Logout
 
 </a>
@@ -97,23 +85,17 @@ Logout
 <div class="flex justify-between items-center mb-10">
 
 <h1 class="text-3xl font-bold text-gray-800">
-
-Centralized AC Management System
-
+Centralized AC Management
 </h1>
 
 <div class="flex items-center gap-4">
 
 <span class="text-green-500 font-semibold">
-
-● Online
-
+● System Online
 </span>
 
 <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center font-bold">
-
 A
-
 </div>
 
 </div>
@@ -126,121 +108,75 @@ A
 
 <!-- ROOMS -->
 
-<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+<div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-xl p-6 hover:scale-105 transition">
 
-<div class="flex justify-between items-center">
+<p class="opacity-80">Total Rooms</p>
 
-<div>
-
-<p class="text-gray-500">Total Rooms</p>
-
-<h2 class="text-4xl font-bold text-blue-600">
-
+<h2 class="text-4xl font-bold mt-2">
 {{$rooms->count()}}
-
 </h2>
 
-</div>
-
-<i class="fa-solid fa-server text-3xl text-blue-500"></i>
+<i class="fa-solid fa-server text-3xl mt-4 opacity-80"></i>
 
 </div>
 
-</div>
 
-<!-- TOTAL AC UNITS -->
+<!-- TOTAL AC -->
 
-<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl shadow-xl p-6 hover:scale-105 transition">
 
-<div class="flex justify-between items-center">
+<p class="opacity-80">Total AC Units</p>
 
-<div>
-
-<p class="text-gray-500">Total AC Units</p>
-
-<h2 class="text-4xl font-bold text-indigo-600">
-
+<h2 class="text-4xl font-bold mt-2">
 {{$totalAc}}
-
 </h2>
 
-</div>
-
-<i class="fa-solid fa-snowflake text-3xl text-indigo-500"></i>
+<i class="fa-solid fa-snowflake text-3xl mt-4 opacity-80"></i>
 
 </div>
 
-</div>
 
-<!-- AC -->
+<!-- ACTIVE AC -->
 
-<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+<div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-xl p-6 hover:scale-105 transition">
 
-<div class="flex justify-between items-center">
+<p class="opacity-80">Active AC Units</p>
 
-<div>
-
-<p class="text-gray-500">Active AC Units</p>
-
-<h2 class="text-4xl font-bold text-green-600">
-
+<h2 class="text-4xl font-bold mt-2">
 {{$activeAc}}
-
 </h2>
 
-</div>
-
-<i class="fa-solid fa-wind text-3xl text-green-500"></i>
+<i class="fa-solid fa-wind text-3xl mt-4 opacity-80"></i>
 
 </div>
 
-</div>
 
 <!-- USERS -->
 
-<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+<div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl shadow-xl p-6 hover:scale-105 transition">
 
-<div class="flex justify-between items-center">
+<p class="opacity-80">Total Users</p>
 
-<div>
-
-<p class="text-gray-500">Total Users</p>
-
-<h2 class="text-4xl font-bold text-purple-600">
-
+<h2 class="text-4xl font-bold mt-2">
 {{$users}}
-
 </h2>
 
-</div>
-
-<i class="fa-solid fa-users text-3xl text-purple-500"></i>
+<i class="fa-solid fa-users text-3xl mt-4 opacity-80"></i>
 
 </div>
 
-</div>
 
 <!-- ONLINE -->
 
-<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-6 hover:scale-105 transition">
+<div class="bg-gradient-to-r from-orange-400 to-red-500 text-white rounded-2xl shadow-xl p-6 hover:scale-105 transition">
 
-<div class="flex justify-between items-center">
+<p class="opacity-80">Users Online</p>
 
-<div>
-
-<p class="text-gray-500">Users Online</p>
-
-<h2 class="text-4xl font-bold text-orange-500">
-
+<h2 class="text-4xl font-bold mt-2">
 1
-
 </h2>
 
-</div>
-
-<i class="fa-solid fa-user-check text-3xl text-orange-500"></i>
-
-</div>
+<i class="fa-solid fa-user-check text-3xl mt-4 opacity-80"></i>
 
 </div>
 
@@ -249,23 +185,19 @@ A
 <!-- SERVER ROOMS -->
 
 <h2 class="text-2xl font-bold mb-6 text-gray-800">
-
 Server Rooms
-
 </h2>
 
 <div class="grid grid-cols-3 gap-8">
 
 @foreach($rooms as $room)
 
-<div class="bg-white/80 backdrop-blur-xl shadow-xl rounded-3xl p-6 hover:shadow-2xl hover:scale-[1.02] transition">
+<div class="bg-white shadow-xl rounded-3xl p-6 hover:shadow-2xl hover:scale-[1.02] transition border">
 
 <div class="flex justify-between items-center mb-3">
 
 <h3 class="text-xl font-bold">
-
 {{$room->name}}
-
 </h3>
 
 <i class="fa-solid fa-server text-blue-500"></i>
@@ -273,9 +205,7 @@ Server Rooms
 </div>
 
 <p class="text-gray-500 mb-4">
-
 Total : {{$room->acUnits->count()}} units
-
 </p>
 
 <div class="bg-green-100 text-green-700 p-3 rounded-xl mb-2 flex justify-between">
@@ -283,9 +213,7 @@ Total : {{$room->acUnits->count()}} units
 <span>Active Units</span>
 
 <span class="font-bold">
-
 {{ $room->acUnits->where('status.power','ON')->count() }}
-
 </span>
 
 </div>
@@ -295,9 +223,7 @@ Total : {{$room->acUnits->count()}} units
 <span>Inactive Units</span>
 
 <span class="font-bold">
-
 {{ $room->acUnits->where('status.power','OFF')->count() }}
-
 </span>
 
 </div>

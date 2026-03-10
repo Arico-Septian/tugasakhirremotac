@@ -6,32 +6,59 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen">
 
 <div class="flex">
 
 <!-- SIDEBAR -->
 
-<div class="w-64 bg-white h-screen shadow-lg p-6">
+<div class="w-64 bg-white shadow-xl h-screen p-6 border-r">
 
-<h2 class="text-xl font-bold mb-8 text-blue-600">
+<h2 class="text-2xl font-bold text-blue-600 mb-10 flex items-center gap-2">
+
+<i class="fa-solid fa-layer-group"></i>
+
 Centralized AC
+
 </h2>
 
-<ul class="space-y-4">
+<ul class="space-y-5">
 
-<li class="text-gray-600 hover:text-blue-600">
-<a href="/dashboard">Dashboard</a>
+<li>
+<a href="/dashboard"
+class="flex items-center gap-2 hover:text-blue-600">
+
+<i class="fa-solid fa-chart-pie"></i>
+
+Dashboard
+</a>
 </li>
 
-<li class="font-semibold text-blue-600">
+<li class="flex items-center gap-2 text-blue-600 font-semibold">
+
+<i class="fa-solid fa-server"></i>
+
 Manage Rooms
+
 </li>
 
 <li>
-<a href="/logout" class="text-red-500">Logout</a>
+</li>
+
+<li>
+<a href="/logout"
+class="flex items-center gap-2 text-red-500">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</a>
 </li>
 
 </ul>
@@ -43,14 +70,16 @@ Manage Rooms
 
 <div class="flex-1 p-10">
 
-<div class="flex justify-between items-center mb-8">
+<!-- HEADER -->
 
-<h1 class="text-2xl font-bold">
+<div class="flex justify-between items-center mb-10">
+
+<h1 class="text-3xl font-bold text-gray-800">
 Room Management
 </h1>
 
 <button onclick="openModal()"
-class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition">
 
 + Add Room
 
@@ -61,23 +90,33 @@ class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
 
 <!-- ROOM GRID -->
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-3 gap-8">
 
 @foreach($rooms as $room)
 
 <a href="/rooms/{{$room->id}}/ac">
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition">
+<div class="bg-white/80 backdrop-blur-xl shadow-xl rounded-3xl p-6 hover:shadow-2xl hover:scale-[1.02] transition border">
 
-<h2 class="text-lg font-bold mb-2">
+<div class="flex justify-between items-center mb-3">
+
+<h2 class="text-xl font-bold">
+
 {{$room->name}}
+
 </h2>
 
+<i class="fa-solid fa-server text-blue-500 text-xl"></i>
+
+</div>
+
 <p class="text-gray-500 mb-4">
+
 {{$room->acUnits->count()}} AC Units
+
 </p>
 
-<div class="bg-green-100 text-green-600 p-2 rounded">
+<div class="bg-blue-100 text-blue-600 p-3 rounded-xl text-center font-semibold">
 
 View Details
 
@@ -101,10 +140,10 @@ View Details
 <div id="modal"
 class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
 
-<div class="bg-white p-6 rounded-xl w-96">
+<div class="bg-white p-8 rounded-2xl w-96 shadow-xl">
 
-<h2 class="text-xl font-bold mb-4">
-Add Room
+<h2 class="text-xl font-bold mb-5">
+Add New Room
 </h2>
 
 <form method="POST" action="/rooms">
@@ -114,10 +153,13 @@ Add Room
 <input type="text"
 name="name"
 placeholder="Room Name"
-class="border p-2 w-full mb-4 rounded">
+class="border p-3 w-full mb-4 rounded-lg">
 
-<button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
-Add Room
+<button
+class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-lg w-full">
+
+Create Room
+
 </button>
 
 </form>

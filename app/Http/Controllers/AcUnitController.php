@@ -8,13 +8,16 @@ use App\Models\Room;
 
 class AcUnitController extends Controller
 {
-public function index($room_id)
-    {
-        $room = Room::findOrFail($room_id);
-        $acs = AcUnit::where('room_id',$room_id)->get();
-    return view('ac.index',compact('room','acs'));
-    }
+public function index($id)
+{
+    $room = Room::findOrFail($id);
 
+    $acs = AcUnit::with('status')
+            ->where('room_id',$id)
+            ->get();
+
+    return view('ac.index', compact('room','acs'));
+}
 public function store(Request $request,$room_id)
     {
         AcUnit::create([
