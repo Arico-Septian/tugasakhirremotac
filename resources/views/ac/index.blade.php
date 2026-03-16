@@ -211,7 +211,7 @@
                 </a>
 
                 <h1 class="text-2xl font-bold text-gray-800">
-                    {{ strtoupper($room->name) }} room / AC Units
+                    {{ strtoupper($room->name) }} AC Units
                 </h1>
 
             </div>

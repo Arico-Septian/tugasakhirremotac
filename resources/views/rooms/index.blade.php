@@ -138,13 +138,6 @@
         <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
             <div class="flex items-center gap-4">
 
-
-                <a href="/rooms" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
-
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                </a>
-
                 <h1 class="text-2xl font-bold text-gray-800">
                     Room Management
                 </h1>

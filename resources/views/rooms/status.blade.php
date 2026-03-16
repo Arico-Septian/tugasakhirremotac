@@ -88,7 +88,8 @@
 
             <li>
 
-                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                <a href="/dashboard"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
 
                     <i class="fa-solid fa-chart-pie"></i>
                     <span class="menu-text">Dashboard</span>
@@ -103,18 +104,6 @@
 
                     <i class="fa-solid fa-server"></i>
                     <span class="menu-text">Manage Rooms</span>
-
-                </a>
-
-            </li>
-
-            <li>
-
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
-
-                    <i class="fa-solid fa-snowflake"></i>
-                    <span class="menu-text">Status AC Units </span>
 
                 </a>
 
@@ -135,22 +124,19 @@
 
         <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
 
-            <h1 class="text-2xl font-bold text-gray-800">
-                AC Status - {{ $room->name }}
-            </h1>
+            <div class="flex items-center gap-4">
 
-            <div class="flex items-center gap-6">
+                <!-- BACK BUTTON -->
 
-                <span class="text-green-500 text-sm font-semibold">
-                    ● System Online
-                </span>
+                <a href="/dashboard" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
 
-                <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-arrow-left"></i>
 
-                    A
+                </a>
 
-                </div>
+                <h1 class="text-2xl font-bold text-gray-800">
+                    {{ strtoupper($room->name) }} AC Units
+                </h1>
 
             </div>
 
