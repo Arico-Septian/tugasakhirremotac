@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AcStatus extends Model
 {
-protected $fillable = [
+    protected $fillable = [
         'ac_unit_id',
         'power',
         'set_temperature',

@@ -1,63 +1,64 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\AcStatus;
 use App\Models\AcUnit;
 use Illuminate\Http\Request;
 
 class AcControlController extends Controller
 {
-public function powerOn($id)
+    public function powerOn($id)
     {
-    $status = AcStatus::firstOrCreate(
-    ['ac_unit_id'=>$id]
-    );
-    $status->power = 'ON';
-    $status->save();
-    return back();
+        $status = AcStatus::firstOrCreate(
+            ['ac_unit_id' => $id]
+        );
+        $status->power = 'ON';
+        $status->save();
+        return back();
     }
-public function powerOff($id)
+    public function powerOff($id)
     {
-    $status = AcStatus::firstOrCreate(
-    ['ac_unit_id'=>$id]
-    );
-    $status->power = 'OFF';
-    $status->save();
-    return back();
+        $status = AcStatus::firstOrCreate(
+            ['ac_unit_id' => $id]
+        );
+        $status->power = 'OFF';
+        $status->save();
+        return back();
     }
-public function setTemp($id,$value)
+    public function setTemp($id, $value)
     {
-    $status = AcStatus::firstOrCreate(
-    ['ac_unit_id'=>$id]
-    );
-    $status->set_temperature = $value;
-    $status->save();
-    return back();
+        $status = AcStatus::firstOrCreate(
+            ['ac_unit_id' => $id]
+        );
+        $status->set_temperature = $value;
+        $status->save();
+        return back();
     }
-public function setMode($id,$mode)
+    public function setMode($id, $mode)
     {
-    $status = AcStatus::firstOrCreate(
-    ['ac_unit_id'=>$id]
-    );
-    $status->mode = strtoupper($mode);
-    $status->save();
-    return back();
+        $status = AcStatus::firstOrCreate(
+            ['ac_unit_id' => $id]
+        );
+        $status->mode = strtoupper($mode);
+        $status->save();
+        return back();
     }
-public function togglePower($id)
+    public function togglePower($id)
     {
 
         $ac = AcUnit::findOrFail($id);
 
         $status = $ac->status;
 
-        if(!$status){
+        if (!$status) {
             $status = new AcStatus();
             $status->ac_unit_id = $ac->id;
         }
 
-        if($status->power == 'ON'){
+        if ($status->power == 'ON') {
             $status->power = 'OFF';
-        }else{
+        } else {
             $status->power = 'ON';
         }
 
@@ -66,12 +67,12 @@ public function togglePower($id)
         return back();
     }
 
-public function setSchedule(Request $request,$id)
+    public function setSchedule(Request $request, $id)
     {
 
         $status = AcStatus::firstOrCreate(
-        ['ac_unit_id'=>$id]
-    );
+            ['ac_unit_id' => $id]
+        );
 
         $status->timer_on = $request->timer_on;
         $status->timer_off = $request->timer_off;
@@ -79,6 +80,5 @@ public function setSchedule(Request $request,$id)
         $status->save();
 
         return back();
-
     }
 }

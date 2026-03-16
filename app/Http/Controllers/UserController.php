@@ -7,20 +7,20 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
- public function index()
+    public function index()
     {
         $users = User::all();
         return view('users.index', compact('users'));
     }
 
-public function destroy($id)
+    public function destroy($id)
     {
-    $user = User::findOrFail($id);
-    $user->delete();
-    return redirect('/users');
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect('/users');
     }
 
-public function profile()
+    public function profile()
     {
         $user = Auth::user();
         return view('profile.index', compact('user'));

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AcUnit extends Model
 {
 
-protected $fillable = [
+    protected $fillable = [
         'room_id',
         'ac_number',
         'name',
@@ -17,13 +17,13 @@ protected $fillable = [
         'is_active'
     ];
 
-public function room()
+    public function room()
     {
-    return $this->belongsTo(Room::class);
+        return $this->belongsTo(Room::class);
     }
 
-public function status()
+    public function status()
     {
-    return $this->hasOne(AcStatus::class);
+        return $this->hasOne(AcStatus::class);
     }
 }
