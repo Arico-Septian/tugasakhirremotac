@@ -1,64 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AC Status</title>
+    <title>AC Status</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
+    <style>
+        /* ===== SIDEBAR ===== */
 
-/* ===== SIDEBAR ===== */
+        .sidebar {
+            transition: all .3s ease;
+        }
 
-.sidebar{
-transition:all .3s ease;
-}
+        .sidebar.close {
+            width: 80px;
+        }
 
-.sidebar.close{
-width:80px;
-}
+        .sidebar.close .menu-text {
+            display: none;
+        }
 
-.sidebar.close .menu-text{
-display:none;
-}
+        .sidebar.close ul li a {
+            justify-content: center;
+        }
 
-.sidebar.close ul li a{
-justify-content:center;
-}
+        /* ===== CONTENT SHIFT ===== */
 
-/* ===== CONTENT SHIFT ===== */
+        .main-content {
+            margin-left: 260px;
+            transition: all .3s ease;
+        }
 
-.main-content{
-margin-left:260px;
-transition:all .3s ease;
-}
+        .sidebar.close+.main-content {
+            margin-left: 100px;
+        }
 
-.sidebar.close + .main-content{
-margin-left:100px;
-}
+        /* ===== CARD STYLE ===== */
 
-/* ===== CARD STYLE ===== */
+        .ac-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            transition: all .25s ease;
+        }
 
-.ac-card{
-background:white;
-border-radius:20px;
-padding:24px;
-box-shadow:0 10px 25px rgba(0,0,0,0.05);
-transition:all .25s ease;
-}
-
-.ac-card:hover{
-transform:translateY(-6px);
-box-shadow:0 20px 40px rgba(0,0,0,0.08);
-}
-
-</style>
+        .ac-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+    </style>
 
 </head>
 
@@ -66,228 +64,219 @@ box-shadow:0 20px 40px rgba(0,0,0,0.08);
 <body class="bg-gray-50">
 
 
-<!-- SIDEBAR -->
+    <!-- SIDEBAR -->
 
-<div id="sidebar"
-class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
 
-<div class="flex justify-between items-center pb-5 mb-8 border-b">
+        <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
-<h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+            <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
 
-<i class="fa-solid fa-layer-group"></i>
-<span class="menu-text">AC System</span>
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="menu-text">AC System</span>
 
-</h2>
+            </h2>
 
-<button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
-<i class="fa-solid fa-bars"></i>
-</button>
+            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-</div>
+        </div>
 
 
-<ul class="space-y-3">
+        <ul class="space-y-3">
 
-<li>
+            <li>
 
-<a href="/dashboard"
-class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 
-<i class="fa-solid fa-chart-pie"></i>
-<span class="menu-text">Dashboard</span>
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span class="menu-text">Dashboard</span>
 
-</a>
+                </a>
 
-</li>
+            </li>
 
-<li>
+            <li>
 
-<a href="/rooms"
-class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
 
-<i class="fa-solid fa-server"></i>
-<span class="menu-text">Manage Rooms</span>
+                    <i class="fa-solid fa-server"></i>
+                    <span class="menu-text">Manage Rooms</span>
 
-</a>
+                </a>
 
-</li>
+            </li>
 
-<li>
+            <li>
 
-<a href="#"
-class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
 
-<i class="fa-solid fa-snowflake"></i>
-<span class="menu-text">Status AC Units </span>
+                    <i class="fa-solid fa-snowflake"></i>
+                    <span class="menu-text">Status AC Units </span>
 
-</a>
+                </a>
 
-</li>
+            </li>
 
-</ul>
+        </ul>
 
-</div>
+    </div>
 
 
 
-<!-- MAIN -->
+    <!-- MAIN -->
 
-<div class="main-content min-h-screen flex flex-col">
+    <div class="main-content min-h-screen flex flex-col">
 
 
-<!-- HEADER -->
+        <!-- HEADER -->
 
-<header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
 
-<h1 class="text-2xl font-bold text-gray-800">
-AC Status - {{$room->name}}
-</h1>
+            <h1 class="text-2xl font-bold text-gray-800">
+                AC Status - {{ $room->name }}
+            </h1>
 
-<div class="flex items-center gap-6">
+            <div class="flex items-center gap-6">
 
-<span class="text-green-500 text-sm font-semibold">
-● System Online
-</span>
+                <span class="text-green-500 text-sm font-semibold">
+                    ● System Online
+                </span>
 
-<div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
+                <div
+                    class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold">
 
-A
+                    A
 
-</div>
+                </div>
 
-</div>
+            </div>
 
-</header>
+        </header>
 
 
 
-<!-- CONTENT -->
+        <!-- CONTENT -->
 
-<div class="p-8">
+        <div class="p-8">
 
 
-<!-- AC GRID -->
+            <!-- AC GRID -->
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-@foreach($acs as $ac)
+                @foreach ($acs as $ac)
+                    <div class="ac-card">
 
-<div class="ac-card">
+                        <div class="flex justify-between items-center mb-4">
 
-<div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">
 
-<h2 class="text-lg font-semibold">
+                                AC {{ $ac->ac_number }}
 
-AC {{$ac->ac_number}}
+                            </h2>
 
-</h2>
+                            <i class="fa-solid fa-snowflake text-blue-500"></i>
 
-<i class="fa-solid fa-snowflake text-blue-500"></i>
+                        </div>
 
-</div>
 
+                        <p class="text-gray-500 text-sm mb-4">
 
-<p class="text-gray-500 text-sm mb-4">
+                            Brand : {{ $ac->brand }}
 
-Brand : {{$ac->brand}}
+                        </p>
 
-</p>
 
+                        @if ($ac->status)
+                            <!-- POWER -->
 
-@if($ac->status)
+                            <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
-<!-- POWER -->
+                                <span class="flex items-center gap-2">
 
-<div class="bg-green-50 text-green-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                    <i class="fa-solid fa-power-off"></i>
 
-<span class="flex items-center gap-2">
+                                    Power
 
-<i class="fa-solid fa-power-off"></i>
+                                </span>
 
-Power
+                                <span class="font-semibold">
 
-</span>
+                                    {{ $ac->status->power }}
 
-<span class="font-semibold">
+                                </span>
 
-{{$ac->status->power}}
+                            </div>
 
-</span>
 
-</div>
+                            <!-- TEMP -->
 
+                            <div class="bg-blue-50 text-blue-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
-<!-- TEMP -->
+                                <span class="flex items-center gap-2">
 
-<div class="bg-blue-50 text-blue-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                    <i class="fa-solid fa-temperature-half"></i>
 
-<span class="flex items-center gap-2">
+                                    Temperature
 
-<i class="fa-solid fa-temperature-half"></i>
+                                </span>
 
-Temperature
+                                <span class="font-semibold">
 
-</span>
+                                    {{ $ac->status->set_temperature }}°C
 
-<span class="font-semibold">
+                                </span>
 
-{{$ac->status->set_temperature}}°C
+                            </div>
 
-</span>
 
-</div>
+                            <!-- MODE -->
 
+                            <div class="bg-purple-50 text-purple-700 p-3 rounded-lg flex justify-between text-sm">
 
-<!-- MODE -->
+                                <span class="flex items-center gap-2">
 
-<div class="bg-purple-50 text-purple-700 p-3 rounded-lg flex justify-between text-sm">
+                                    <i class="fa-solid fa-fan"></i>
 
-<span class="flex items-center gap-2">
+                                    Mode
 
-<i class="fa-solid fa-fan"></i>
+                                </span>
 
-Mode
+                                <span class="font-semibold">
 
-</span>
+                                    {{ $ac->status->mode }}
 
-<span class="font-semibold">
+                                </span>
 
-{{$ac->status->mode}}
+                            </div>
+                        @else
+                            <div class="bg-gray-100 text-gray-500 p-3 rounded-lg text-center text-sm">
 
-</span>
+                                No Status Data
 
-</div>
+                            </div>
+                        @endif
 
-@else
+                    </div>
+                @endforeach
 
-<div class="bg-gray-100 text-gray-500 p-3 rounded-lg text-center text-sm">
+            </div>
 
-No Status Data
+        </div>
 
-</div>
+    </div>
 
-@endif
 
-</div>
 
-@endforeach
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<script>
-
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("close")
-}
-
-</script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("close")
+        }
+    </script>
 
 </body>
+
 </html>

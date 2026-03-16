@@ -1,313 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>User Management</title>
+    <title>User Management</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
+    <style>
+        /* SIDEBAR */
 
-/* SIDEBAR */
+        .sidebar {
+            transition: all .3s ease;
+        }
 
-.sidebar{
-transition:all .3s ease;
-}
+        .sidebar.close {
+            width: 80px;
+        }
 
-.sidebar.close{
-width:80px;
-}
+        .sidebar.close .menu-text {
+            display: none;
+        }
 
-.sidebar.close .menu-text{
-display:none;
-}
+        .sidebar.close h2 span {
+            display: none;
+        }
 
-.sidebar.close h2 span{
-display:none;
-}
+        .sidebar.close ul li a {
+            justify-content: center;
+        }
 
-.sidebar.close ul li a{
-justify-content:center;
-}
+        /* CONTENT SHIFT */
 
-/* CONTENT SHIFT */
+        .main-content {
+            margin-left: 260px;
+            transition: all .3s ease;
+        }
 
-.main-content{
-margin-left:260px;
-transition:all .3s ease;
-}
+        .sidebar.close+.main-content {
+            margin-left: 100px;
+        }
 
-.sidebar.close + .main-content{
-margin-left:100px;
-}
+        /* CARD */
 
-/* CARD */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+        }
 
-.card{
-background:white;
-border-radius:16px;
-padding:20px;
-box-shadow:0 6px 20px rgba(0,0,0,0.05);
-}
+        /* MOBILE */
 
-/* MOBILE */
+        @media(max-width:900px) {
 
-@media(max-width:900px){
+            .main-content {
+                margin-left: 0;
+            }
 
-.main-content{
-margin-left:0;
-}
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
 
-.sidebar{
-transform:translateX(-100%);
-position:fixed;
-}
+            .sidebar.open {
+                transform: translateX(0);
+            }
 
-.sidebar.open{
-transform:translateX(0);
-}
-
-}
-
-</style>
+        }
+    </style>
 
 </head>
 
 <body class="bg-gray-50">
 
-<!-- SIDEBAR -->
+    <!-- SIDEBAR -->
 
-<div id="sidebar"
-class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
 
-<div class="flex justify-between items-center pb-5 mb-8 border-b">
+        <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
-<h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
-<i class="fa-solid fa-layer-group"></i>
-<span class="menu-text">AC System</span>
-</h2>
+            <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="menu-text">AC System</span>
+            </h2>
 
-<button onclick="toggleSidebar()" class="text-gray-500">
-<i class="fa-solid fa-bars"></i>
-</button>
+            <button onclick="toggleSidebar()" class="text-gray-500">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-</div>
+        </div>
 
-<ul class="space-y-3">
+        <ul class="space-y-3">
 
-<li>
-<a href="/dashboard"
-class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-<i class="fa-solid fa-chart-pie"></i>
-<span class="menu-text">Dashboard</span>
-</a>
-</li>
+            <li>
+                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
 
-<li>
-<a href="/rooms"
-class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-<i class="fa-solid fa-server"></i>
-<span class="menu-text">Manage Rooms</span>
-</a>
-</li>
+            <li>
+                <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                    <i class="fa-solid fa-server"></i>
+                    <span class="menu-text">Manage Rooms</span>
+                </a>
+            </li>
 
-<li>
-<a href="/users"
-class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
-<i class="fa-solid fa-users"></i>
-<span class="menu-text">User Management</span>
-</a>
-</li>
+            <li>
+                <a href="/users"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="menu-text">User Management</span>
+                </a>
+            </li>
 
-</ul>
+        </ul>
 
-</div>
+    </div>
 
 
 
-<!-- MAIN -->
+    <!-- MAIN -->
 
-<div class="main-content min-h-screen flex flex-col">
+    <div class="main-content min-h-screen flex flex-col">
 
-<header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
 
-<h1 class="text-2xl font-bold text-gray-800">
-User Management
-</h1>
+            <h1 class="text-2xl font-bold text-gray-800">
+                User Management
+            </h1>
 
-<button onclick="openModal()"
-class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+            <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
 
-+ Add User
+                + Add User
 
-</button>
+            </button>
 
-</header>
+        </header>
 
 
 
-<div class="p-8">
+        <div class="p-8">
 
-<!-- STATS -->
+            <!-- STATS -->
 
-<div class="card mb-6 flex justify-between items-center">
+            <div class="card mb-6 flex justify-between items-center">
 
-<div>
-<p class="text-gray-500 text-sm">Total Users</p>
-<h2 class="text-3xl font-bold">{{$users->count()}}</h2>
-</div>
+                <div>
+                    <p class="text-gray-500 text-sm">Total Users</p>
+                    <h2 class="text-3xl font-bold">{{ $users->count() }}</h2>
+                </div>
 
-<i class="fa-solid fa-users text-3xl text-blue-500"></i>
+                <i class="fa-solid fa-users text-3xl text-blue-500"></i>
 
-</div>
+            </div>
 
 
-<!-- USER TABLE -->
+            <!-- USER TABLE -->
 
-<div class="card overflow-x-auto">
+            <div class="card overflow-x-auto">
 
-<table class="w-full">
+                <table class="w-full">
 
-<thead class="border-b">
+                    <thead class="border-b">
 
-<tr class="text-left text-gray-500 text-sm">
+                        <tr class="text-left text-gray-500 text-sm">
 
-<th class="p-3">Name</th>
-<th class="p-3">Email</th>
-<th class="p-3">Role</th>
-<th class="p-3">Action</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Email</th>
+                            <th class="p-3">Role</th>
+                            <th class="p-3">Action</th>
 
-</tr>
+                        </tr>
 
-</thead>
+                    </thead>
 
-<tbody>
+                    <tbody>
 
-@foreach($users as $user)
+                        @foreach ($users as $user)
+                            <tr class="border-b hover:bg-gray-50">
 
-<tr class="border-b hover:bg-gray-50">
+                                <td class="p-3">{{ $user->name }}</td>
+                                <td class="p-3">{{ $user->email }}</td>
+                                <td class="p-3">{{ $user->role }}</td>
 
-<td class="p-3">{{$user->name}}</td>
-<td class="p-3">{{$user->email}}</td>
-<td class="p-3">{{$user->role}}</td>
+                                <td class="p-3 flex gap-2">
 
-<td class="p-3 flex gap-2">
+                                    <form action="/users/{{ $user->id }}" method="POST">
 
-<form action="/users/{{$user->id}}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
 
-@csrf
-@method('DELETE')
+                                        <button onclick="return confirm('Delete this user?')"
+                                            class="bg-red-500 text-white px-3 py-1 rounded">
 
-<button
-onclick="return confirm('Delete this user?')"
-class="bg-red-500 text-white px-3 py-1 rounded">
+                                            Delete
 
-Delete
+                                        </button>
 
-</button>
+                                    </form>
 
-</form>
+                                </td>
 
-</td>
+                            </tr>
+                        @endforeach
 
-</tr>
+                    </tbody>
 
-@endforeach
+                </table>
 
-</tbody>
+            </div>
 
-</table>
+        </div>
 
-</div>
+    </div>
 
-</div>
+    </div>
 
-</div>
+    <!-- MODAL ADD USER -->
 
-</div>
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
 
-<!-- MODAL ADD USER -->
+        <div class="bg-white p-8 rounded-xl w-96">
 
-<div id="modal"
-class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+            <h2 class="text-xl font-bold mb-5">
+                Add New User
+            </h2>
 
-<div class="bg-white p-8 rounded-xl w-96">
+            <form method="POST" action="/users">
 
-<h2 class="text-xl font-bold mb-5">
-Add New User
-</h2>
+                @csrf
 
-<form method="POST" action="/users">
+                <input type="text" name="name" placeholder="Name" class="border p-3 w-full mb-3 rounded">
 
-@csrf
+                <input type="email" name="email" placeholder="Email" class="border p-3 w-full mb-3 rounded">
 
-<input
-type="text"
-name="name"
-placeholder="Name"
-class="border p-3 w-full mb-3 rounded">
+                <input type="password" name="password" placeholder="Password" class="border p-3 w-full mb-3 rounded">
 
-<input
-type="email"
-name="email"
-placeholder="Email"
-class="border p-3 w-full mb-3 rounded">
+                <select name="role" class="border p-3 w-full mb-4 rounded">
 
-<input
-type="password"
-name="password"
-placeholder="Password"
-class="border p-3 w-full mb-3 rounded">
+                    <option value="admin">Admin</option>
+                    <option value="operator">Operator</option>
 
-<select
-name="role"
-class="border p-3 w-full mb-4 rounded">
+                </select>
 
-<option value="admin">Admin</option>
-<option value="operator">Operator</option>
+                <button class="bg-blue-600 text-white w-full py-2 rounded">
 
-</select>
+                    Create User
 
-<button
-class="bg-blue-600 text-white w-full py-2 rounded">
+                </button>
 
-Create User
+            </form>
 
-</button>
+        </div>
 
-</form>
+    </div>
 
-</div>
+    </div>
 
-</div>
 
-</div>
+    <script>
+        function toggleSidebar() {
 
+            let sidebar = document.getElementById("sidebar")
 
-<script>
+            sidebar.classList.toggle("close")
+            sidebar.classList.toggle("open")
 
-function toggleSidebar(){
+        }
 
-let sidebar=document.getElementById("sidebar")
+        function openModal() {
 
-sidebar.classList.toggle("close")
-sidebar.classList.toggle("open")
+            document.getElementById("modal").classList.remove("hidden")
 
-}
-
-function openModal(){
-
-document.getElementById("modal").classList.remove("hidden")
-
-}
-
-</script>
+        }
+    </script>
 
 </body>
+
 </html>
