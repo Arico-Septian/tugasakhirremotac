@@ -25,23 +25,24 @@ class AcUnitController extends Controller
             'ac_number' => 'required'
         ]);
 
+        $room = Room::findOrFail($roomId);
+
         $ac = AcUnit::create([
             'name' => $request->name,
             'room_id' => $roomId,
             'brand' => $request->brand,
             'ac_number' => $request->ac_number,
             'status' => 'OFF'
-
         ]);
 
         $mqtt = new \App\Services\MqttService();
 
+        $topic = "room/{$room->name}/ac/add"; //
+
         $mqtt->publish(
-            "device/esp32_01/ac/add",
+            "room/{$room->name}/ac/add",
             json_encode([
-                "ac_id" => $ac->id,
-                "name" => $ac->name,
-                "room_id" => $ac->room_id,
+                "id" => (int)$ac->ac_number,
                 "brand" => $ac->brand
             ])
         );
@@ -52,6 +53,18 @@ class AcUnitController extends Controller
     public function destroy($id)
     {
         $ac = AcUnit::findOrFail($id);
+
+        $room = Room::findOrFail($ac->room_id);
+
+        $mqtt = new \App\Services\MqttService();
+
+        $mqtt->publish(
+            "room/{$room->name}/ac/remove",
+            json_encode([
+                "id" => (int)$ac->ac_number
+            ])
+        );
+
         $room_id = $ac->room_id;
 
         $ac->delete();

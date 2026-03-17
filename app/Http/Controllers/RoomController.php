@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\AcUnit;
+use App\Services\MqttService;
+
 
 class RoomController extends Controller
 {
@@ -15,19 +17,16 @@ class RoomController extends Controller
     }
     public function store(Request $request)
     {
-        // ✅ validasi dulu
         $request->validate([
             'name' => 'required',
             'device_id' => 'required|unique:rooms,device_id'
         ]);
 
-        // ✅ simpan ke database
         $room = Room::create([
             'name' => $request->name,
             'device_id' => $request->device_id
         ]);
 
-        // ✅ kirim ke ESP sesuai device_id
         $mqtt = new \App\Services\MqttService();
 
         $topic = "device/{$room->device_id}/config";
@@ -44,7 +43,16 @@ class RoomController extends Controller
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
+
+        $mqtt = new MqttService();
+
+        $mqtt->publish(
+            "device/{$room->device_id}/clear",
+            json_encode([])
+        );
+
         $room->delete();
+
         return redirect('/rooms');
     }
     public function status($id)

@@ -4,50 +4,103 @@ namespace App\Http\Controllers;
 
 use App\Models\AcStatus;
 use App\Models\AcUnit;
-use Illuminate\Http\Request;
+use App\Models\Room;
+use App\Services\MqttService;
 
 class AcControlController extends Controller
 {
     public function powerOn($id)
     {
-        $status = AcStatus::firstOrCreate(
-            ['ac_unit_id' => $id]
-        );
+        $ac = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
+
+        $status = AcStatus::firstOrCreate([
+            'ac_unit_id' => $id
+        ]);
+
         $status->power = 'ON';
         $status->save();
+
+        $mqtt = new MqttService();
+
+        $mqtt->publish(
+            "room/{$room->name}/ac/{$ac->id}/control",
+            json_encode(["power" => "ON"])
+        );
+
         return back();
     }
+
     public function powerOff($id)
     {
-        $status = AcStatus::firstOrCreate(
-            ['ac_unit_id' => $id]
-        );
+        $ac = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
+
+        $status = AcStatus::firstOrCreate([
+            'ac_unit_id' => $id
+        ]);
+
         $status->power = 'OFF';
         $status->save();
+
+        $mqtt = new MqttService();
+
+        $mqtt->publish(
+            "room/{$room->name}/ac/{$ac->id}/control",
+            json_encode(["power" => "OFF"])
+        );
+
         return back();
     }
+
     public function setTemp($id, $value)
     {
-        $status = AcStatus::firstOrCreate(
-            ['ac_unit_id' => $id]
-        );
+        $ac = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
+
+        $status = AcStatus::firstOrCreate([
+            'ac_unit_id' => $id
+        ]);
+
         $status->set_temperature = $value;
         $status->save();
+
+        $mqtt = new MqttService();
+
+        $mqtt->publish(
+            "room/{$room->name}/ac/{$ac->id}/control",
+            json_encode(["temp" => (int)$value])
+        );
+
         return back();
     }
+
     public function setMode($id, $mode)
     {
-        $status = AcStatus::firstOrCreate(
-            ['ac_unit_id' => $id]
-        );
+        $ac = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
+
+        $status = AcStatus::firstOrCreate([
+            'ac_unit_id' => $id
+        ]);
+
         $status->mode = strtoupper($mode);
         $status->save();
+
+        $mqtt = new MqttService();
+
+        $mqtt->publish(
+            "room/{$room->name}/ac/{$ac->id}/control",
+            json_encode(["mode" => strtoupper($mode)])
+        );
+
         return back();
     }
+
     public function togglePower($id)
     {
-
         $ac = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
 
         $status = $ac->status;
 
@@ -56,28 +109,15 @@ class AcControlController extends Controller
             $status->ac_unit_id = $ac->id;
         }
 
-        if ($status->power == 'ON') {
-            $status->power = 'OFF';
-        } else {
-            $status->power = 'ON';
-        }
-
+        $status->power = ($status->power == 'ON') ? 'OFF' : 'ON';
         $status->save();
 
-        return back();
-    }
+        $mqtt = new MqttService();
 
-    public function setSchedule(Request $request, $id)
-    {
-
-        $status = AcStatus::firstOrCreate(
-            ['ac_unit_id' => $id]
+        $mqtt->publish(
+            "room/{$room->name}/ac/{$ac->id}/control",
+            json_encode(["power" => $status->power])
         );
-
-        $status->timer_on = $request->timer_on;
-        $status->timer_off = $request->timer_off;
-
-        $status->save();
 
         return back();
     }

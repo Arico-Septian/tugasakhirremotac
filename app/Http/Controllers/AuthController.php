@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // LOGIN
     public function login(Request $request)
     {
         $request->validate([
@@ -23,7 +22,7 @@ class AuthController extends Controller
         }
         return back()->with('error', 'Username atau password salah');
     }
-    // REGISTER
+
     public function register(Request $request)
     {
         $request->validate([
@@ -40,7 +39,7 @@ class AuthController extends Controller
 
         return redirect('/dashboard');
     }
-    // LOGOUT
+
     public function logout(Request $request)
     {
         Auth::logout();
