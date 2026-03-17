@@ -15,12 +15,30 @@ class RoomController extends Controller
     }
     public function store(Request $request)
     {
+        // ✅ validasi dulu
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
+            'device_id' => 'required|unique:rooms,device_id'
         ]);
-        Room::create([
-            'name' => $request->name
+
+        // ✅ simpan ke database
+        $room = Room::create([
+            'name' => $request->name,
+            'device_id' => $request->device_id
         ]);
+
+        // ✅ kirim ke ESP sesuai device_id
+        $mqtt = new \App\Services\MqttService();
+
+        $topic = "device/{$room->device_id}/config";
+
+        $mqtt->publish(
+            $topic,
+            json_encode([
+                "room" => $room->name
+            ])
+        );
+
         return redirect('/rooms');
     }
     public function destroy($id)

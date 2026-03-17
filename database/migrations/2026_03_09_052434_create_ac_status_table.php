@@ -7,30 +7,28 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
 
-public function up()
-{
-Schema::create('ac_statuses', function (Blueprint $table) {
+    public function up()
+    {
+        Schema::create('ac_statuses', function (Blueprint $table) {
 
-$table->id();
+            $table->id();
 
-$table->foreignId('ac_unit_id')
-      ->constrained('ac_units')
-      ->onDelete('cascade');
+            $table->foreignId('ac_unit_id')
+                ->constrained('ac_units')
+                ->onDelete('cascade');
 
-$table->enum('power',['ON','OFF'])->default('OFF');
+            $table->enum('power', ['ON', 'OFF'])->default('OFF');
 
-$table->integer('set_temperature')->default(24);
+            $table->integer('set_temperature')->default(24);
 
-$table->enum('mode',['COOL','HEAT','FAN','AUTO'])->default('AUTO');
+            $table->enum('mode', ['COOL', 'HEAT', 'FAN', 'AUTO'])->default('AUTO');
 
-$table->timestamps();
+            $table->timestamps();
+        });
+    }
 
-});
-}
-
-public function down()
-{
-Schema::dropIfExists('ac_statuses');
-}
-
+    public function down()
+    {
+        Schema::dropIfExists('ac_statuses');
+    }
 };

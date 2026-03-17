@@ -11,7 +11,7 @@ class MqttService
 
     public function __construct()
     {
-        $server = '192.168.1.20';
+        $server = '192.168.1.12';
         $port = 1883;
         $clientId = 'laravel_client';
 

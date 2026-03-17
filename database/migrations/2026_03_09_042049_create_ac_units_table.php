@@ -22,7 +22,6 @@ return new class extends Migration
             $table->integer('ac_number');
 
             $table->timestamps();
-
         });
     }
 

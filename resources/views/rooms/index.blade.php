@@ -252,18 +252,19 @@
             </h2>
 
             <form method="POST" action="/rooms">
-
                 @csrf
 
-                <input type="text" name="name" placeholder="Room Name"
-                    class="border p-3 w-full mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- ROOM NAME -->
+                <input type="text" name="name" placeholder="Room Name" class="border p-3 w-full mb-3 rounded-lg"
+                    required>
+
+                <!-- 🔥 TAMBAHAN WAJIB -->
+                <input type="text" name="device_id" placeholder="ESP ID (contoh: esp32_01)"
+                    class="border p-3 w-full mb-4 rounded-lg" required>
 
                 <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
-
                     Create Room
-
                 </button>
-
             </form>
 
         </div>

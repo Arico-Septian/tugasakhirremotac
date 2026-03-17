@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'device_id'
+    ];
 
     public function acUnits()
     {
