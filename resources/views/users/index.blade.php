@@ -173,7 +173,6 @@
                         <tr class="text-left text-gray-500 text-sm">
 
                             <th class="p-3">Name</th>
-                            <th class="p-3">Email</th>
                             <th class="p-3">Role</th>
                             <th class="p-3">Action</th>
 
@@ -187,7 +186,6 @@
                             <tr class="border-b hover:bg-gray-50">
 
                                 <td class="p-3">{{ $user->name }}</td>
-                                <td class="p-3">{{ $user->email }}</td>
                                 <td class="p-3">{{ $user->role }}</td>
 
                                 <td class="p-3 flex gap-2">
@@ -239,14 +237,13 @@
 
                 <input type="text" name="name" placeholder="Name" class="border p-3 w-full mb-3 rounded">
 
-                <input type="email" name="email" placeholder="Email" class="border p-3 w-full mb-3 rounded">
-
                 <input type="password" name="password" placeholder="Password" class="border p-3 w-full mb-3 rounded">
 
                 <select name="role" class="border p-3 w-full mb-4 rounded">
 
                     <option value="admin">Admin</option>
                     <option value="operator">Operator</option>
+                    <option value="user">User</option>
 
                 </select>
 

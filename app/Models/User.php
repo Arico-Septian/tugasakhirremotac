@@ -8,8 +8,8 @@ class User extends Authenticatable
 {
     protected $fillable = [
         'name',
-        'email',
         'password',
+        'role'
     ];
 
     public function isAdmin()
@@ -20,5 +20,10 @@ class User extends Authenticatable
     public function isOperator()
     {
         return $this->role === 'operator';
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
     }
 }

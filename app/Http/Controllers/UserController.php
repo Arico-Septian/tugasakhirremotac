@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -13,11 +14,27 @@ class UserController extends Controller
         return view('users.index', compact('users'));
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:users',
+            'password' => 'required|min:6',
+            'role' => 'required|in:admin,operator,user'
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'password' => bcrypt($request->password),
+            'role' => $request->role
+        ]);
+
+        return back()->with('success', 'User berhasil ditambahkan');
+    }
+
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-        return redirect('/users');
+        User::findOrFail($id)->delete();
+        return back()->with('success', 'User berhasil dihapus');
     }
 
     public function profile()

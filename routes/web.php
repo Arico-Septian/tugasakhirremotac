@@ -27,10 +27,6 @@ Route::get('/register', function () {
 });
 
 
-// proses register
-Route::post('/register', [AuthController::class, 'register']);
-
-
 // logout
 Route::get('/logout', [AuthController::class, 'logout']);
 
@@ -272,3 +268,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
 });
+
+Route::resource('/users', UserController::class)
+    ->middleware('role:admin');
