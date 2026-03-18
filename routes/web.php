@@ -255,12 +255,20 @@ Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
 
 
 
-Route::middleware(['auth', 'role'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
+    // ✅ semua role (admin, operator, user)
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    Route::resource('/rooms', RoomController::class);
+    // ✅ hanya admin + operator
+    Route::middleware(['role:admin,operator'])->group(function () {
+        Route::resource('/rooms', RoomController::class);
+        Route::resource('/ac', AcUnitController::class);
+    });
 
-    Route::resource('/ac', AcUnitController::class);
+    // ✅ hanya admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('/users', UserController::class);
+    });
 
 });

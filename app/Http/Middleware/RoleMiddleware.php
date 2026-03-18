@@ -8,14 +8,16 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
+        // cek login
         if (!Auth::check()) {
             abort(403, 'Belum login');
         }
 
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
+        // cek role
+        if (!in_array(Auth::user()->role, $roles)) {
+            abort(403, 'Akses ditolak');
         }
 
         return $next($request);

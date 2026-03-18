@@ -63,55 +63,52 @@
 
 <body class="bg-gray-50">
 
-
     <!-- SIDEBAR -->
+    @auth
 
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
+        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
 
-        <div class="flex justify-between items-center pb-5 mb-8 border-b">
+            <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
-            <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+                <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
 
-                <i class="fa-solid fa-layer-group"></i>
-                <span class="menu-text">AC System</span>
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="menu-text">AC System</span>
 
-            </h2>
+                </h2>
 
-            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+
+            <ul class="space-y-3">
+
+                {{-- Dashboard (SEMUA ROLE) --}}
+                <li>
+                    <a href="/dashboard"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+
+                {{-- Rooms (Admin + Operator) --}}
+                @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                    <li>
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-server"></i>
+                            <span class="menu-text">Manage Rooms</span>
+                        </a>
+                    </li>
+                @endif
+
+            </ul>
 
         </div>
-
-
-        <ul class="space-y-3">
-
-            <li>
-
-                <a href="/dashboard"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
-
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span class="menu-text">Dashboard</span>
-
-                </a>
-
-            </li>
-
-            <li>
-
-                <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-
-                    <i class="fa-solid fa-server"></i>
-                    <span class="menu-text">Manage Rooms</span>
-
-                </a>
-
-            </li>
-
-        </ul>
-
-    </div>
+    @endauth
 
 
 

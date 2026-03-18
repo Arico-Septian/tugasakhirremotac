@@ -136,29 +136,38 @@
 
         <ul class="space-y-3">
 
-            <li>
-                <a href="/dashboard"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span class="menu-text">Dashboard</span>
-                </a>
-            </li>
+            @auth
+                <li>
+                    <a href="/dashboard"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
 
-            <li>
-                <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-                    <i class="fa-solid fa-server"></i>
-                    <span class="menu-text">Manage Rooms</span>
-                </a>
-            </li>
+                {{-- Admin + Operator --}}
+                @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                    <li>
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-server"></i>
+                            <span class="menu-text">Manage Rooms</span>
+                        </a>
+                    </li>
+                @endif
 
-            <li>
-                <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-                    <i class="fa-solid fa-users"></i>
-                    <span class="menu-text">User Management</span>
-                </a>
-            </li>
 
-        </ul>
+                {{-- Admin only --}}
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-users"></i>
+                            <span class="menu-text">User Management</span>
+                        </a>
+                    </li>
+                @endif
+
+            </ul>
+        @endauth
 
     </div>
 
@@ -173,95 +182,97 @@
 
         <header class="sticky top-0 bg-white border-b px-10 py-6 flex items-center justify-between shadow-sm">
 
-            <div class="flex items-center gap-6">
+            @auth
+                <div class="flex items-center gap-6">
 
-                <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-
-                <div>
-
-                    <h1 class="text-3xl font-bold text-gray-800">
-                        Centralized AC Management
-                    </h1>
-
-                    <p class="text-sm text-gray-400">
-                        Server Room Cooling Control System
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="flex items-center gap-6">
-
-                <div id="systemStatus"
-                    class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
-
-                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-
-                    Online
-
-                </div>
-
-
-                <!-- PROFILE -->
-
-                <div class="relative">
-
-                    <button onclick="toggleProfile()"
-                        class="flex items-center gap-3 bg-white border px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 transition">
-
-                        <div
-                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
-
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-
-                        </div>
-
-
-                        <div class="text-left hidden md:block">
-
-                            <p class="text-sm font-semibold text-gray-800">
-                                {{ Auth::user()->name }}
-                            </p>
-
-                            <p class="text-xs text-gray-400">
-                                {{ Auth::user()->role ?? 'Administrator' }}
-                            </p>
-
-                        </div>
-
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-
+                    <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
 
+                    <div>
 
-                    <div id="profileMenu"
-                        class="hidden absolute right-0 mt-3 w-52 bg-white border shadow-lg rounded-xl p-2">
+                        <h1 class="text-3xl font-bold text-gray-800">
+                            Centralized AC Management
+                        </h1>
 
-                        <a href="/profile"
-                            class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-
-                            <i class="fa-solid fa-user"></i>
-                            Profile
-
-                        </a>
-
-                        <a href="/logout"
-                            class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 text-red-500">
-
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            Logout
-
-                        </a>
+                        <p class="text-sm text-gray-400">
+                            Server Room Cooling Control System
+                        </p>
 
                     </div>
 
                 </div>
 
-            </div>
+
+                <div class="flex items-center gap-6">
+
+                    <div id="systemStatus"
+                        class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
+
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+
+                        Online
+
+                    </div>
+
+
+                    <!-- PROFILE -->
+
+                    <div class="relative">
+
+                        <button onclick="toggleProfile()"
+                            class="flex items-center gap-3 bg-white border px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 transition">
+
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+
+                            </div>
+
+
+                            <div class="text-left hidden md:block">
+
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ Auth::user()->name }}
+                                </p>
+
+                                <p class="text-xs text-gray-400">
+                                    {{ Auth::user()->role ?? 'Administrator' }}
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+
+                        </button>
+
+
+                        <div id="profileMenu"
+                            class="hidden absolute right-0 mt-3 w-52 bg-white border shadow-lg rounded-xl p-2">
+
+                            <a href="/profile"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+
+                                <i class="fa-solid fa-user"></i>
+                                Profile
+
+                            </a>
+
+                            <a href="/logout"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 text-red-500">
+
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Logout
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            @endauth
 
         </header>
 
