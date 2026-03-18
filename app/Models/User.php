@@ -11,4 +11,14 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOperator()
+    {
+        return $this->role === 'operator';
+    }
 }

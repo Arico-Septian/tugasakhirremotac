@@ -24,7 +24,7 @@ class AcControlController extends Controller
         $mqtt = new MqttService();
 
         $mqtt->publish(
-            "room/{$room->name}/ac/{$ac->id}/control",
+            "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => "ON"])
         );
 
@@ -46,7 +46,7 @@ class AcControlController extends Controller
         $mqtt = new MqttService();
 
         $mqtt->publish(
-            "room/{$room->name}/ac/{$ac->id}/control",
+            "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => "OFF"])
         );
 
@@ -68,7 +68,7 @@ class AcControlController extends Controller
         $mqtt = new MqttService();
 
         $mqtt->publish(
-            "room/{$room->name}/ac/{$ac->id}/control",
+            "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["temp" => (int)$value])
         );
 
@@ -90,7 +90,7 @@ class AcControlController extends Controller
         $mqtt = new MqttService();
 
         $mqtt->publish(
-            "room/{$room->name}/ac/{$ac->id}/control",
+            "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["mode" => strtoupper($mode)])
         );
 
@@ -115,7 +115,7 @@ class AcControlController extends Controller
         $mqtt = new MqttService();
 
         $mqtt->publish(
-            "room/{$room->name}/ac/{$ac->id}/control",
+            "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => $status->power])
         );
 

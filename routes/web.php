@@ -250,3 +250,17 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 Route::post('/ac/{id}/schedule', [AcControlController::class, 'setSchedule']);
 
 Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
+
+
+
+
+
+Route::middleware(['auth', 'role'])->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::resource('/rooms', RoomController::class);
+
+    Route::resource('/ac', AcUnitController::class);
+
+});
