@@ -221,14 +221,14 @@
 
             </div>
 
-            @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                <button onclick="openModal()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
-
-                    + Add AC
-
-                </button>
-            @endif
+            @auth
+                @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                    <button onclick="openModal()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+                        + Add AC
+                    </button>
+                @endif
+            @endauth
 
         </header>
 
@@ -271,131 +271,130 @@
                         @endif
 
 
-
                         <!-- POWER -->
+                        @auth
+                            @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                                <div class="mt-5">
 
-                        @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                            <div class="mt-5">
+                                    <p class="text-xs text-gray-500 mb-2">Power</p>
 
-                                <p class="text-xs text-gray-500 mb-2">Power</p>
+                                    <form action="/ac/{{ $ac->id }}/toggle" method="POST">
 
-                                <form action="/ac/{{ $ac->id }}/toggle" method="POST">
+                                        @csrf
 
-                                    @csrf
+                                        <label class="switch">
 
-                                    <label class="switch">
+                                            <input type="checkbox" onchange="this.form.submit()"
+                                                {{ $ac->status && $ac->status->power == 'ON' ? 'checked' : '' }}>
 
-                                        <input type="checkbox" onchange="this.form.submit()"
-                                            {{ $ac->status && $ac->status->power == 'ON' ? 'checked' : '' }}>
+                                            <span class="slider"></span>
 
-                                        <span class="slider"></span>
+                                        </label>
 
-                                    </label>
-
-                                </form>
-
-                            </div>
-
-
-
-                            <!-- TEMPERATURE -->
-
-                            <div class="mt-6">
-
-                                <p class="text-xs text-gray-500 mb-2">
-                                    Temperature : {{ $ac->status->set_temperature ?? 24 }}°C
-                                </p>
-
-                                <input type="range" min="16" max="30"
-                                    value="{{ $ac->status->set_temperature ?? 24 }}" class="temp-slider"
-                                    onchange="setTemp({{ $ac->id }},this.value)">
-
-                            </div>
-
-
-
-                            <!-- MODE -->
-
-                            <div class="mt-6">
-
-                                <p class="text-xs text-gray-500 mb-3">Mode</p>
-
-                                <div class="grid grid-cols-5 gap-2">
-
-                                    <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
-                                        <i class="fa-solid fa-snowflake"></i>
-                                        Cool
-                                    </a>
-
-                                    <a href="/ac/{{ $ac->id }}/mode/heat" class="mode-btn">
-                                        <i class="fa-solid fa-fire"></i>
-                                        Heat
-                                    </a>
-
-                                    <a href="/ac/{{ $ac->id }}/mode/dry" class="mode-btn">
-                                        <i class="fa-solid fa-droplet"></i>
-                                        Dry
-                                    </a>
-
-                                    <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
-                                        <i class="fa-solid fa-fan"></i>
-                                        Fan
-                                    </a>
-
-                                    <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
-                                        <i class="fa-solid fa-rotate"></i>
-                                        Auto
-                                    </a>
+                                    </form>
 
                                 </div>
 
-                                <form action="/ac/{{ $ac->id }}/schedule" method="POST" class="mt-4">
 
-                                    @csrf
 
-                                    <div class="grid grid-cols-2 gap-3">
+                                <!-- TEMPERATURE -->
 
-                                        <div>
-                                            <label class="text-sm text-gray-500">ON Time</label>
-                                            <input type="time" name="timer_on" class="w-full border rounded-lg p-2">
-                                        </div>
+                                <div class="mt-6">
 
-                                        <div>
-                                            <label class="text-sm text-gray-500">OFF Time</label>
-                                            <input type="time" name="timer_off" class="w-full border rounded-lg p-2">
-                                        </div>
+                                    <p class="text-xs text-gray-500 mb-2">
+                                        Temperature : {{ $ac->status->set_temperature ?? 24 }}°C
+                                    </p>
+
+                                    <input type="range" min="16" max="30"
+                                        value="{{ $ac->status->set_temperature ?? 24 }}" class="temp-slider"
+                                        onchange="setTemp({{ $ac->id }},this.value)">
+
+                                </div>
+
+
+
+                                <!-- MODE -->
+
+                                <div class="mt-6">
+
+                                    <p class="text-xs text-gray-500 mb-3">Mode</p>
+
+                                    <div class="grid grid-cols-5 gap-2">
+
+                                        <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
+                                            <i class="fa-solid fa-snowflake"></i>
+                                            Cool
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/heat" class="mode-btn">
+                                            <i class="fa-solid fa-fire"></i>
+                                            Heat
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/dry" class="mode-btn">
+                                            <i class="fa-solid fa-droplet"></i>
+                                            Dry
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
+                                            <i class="fa-solid fa-fan"></i>
+                                            Fan
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
+                                            <i class="fa-solid fa-rotate"></i>
+                                            Auto
+                                        </a>
 
                                     </div>
 
-                                    <button class="mt-3 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
+                                    <form action="/ac/{{ $ac->id }}/schedule" method="POST" class="mt-4">
 
-                                        Set Timer
+                                        @csrf
+
+                                        <div class="grid grid-cols-2 gap-3">
+
+                                            <div>
+                                                <label class="text-sm text-gray-500">ON Time</label>
+                                                <input type="time" name="timer_on" class="w-full border rounded-lg p-2">
+                                            </div>
+
+                                            <div>
+                                                <label class="text-sm text-gray-500">OFF Time</label>
+                                                <input type="time" name="timer_off" class="w-full border rounded-lg p-2">
+                                            </div>
+
+                                        </div>
+
+                                        <button class="mt-3 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
+
+                                            Set Timer
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            @endif
+
+                            @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                                <form action="/ac/{{ $ac->id }}" method="POST" class="mt-6">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button onclick="return confirm('Delete this AC?')"
+                                        class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
+
+                                        Delete AC
 
                                     </button>
 
                                 </form>
-
-                            </div>
-                        @endif
-
-                        @if (Auth::user()->role == 'admin')
-                            <form action="/ac/{{ $ac->id }}" method="POST" class="mt-6">
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button onclick="return confirm('Delete this AC?')"
-                                    class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
-
-                                    Delete AC
-
-                                </button>
-
-                            </form>
-                        @endif
+                            @endif
+                        @endauth
                     </div>
                 @endforeach
-
             </div>
 
         </div>
@@ -405,56 +404,58 @@
 
 
     <!-- MODAL -->
+    @auth
+        @if (in_array(Auth::user()->role, ['admin', 'operator']))
+            <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
 
-    @if (in_array(Auth::user()->role, ['admin', 'operator']))
-        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
 
-            <div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
+                    <h2 class="text-xl font-bold mb-5">
+                        Add New AC
+                    </h2>
 
-                <h2 class="text-xl font-bold mb-5">
-                    Add New AC
-                </h2>
+                    <form method="POST" action="/rooms/{{ $room->id }}/ac">
 
-                <form method="POST" action="/rooms/{{ $room->id }}/ac">
+                        @csrf
 
-                    @csrf
+                        <input type="number" name="ac_number" placeholder="AC Number"
+                            class="border p-3 w-full mb-3 rounded-lg">
 
-                    <input type="number" name="ac_number" placeholder="AC Number"
-                        class="border p-3 w-full mb-3 rounded-lg">
+                        <input type="text" name="name" placeholder="AC Name"
+                            class="border p-3 w-full mb-3 rounded-lg">
 
-                    <input type="text" name="name" placeholder="AC Name"
-                        class="border p-3 w-full mb-3 rounded-lg">
+                        <input type="text" name="brand" placeholder="Brand"
+                            class="border p-3 w-full mb-4 rounded-lg">
 
-                    <input type="text" name="brand" placeholder="Brand"
-                        class="border p-3 w-full mb-4 rounded-lg">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
 
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
+                            Create AC
 
-                        Create AC
+                        </button>
 
-                    </button>
+                    </form>
 
-                </form>
+                </div>
 
             </div>
+        @endif
+    @endauth
 
-        </div>
 
 
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("close")
+        }
 
-        <script>
-            function toggleSidebar() {
-                document.getElementById("sidebar").classList.toggle("close")
-            }
+        function openModal() {
+            document.getElementById('modal').classList.remove('hidden')
+        }
 
-            function openModal() {
-                document.getElementById('modal').classList.remove('hidden')
-            }
-
-            function setTemp(id, temp) {
-                window.location = "/ac/" + id + "/temp/" + temp
-            }
-        </script>
+        function setTemp(id, temp) {
+            window.location = "/ac/" + id + "/temp/" + temp
+        }
+    </script>
 
 </body>
 
