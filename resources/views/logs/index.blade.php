@@ -168,7 +168,7 @@
                                 <!-- ACTIVITY -->
                                 <td class="p-3">
 
-                                    @if ($log->activity== 'on')
+                                    @if ($log->activity == 'on')
                                         <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">ON</span>
                                     @elseif($log->activity == 'off')
                                         <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">OFF</span>

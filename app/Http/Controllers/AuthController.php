@@ -19,22 +19,18 @@ class AuthController extends Controller
 
         $user = User::where('name', $request->name)->first();
 
-        // ❌ user tidak ditemukan
         if (!$user) {
             return back()->with('error', 'User tidak ditemukan');
         }
 
-        // 🔴 CEK STATUS USER
         if (!$user->is_active) {
             return back()->with('error', 'User tidak aktif');
         }
 
-        // ❌ password salah
         if (!Hash::check($request->password, $user->password)) {
             return back()->with('error', 'Password salah');
         }
 
-        // ✅ LOGIN
         Auth::login($user);
 
         $user->is_online = true;
