@@ -16,8 +16,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-            $table->string('room');
-            $table->string('ac');
+            $table->string('room')->nullable();
+            $table->string('ac')->nullable();
             $table->string('activity');
 
             $table->timestamps();

@@ -37,10 +37,12 @@ class AuthController extends Controller
         $user->last_login_at = now();
         $user->save();
 
+        // ✅ FIX LOGIN LOG
         UserLog::create([
             'user_id' => $user->id,
-            'action' => 'login',
-            'ip' => $request->ip()
+            'room' => null,
+            'ac' => null,
+            'activity' => 'login'
         ]);
 
         return redirect('/dashboard');
@@ -56,10 +58,12 @@ class AuthController extends Controller
             $user->last_logout_at = now();
             $user->save();
 
+            // ✅ FIX LOGOUT LOG
             UserLog::create([
                 'user_id' => $user->id,
-                'action' => 'logout',
-                'ip' => $request->ip()
+                'room' => null,
+                'ac' => null,
+                'activity' => 'logout'
             ]);
         }
 
