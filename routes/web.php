@@ -266,8 +266,13 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('/users', UserController::class);
     });
-
 });
 
 Route::resource('/users', UserController::class)
     ->middleware('role:admin');
+
+Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
+
+use App\Http\Controllers\UserLogController;
+
+Route::get('/logs', [UserLogController::class, 'index']);

@@ -42,4 +42,14 @@ class UserController extends Controller
         $user = Auth::user();
         return view('profile.index', compact('user'));
     }
+
+    public function changeStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return back();
+    }
 }

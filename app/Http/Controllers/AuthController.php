@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,19 +17,57 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if (Auth::attempt($request->only('name', 'password'))) {
-            $request->session()->regenerate();
-            return redirect('/dashboard');
+        $user = User::where('name', $request->name)->first();
+
+        // ❌ user tidak ditemukan
+        if (!$user) {
+            return back()->with('error', 'User tidak ditemukan');
         }
 
-        return back()->with('error', 'Username atau password salah');
+        // 🔴 CEK STATUS USER
+        if (!$user->is_active) {
+            return back()->with('error', 'User tidak aktif');
+        }
+
+        // ❌ password salah
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->with('error', 'Password salah');
+        }
+
+        // ✅ LOGIN
+        Auth::login($user);
+
+        $user->is_online = true;
+        $user->last_login_at = now();
+        $user->save();
+
+        UserLog::create([
+            'user_id' => $user->id,
+            'action' => 'login',
+            'ip' => $request->ip()
+        ]);
+
+        return redirect('/dashboard');
     }
 
     public function logout(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user) {
+            $user->is_online = false;
+            $user->last_logout_at = now();
+            $user->save();
+
+            UserLog::create([
+                'user_id' => $user->id,
+                'action' => 'logout',
+                'ip' => $request->ip()
+            ]);
+        }
+
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
         return redirect('/login');
     }

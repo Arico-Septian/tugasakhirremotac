@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Models\Room;
+use App\Models\UserLog;
 use App\Services\MqttService;
+use Illuminate\Support\Facades\Auth;
 
 class AcControlController extends Controller
 {
@@ -21,8 +23,14 @@ class AcControlController extends Controller
         $status->power = 'ON';
         $status->save();
 
-        $mqtt = new MqttService();
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => $ac->ac_number,
+            'activity' => 'on'
+        ]);
 
+        $mqtt = new MqttService();
         $mqtt->publish(
             "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => "ON"])
@@ -43,8 +51,14 @@ class AcControlController extends Controller
         $status->power = 'OFF';
         $status->save();
 
-        $mqtt = new MqttService();
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => $ac->ac_number,
+            'activity' => 'off'
+        ]);
 
+        $mqtt = new MqttService();
         $mqtt->publish(
             "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => "OFF"])
@@ -65,8 +79,14 @@ class AcControlController extends Controller
         $status->set_temperature = $value;
         $status->save();
 
-        $mqtt = new MqttService();
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => $ac->ac_number,
+            'activity' => 'set_temp_' . $value
+        ]);
 
+        $mqtt = new MqttService();
         $mqtt->publish(
             "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["temp" => (int)$value])
@@ -87,8 +107,14 @@ class AcControlController extends Controller
         $status->mode = strtoupper($mode);
         $status->save();
 
-        $mqtt = new MqttService();
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => $ac->ac_number,
+            'activity' => 'mode_' . strtoupper($mode)
+        ]);
 
+        $mqtt = new MqttService();
         $mqtt->publish(
             "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["mode" => strtoupper($mode)])
@@ -112,8 +138,14 @@ class AcControlController extends Controller
         $status->power = ($status->power == 'ON') ? 'OFF' : 'ON';
         $status->save();
 
-        $mqtt = new MqttService();
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => $ac->ac_number,
+            'activity' => strtolower($status->power)
+        ]);
 
+        $mqtt = new MqttService();
         $mqtt->publish(
             "room/{$room->name}/ac/{$ac->ac_number}/control",
             json_encode(["power" => $status->power])

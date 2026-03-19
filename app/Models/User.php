@@ -9,7 +9,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'password',
-        'role'
+        'role',
+        'is_active',
+        'is_online',
+        'last_login_at',
+        'last_logout_at'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     public function isAdmin()
