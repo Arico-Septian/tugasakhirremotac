@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AcUnit;
 use App\Models\Room;
+use App\Models\UserLog;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AcUnitController extends Controller
 {
@@ -22,7 +25,13 @@ class AcUnitController extends Controller
         $request->validate([
             'name' => 'required',
             'brand' => 'required',
-            'ac_number' => 'required'
+            'ac_number' => [
+                'required',
+                'integer',
+                Rule::unique('ac_units')->where(function ($q) use ($roomId) {
+                    return $q->where('room_id', $roomId);
+                })
+            ]
         ]);
 
         $room = Room::findOrFail($roomId);
@@ -37,8 +46,6 @@ class AcUnitController extends Controller
 
         $mqtt = new \App\Services\MqttService();
 
-        $topic = "room/{$room->name}/ac/add"; //
-
         $mqtt->publish(
             "room/{$room->name}/ac/add",
             json_encode([
@@ -46,6 +53,13 @@ class AcUnitController extends Controller
                 "brand" => $ac->brand
             ])
         );
+
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => 'AC ' . $ac->ac_number,
+            'activity' => 'add_ac'
+        ]);
 
         return back();
     }
@@ -64,6 +78,13 @@ class AcUnitController extends Controller
                 "id" => (int)$ac->ac_number
             ])
         );
+
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => 'AC ' . $ac->ac_number,
+            'activity' => 'delete_ac'
+        ]);
 
         $room_id = $ac->room_id;
 

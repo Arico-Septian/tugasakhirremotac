@@ -83,8 +83,7 @@
 
             @auth
                 <li>
-                    <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -198,13 +197,22 @@
                             <th class="p-3">AC</th>
                             <th class="p-3">Activity</th>
                             <th class="p-3">Time</th>
+
                         </tr>
                     </thead>
 
                     <tbody>
-                        @foreach ($logs as $log)
-                            <tr class="border-b hover:bg-gray-50">
 
+                        @if ($logs->isEmpty())
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-400 py-6">
+                                    No activity yet
+                                </td>
+                            </tr>
+                        @endif
+
+                        @foreach ($logs as $log)
+                            <tr class="border-b hover:bg-gray-50 transition">
                                 <!-- USER -->
                                 <td class="p-3 font-medium">
                                     {{ $log->user->name ?? '-' }}
@@ -223,7 +231,18 @@
                                 <!-- ACTIVITY -->
                                 <td class="p-3">
 
-                                    @if ($log->activity == 'on')
+                                    @if ($log->activity == 'add_room')
+                                        <span class="bg-purple-100 text-purple-600 px-2 py-1 rounded text-xs">ADD
+                                            ROOM</span>
+                                    @elseif($log->activity == 'delete_room')
+                                        <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">DELETE
+                                            ROOM</span>
+                                    @elseif($log->activity == 'add_ac')
+                                        <span class="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs">ADD
+                                            AC</span>
+                                    @elseif($log->activity == 'delete_ac')
+                                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">DELETE AC</span>
+                                    @elseif($log->activity == 'on')
                                         <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">ON</span>
                                     @elseif($log->activity == 'off')
                                         <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">OFF</span>
@@ -237,7 +256,7 @@
 
                                 <!-- TIME -->
                                 <td class="p-3 text-gray-600">
-                                    {{ $log->created_at }}
+                                    {{ $log->created_at->format('d M Y H:i') }}
                                 </td>
 
                             </tr>

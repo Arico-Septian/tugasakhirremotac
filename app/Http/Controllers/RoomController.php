@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\AcUnit;
 use App\Services\MqttService;
+use App\Models\UserLog;
+use Illuminate\Support\Facades\Auth;
 
 
 class RoomController extends Controller
@@ -27,7 +29,7 @@ class RoomController extends Controller
             'device_id' => $request->device_id
         ]);
 
-        $mqtt = new \App\Services\MqttService();
+        $mqtt = new MqttService();
 
         $topic = "device/{$room->device_id}/config";
 
@@ -37,6 +39,13 @@ class RoomController extends Controller
                 "room" => $room->name
             ])
         );
+
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => '-',
+            'activity' => 'add_room'
+        ]);
 
         return redirect('/rooms');
     }
@@ -50,6 +59,13 @@ class RoomController extends Controller
             "device/{$room->device_id}/clear",
             json_encode([])
         );
+
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room' => $room->name,
+            'ac' => '-',
+            'activity' => 'delete_room'
+        ]);
 
         $room->delete();
 
