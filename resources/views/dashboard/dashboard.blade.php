@@ -18,8 +18,7 @@
         }
 
         header {
-            border-bottom: 1px solid #f1f5f9;
-            /* garis sangat halus */
+            border-bottom: none;
         }
 
         /* SIDEBAR */
@@ -182,6 +181,17 @@
                         </a>
                     </li>
                 @endif
+
+                {{-- Admin only --}}
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a href="/logs"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span class="menu-text">Activity Log</span>
+                        </a>
+                    </li>
+                @endif
             @endauth
         </ul>
 
@@ -236,7 +246,8 @@
 
         <!-- HEADER -->
 
-        <header class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between">
+        <header
+            class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between shadow-sm transition-all duration-300">
             @auth
                 <div class="flex items-center gap-6">
 

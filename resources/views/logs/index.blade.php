@@ -80,44 +80,99 @@
         </div>
 
         <ul class="space-y-3">
-            <li>
-                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span class="menu-text">Dashboard</span>
-                </a>
-            </li>
 
-            <li>
-                <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-                    <i class="fa-solid fa-server"></i>
-                    <span class="menu-text">Manage Rooms</span>
-                </a>
-            </li>
+            @auth
+                <li>
+                    <a href="/dashboard"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
 
-            <li>
-                <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
-                    <i class="fa-solid fa-users"></i>
-                    <span class="menu-text">User Management</span>
-                </a>
-            </li>
+                {{-- Admin + Operator --}}
+                @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                    <li>
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-server"></i>
+                            <span class="menu-text">Manage Rooms</span>
+                        </a>
+                    </li>
+                @endif
 
-            <!-- ACTIVE MENU -->
-            <li>
-                <a href="/logs"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span class="menu-text">Activity Log</span>
-                </a>
-            </li>
+
+                {{-- Admin only --}}
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-users"></i>
+                            <span class="menu-text">User Management</span>
+                        </a>
+                    </li>
+                @endif
+
+                {{-- Admin only --}}
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a href="/logs"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span class="menu-text">Activity Log</span>
+                        </a>
+                    </li>
+                @endif
+            @endauth
         </ul>
+        <!-- PROFILE PINDAH KE BAWAH -->
+        @auth
+            <div class="absolute bottom-6 left-6 right-6">
+
+                <!-- MODE NORMAL -->
+                <div class="profile-full">
+                    <button class="w-full flex items-center gap-3 px-3 py-2">
+
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
+
+                        <div class="text-left menu-text">
+                            <p class="text-sm font-semibold text-gray-800">
+                                {{ Auth::user()->name }}
+                            </p>
+                            <p class="text-xs text-gray-400">
+                                {{ Auth::user()->role ?? 'Administrator' }}
+                            </p>
+                        </div>
+
+                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
+                            onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+
+                    </button>
+                </div>
+
+                <!-- MODE COLLAPSE -->
+                <div class="profile-collapse hidden text-center">
+                    <a href="/logout" class="text-red-500 text-xl">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+
+            </div>
+        @endauth
 
     </div>
 
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
 
-        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Activity Log</h1>
+        <header class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Activity Log</h1>
+                <p class="text-sm text-gray-400">System & User Activity Monitoring</p>
+            </div>
         </header>
 
         <div class="p-8">

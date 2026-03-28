@@ -116,6 +116,17 @@
                         </a>
                     </li>
                 @endif
+
+                {{-- Admin only --}}
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span class="menu-text">Activity Log</span>
+                        </a>
+                    </li>
+                @endif
+
             </ul>
             <!-- PROFILE PINDAH KE BAWAH -->
             @auth
