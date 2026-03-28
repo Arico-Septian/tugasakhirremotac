@@ -68,7 +68,7 @@ Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
 
 Route::get('/set-room/{room}', function ($room) {
 
-    $mqtt = new \App\Services\MqttService();
+    $mqtt = new MqttService();;
 
     $topic = "device/esp32_01/config";
 
@@ -83,7 +83,7 @@ Route::get('/set-room/{room}', function ($room) {
 
 Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
 
-    $mqtt = new \App\Services\MqttService();
+    $mqtt = new MqttService();;
 
     $topic = "room/$room/ac/add";
 
@@ -99,7 +99,7 @@ Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
 
 Route::get('/remove-ac/{room}/{id}', function ($room, $id) {
 
-    $mqtt = new \App\Services\MqttService();
+    $mqtt = new MqttService();;
 
     $topic = "room/$room/ac/remove";
 
@@ -246,8 +246,6 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 Route::post('/ac/{id}/schedule', [AcControlController::class, 'setSchedule']);
 
 Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
-
-
 
 
 
