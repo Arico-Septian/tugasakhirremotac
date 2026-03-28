@@ -17,7 +17,24 @@
             font-family: ui-sans-serif, system-ui;
         }
 
+        header {
+            border-bottom: 1px solid #f1f5f9;
+            /* garis sangat halus */
+        }
+
         /* SIDEBAR */
+
+        .sidebar.close .profile-full {
+            display: none;
+        }
+
+        .sidebar.close .profile-collapse {
+            display: block;
+        }
+
+        .sidebar.close .absolute .menu-text {
+            display: none;
+        }
 
         .sidebar {
             transition: all .3s ease;
@@ -42,12 +59,12 @@
         /* CONTENT SHIFT */
 
         .main-content {
-            margin-left: 260px;
+            margin-left: 256px;
             transition: all .3s ease;
         }
 
         .sidebar.close+.main-content {
-            margin-left: 100px;
+            margin-left: 80px;
         }
 
         /* CARD */
@@ -55,14 +72,14 @@
         .stat-card {
             background: white;
             border-radius: 18px;
-            padding: 24px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all .25s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         /* ROOM CARD */
@@ -76,7 +93,7 @@
         }
 
         .room-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-2px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
         }
 
@@ -114,12 +131,12 @@
 
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-100">
 
 
     <!-- SIDEBAR -->
 
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
 
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
@@ -165,8 +182,47 @@
                         </a>
                     </li>
                 @endif
+            @endauth
+        </ul>
 
-            </ul>
+        <!-- PROFILE PINDAH KE BAWAH -->
+        @auth
+            <div class="absolute bottom-6 left-6 right-6">
+
+                <!-- MODE NORMAL -->
+                <div class="profile-full">
+                    <button class="w-full flex items-center gap-3 px-3 py-2">
+
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
+
+                        <div class="text-left menu-text">
+                            <p class="text-sm font-semibold text-gray-800">
+                                {{ Auth::user()->name }}
+                            </p>
+                            <p class="text-xs text-gray-400">
+                                {{ Auth::user()->role ?? 'Administrator' }}
+                            </p>
+                        </div>
+
+                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
+                            onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+
+                    </button>
+                </div>
+
+                <!-- MODE COLLAPSE -->
+                <div class="profile-collapse hidden text-center">
+                    <a href="/logout" class="text-red-500 text-xl">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+
+            </div>
         @endauth
 
     </div>
@@ -180,8 +236,7 @@
 
         <!-- HEADER -->
 
-        <header class="sticky top-0 bg-white border-b px-10 py-6 flex items-center justify-between shadow-sm">
-
+        <header class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between">
             @auth
                 <div class="flex items-center gap-6">
 
@@ -191,7 +246,7 @@
 
                     <div>
 
-                        <h1 class="text-3xl font-bold text-gray-800">
+                        <h1 class="text-2xl font-bold text-gray-800">
                             Centralized AC Management
                         </h1>
 
@@ -215,62 +270,6 @@
 
                     </div>
 
-
-                    <!-- PROFILE -->
-
-                    <div class="relative">
-
-                        <button onclick="toggleProfile()"
-                            class="flex items-center gap-3 bg-white border px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 transition">
-
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
-
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-
-                            </div>
-
-
-                            <div class="text-left hidden md:block">
-
-                                <p class="text-sm font-semibold text-gray-800">
-                                    {{ Auth::user()->name }}
-                                </p>
-
-                                <p class="text-xs text-gray-400">
-                                    {{ Auth::user()->role ?? 'Administrator' }}
-                                </p>
-
-                            </div>
-
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-
-                        </button>
-
-
-                        <div id="profileMenu"
-                            class="hidden absolute right-0 mt-3 w-52 bg-white border shadow-lg rounded-xl p-2">
-
-                            <a href="/profile"
-                                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-
-                                <i class="fa-solid fa-user"></i>
-                                Profile
-
-                            </a>
-
-                            <a href="/logout"
-                                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-50 text-red-500">
-
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                                Logout
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
                 </div>
             @endauth
 
@@ -280,7 +279,7 @@
 
         <!-- CONTENT -->
 
-        <div class="p-8">
+        <div class="px-6 py-6">
 
 
             <!-- STATISTICS -->
@@ -295,7 +294,7 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">Rooms</p>
-                            <h2 class="text-3xl font-bold">{{ $rooms->count() }}</h2>
+                            <h2 class="text-2xl font-bold">{{ $rooms->count() }}</h2>
 
                         </div>
 
@@ -316,7 +315,7 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">AC Units</p>
-                            <h2 class="text-3xl font-bold">{{ $totalAc }}</h2>
+                            <h2 class="text-2xl font-bold">{{ $totalAc }}</h2>
 
                         </div>
 
@@ -337,7 +336,7 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">Active AC Units</p>
-                            <h2 class="text-3xl font-bold">{{ $activeAc }}</h2>
+                            <h2 class="text-2xl font-bold">{{ $activeAc }}</h2>
 
                         </div>
 
@@ -358,7 +357,7 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">Users</p>
-                            <h2 class="text-3xl font-bold">{{ $users }}</h2>
+                            <h2 class="text-2xl font-bold">{{ $users }}</h2>
 
                         </div>
 
@@ -379,7 +378,7 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">Users Online</p>
-                            <h2 class="text-3xl font-bold">1</h2>
+                            <h2 class="text-2xl font-bold">1</h2>
 
                         </div>
 
@@ -397,7 +396,7 @@
 
             <!-- SERVER ROOMS -->
 
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">
                 Server Rooms
             </h2>
 
