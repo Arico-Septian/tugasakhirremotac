@@ -103,9 +103,57 @@
                             <span class="menu-text">Manage Rooms</span>
                         </a>
                     </li>
-                @endif
 
+                    {{-- User Management (ADMIN ONLY) --}}
+                    @if (Auth::user()->role == 'admin')
+                        <li>
+                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                                <i class="fa-solid fa-users"></i>
+                                <span class="menu-text">User Management</span>
+                            </a>
+                        </li>
+                    @endif
+                @endif
             </ul>
+            <!-- PROFILE PINDAH KE BAWAH -->
+            @auth
+                <div class="absolute bottom-6 left-6 right-6">
+
+                    <!-- MODE NORMAL -->
+                    <div class="profile-full">
+                        <button class="w-full flex items-center gap-3 px-3 py-2">
+
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+
+                            <div class="text-left menu-text">
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ Auth::user()->name }}
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    {{ Auth::user()->role ?? 'Administrator' }}
+                                </p>
+                            </div>
+
+                            <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
+
+                        </button>
+                    </div>
+
+                    <!-- MODE COLLAPSE -->
+                    <div class="profile-collapse hidden text-center">
+                        <a href="/logout" class="text-red-500 text-xl">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
+
+                </div>
+            @endauth
 
         </div>
     @endauth
