@@ -91,12 +91,6 @@
                   hover:scale-110 hover:shadow-xl transition duration-300">
             Get Started
         </a>
-
-        <a href="/dashboard"
-           class="border border-white px-6 py-3 rounded-xl
-                  hover:bg-white hover:text-blue-600 transition duration-300">
-            View Dashboard
-        </a>
     </div>
 
 </section>
