@@ -274,3 +274,10 @@ Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
 use App\Http\Controllers\UserLogController;
 
 Route::get('/logs', [UserLogController::class, 'index']);
+
+
+use App\Models\AcStatus;
+
+Route::get('/api/ac-status', function () {
+    return AcStatus::with('acUnit.room')->get();
+});

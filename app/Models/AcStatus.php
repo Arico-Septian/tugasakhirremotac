@@ -12,4 +12,9 @@ class AcStatus extends Model
         'set_temperature',
         'mode'
     ];
+
+    public function acUnit()
+    {
+        return $this->belongsTo(\App\Models\AcUnit::class);
+    }
 }

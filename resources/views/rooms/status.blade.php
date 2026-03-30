@@ -244,10 +244,8 @@
 
                                 </span>
 
-                                <span class="font-semibold">
-
-                                    {{ $ac->status->power }}
-
+                                <span id="power-{{ $ac->ac_number }}" class="font-semibold">
+                                    {{ $ac->status->power ?? 'OFF' }}
                                 </span>
 
                             </div>
@@ -265,10 +263,8 @@
 
                                 </span>
 
-                                <span class="font-semibold">
-
-                                    {{ $ac->status->set_temperature }}°C
-
+                                <span id="temp-{{ $ac->ac_number }}" class="font-semibold">
+                                    {{ $ac->status->set_temperature ?? 24 }}°C
                                 </span>
 
                             </div>
@@ -286,10 +282,8 @@
 
                                 </span>
 
-                                <span class="font-semibold">
-
-                                    {{ $ac->status->mode }}
-
+                                <span id="mode-{{ $ac->ac_number }}" class="font-semibold">
+                                    {{ $ac->status->mode ?? 'AUTO' }}
                                 </span>
 
                             </div>
@@ -317,6 +311,51 @@
             document.getElementById("sidebar").classList.toggle("close")
         }
     </script>
+
+    <script>
+function loadStatus() {
+    fetch('/api/ac-status')
+    .then(res => res.json())
+    .then(data => {
+
+        data.forEach(ac => {
+            let id = ac.ac_unit.ac_number;
+
+            let powerEl = document.getElementById('power-' + id);
+            let tempEl = document.getElementById('temp-' + id);
+            let modeEl = document.getElementById('mode-' + id);
+
+            if (powerEl) {
+                powerEl.innerText = ac.power;
+
+                // warna power
+                powerEl.parentElement.classList.remove('bg-green-50','text-green-700','bg-red-50','text-red-700');
+
+                if (ac.power === 'ON') {
+                    powerEl.parentElement.classList.add('bg-green-50','text-green-700');
+                } else {
+                    powerEl.parentElement.classList.add('bg-red-50','text-red-700');
+                }
+            }
+
+            if (tempEl) {
+                tempEl.innerText = ac.set_temperature + '°C';
+            }
+
+            if (modeEl) {
+                modeEl.innerText = ac.mode;
+            }
+        });
+
+    });
+}
+
+// realtime tiap 2 detik
+setInterval(loadStatus, 2000);
+
+// load pertama
+loadStatus();
+</script>
 
 </body>
 

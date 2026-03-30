@@ -26,4 +26,5 @@ class AcUnit extends Model
     {
         return $this->hasOne(AcStatus::class);
     }
+
 }
