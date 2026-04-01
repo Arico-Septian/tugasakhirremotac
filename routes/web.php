@@ -281,3 +281,9 @@ use App\Models\AcStatus;
 Route::get('/api/ac-status', function () {
     return AcStatus::with('acUnit.room')->get();
 });
+
+Route::get('/users-online', function () {
+    return response()->json([
+        'count' => \App\Models\User::where('last_activity', '>=', now()->subMinutes(5))->count()
+    ]);
+});

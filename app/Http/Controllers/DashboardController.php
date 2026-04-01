@@ -17,12 +17,28 @@ class DashboardController extends Controller
             $q->where('power', 'ON');
         })->count();
         $users = User::count();
+        $usersOnline = User::where('is_online', true)
+            ->where('last_activity', '>=', now()->subMinutes(5))
+            ->count();
+
+        $onlineUsers = User::where('is_online', true)
+            ->where('last_activity', '>=', now()->subMinute())
+            ->get();
+
+        $idleUsers = User::where('is_online', true)
+            ->where('last_activity', '<', now()->subMinute())
+            ->where('last_activity', '>=', now()->subMinutes(5))
+            ->get();
+
         return view('dashboard.dashboard', compact(
             'rooms',
             'totalRooms',
             'totalAc',
             'activeAc',
-            'users'
+            'users',
+            'usersOnline',
+            'onlineUsers',
+            'idleUsers'
         ));
     }
 }

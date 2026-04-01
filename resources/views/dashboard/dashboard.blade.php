@@ -185,8 +185,7 @@
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
-                        <a href="/logs"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             <span class="menu-text">Activity Log</span>
                         </a>
@@ -361,6 +360,7 @@
 
 
 
+
                 <div class="stat-card">
 
                     <div class="flex justify-between items-center">
@@ -389,8 +389,9 @@
                         <div>
 
                             <p class="text-gray-500 text-sm">Users Online</p>
-                            <h2 class="text-2xl font-bold">1</h2>
-
+                            <h2 id="usersOnlineCount" class="text-2xl font-bold">
+                                {{ $usersOnline }}
+                            </h2>
                         </div>
 
                         <div class="icon-box text-orange-500">
@@ -402,7 +403,6 @@
                 </div>
 
             </div>
-
 
 
             <!-- SERVER ROOMS -->
@@ -477,6 +477,7 @@
     <script>
         function toggleSidebar() {
 
+
             let sidebar = document.getElementById("sidebar")
 
             sidebar.classList.toggle("close")
@@ -489,6 +490,13 @@
             document.getElementById("profileMenu").classList.toggle("hidden")
 
         }
+        setInterval(() => {
+            fetch('/users-online')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('usersOnlineCount').innerText = data.count;
+                });
+        }, 5000);
     </script>
 
 </body>

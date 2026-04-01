@@ -35,9 +35,10 @@ class AuthController extends Controller
 
         $user->is_online = true;
         $user->last_login_at = now();
+        $user->last_activity = now();
+
         $user->save();
 
-        // ✅ FIX LOGIN LOG
         UserLog::create([
             'user_id' => $user->id,
             'room' => null,
@@ -56,6 +57,8 @@ class AuthController extends Controller
         if ($user) {
             $user->is_online = false;
             $user->last_logout_at = now();
+            $user->last_activity = null;
+
             $user->save();
 
             // ✅ FIX LOGOUT LOG
