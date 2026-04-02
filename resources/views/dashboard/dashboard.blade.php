@@ -499,6 +499,43 @@
         }, 5000);
     </script>
 
+    <script>
+        let role = "{{ Auth::check() ? Auth::user()->role : '' }}";
+
+        let idleTime;
+
+        if (role === 'admin') {
+            idleTime = 10 * 60 * 1000;
+        } else if (role === 'operator') {
+            idleTime = 5 * 60 * 1000;
+        } else {
+            idleTime = 2 * 60 * 1000;
+        }
+
+        let timeout;
+
+        function resetTimer() {
+            clearTimeout(timeout);
+
+            timeout = setTimeout(() => {
+                window.location.href = "/logout";
+            }, idleTime);
+        }
+
+        window.onload = resetTimer;
+
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
+
+        document.addEventListener("visibilitychange", function() {
+            if (!document.hidden) {
+                resetTimer();
+            }
+        });
+    </script>
+
 </body>
 
 </html>
