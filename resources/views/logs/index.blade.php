@@ -180,7 +180,7 @@
             <div class="card mb-6 flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-sm">Total Activity</p>
-                    <h2 class="text-3xl font-bold">{{ $logs->count() }}</h2>
+                    <h2 class="text-3xl font-bold">{{ $logs->total() }}</h2>
                 </div>
                 <i class="fa-solid fa-clock text-3xl text-blue-500"></i>
             </div>
@@ -264,6 +264,10 @@
                     </tbody>
 
                 </table>
+
+                <div class="mt-4">
+                    {{ $logs->links() }}
+                </div>
 
             </div>
 
