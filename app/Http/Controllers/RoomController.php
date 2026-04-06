@@ -8,15 +8,44 @@ use App\Models\AcUnit;
 use App\Services\MqttService;
 use App\Models\UserLog;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Cache;
 
 class RoomController extends Controller
 {
+    /**
+     * =============================
+     * 📋 LIST ROOM + STATUS ESP
+     * =============================
+     */
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = Room::with(['acUnits.status'])->get();
+
+        foreach ($rooms as $room) {
+
+            $deviceId = strtolower($room->device_id);
+
+            // default dari cache
+            $status = Cache::get("device_status_{$deviceId}", 'offline');
+
+            // fallback dari last_seen
+            $lastSeen = Cache::get("device_{$deviceId}_last_seen");
+
+            if ($lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
+                $status = 'online';
+            }
+
+            $room->device_status = $status;
+        }
+
         return view('rooms.index', compact('rooms'));
     }
+
+    /**
+     * =============================
+     * ➕ CREATE ROOM
+     * =============================
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -24,14 +53,16 @@ class RoomController extends Controller
             'device_id' => 'required|unique:rooms,device_id'
         ]);
 
+        $deviceId = strtolower($request->device_id);
+
         $room = Room::create([
             'name' => $request->name,
-            'device_id' => $request->device_id
+            'device_id' => $deviceId
         ]);
 
         $mqtt = new MqttService();
 
-        $topic = "device/{$room->device_id}/config";
+        $topic = "device/{$deviceId}/config";
 
         $mqtt->publish(
             $topic,
@@ -39,6 +70,9 @@ class RoomController extends Controller
                 "room" => $room->name
             ])
         );
+
+        // 🔥 set default status biar langsung muncul di UI
+        Cache::put("device_status_{$deviceId}", 'offline');
 
         UserLog::create([
             'user_id' => Auth::id(),
@@ -49,16 +83,29 @@ class RoomController extends Controller
 
         return redirect('/rooms');
     }
+
+    /**
+     * =============================
+     * ❌ DELETE ROOM
+     * =============================
+     */
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
 
+        $deviceId = strtolower($room->device_id);
+
         $mqtt = new MqttService();
 
+        // 🔥 clear ESP
         $mqtt->publish(
-            "device/{$room->device_id}/clear",
-            json_encode([])
+            "device/{$deviceId}/clear",
+            json_encode(new \stdClass())
         );
+
+        // 🔥 bersihkan cache
+        Cache::forget("device_status_{$deviceId}");
+        Cache::forget("device_{$deviceId}_last_seen");
 
         UserLog::create([
             'user_id' => Auth::id(),
@@ -71,10 +118,20 @@ class RoomController extends Controller
 
         return redirect('/rooms');
     }
+
+    /**
+     * =============================
+     * 📊 DETAIL STATUS AC
+     * =============================
+     */
     public function status($id)
     {
         $room = Room::findOrFail($id);
-        $acs = AcUnit::with('status')->where('room_id', $id)->get();
+
+        $acs = AcUnit::with('status')
+            ->where('room_id', $id)
+            ->get();
+
         return view('rooms.status', compact('room', 'acs'));
     }
 }

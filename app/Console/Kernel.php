@@ -10,10 +10,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('clean:logs')->daily();
+
+        $schedule->command('device:check-status')->everyTenSeconds()->runInBackground();
     }
 
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
     }
 }

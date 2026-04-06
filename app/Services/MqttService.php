@@ -13,7 +13,7 @@ class MqttService
     {
         $server = '192.168.18.194';
         $port = 1883;
-        $clientId = 'laravel_client';
+        $clientId = 'laravel_' . uniqid();
 
         $connectionSettings = (new ConnectionSettings)
             ->setUsername('mqtt_user')
@@ -25,7 +25,7 @@ class MqttService
 
     public function publish($topic, $message)
     {
-        $this->mqtt->publish($topic, $message, 1, true);
+        $this->mqtt->publish($topic, $message, 1, false);
     }
 
     public function subscribe($topic, $callback)
@@ -34,27 +34,27 @@ class MqttService
         $this->mqtt->loop(true);
     }
 
-public function resendConfig($deviceId)
-{
-    $room = \App\Models\Room::where('device_id', $deviceId)->first();
+    public function resendConfig($deviceId)
+    {
+        $room = \App\Models\Room::where('device_id', $deviceId)->first();
 
-    if (!$room) return;
+        if (!$room) return;
 
-    $acs = \App\Models\AcUnit::where('room_id', $room->id)->get();
+        $acs = \App\Models\AcUnit::where('room_id', $room->id)->get();
 
-    $this->publish(
-        "device/{$deviceId}/config",
-        json_encode([
-            "room" => $room->name,
-            "acs" => $acs->map(fn($ac) => [
-                "id" => (int)$ac->ac_number,
-                "brand" => $ac->brand
+        $this->publish(
+            "device/{$deviceId}/config",
+            json_encode([
+                "room" => $room->name,
+                "acs" => $acs->map(fn($ac) => [
+                    "id" => (int)$ac->ac_number,
+                    "brand" => $ac->brand
+                ])
             ])
-        ])
-    );
+        );
 
-    echo "📤 CONFIG + AC LIST DIKIRIM KE {$deviceId}\n";
-}
+        echo "📤 CONFIG + AC LIST DIKIRIM KE {$deviceId}\n";
+    }
 
     public function subscribeMultiple(array $topics)
     {

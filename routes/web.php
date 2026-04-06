@@ -287,3 +287,40 @@ Route::get('/users-online', function () {
         'count' => \App\Models\User::where('last_activity', '>=', now()->subMinutes(5))->count()
     ]);
 });
+
+
+Route::get('/cek-driver', function () {
+    return config('cache.default');
+});
+
+
+use Illuminate\Support\Facades\Cache;
+Route::get('/test-cache', function () {
+    Cache::put('test_key', 'OK', 60);
+    return Cache::get('test_key');
+});
+
+
+use App\Models\Room;
+use Carbon\Carbon;
+Route::get('/device-status', function () {
+
+    $rooms = Room::all();
+
+    return $rooms->map(function ($room) {
+
+        $deviceId = strtolower($room->device_id);
+
+        $lastSeen = Cache::get("device_{$deviceId}_last_seen");
+
+        $isOnline = $lastSeen && now()->diffInSeconds(
+            $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen)
+        ) <= 15;
+
+        return [
+            'device_id' => $deviceId,
+            'is_online' => $isOnline
+        ];
+    });
+
+});

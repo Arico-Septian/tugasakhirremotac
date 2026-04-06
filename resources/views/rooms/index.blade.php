@@ -197,13 +197,42 @@
             <!-- ROOM GRID -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($rooms as $room)
-                    <div class="room-card">
-                        <div class="flex justify-between mb-3">
-                            <h2 class="text-lg font-semibold">
-                                {{ $room->name }}
-                            </h2>
-                            <i class="fa-solid fa-server text-gray-400"></i>
+                    <div
+                        class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
+
+
+                        <div class="flex justify-between items-start mb-2">
+
+                            <div>
+                                <h2 class="text-lg font-semibold">
+                                    {{ $room->name }}
+                                </h2>
+
+                                @php
+                                    $status = $room->device_status ?? 'offline';
+                                @endphp
+
+                                @if ($status == 'online')
+                                    <span
+                                        class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 mt-1">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                        ESP Online
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center gap-1 text-xs font-semibold text-red-500 mt-1">
+                                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                                        ESP Offline
+                                    </span>
+                                @endif
+
+                            </div>
+
+                            <i class="fa-solid fa-server text-gray-400 text-lg"></i>
+
                         </div>
+
+
                         <p class="text-gray-500 text-sm mb-4">
                             Total : {{ $room->acUnits->count() }} units
                         </p>
