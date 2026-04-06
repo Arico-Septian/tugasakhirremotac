@@ -102,6 +102,14 @@
             border-radius: 50%;
         }
 
+        .power-on {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.6);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
         input:checked+.slider {
             background: #22c55e;
         }
@@ -151,6 +159,73 @@
         .mode-btn:hover {
             background: #eef2ff;
             transform: translateY(-3px) scale(1.05);
+        }
+
+        /* ===== HEADER ===== */
+
+        .header-wrap {
+            position: relative;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* ✨ GARIS MELINGKAR */
+        .header-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(120deg,
+                    rgba(255, 255, 255, 0.9),
+                    rgba(200, 200, 255, 0.4),
+                    rgba(255, 255, 255, 0.6));
+
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+            pointer-events: none;
+        }
+
+        .header-wrap {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-wrap * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-wrap {
+            overflow: visible;
+        }
+
+        #dropdownAC {
+            z-index: 9999;
+        }
+
+        #dropdownAC {
+            transition: all 0.25s ease;
+            transform: translateY(10px);
+            opacity: 0;
+        }
+
+        #dropdownAC.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        #dropdownAC {
+            transform-origin: top left;
+            will-change: transform, opacity;
         }
     </style>
 
@@ -266,55 +341,71 @@
 
     <div class="main-content min-h-screen flex flex-col">
 
-        <header
-            class="sticky top-0 bg-white/80 backdrop-blur-lg border-b px-8 py-5 flex justify-between items-center shadow-sm">
-
-            <div class="flex items-center gap-4">
-
-                <!-- BACK BUTTON -->
-
-                <a href="/rooms" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
-
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                </a>
-
-                <h1 class="text-2xl font-bold text-gray-800">
-                    {{ strtoupper($room->name) }} AC Units
-                </h1>
-
-            </div>
-
-            @auth
-                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                    <button onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
-                        + Add AC
-                    </button>
-                @endif
-            @endauth
-
-        </header>
-
-
-
         <!-- CONTENT -->
 
         <div class="p-8">
-            <div class="relative mb-6">
 
-                <!-- BUTTON -->
-                <button onclick="toggleDropdown()"
-                    class="w-full flex justify-between items-center px-5 py-4 bg-white/80 backdrop-blur-lg border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transition">
+            @php
+                $firstAc = $acs->first();
+            @endphp
 
-                    <span id="selectedAC">Pilih AC</span>
-                    <i class="fa-solid fa-chevron-down"></i>
+            <div class="header-wrap flex justify-between items-center mb-6 px-6 py-4">
 
-                </button>
+                <!-- LEFT -->
+                <div class="flex items-center gap-4">
 
-                <!-- DROPDOWN -->
+                    <!-- SELECT AC  -->
+                    <div onclick="toggleDropdown()"
+                        class="flex items-center gap-3 px-5 py-3 bg-white border rounded-full shadow-sm cursor-pointer hover:shadow min-w-[200px] justify-between">
+
+                        <span id="selectedAC" class="font-medium text-gray-700">
+                            {{ $firstAc ? 'AC ' . $firstAc->ac_number : 'No AC' }}
+                        </span>
+
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                    </div>
+
+                    <!-- ROOM -->
+                    <span class="text-gray-400 tracking-widest text-sm">
+                        {{ strtoupper($room->name) }}
+                    </span>
+
+                </div>
+
+                <!-- RIGHT -->
+                <div class="flex items-center gap-3">
+
+                    @auth
+                        @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                            <button onclick="openModal()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+                                + Add AC
+                            </button>
+                        @endif
+                    @endauth
+
+                    <!-- DELETE PINDAH KE SINI -->
+                    @auth
+                        @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                            <form id="deleteForm" method="POST" action="/ac/{{ $firstAc?->id }}">
+                                @csrf
+                                @method('DELETE')
+
+                                <button {{ !$firstAc ? 'disabled' : '' }}
+                                    class="w-10 h-10 rounded-full border border-red-400 text-red-500 hover:bg-red-50 disabled:opacity-50">
+
+                                    <i class="fa-solid fa-trash"></i>
+
+                                </button>
+                            </form>
+                        @endif
+                    @endauth
+
+                </div>
+
+                <!-- DROPDOWN BARU -->
                 <div id="dropdownAC"
-                    class="hidden absolute w-full mt-2 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
+                    class="hidden absolute top-full left-0 mt-2 w-64 bg-white border rounded-xl shadow-lg z-[9999]">
 
                     @foreach ($acs as $ac)
                         <div onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }}')"
@@ -329,168 +420,199 @@
 
             </div>
 
-            <div>
+            <div class="p-8 pt-0">
 
                 @foreach ($acs as $index => $ac)
                     <div id="ac-{{ $ac->id }}" class="ac-panel {{ $index == 0 ? '' : 'hidden' }}">
 
-                        <div class="ac-card w-full max-w-xl mx-auto border border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-[350px_1fr] gap-6">
 
-                            <div class="flex justify-between items-center mb-4">
+                            <!-- LEFT (REMOTE) -->
+                            <div class="ac-card flex flex-col items-center justify-center text-center">
 
-                                <h2 class="text-lg font-semibold">
-                                    AC {{ $ac->ac_number }}
-                                </h2>
+                                <!-- POWER (TIDAK DIUBAH LOGIC) -->
+                                <form action="/ac/{{ $ac->id }}/toggle" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-20 h-20 rounded-full flex items-center justify-center
+                {{ $ac->status && $ac->status?->power == 'ON' ? 'bg-green-500 shadow-green-300' : 'bg-gray-300' }}
+                text-white text-2xl shadow-lg hover:scale-110 transition">
 
-                                <i class="fa-solid fa-snowflake text-blue-500"></i>
+                                        <i class="fa-solid fa-power-off"></i>
+                                    </button>
+                                </form>
+
+                                <!-- TEMPERATURE -->
+                                <div class="mt-6">
+
+                                    <div class="text-6xl font-bold text-blue-600">
+                                        {{ $ac->status?->set_temperature ?? 24 }}°C
+                                    </div>
+
+                                    <p class="text-xs text-gray-400 tracking-widest">
+                                        TEMPERATURE
+                                    </p>
+
+                                </div>
+
+                                <!-- BUTTON -->
+                                <div class="flex gap-6 mt-6">
+
+                                    <button
+                                        onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
+                                        class="w-12 h-12 bg-gray-200 rounded-full text-xl hover:scale-110">
+                                        −
+                                    </button>
+
+                                    <button
+                                        onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) + 1 }})"
+                                        class="w-12 h-12 bg-blue-600 text-white rounded-full text-xl hover:scale-110">
+                                        +
+                                    </button>
+
+                                </div>
 
                             </div>
 
-                            <p class="text-gray-500 text-sm mb-3">
-                                Brand : {{ $ac->brand }}
-                            </p>
 
+                            <!-- RIGHT -->
+                            <div class="flex flex-col gap-5">
 
-                            <!-- STATUS -->
+                                <!-- INFO -->
+                                <div class="grid grid-cols-3 gap-4">
 
-                            @if ($ac->status && $ac->status->power == 'ON')
-                                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-semibold">
-                                    ● ON
-                                </span>
-                            @else
-                                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">
-                                    ● OFF
-                                </span>
-                            @endif
-
-
-                            <!-- POWER -->
-                            @auth
-                                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                    <div class="mt-5">
-
-                                        <p class="text-xs text-gray-500 mb-2">Power</p>
-
-                                        <form action="/ac/{{ $ac->id }}/toggle" method="POST">
-
-                                            @csrf
-
-                                            <label class="switch">
-
-                                                <input type="checkbox" onchange="this.form.submit()"
-                                                    {{ $ac->status && $ac->status->power == 'ON' ? 'checked' : '' }}>
-
-                                                <span class="slider"></span>
-
-                                            </label>
-
-                                        </form>
-
-                                    </div>
-
-
-
-                                    <!-- TEMPERATURE -->
-
-                                    <div class="mt-6">
-
-                                        <p class="text-xs text-gray-500 mb-2">
-                                            Temperature : {{ $ac->status->set_temperature ?? 24 }}°C
+                                    <div class="ac-card text-center">
+                                        <p class="text-xs text-gray-400">SET TEMP</p>
+                                        <p class="text-xl font-semibold">
+                                            {{ $ac->status?->set_temperature ?? 24 }}°C
                                         </p>
+                                    </div>
 
-                                        <input type="range" min="16" max="30"
-                                            value="{{ $ac->status->set_temperature ?? 24 }}" class="temp-slider"
-                                            onchange="setTemp({{ $ac->id }},this.value)">
+                                    <div class="ac-card text-center">
+                                        <p class="text-xl font-semibold">
+                                            {{ ucfirst($ac->status?->mode ?? 'cool') }}
+                                        </p>
+                                    </div>
+
+                                    <div class="ac-card text-center">
+                                        <p
+                                            class="text-xl font-semibold {{ ($ac->status?->power ?? 'OFF') == 'ON' ? 'text-green-600' : 'text-gray-400' }}">
+
+                                            {{ $ac->status?->power ?? 'OFF' }}
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <!-- MODE (TIDAK DIUBAH LOGIC) -->
+                                <div class="ac-card">
+
+                                    <p class="text-gray-500 mb-4 text-sm">OPERATING MODE</p>
+
+                                    <div class="grid grid-cols-5 gap-2">
+
+                                        <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
+                                            <i class="fa-solid fa-snowflake"></i> Cool
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/heat" class="mode-btn">
+                                            <i class="fa-solid fa-fire"></i> Heat
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/dry" class="mode-btn">
+                                            <i class="fa-solid fa-droplet"></i> Dry
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
+                                            <i class="fa-solid fa-fan"></i> Fan
+                                        </a>
+
+                                        <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
+                                            <i class="fa-solid fa-rotate"></i> Auto
+                                        </a>
 
                                     </div>
 
+                                </div>
 
 
-                                    <!-- MODE -->
+                                <!-- TIMER (TETAP FORM LAMA) -->
+                                <div class="ac-card">
 
-                                    <div class="mt-6">
+                                    <!-- HEADER -->
+                                    <div class="flex justify-between items-center mb-4">
 
-                                        <p class="text-xs text-gray-500 mb-3">Mode</p>
-
-                                        <div class="grid grid-cols-5 gap-2">
-
-                                            <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
-                                                <i class="fa-solid fa-snowflake"></i>
-                                                Cool
-                                            </a>
-
-                                            <a href="/ac/{{ $ac->id }}/mode/heat" class="mode-btn">
-                                                <i class="fa-solid fa-fire"></i>
-                                                Heat
-                                            </a>
-
-                                            <a href="/ac/{{ $ac->id }}/mode/dry" class="mode-btn">
-                                                <i class="fa-solid fa-droplet"></i>
-                                                Dry
-                                            </a>
-
-                                            <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
-                                                <i class="fa-solid fa-fan"></i>
-                                                Fan
-                                            </a>
-
-                                            <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
-                                                <i class="fa-solid fa-rotate"></i>
-                                                Auto
-                                            </a>
-
+                                        <div class="flex items-center gap-2 text-blue-500">
+                                            <i class="fa-solid fa-clock"></i>
+                                            <span class="font-medium">Timer Schedule</span>
                                         </div>
 
-                                        <form action="/ac/{{ $ac->id }}/schedule" method="POST" class="mt-4">
+                                        <button id="btnTimer-{{ $ac->id }}"
+                                            onclick="toggleTimer({{ $ac->id }})"
+                                            class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
+                                            Set Timer
+                                        </button>
 
-                                            @csrf
+                                    </div>
 
-                                            <div class="grid grid-cols-2 gap-3">
+                                    <!-- DEFAULT VIEW -->
+                                    <div id="timerView-{{ $ac->id }}">
 
-                                                <div>
-                                                    <label class="text-sm text-gray-500">ON Time</label>
-                                                    <input type="time" name="timer_on"
-                                                        class="w-full border rounded-lg p-2">
-                                                </div>
+                                        @if ($ac->timer_on || $ac->timer_off)
+                                            <p class="text-gray-600 text-sm">
+                                                ON: {{ $ac->timer_on ?? '--:--' }} &nbsp;&nbsp;
+                                                OFF: {{ $ac->timer_off ?? '--:--' }}
+                                            </p>
+                                        @else
+                                            <p class="text-gray-400 text-sm">
+                                                No timer set
+                                            </p>
+                                        @endif
 
-                                                <div>
-                                                    <label class="text-sm text-gray-500">OFF Time</label>
-                                                    <input type="time" name="timer_off"
-                                                        class="w-full border rounded-lg p-2">
-                                                </div>
+                                    </div>
+
+                                    <!-- EDIT MODE -->
+                                    <form id="timerEdit-{{ $ac->id }}" class="hidden"
+                                        action="/ac/{{ $ac->id }}/schedule" method="POST">
+                                        @csrf
+
+                                        <div class="grid grid-cols-2 gap-4 mb-4">
+
+                                            <!-- ON -->
+                                            <div>
+                                                <p class="text-xs text-gray-400 mb-1">TURN ON</p>
+                                                <input type="time" name="timer_on" value="{{ $ac->timer_on }}"
+                                                    class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
 
                                             </div>
 
-                                            <button
-                                                class="mt-3 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl shadow-md hover:shadow-lg transition">
+                                            <!-- OFF -->
+                                            <div>
+                                                <p class="text-xs text-gray-400 mb-1">TURN OFF</p>
+                                                <input type="time" name="timer_off" value="{{ $ac->timer_off }}"
+                                                    class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
+                                            </div>
 
-                                                Set Timer
+                                        </div>
 
+                                        <!-- BUTTON -->
+                                        <div class="flex gap-3">
+
+                                            <button class="flex-1 bg-blue-600 text-white py-3 rounded-full">
+                                                ✓ Save
                                             </button>
 
-                                        </form>
+                                            <button type="button" onclick="toggleTimer({{ $ac->id }})"
+                                                class="flex-1 bg-gray-200 py-3 rounded-full">
+                                                Cancel
+                                            </button>
 
-                                    </div>
-                                @endif
-
-                                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                    <form action="/ac/{{ $ac->id }}" method="POST" class="mt-6">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button onclick="return confirm('Delete this AC?')"
-                                            class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
-
-                                            Delete AC
-
-                                        </button>
+                                        </div>
 
                                     </form>
-                                @endif
-                            @endauth
-                        </div>
-                    </div>
+
+                                </div>
                 @endforeach
             </div>
 
@@ -552,27 +674,59 @@
         function setTemp(id, temp) {
             window.location = "/ac/" + id + "/temp/" + temp
         }
+
+        function toggleTimer(id) {
+
+            const view = document.getElementById('timerView-' + id);
+            const edit = document.getElementById('timerEdit-' + id);
+            const btn = document.getElementById('btnTimer-' + id);
+
+            if (!view || !edit || !btn) return;
+
+            const isEdit = edit.classList.contains('hidden');
+
+            view.classList.toggle('hidden');
+            edit.classList.toggle('hidden');
+
+            if (isEdit) {
+                btn.classList.add('hidden');
+            } else {
+                btn.classList.remove('hidden');
+            }
+        }
     </script>
 
     <script>
         function toggleDropdown() {
-            document.getElementById('dropdownAC').classList.toggle('hidden');
+            const el = document.getElementById('dropdownAC');
+
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                setTimeout(() => el.classList.add('show'), 10);
+            } else {
+                el.classList.remove('show');
+                setTimeout(() => el.classList.add('hidden'), 200);
+            }
         }
 
         function selectAC(id, name) {
 
-            // ubah text
             document.getElementById('selectedAC').innerText = name;
 
-            // tutup dropdown
-            document.getElementById('dropdownAC').classList.add('hidden');
+            const dropdown = document.getElementById('dropdownAC');
+            dropdown.classList.remove('show');
+            setTimeout(() => dropdown.classList.add('hidden'), 200);
 
-            // switch AC
             document.querySelectorAll('.ac-panel').forEach(el => {
                 el.classList.add('hidden');
             });
 
             document.getElementById('ac-' + id).classList.remove('hidden');
+
+            const deleteForm = document.getElementById('deleteForm');
+            if (deleteForm) {
+                deleteForm.action = "/ac/" + id;
+            }
         }
 
         // klik luar = tutup dropdown
@@ -580,8 +734,9 @@
 
             let dropdown = document.getElementById('dropdownAC');
 
-            if (!e.target.closest('#dropdownAC') && !e.target.closest('button')) {
-                dropdown.classList.add('hidden');
+            if (!e.target.closest('#dropdownAC') && !e.target.closest('[onclick="toggleDropdown()"]')) {
+                dropdown.classList.remove('show');
+                setTimeout(() => dropdown.classList.add('hidden'), 200);
             }
         });
     </script>
