@@ -696,6 +696,10 @@
             } else {
                 console.error("AC panel tidak ditemukan:", id);
             }
+            let deleteForm = document.getElementById('deleteForm');
+            if (deleteForm) {
+                deleteForm.action = "/ac/" + id;
+            }
 
             document.getElementById('dropdownAC').classList.remove('show');
             setTimeout(() => {
