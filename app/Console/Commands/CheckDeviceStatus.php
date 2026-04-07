@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use App\Models\AcStatus;
 use App\Models\Room;
+use Carbon\Carbon;
 
 class CheckDeviceStatus extends Command
 {
@@ -15,52 +16,82 @@ class CheckDeviceStatus extends Command
     public function handle()
     {
         $this->info("🚀 Device checker started...");
+        sleep(5);
 
         while (true) {
 
-            Room::chunk(50, function ($rooms) {
+            Room::whereNotNull('device_id')
+                ->select('id', 'device_id')
+                ->chunk(50, function ($rooms) {
 
-                foreach ($rooms as $room) {
+                    foreach ($rooms as $room) {
 
-                    // 🔥 WAJIB lowercase
-                    $deviceId = strtolower($room->device_id);
+                        if (!$room->device_id) {
+                            continue;
+                        }
 
-                    $lastSeen = Cache::get("device_{$deviceId}_last_seen");
+                        $deviceId = strtolower(trim($room->device_id));
 
-                    $isOffline = !$lastSeen || now()->diffInSeconds($lastSeen) > 10;
+                        $lastSeen   = Cache::get("device_{$deviceId}_last_seen");
+                        $statusKey  = "device_status_{$deviceId}";
+                        $unknownKey = "device_unknown_{$deviceId}";
 
-                    $currentStatus = Cache::get("device_status_{$deviceId}");
+                        /* === UNKNOWN === */
+                        if (!$lastSeen) {
 
-                    if ($isOffline) {
+                            if (!Cache::get($unknownKey)) {
+                                $this->line("⚠️ UNKNOWN: {$deviceId}");
+                                Cache::put($unknownKey, true, 60);
+                            }
 
-                        if ($currentStatus !== 'offline') {
+                            continue;
+                        }
 
-                            $this->info("🔴 OFFLINE: {$deviceId}");
+                        /* === PARSE WAKTU === */
+                        if (!$lastSeen instanceof Carbon) {
+                            $lastSeen = Carbon::parse($lastSeen);
+                        }
 
-                            // 🔥 update cache + TTL
-                            Cache::put("device_status_{$deviceId}", 'offline', 60);
+                        $diff = max(0, now()->diffInSeconds($lastSeen));
+                        $isOffline = $diff > 15;
 
-                            AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
-                                $q->where('device_id', $deviceId);
-                            })
+                        $currentStatus = Cache::get($statusKey);
+
+                        /* === OFFLINE === */
+                        if ($isOffline) {
+
+                            if ($currentStatus !== 'offline') {
+
+                                $this->info("🔴 OFFLINE: {$deviceId} (diff: {$diff}s)");
+
+                                Cache::forever($statusKey, 'offline');
+                                Cache::forget($unknownKey);
+
+                                AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
+                                    $q->where('device_id', $deviceId);
+                                })
                                 ->where('power', '!=', 'OFF')
                                 ->update([
                                     'power' => 'OFF'
                                 ]);
+                            }
                         }
-                    } else {
 
-                        if ($currentStatus !== 'online') {
+                        /* === ONLINE === */
+                        else {
 
-                            $this->info("🟢 ONLINE: {$deviceId}");
+                            if ($currentStatus !== 'online') {
 
-                            Cache::put("device_status_{$deviceId}", 'online', 60);
+                                $this->info("🟢 ONLINE: {$deviceId} (diff: {$diff}s)");
+
+                                Cache::forever($statusKey, 'online');
+                                Cache::forget($unknownKey);
+                            }
                         }
                     }
-                }
-            });
+                });
 
-            sleep(3);
+            sleep(5);
         }
 
         return Command::SUCCESS;
