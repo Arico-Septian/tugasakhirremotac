@@ -1,6 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Room;
+use Carbon\Carbon;
+use App\Http\Controllers\AuthController;
+use App\Services\MqttService;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AcUnitController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\AcControlController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserLogController;
+use App\Models\AcStatus;
+use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\TimerController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -9,31 +23,23 @@ Route::get('/', function () {
 Route::view('/login', 'auth.login');
 Route::view('/register', 'auth.register');
 
-
-use App\Http\Controllers\AuthController;
 // halaman login
 Route::get('/login', function () {
     return view('auth.login');
 });
 
-
 // proses login
 Route::post('/login', [AuthController::class, 'login']);
-
 
 // halaman register
 Route::get('/register', function () {
     return view('auth.register');
 });
 
-
 // logout
 Route::get('/logout', [AuthController::class, 'logout']);
 
-
 // Setting room manual
-use App\Services\MqttService;
-
 Route::get('/set-room/{room}', function ($room) {
 
     $mqtt = new MqttService();
@@ -194,19 +200,12 @@ Route::get('/system-check', function () {
 });
 
 // setting melalui dashboard
-use App\Http\Controllers\DashboardController;
-
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
-use App\Http\Controllers\AcUnitController;
-
 Route::get('/dashboard/ac-control', [AcUnitController::class, 'index']);
-
-
-use App\Http\Controllers\RoomController;
 
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::post('/rooms', [RoomController::class, 'store']);
@@ -217,15 +216,11 @@ Route::post('/rooms/add', [RoomController::class, 'store']);
 Route::get('/rooms/{id}/ac', [AcUnitController::class, 'index']);
 Route::post('/rooms/{id}/ac', [AcUnitController::class, 'store']);
 
-
-use App\Http\Controllers\AcControlController;
-
 Route::get('/ac/{id}/on', [AcControlController::class, 'powerOn']);
 Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
 Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
 Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
 Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
-
 
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::post('/rooms', [RoomController::class, 'store']);
@@ -237,8 +232,6 @@ Route::delete('/ac/{id}', [AcUnitController::class, 'destroy']);
 
 Route::get('/rooms/{id}/status', [RoomController::class, 'status']);
 
-use App\Http\Controllers\UserController;
-
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
@@ -247,20 +240,18 @@ Route::post('/ac/{id}/schedule', [AcControlController::class, 'setSchedule']);
 
 Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
 
-
-
 Route::middleware(['auth'])->group(function () {
 
-    // ✅ semua role (admin, operator, user)
+    // semua role (admin, operator, user)
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // ✅ hanya admin + operator
+    // hanya admin + operator
     Route::middleware(['role:admin,operator'])->group(function () {
         Route::resource('/rooms', RoomController::class);
         Route::resource('/ac', AcUnitController::class);
     });
 
-    // ✅ hanya admin
+    // hanya admin
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('/users', UserController::class);
     });
@@ -271,12 +262,7 @@ Route::resource('/users', UserController::class)
 
 Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
 
-use App\Http\Controllers\UserLogController;
-
 Route::get('/logs', [UserLogController::class, 'index']);
-
-
-use App\Models\AcStatus;
 
 Route::get('/api/ac-status', function () {
     return AcStatus::with('acUnit.room')->get();
@@ -288,21 +274,17 @@ Route::get('/users-online', function () {
     ]);
 });
 
-
 Route::get('/cek-driver', function () {
     return config('cache.default');
 });
 
-
-use Illuminate\Support\Facades\Cache;
 Route::get('/test-cache', function () {
     Cache::put('test_key', 'OK', 60);
     return Cache::get('test_key');
 });
 
+Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
 
-use App\Models\Room;
-use Carbon\Carbon;
 Route::get('/device-status', function () {
 
     $rooms = Room::all();

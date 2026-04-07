@@ -132,11 +132,8 @@
 
 <body class="bg-gray-100">
 
-
     <!-- SIDEBAR -->
-
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
-
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -151,7 +148,6 @@
         </div>
 
         <ul class="space-y-3">
-
             @auth
                 <li>
                     <a href="/dashboard"
@@ -170,7 +166,6 @@
                         </a>
                     </li>
                 @endif
-
 
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
@@ -230,21 +225,14 @@
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </a>
                 </div>
-
             </div>
         @endauth
-
     </div>
 
-
-
     <!-- MAIN -->
-
     <div class="main-content min-h-screen flex flex-col">
 
-
         <!-- HEADER -->
-
         <header
             class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between shadow-sm transition-all duration-300">
             @auth
@@ -265,12 +253,9 @@
                         </p>
 
                     </div>
-
                 </div>
 
-
                 <div class="flex items-center gap-6">
-
                     <div id="systemStatus"
                         class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
 
@@ -279,28 +264,17 @@
                         Online
 
                     </div>
-
                 </div>
             @endauth
-
         </header>
 
-
-
         <!-- CONTENT -->
-
         <div class="px-6 py-6">
 
-
             <!-- STATISTICS -->
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
-
-
                 <div class="stat-card">
-
                     <div class="flex justify-between items-center">
-
                         <div>
 
                             <p class="text-gray-500 text-sm">Rooms</p>
@@ -313,15 +287,10 @@
                         </div>
 
                     </div>
-
                 </div>
 
-
-
                 <div class="stat-card">
-
                     <div class="flex justify-between items-center">
-
                         <div>
 
                             <p class="text-gray-500 text-sm">AC Units</p>
@@ -334,13 +303,9 @@
                         </div>
 
                     </div>
-
                 </div>
 
-
-
                 <div class="stat-card">
-
                     <div class="flex justify-between items-center">
 
                         <div>
@@ -355,14 +320,9 @@
                         </div>
 
                     </div>
-
                 </div>
 
-
-
-
                 <div class="stat-card">
-
                     <div class="flex justify-between items-center">
 
                         <div>
@@ -377,13 +337,9 @@
                         </div>
 
                     </div>
-
                 </div>
 
-
-
                 <div class="stat-card">
-
                     <div class="flex justify-between items-center">
 
                         <div>
@@ -399,21 +355,15 @@
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
-
             <!-- SERVER ROOMS -->
-
             <h2 class="text-2xl font-bold mb-4 text-gray-800">
                 Server Rooms
             </h2>
 
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
                 @foreach ($rooms as $room)
                     <div class="room-card">
 
@@ -425,11 +375,9 @@
 
                         </div>
 
-
                         <p class="text-gray-500 text-sm mb-4">
                             Total : {{ $room->acUnits->count() }} units
                         </p>
-
 
                         <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
 
@@ -441,7 +389,6 @@
 
                         </div>
 
-
                         <div class="bg-gray-100 text-gray-600 p-3 rounded-lg mb-4 flex justify-between text-sm">
 
                             <span>Inactive Units</span>
@@ -452,7 +399,6 @@
 
                         </div>
 
-
                         <a href="/rooms/{{ $room->id }}/status">
 
                             <button class="w-full py-2 rounded-lg bg-gray-900 text-white hover:bg-black transition">
@@ -462,21 +408,14 @@
                             </button>
 
                         </a>
-
                     </div>
                 @endforeach
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <script>
         function toggleSidebar() {
-
 
             let sidebar = document.getElementById("sidebar")
 
@@ -497,9 +436,7 @@
                     document.getElementById('usersOnlineCount').innerText = data.count;
                 });
         }, 5000);
-    </script>
 
-    <script>
         let role = "{{ Auth::check() ? Auth::user()->role : '' }}";
 
         let idleTime;
@@ -535,7 +472,6 @@
             }
         });
     </script>
-
 </body>
 
 </html>

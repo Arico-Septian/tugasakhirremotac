@@ -14,7 +14,9 @@ class AcUnit extends Model
         'brand',
         'location',
         'ip_ir',
-        'is_active'
+        'is_active',
+        'timer_on',
+        'timer_off'
     ];
 
     public function room()
@@ -26,5 +28,4 @@ class AcUnit extends Model
     {
         return $this->hasOne(AcStatus::class);
     }
-
 }

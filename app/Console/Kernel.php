@@ -12,6 +12,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('clean:logs')->daily();
 
         $schedule->command('device:check-status')->everyTenSeconds()->runInBackground();
+
+        $schedule->command('ac:run-timer')->everyMinute();
     }
 
     protected function commands()

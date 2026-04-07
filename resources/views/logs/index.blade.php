@@ -67,8 +67,8 @@
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
-
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
+
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
                 <i class="fa-solid fa-layer-group"></i>
                 <span class="menu-text">AC System</span>
@@ -80,7 +80,6 @@
         </div>
 
         <ul class="space-y-3">
-
             @auth
                 <li>
                     <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
@@ -98,7 +97,6 @@
                         </a>
                     </li>
                 @endif
-
 
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
@@ -122,6 +120,7 @@
                 @endif
             @endauth
         </ul>
+
         <!-- PROFILE PINDAH KE BAWAH -->
         @auth
             <div class="absolute bottom-6 left-6 right-6">
@@ -161,7 +160,6 @@
 
             </div>
         @endauth
-
     </div>
 
     <!-- MAIN -->
@@ -202,7 +200,6 @@
                     </thead>
 
                     <tbody>
-
                         @if ($logs->isEmpty())
                             <tr>
                                 <td colspan="5" class="text-center text-gray-400 py-6">
@@ -262,7 +259,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-
                 </table>
 
                 <div class="mt-4">
@@ -270,9 +266,7 @@
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
     <script>

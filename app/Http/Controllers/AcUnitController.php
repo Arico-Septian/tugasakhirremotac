@@ -92,4 +92,16 @@ class AcUnitController extends Controller
 
         return redirect('/rooms/' . $room_id . '/ac');
     }
+
+    public function schedule(Request $request, $id)
+    {
+        $ac = AcUnit::findOrFail($id);
+
+        $ac->update([
+            'timer_on' => $request->timer_on,
+            'timer_off' => $request->timer_off
+        ]);
+
+        return back()->with('success', 'Timer disimpan');
+    }
 }

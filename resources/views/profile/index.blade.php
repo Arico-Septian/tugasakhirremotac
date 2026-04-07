@@ -15,12 +15,8 @@
 </head>
 
 <body class="bg-gray-50">
-
-
     <div class="max-w-3xl mx-auto mt-12">
-
         <div class="bg-white rounded-2xl shadow-lg p-8">
-
             <div class="flex items-center gap-6 mb-8">
 
                 <div
@@ -45,19 +41,15 @@
                     </span>
 
                 </div>
-
             </div>
 
-
             <hr class="mb-6">
-
 
             <h3 class="text-lg font-semibold mb-4">
                 Account Information
             </h3>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
-
                 <div>
 
                     <label class="text-gray-500 text-sm">
@@ -81,21 +73,16 @@
                     </p>
 
                 </div>
-
             </div>
 
-
             <hr class="mb-6">
-
 
             <h3 class="text-lg font-semibold mb-4">
                 Change Password
             </h3>
 
             <form method="POST" action="/change-password">
-
                 @csrf
-
                 <input type="password" name="password" placeholder="New Password"
                     class="border p-3 rounded-lg w-full mb-4">
 
@@ -106,12 +93,8 @@
                 </button>
 
             </form>
-
         </div>
-
     </div>
-
-
 </body>
 
 </html>

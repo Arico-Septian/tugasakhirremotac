@@ -13,7 +13,6 @@
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-sky-200">
-
     <div class="bg-white shadow-2xl rounded-2xl flex overflow-hidden w-[850px]">
 
         <!-- LEFT SIDE -->
@@ -36,9 +35,7 @@
                 <div>✔ Ensure optimal server room environment</div>
 
             </div>
-
         </div>
-
 
         <!-- RIGHT SIDE -->
         <div class="w-1/2 p-10">
@@ -58,9 +55,7 @@
             @endif
 
             <form method="POST" action="/login" class="space-y-4">
-
                 @csrf
-
                 <div>
                     <label class="text-sm text-gray-600">Username</label>
 
@@ -83,7 +78,6 @@
                     Login
 
                 </button>
-
             </form>
 
             <div class="text-center mt-4 text-sm text-gray-500">
@@ -95,11 +89,8 @@
                 </a>
 
             </div>
-
         </div>
-
     </div>
-
 </body>
 
 </html>

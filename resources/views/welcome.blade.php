@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,13 +31,21 @@
         }
 
         @keyframes gradientMove {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .glass {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(14px);
         }
 
@@ -48,147 +57,162 @@
 
 <body class="text-white overflow-x-hidden">
 
-<!-- PARTICLES -->
-<div id="tsparticles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
+    <!-- PARTICLES -->
+    <div id="tsparticles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
 
-<!-- HERO -->
-<section id="parallax" class="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
+    <!-- HERO -->
+    <section id="parallax" class="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
 
-    <!-- PARALLAX BACKGROUND -->
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="parallax-layer absolute w-72 h-72 bg-white/10 rounded-full blur-3xl top-20 left-20"></div>
-        <div class="parallax-layer absolute w-96 h-96 bg-blue-300/10 rounded-full blur-3xl bottom-20 right-20"></div>
-    </div>
+        <!-- PARALLAX BACKGROUND -->
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="parallax-layer absolute w-72 h-72 bg-white/10 rounded-full blur-3xl top-20 left-20"></div>
+            <div class="parallax-layer absolute w-96 h-96 bg-blue-300/10 rounded-full blur-3xl bottom-20 right-20">
+            </div>
+        </div>
 
-    <!-- ICON -->
-    <div data-aos="zoom-in" class="text-6xl mb-6">❄️</div>
+        <!-- ICON -->
+        <div data-aos="zoom-in" class="text-6xl mb-6">❄️</div>
 
-    <!-- TITLE -->
-    <h1 data-aos="fade-up" class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
-        Intelligent Climate Control
-        <span class="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200">
-            Powered by IoT Technology
-        </span>
-    </h1>
+        <!-- TITLE -->
+        <h1 data-aos="fade-up" class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+            Intelligent Climate Control
+            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200">
+                Powered by IoT Technology
+            </span>
+        </h1>
 
-    <!-- DESCRIPTION -->
-    <p data-aos="fade-up" data-aos-delay="200"
-       class="max-w-2xl text-lg md:text-xl opacity-90 mb-10 leading-relaxed">
-        A modern, intelligent air conditioning management system designed to deliver
-        seamless control, real-time monitoring, and energy-efficient operation —
-        all from a single elegant dashboard.
-    </p>
+        <!-- DESCRIPTION -->
+        <p data-aos="fade-up" data-aos-delay="200"
+            class="max-w-2xl text-lg md:text-xl opacity-90 mb-10 leading-relaxed">
+            A modern, intelligent air conditioning management system designed to deliver
+            seamless control, real-time monitoring, and energy-efficient operation —
+            all from a single elegant dashboard.
+        </p>
 
-    <!-- MICRO TEXT -->
-    <p class="text-sm opacity-70 mb-6 tracking-wide">
-        Realtime • Scalable • Smart Automation
-    </p>
+        <!-- MICRO TEXT -->
+        <p class="text-sm opacity-70 mb-6 tracking-wide">
+            Realtime • Scalable • Smart Automation
+        </p>
 
-    <!-- BUTTON -->
-    <div data-aos="fade-up" data-aos-delay="400" class="flex gap-4">
-        <a href="/login"
-           class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow
+        <!-- BUTTON -->
+        <div data-aos="fade-up" data-aos-delay="400" class="flex gap-4">
+            <a href="/login"
+                class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow
                   hover:scale-110 hover:shadow-xl transition duration-300">
-            Get Started
-        </a>
-    </div>
+                Get Started
+            </a>
+        </div>
 
-</section>
+    </section>
 
-<!-- ILUSTRASI -->
-<section class="py-16 px-8 flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
+    <!-- ILUSTRASI -->
+    <section class="py-16 px-8 flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
 
-    <div data-aos="fade-right" class="flex-1 tilt">
-        <img src="https://cdn-icons-png.flaticon.com/512/1048/1048943.png"
-             class="w-full max-w-md mx-auto">
-    </div>
+        <div data-aos="fade-right" class="flex-1 tilt">
+            <img src="https://cdn-icons-png.flaticon.com/512/1048/1048943.png" class="w-full max-w-md mx-auto">
+        </div>
 
-    <div data-aos="fade-left" class="flex-1">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            Smart Automation for
-            <span class="text-blue-200">Modern Environments</span>
+        <div data-aos="fade-left" class="flex-1">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+                Smart Automation for
+                <span class="text-blue-200">Modern Environments</span>
+            </h2>
+
+            <p class="opacity-90 leading-relaxed text-lg">
+                Built with ESP32, MQTT, and Laravel, this system enables efficient,
+                scalable, and intelligent environmental control tailored for modern infrastructures.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- FEATURES -->
+    <section class="py-16 px-8 bg-white text-gray-800">
+
+        <h2 class="text-3xl font-bold text-center mb-12">
+            Key Features
         </h2>
 
-        <p class="opacity-90 leading-relaxed text-lg">
-            Built with ESP32, MQTT, and Laravel, this system enables efficient,
-            scalable, and intelligent environmental control tailored for modern infrastructures.
-        </p>
-    </div>
+        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
-</section>
+            <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
+                <h3 class="font-bold text-lg mb-2">⚡ Real-Time Intelligence</h3>
+                <p>
+                    Experience instant system feedback with live data synchronization.
+                </p>
+            </div>
 
-<!-- FEATURES -->
-<section class="py-16 px-8 bg-white text-gray-800">
+            <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
+                <h3 class="font-bold text-lg mb-2">📱 Seamless Remote Access</h3>
+                <p>
+                    Control your AC system anytime, anywhere with ease.
+                </p>
+            </div>
 
-    <h2 class="text-3xl font-bold text-center mb-12">
-        Key Features
-    </h2>
+            <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
+                <h3 class="font-bold text-lg mb-2">🔄 Intelligent Synchronization</h3>
+                <p>
+                    Keeps system data consistent even after device restart.
+                </p>
+            </div>
 
-    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-
-        <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
-            <h3 class="font-bold text-lg mb-2">⚡ Real-Time Intelligence</h3>
-            <p>
-                Experience instant system feedback with live data synchronization.
-            </p>
         </div>
 
-        <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
-            <h3 class="font-bold text-lg mb-2">📱 Seamless Remote Access</h3>
-            <p>
-                Control your AC system anytime, anywhere with ease.
-            </p>
-        </div>
+    </section>
 
-        <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
-            <h3 class="font-bold text-lg mb-2">🔄 Intelligent Synchronization</h3>
-            <p>
-                Keeps system data consistent even after device restart.
-            </p>
-        </div>
+    <!-- FOOTER -->
+    <footer class="text-center py-10 text-sm opacity-70">
+        <p class="font-semibold tracking-wide">Smart AC Control System</p>
+        <p class="mt-2">Designed & Developed by <span class="font-semibold">Arico Official</span></p>
+        <p class="mt-1 text-xs opacity-60">© 2026 All Rights Reserved</p>
+    </footer>
 
-    </div>
+    <!-- SCRIPT -->
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
 
-</section>
+        tsParticles.load("tsparticles", {
+            particles: {
+                number: {
+                    value: 60
+                },
+                size: {
+                    value: 3
+                },
+                move: {
+                    speed: 1
+                },
+                links: {
+                    enable: true,
+                    color: "#ffffff",
+                    opacity: 0.2
+                },
+                opacity: {
+                    value: 0.3
+                }
+            }
+        });
 
-<!-- FOOTER -->
-<footer class="text-center py-10 text-sm opacity-70">
-    <p class="font-semibold tracking-wide">Smart AC Control System</p>
-    <p class="mt-2">Designed & Developed by <span class="font-semibold">Arico Official</span></p>
-    <p class="mt-1 text-xs opacity-60">© 2026 All Rights Reserved</p>
-</footer>
+        VanillaTilt.init(document.querySelectorAll(".tilt"), {
+            max: 10,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2
+        });
 
-<!-- SCRIPT -->
-<script>
-AOS.init({ duration: 1000, once: true });
-
-tsParticles.load("tsparticles", {
-    particles: {
-        number: { value: 60 },
-        size: { value: 3 },
-        move: { speed: 1 },
-        links: { enable: true, color: "#ffffff", opacity: 0.2 },
-        opacity: { value: 0.3 }
-    }
-});
-
-VanillaTilt.init(document.querySelectorAll(".tilt"), {
-    max: 10,
-    speed: 400,
-    glare: true,
-    "max-glare": 0.2
-});
-
-// PARALLAX
-document.addEventListener("mousemove", (e) => {
-    document.querySelectorAll(".parallax-layer").forEach(layer => {
-        let speed = 20;
-        let x = (window.innerWidth - e.pageX * speed) / 100;
-        let y = (window.innerHeight - e.pageY * speed) / 100;
-        layer.style.transform = `translate(${x}px, ${y}px)`;
-    });
-});
-</script>
+        document.addEventListener("mousemove", (e) => {
+            document.querySelectorAll(".parallax-layer").forEach(layer => {
+                let speed = 20;
+                let x = (window.innerWidth - e.pageX * speed) / 100;
+                let y = (window.innerHeight - e.pageY * speed) / 100;
+                layer.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+    </script>
 
 </body>
+
 </html>

@@ -58,6 +58,17 @@
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
         }
 
+        .ac-panel {
+            transition: all 0.25s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .ac-panel:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
 
         /* ===== POWER SWITCH ===== */
 
@@ -173,7 +184,7 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
-        /* ✨ GARIS MELINGKAR */
+        /* ===== GARIS MELINGKAR ===== */
         .header-wrap::before {
             content: "";
             position: absolute;
@@ -234,28 +245,21 @@
 <body class="bg-gradient-to-br from-blue-50 via-white to-purple-50">
 
     <!-- SIDEBAR -->
-
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r">
-
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
-
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
-
                 <i class="fa-solid fa-layer-group"></i>
                 <span class="menu-text">AC System</span>
-
             </h2>
 
             <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
                 <i class="fa-solid fa-bars"></i>
             </button>
-
         </div>
 
         <ul class="space-y-3">
             @auth
-                {{-- Dashboard (semua role) --}}
-
+                {{-- Dashboard --}}
                 <li>
                     <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
                         <i class="fa-solid fa-chart-pie"></i>
@@ -272,6 +276,7 @@
                         </a>
                     </li>
                 @endif
+
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
@@ -293,6 +298,7 @@
                 @endif
             @endauth
         </ul>
+
         <!-- PROFILE PINDAH KE BAWAH -->
         @auth
             <div class="absolute bottom-6 left-6 right-6">
@@ -300,7 +306,6 @@
                 <!-- MODE NORMAL -->
                 <div class="profile-full">
                     <button class="w-full flex items-center gap-3 px-3 py-2">
-
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -319,7 +324,6 @@
                             onclick="event.stopPropagation()">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </a>
-
                     </button>
                 </div>
 
@@ -329,20 +333,14 @@
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </a>
                 </div>
-
             </div>
         @endauth
-
     </div>
 
-
-
     <!-- MAIN -->
-
     <div class="main-content min-h-screen flex flex-col">
 
         <!-- CONTENT -->
-
         <div class="p-8">
 
             @php
@@ -369,12 +367,10 @@
                     <span class="text-gray-400 tracking-widest text-sm">
                         {{ strtoupper($room->name) }}
                     </span>
-
                 </div>
 
                 <!-- RIGHT -->
                 <div class="flex items-center gap-3">
-
                     @auth
                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
                             <button onclick="openModal()"
@@ -395,12 +391,10 @@
                                     class="w-10 h-10 rounded-full border border-red-400 text-red-500 hover:bg-red-50 disabled:opacity-50">
 
                                     <i class="fa-solid fa-trash"></i>
-
                                 </button>
                             </form>
                         @endif
                     @endauth
-
                 </div>
 
                 <!-- DROPDOWN BARU -->
@@ -415,36 +409,29 @@
 
                         </div>
                     @endforeach
-
                 </div>
-
             </div>
 
             <div class="p-8 pt-0">
-
-                @foreach ($acs as $index => $ac)
-                    <div id="ac-{{ $ac->id }}" class="ac-panel {{ $index == 0 ? '' : 'hidden' }}">
-
+                @foreach ($acs as $ac)
+                    <div id="ac-{{ $ac->id }}" class="ac-panel hidden">
                         <div class="grid grid-cols-1 md:grid-cols-[350px_1fr] gap-6">
 
-                            <!-- LEFT (REMOTE) -->
+                            <!-- LEFT -->
                             <div class="ac-card flex flex-col items-center justify-center text-center">
 
-                                <!-- POWER (TIDAK DIUBAH LOGIC) -->
+                                <!-- POWER -->
                                 <form action="/ac/{{ $ac->id }}/toggle" method="POST">
                                     @csrf
                                     <button type="submit"
                                         class="w-20 h-20 rounded-full flex items-center justify-center
-                {{ $ac->status && $ac->status?->power == 'ON' ? 'bg-green-500 shadow-green-300' : 'bg-gray-300' }}
-                text-white text-2xl shadow-lg hover:scale-110 transition">
-
+                                        {{ $ac->status && $ac->status?->power == 'ON' ? 'bg-green-500 shadow-green-300' : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:scale-110 transition">
                                         <i class="fa-solid fa-power-off"></i>
                                     </button>
                                 </form>
 
                                 <!-- TEMPERATURE -->
                                 <div class="mt-6">
-
                                     <div class="text-6xl font-bold text-blue-600">
                                         {{ $ac->status?->set_temperature ?? 24 }}°C
                                     </div>
@@ -452,12 +439,10 @@
                                     <p class="text-xs text-gray-400 tracking-widest">
                                         TEMPERATURE
                                     </p>
-
                                 </div>
 
                                 <!-- BUTTON -->
                                 <div class="flex gap-6 mt-6">
-
                                     <button
                                         onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
                                         class="w-12 h-12 bg-gray-200 rounded-full text-xl hover:scale-110">
@@ -469,18 +454,13 @@
                                         class="w-12 h-12 bg-blue-600 text-white rounded-full text-xl hover:scale-110">
                                         +
                                     </button>
-
                                 </div>
-
                             </div>
-
 
                             <!-- RIGHT -->
                             <div class="flex flex-col gap-5">
-
                                 <!-- INFO -->
                                 <div class="grid grid-cols-3 gap-4">
-
                                     <div class="ac-card text-center">
                                         <p class="text-xs text-gray-400">SET TEMP</p>
                                         <p class="text-xl font-semibold">
@@ -501,17 +481,12 @@
                                             {{ $ac->status?->power ?? 'OFF' }}
                                         </p>
                                     </div>
-
                                 </div>
 
-
-                                <!-- MODE (TIDAK DIUBAH LOGIC) -->
+                                <!-- MODE -->
                                 <div class="ac-card">
-
                                     <p class="text-gray-500 mb-4 text-sm">OPERATING MODE</p>
-
                                     <div class="grid grid-cols-5 gap-2">
-
                                         <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
                                             <i class="fa-solid fa-snowflake"></i> Cool
                                         </a>
@@ -527,22 +502,17 @@
                                         <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
                                             <i class="fa-solid fa-fan"></i> Fan
                                         </a>
-
                                         <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
                                             <i class="fa-solid fa-rotate"></i> Auto
                                         </a>
-
                                     </div>
-
                                 </div>
 
-
-                                <!-- TIMER (TETAP FORM LAMA) -->
+                                <!-- TIMER -->
                                 <div class="ac-card">
 
                                     <!-- HEADER -->
                                     <div class="flex justify-between items-center mb-4">
-
                                         <div class="flex items-center gap-2 text-blue-500">
                                             <i class="fa-solid fa-clock"></i>
                                             <span class="font-medium">Timer Schedule</span>
@@ -553,47 +523,57 @@
                                             class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
                                             Set Timer
                                         </button>
-
                                     </div>
 
                                     <!-- DEFAULT VIEW -->
                                     <div id="timerView-{{ $ac->id }}">
-
                                         @if ($ac->timer_on || $ac->timer_off)
                                             <p class="text-gray-600 text-sm">
-                                                ON: {{ $ac->timer_on ?? '--:--' }} &nbsp;&nbsp;
-                                                OFF: {{ $ac->timer_off ?? '--:--' }}
+                                                ON:
+                                                {{ $ac->timer_on ? \Carbon\Carbon::parse($ac->timer_on)->format('H:i') : '--:--' }}
+                                                &nbsp;&nbsp;
+                                                OFF:
+                                                {{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->format('H:i') : '--:--' }}
+                                            </p>
+
+                                            <p class="text-green-500 text-xs mt-1">
+                                                Timer aktif
                                             </p>
                                         @else
                                             <p class="text-gray-400 text-sm">
                                                 No timer set
                                             </p>
                                         @endif
-
                                     </div>
 
                                     <!-- EDIT MODE -->
+                                    @if ($errors->any() && old('ac_id') == $ac->id)
+                                        <div class="text-red-500 text-sm mb-2">
+                                            {{ $errors->first() }}
+                                        </div>
+                                    @endif
+
                                     <form id="timerEdit-{{ $ac->id }}" class="hidden"
                                         action="/ac/{{ $ac->id }}/schedule" method="POST">
                                         @csrf
-
+                                        <input type="hidden" name="ac_id" value="{{ $ac->id }}">
                                         <div class="grid grid-cols-2 gap-4 mb-4">
 
                                             <!-- ON -->
                                             <div>
                                                 <p class="text-xs text-gray-400 mb-1">TURN ON</p>
-                                                <input type="time" name="timer_on" value="{{ $ac->timer_on }}"
+                                                <input type="time" name="timer_on"
+                                                    value="{{ $ac->timer_on ? \Carbon\Carbon::parse($ac->timer_on)->format('H:i') : '' }}"
                                                     class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
-
                                             </div>
 
                                             <!-- OFF -->
                                             <div>
                                                 <p class="text-xs text-gray-400 mb-1">TURN OFF</p>
-                                                <input type="time" name="timer_off" value="{{ $ac->timer_off }}"
+                                                <input type="time" name="timer_off"
+                                                    value="{{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->format('H:i') : '' }}"
                                                     class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
                                             </div>
-
                                         </div>
 
                                         <!-- BUTTON -->
@@ -609,24 +589,20 @@
                                             </button>
 
                                         </div>
-
                                     </form>
-
                                 </div>
+                            </div>
+                        </div>
+                    </div>
                 @endforeach
             </div>
-
         </div>
-
     </div>
-
-
 
     <!-- MODAL -->
     @auth
         @if (in_array(Auth::user()->role, ['admin', 'operator']))
             <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-
                 <div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
 
                     <h2 class="text-xl font-bold mb-5">
@@ -634,7 +610,6 @@
                     </h2>
 
                     <form method="POST" action="/rooms/{{ $room->id }}/ac">
-
                         @csrf
 
                         <input type="number" name="ac_number" placeholder="AC Number"
@@ -651,16 +626,11 @@
                             Create AC
 
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
         @endif
     @endauth
-
-
 
     <script>
         function toggleSidebar() {
@@ -694,9 +664,7 @@
                 btn.classList.remove('hidden');
             }
         }
-    </script>
 
-    <script>
         function toggleDropdown() {
             const el = document.getElementById('dropdownAC');
 
@@ -711,25 +679,30 @@
 
         function selectAC(id, name) {
 
-            document.getElementById('selectedAC').innerText = name;
+            console.log("Selected:", id);
 
-            const dropdown = document.getElementById('dropdownAC');
-            dropdown.classList.remove('show');
-            setTimeout(() => dropdown.classList.add('hidden'), 200);
+            document.getElementById('selectedAC').innerText = name;
 
             document.querySelectorAll('.ac-panel').forEach(el => {
                 el.classList.add('hidden');
             });
 
-            document.getElementById('ac-' + id).classList.remove('hidden');
+            let target = document.getElementById('ac-' + id);
 
-            const deleteForm = document.getElementById('deleteForm');
-            if (deleteForm) {
-                deleteForm.action = "/ac/" + id;
+            console.log("TARGET:", target);
+
+            if (target) {
+                target.classList.remove('hidden');
+            } else {
+                console.error("AC panel tidak ditemukan:", id);
             }
+
+            document.getElementById('dropdownAC').classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('dropdownAC').classList.add('hidden');
+            }, 200);
         }
 
-        // klik luar = tutup dropdown
         window.addEventListener('click', function(e) {
 
             let dropdown = document.getElementById('dropdownAC');
@@ -739,9 +712,13 @@
                 setTimeout(() => dropdown.classList.add('hidden'), 200);
             }
         });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            @if ($firstAc)
+                selectAC({{ $firstAc->id }}, "AC {{ $firstAc->ac_number }}");
+            @endif
+        });
     </script>
-
-
 </body>
 
 </html>

@@ -70,9 +70,7 @@
 <body class="bg-gray-50">
 
     <!-- SIDEBAR -->
-
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
-
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -87,7 +85,6 @@
             </button>
 
         </div>
-
 
         @auth
             <ul class="space-y-3">
@@ -126,8 +123,8 @@
                         </a>
                     </li>
                 @endif
-
             </ul>
+
             <!-- PROFILE PINDAH KE BAWAH -->
             @auth
                 <div class="absolute bottom-6 left-6 right-6">
@@ -170,7 +167,6 @@
         @endauth
     </div>
 
-
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
         <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
@@ -190,17 +186,12 @@
             @endauth
         </header>
 
-
         <!-- CONTENT -->
-
         <div class="p-8">
             <!-- ROOM GRID -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($rooms as $room)
-                    <div
-                        class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
-
-
+                    <div class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
                         <div class="flex justify-between items-start mb-2">
 
                             <div>
@@ -231,7 +222,6 @@
                             <i class="fa-solid fa-server text-gray-400 text-lg"></i>
 
                         </div>
-
 
                         <p class="text-gray-500 text-sm mb-4">
                             Total : {{ $room->acUnits->count() }} units
@@ -269,7 +259,6 @@
 
                                         @csrf
                                         @method('DELETE')
-
                                         <button onclick="return confirm('Delete this room?')"
                                             class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
 
@@ -280,22 +269,14 @@
                                     </form>
                                 @endif
                             @endauth
-
                         </div>
-
                     </div>
                 @endforeach
-
             </div>
-
         </div>
-
     </div>
 
-
-
     <!-- MODAL -->
-
     @auth
         @if (in_array(Auth::user()->role, ['admin', 'operator']))
             <div id="modal" class="hidden fixed inset-0 modal-bg flex items-center justify-center">
@@ -313,7 +294,7 @@
                         <input type="text" name="name" placeholder="Room Name"
                             class="border p-3 w-full mb-3 rounded-lg" required>
 
-                        <!-- 🔥 TAMBAHAN WAJIB -->
+                        <!-- TAMBAHAN WAJIB -->
                         <input type="text" name="device_id" placeholder="ESP ID (contoh: esp32_01)"
                             class="border p-3 w-full mb-4 rounded-lg" required>
 
@@ -321,14 +302,10 @@
                             Create Room
                         </button>
                     </form>
-
                 </div>
-
             </div>
         @endif
     @endauth
-
-
 
     <script>
         function toggleSidebar() {

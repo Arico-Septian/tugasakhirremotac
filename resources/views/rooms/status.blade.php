@@ -60,14 +60,11 @@
 
 </head>
 
-
 <body class="bg-gray-50">
 
     <!-- SIDEBAR -->
     @auth
-
         <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
-
             <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
                 <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -83,10 +80,9 @@
 
             </div>
 
-
             <ul class="space-y-3">
 
-                {{-- Dashboard (SEMUA ROLE) --}}
+                {{-- Dashboard --}}
                 <li>
                     <a href="/dashboard"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
@@ -95,7 +91,7 @@
                     </a>
                 </li>
 
-                {{-- Rooms (Admin + Operator) --}}
+                {{-- Rooms --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
                         <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
@@ -104,7 +100,7 @@
                         </a>
                     </li>
 
-                    {{-- User Management (ADMIN ONLY) --}}
+                    {{-- User Management --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
@@ -125,6 +121,7 @@
                     @endif
                 @endif
             </ul>
+
             <!-- PROFILE PINDAH KE BAWAH -->
             @auth
                 <div class="absolute bottom-6 left-6 right-6">
@@ -164,25 +161,17 @@
 
                 </div>
             @endauth
-
         </div>
     @endauth
 
-
-
     <!-- MAIN -->
-
     <div class="main-content min-h-screen flex flex-col">
 
-
         <!-- HEADER -->
-
         <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
-
             <div class="flex items-center gap-4">
 
                 <!-- BACK BUTTON -->
-
                 <a href="/dashboard" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
 
                     <i class="fa-solid fa-arrow-left"></i>
@@ -194,23 +183,15 @@
                 </h1>
 
             </div>
-
         </header>
 
-
-
         <!-- CONTENT -->
-
         <div class="p-8">
 
-
             <!-- AC GRID -->
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
                 @foreach ($acs as $ac)
                     <div class="ac-card">
-
                         <div class="flex justify-between items-center mb-4">
 
                             <h2 class="text-lg font-semibold">
@@ -223,17 +204,13 @@
 
                         </div>
 
-
                         <p class="text-gray-500 text-sm mb-4">
 
                             Brand : {{ $ac->brand }}
 
                         </p>
 
-
-                        @if ($ac->status)
-                            <!-- POWER -->
-
+                        <!-- POWER -->
                             <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
@@ -244,15 +221,13 @@
 
                                 </span>
 
-                                <span id="power-{{ $ac->ac_number }}" class="font-semibold">
-                                    {{ $ac->status->power ?? 'OFF' }}
+                                <span id="power-{{ $ac->id }}" class="font-semibold">
+                                    {{ $ac->status?->power ?? 'OFF' }}
                                 </span>
 
                             </div>
 
-
                             <!-- TEMP -->
-
                             <div class="bg-blue-50 text-blue-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
@@ -263,15 +238,13 @@
 
                                 </span>
 
-                                <span id="temp-{{ $ac->ac_number }}" class="font-semibold">
-                                    {{ $ac->status->set_temperature ?? 24 }}°C
+                                <span id="temp-{{ $ac->id }}" class="font-semibold">
+                                    {{ $ac->status?->set_temperature ?? 24 }}°C
                                 </span>
 
                             </div>
 
-
                             <!-- MODE -->
-
                             <div class="bg-purple-50 text-purple-700 p-3 rounded-lg flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
@@ -282,80 +255,60 @@
 
                                 </span>
 
-                                <span id="mode-{{ $ac->ac_number }}" class="font-semibold">
-                                    {{ $ac->status->mode ?? 'AUTO' }}
+                                <span id="mode-{{ $ac->id }}" class="font-semibold">
+                                    {{ $ac->status?->mode ?? 'AUTO' }}
                                 </span>
 
                             </div>
-                        @else
+
                             <div class="bg-gray-100 text-gray-500 p-3 rounded-lg text-center text-sm">
 
                                 No Status Data
 
                             </div>
-                        @endif
 
                     </div>
                 @endforeach
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <script>
         function toggleSidebar() {
             document.getElementById("sidebar").classList.toggle("close")
         }
+
+        function loadStatus() {
+            fetch('/api/ac-status')
+                .then(res => res.json())
+                .then(data => {
+                    if (!Array.isArray(data)) return;
+
+                    data.forEach(ac => {
+                        if (!ac.ac_unit) return;
+
+                        let id = ac.ac_unit.id;
+
+                        let powerEl = document.getElementById('power-' + id);
+                        let tempEl = document.getElementById('temp-' + id);
+                        let modeEl = document.getElementById('mode-' + id);
+
+                        if (powerEl) {
+                            powerEl.innerText = ac.power ?? 'OFF';
+                        }
+
+                        if (tempEl) {
+                            tempEl.innerText = (ac.set_temperature ?? 24) + '°C';
+                        }
+
+                        if (modeEl) {
+                            modeEl.innerText = ac.mode ?? 'AUTO';
+                        }
+                    });
+                })
+                .catch(err => console.error("Fetch error:", err));
+        }
     </script>
-
-    <script>
-function loadStatus() {
-    fetch('/api/ac-status')
-    .then(res => res.json())
-    .then(data => {
-
-        data.forEach(ac => {
-            let id = ac.ac_unit.ac_number;
-
-            let powerEl = document.getElementById('power-' + id);
-            let tempEl = document.getElementById('temp-' + id);
-            let modeEl = document.getElementById('mode-' + id);
-
-            if (powerEl) {
-                powerEl.innerText = ac.power;
-
-                // warna power
-                powerEl.parentElement.classList.remove('bg-green-50','text-green-700','bg-red-50','text-red-700');
-
-                if (ac.power === 'ON') {
-                    powerEl.parentElement.classList.add('bg-green-50','text-green-700');
-                } else {
-                    powerEl.parentElement.classList.add('bg-red-50','text-red-700');
-                }
-            }
-
-            if (tempEl) {
-                tempEl.innerText = ac.set_temperature + '°C';
-            }
-
-            if (modeEl) {
-                modeEl.innerText = ac.mode;
-            }
-        });
-
-    });
-}
-
-// realtime tiap 2 detik
-setInterval(loadStatus, 2000);
-
-// load pertama
-loadStatus();
-</script>
 
 </body>
 
