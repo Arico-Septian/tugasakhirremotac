@@ -18,23 +18,23 @@ class MqttSubscribe extends Command
     {
         $mqtt = new MqttService();
 
-        $this->info("🚀 MQTT LISTENER STARTED");
+        $this->info("MQTT LISTENER STARTED");
 
         $mqtt->subscribeMultiple([
 
-            /* === 🟢 DEVICE ONLINE === */
+            /* === DEVICE ONLINE === */
             'device/+/online' => function ($topic, $message) use ($mqtt) {
 
                 $data = json_decode($message, true);
 
                 if (!$data || empty($data['device_id'])) {
-                    $this->warn("⚠️ JSON ONLINE tidak valid");
+                    $this->warn("JSON ONLINE tidak valid");
                     return;
                 }
 
                 $deviceId = $this->normalize($data['device_id']);
 
-                $this->info("🟢 ESP ONLINE: {$deviceId}");
+                $this->info("ESP ONLINE: {$deviceId}");
 
                 $this->setOnline($deviceId);
 
@@ -43,7 +43,7 @@ class MqttSubscribe extends Command
                 event(new DeviceStatusUpdated($deviceId, 'online'));
             },
 
-            /* === 💓 PING === */
+            /* === PING === */
             'device/+/ping' => function ($topic) {
 
                 $deviceId = $this->extractDeviceId($topic, 'ping');
@@ -51,12 +51,12 @@ class MqttSubscribe extends Command
 
                 $this->setOnline($deviceId);
 
-                $this->line("💓 PING: {$deviceId}");
+                $this->line("PING: {$deviceId}");
 
                 event(new DeviceStatusUpdated($deviceId, 'online'));
             },
 
-            /* === 🔴 STATUS (LWT) === */
+            /* === STATUS (LWT) === */
             'device/+/status' => function ($topic, $message) {
 
                 $deviceId = $this->extractDeviceId($topic, 'status');
@@ -64,7 +64,7 @@ class MqttSubscribe extends Command
 
                 if ($message === 'offline') {
 
-                    $this->error("🔴 ESP OFFLINE: {$deviceId}");
+                    $this->error("ESP OFFLINE: {$deviceId}");
 
                     Cache::forget("device_{$deviceId}_last_seen");
                     Cache::forever("device_status_{$deviceId}", 'offline');
@@ -80,7 +80,7 @@ class MqttSubscribe extends Command
 
                 } elseif ($message === 'online') {
 
-                    $this->info("🟢 STATUS ONLINE: {$deviceId}");
+                    $this->info("STATUS ONLINE: {$deviceId}");
 
                     $this->setOnline($deviceId);
 
@@ -88,7 +88,7 @@ class MqttSubscribe extends Command
                 }
             },
 
-            /* === ❤️ HEARTBEAT === */
+            /* === HEARTBEAT === */
             'device/+/heartbeat' => function ($topic) {
 
                 $deviceId = $this->extractDeviceId($topic, 'heartbeat');
@@ -97,13 +97,13 @@ class MqttSubscribe extends Command
                 $this->setOnline($deviceId);
             },
 
-            /* === ➕ ADD AC === */
+            /* === ADD AC === */
             'room/+/ac/add' => function ($topic, $message) {
 
                 $data = json_decode($message, true);
 
                 if (!$data || empty($data['id'])) {
-                    $this->warn("⚠️ AC ADD tidak valid");
+                    $this->warn("AC ADD tidak valid");
                     return;
                 }
 
@@ -128,13 +128,13 @@ class MqttSubscribe extends Command
                     ]
                 );
 
-                $this->info("➕ AC ditambahkan ke {$roomName}");
+                $this->info("AC ditambahkan ke {$roomName}");
             },
 
         ]);
     }
 
-    /* === 🔧 HELPER: SET ONLINE === */
+    /* === HELPER: SET ONLINE === */
     private function setOnline($deviceId)
     {
         $deviceId = $this->normalize($deviceId);
@@ -144,7 +144,7 @@ class MqttSubscribe extends Command
         Cache::forget("device_unknown_{$deviceId}");
     }
 
-    /* === 🔧 HELPER: EXTRACT DEVICE ID === */
+    /* === HELPER: EXTRACT DEVICE ID === */
     private function extractDeviceId($topic, $type)
     {
         if (!preg_match("/device\/(.+)\/{$type}/", $topic, $matches)) {
@@ -154,7 +154,7 @@ class MqttSubscribe extends Command
         return $this->normalize($matches[1]);
     }
 
-    /* === 🔧 HELPER: NORMALIZE ID === */
+    /* === HELPER: NORMALIZE ID === */
     private function normalize($value)
     {
         return strtolower(trim($value));

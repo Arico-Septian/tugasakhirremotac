@@ -15,7 +15,7 @@ class CheckDeviceStatus extends Command
 
     public function handle()
     {
-        $this->info("🚀 Device checker started...");
+        $this->info("Device checker started...");
         sleep(5);
 
         while (true) {
@@ -40,7 +40,7 @@ class CheckDeviceStatus extends Command
                         if (!$lastSeen) {
 
                             if (!Cache::get($unknownKey)) {
-                                $this->line("⚠️ UNKNOWN: {$deviceId}");
+                                $this->line("UNKNOWN: {$deviceId}");
                                 Cache::put($unknownKey, true, 60);
                             }
 
@@ -62,7 +62,7 @@ class CheckDeviceStatus extends Command
 
                             if ($currentStatus !== 'offline') {
 
-                                $this->info("🔴 OFFLINE: {$deviceId} (diff: {$diff}s)");
+                                $this->info("OFFLINE: {$deviceId} (diff: {$diff}s)");
 
                                 Cache::forever($statusKey, 'offline');
                                 Cache::forget($unknownKey);
@@ -82,7 +82,7 @@ class CheckDeviceStatus extends Command
 
                             if ($currentStatus !== 'online') {
 
-                                $this->info("🟢 ONLINE: {$deviceId} (diff: {$diff}s)");
+                                $this->info("ONLINE: {$deviceId} (diff: {$diff}s)");
 
                                 Cache::forever($statusKey, 'online');
                                 Cache::forget($unknownKey);

@@ -12,11 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class RoomController extends Controller
 {
-    /**
-     * =============================
-     * 📋 LIST ROOM + STATUS ESP
-     * =============================
-     */
+    /* === LIST ROOM + STATUS ESP ===*/
     public function index()
     {
         $rooms = Room::with(['acUnits.status'])->get();
@@ -25,10 +21,8 @@ class RoomController extends Controller
 
             $deviceId = strtolower($room->device_id);
 
-            // default dari cache
             $status = Cache::get("device_status_{$deviceId}", 'offline');
 
-            // fallback dari last_seen
             $lastSeen = Cache::get("device_{$deviceId}_last_seen");
 
             if ($lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
@@ -41,11 +35,7 @@ class RoomController extends Controller
         return view('rooms.index', compact('rooms'));
     }
 
-    /**
-     * =============================
-     * ➕ CREATE ROOM
-     * =============================
-     */
+    /*=== CREATE ROOM ===*/
     public function store(Request $request)
     {
         $request->validate([
@@ -71,7 +61,6 @@ class RoomController extends Controller
             ])
         );
 
-        // 🔥 set default status biar langsung muncul di UI
         Cache::put("device_status_{$deviceId}", 'offline');
 
         UserLog::create([
@@ -84,11 +73,7 @@ class RoomController extends Controller
         return redirect('/rooms');
     }
 
-    /**
-     * =============================
-     * ❌ DELETE ROOM
-     * =============================
-     */
+    /*=== DELETE ROOM ===*/
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
@@ -97,13 +82,11 @@ class RoomController extends Controller
 
         $mqtt = new MqttService();
 
-        // 🔥 clear ESP
         $mqtt->publish(
             "device/{$deviceId}/clear",
             json_encode(new \stdClass())
         );
 
-        // 🔥 bersihkan cache
         Cache::forget("device_status_{$deviceId}");
         Cache::forget("device_{$deviceId}_last_seen");
 
@@ -119,11 +102,7 @@ class RoomController extends Controller
         return redirect('/rooms');
     }
 
-    /**
-     * =============================
-     * 📊 DETAIL STATUS AC
-     * =============================
-     */
+    /*=== DETAIL STATUS AC ===*/
     public function status($id)
     {
         $room = Room::findOrFail($id);

@@ -53,7 +53,7 @@ class MqttService
             ])
         );
 
-        echo "📤 CONFIG + AC LIST DIKIRIM KE {$deviceId}\n";
+        echo "CONFIG + AC LIST DIKIRIM KE {$deviceId}\n";
     }
 
     public function subscribeMultiple(array $topics)
@@ -62,7 +62,6 @@ class MqttService
             $this->mqtt->subscribe($topic, $callback);
         }
 
-        // loop sekali untuk semua
         $this->mqtt->loop(true);
     }
 }

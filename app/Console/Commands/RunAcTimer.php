@@ -46,7 +46,7 @@ class RunAcTimer extends Command
 
                         Cache::put($key, true, 120);
 
-                        $this->info("🟢 TIMER ON → AC {$ac->ac_number}");
+                        $this->info("TIMER ON → AC {$ac->ac_number}");
                     }
                 }
             }
@@ -70,7 +70,7 @@ class RunAcTimer extends Command
 
                         Cache::put($key, true, 120);
 
-                        $this->info("🔴 TIMER OFF → AC {$ac->ac_number}");
+                        $this->info("TIMER OFF → AC {$ac->ac_number}");
                     }
                 }
             }

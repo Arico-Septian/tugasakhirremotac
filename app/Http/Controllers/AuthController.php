@@ -61,7 +61,6 @@ class AuthController extends Controller
 
             $user->save();
 
-            // ✅ FIX LOGOUT LOG
             UserLog::create([
                 'user_id' => $user->id,
                 'room' => null,
