@@ -613,7 +613,7 @@
                     <form method="POST" action="/rooms/{{ $room->id }}/ac">
                         @csrf
 
-                        <input type="number" name="ac_number" placeholder="AC Number"
+                        <input type="number" name="ac_number" min="1" max="15" placeholder="AC Number"
                             class="border p-3 w-full mb-3 rounded-lg">
 
                         <input type="text" name="name" placeholder="AC Name"

@@ -28,11 +28,19 @@ class AcUnitController extends Controller
             'ac_number' => [
                 'required',
                 'integer',
+                'min:1',
+                'max:15',
                 Rule::unique('ac_units')->where(function ($q) use ($roomId) {
                     return $q->where('room_id', $roomId);
                 })
             ]
         ]);
+
+        $count = AcUnit::where('room_id', $roomId)->count();
+
+        if ($count >= 15) {
+            return back()->with('error', 'Maksimal 15 AC per ruangan');
+        }
 
         $room = Room::findOrFail($roomId);
 

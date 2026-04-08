@@ -191,7 +191,8 @@
             <!-- ROOM GRID -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($rooms as $room)
-                    <div class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
+                    <div
+                        class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
                         <div class="flex justify-between items-start mb-2">
 
                             <div>
@@ -227,6 +228,13 @@
                             Total : {{ $room->acUnits->count() }} units
                         </p>
 
+                        @if ($room->temperature)
+                            <div class="bg-blue-50 text-blue-700 p-2 rounded mb-3 text-sm flex justify-between">
+                                <span>🌡️ Temperature</span>
+                                <span class="font-semibold">{{ $room->temperature }} °C</span>
+                            </div>
+                        @endif
+
                         <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
                             <span>Active Units</span>
                             <span class="font-semibold">
@@ -240,7 +248,7 @@
                             <span>Inactive Units</span>
                             <span class="font-semibold">
                                 {{ $room->acUnits->filter(function ($ac) {
-                                        return $ac->status && $ac->status->power == 'OFF';
+                                        return !$ac->status || $ac->status->power == 'OFF';
                                     })->count() }}
                             </span>
                         </div>

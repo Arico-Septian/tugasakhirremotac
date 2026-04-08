@@ -9,6 +9,7 @@ use App\Services\MqttService;
 use App\Models\UserLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Models\RoomTemperature;
 
 class RoomController extends Controller
 {
@@ -30,6 +31,12 @@ class RoomController extends Controller
             }
 
             $room->device_status = $status;
+
+            $latestTemp = RoomTemperature::where('room', $room->name)
+                ->latest()
+                ->first();
+
+            $room->temperature = $latestTemp ? $latestTemp->temperature : null;
         }
 
         return view('rooms.index', compact('rooms'));
