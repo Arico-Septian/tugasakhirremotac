@@ -680,6 +680,8 @@
 
         function selectAC(id, name) {
 
+            localStorage.setItem("selectedAC", id);
+
             console.log("Selected:", id);
 
             document.getElementById('selectedAC').innerText = name;
@@ -714,15 +716,38 @@
 
                 let id = "{{ session('new_ac_id') }}";
 
+                localStorage.setItem("selectedAC", id);
+
                 let el = document.querySelector(`[onclick*="selectAC(${id},"]`);
                 let name = el ? el.innerText.trim() : "AC";
 
                 selectAC(id, name);
             @else
 
-                @if ($firstAc)
-                    selectAC({{ $firstAc->id }}, "AC {{ $firstAc->ac_number }}");
-                @endif
+                let saved = localStorage.getItem("selectedAC");
+
+                if (saved) {
+
+                    let target = document.getElementById('ac-' + saved);
+
+                    if (target) {
+
+                        let el = document.querySelector(`[onclick*="selectAC(${saved},"]`);
+                        let name = el ? el.innerText.trim() : "AC";
+
+                        selectAC(saved, name);
+
+                    } else {
+
+                        localStorage.removeItem("selectedAC");
+
+                        @if ($firstAc)
+                            selectAC({{ $firstAc->id }}, "AC {{ $firstAc->ac_number }}");
+                        @endif
+
+                    }
+
+                }
             @endif
 
         });
