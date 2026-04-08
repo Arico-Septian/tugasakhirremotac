@@ -39,18 +39,18 @@ class MqttListener extends Command
 
         $mqtt->connect($settings, true);
 
-        $mqtt->subscribe('room/+/ac/+/status', function ($topic, $message) {
+        $mqtt->subscribe('room/+/temperature', function ($topic, $message) {
 
             $data = json_decode($message, true);
 
-            if (isset($data['room_temp'])) {
+            if (isset($data['temperature'])) {
 
                 RoomTemperature::create([
                     'room' => $data['room'],
-                    'temperature' => $data['room_temp']
+                    'temperature' => $data['temperature']
                 ]);
 
-                echo "Suhu masuk: " . $data['room_temp'] . "\n";
+                echo "Suhu masuk: " . $data['temperature'] . "\n";
             }
         }, 0);
 
