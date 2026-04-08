@@ -61,7 +61,7 @@ class AcUnitController extends Controller
             'activity' => 'add_ac'
         ]);
 
-        return back();
+        return redirect()->back()->with('new_ac_id', $ac->id);
     }
 
     public function destroy($id)

@@ -421,7 +421,8 @@
                             <div class="ac-card flex flex-col items-center justify-center text-center">
 
                                 <!-- POWER -->
-                                <form action="/ac/{{ $ac->id }}/toggle" method="POST">
+                                <form action="/ac/{{ $ac->id }}/toggle" method="POST"
+                                    onsubmit="return handleSubmit({{ $ac->id }})">
                                     @csrf
                                     <button type="submit"
                                         class="w-20 h-20 rounded-full flex items-center justify-center
@@ -707,21 +708,28 @@
             }, 200);
         }
 
-        window.addEventListener('click', function(e) {
-
-            let dropdown = document.getElementById('dropdownAC');
-
-            if (!e.target.closest('#dropdownAC') && !e.target.closest('[onclick="toggleDropdown()"]')) {
-                dropdown.classList.remove('show');
-                setTimeout(() => dropdown.classList.add('hidden'), 200);
-            }
-        });
-
         document.addEventListener("DOMContentLoaded", function() {
-            @if ($firstAc)
-                selectAC({{ $firstAc->id }}, "AC {{ $firstAc->ac_number }}");
+
+            @if (session('new_ac_id'))
+
+                let id = "{{ session('new_ac_id') }}";
+
+                let el = document.querySelector(`[onclick*="selectAC(${id},"]`);
+                let name = el ? el.innerText.trim() : "AC";
+
+                selectAC(id, name);
+            @else
+
+                @if ($firstAc)
+                    selectAC({{ $firstAc->id }}, "AC {{ $firstAc->ac_number }}");
+                @endif
             @endif
+
         });
+
+        function handleSubmit(id) {
+            return true;
+        }
     </script>
 </body>
 

@@ -205,12 +205,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
-Route::get('/dashboard/ac-control', [AcUnitController::class, 'index']);
-
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::post('/rooms', [RoomController::class, 'store']);
 
-Route::get('/rooms', [RoomController::class, 'index']);
 Route::post('/rooms/add', [RoomController::class, 'store']);
 
 Route::get('/rooms/{id}/ac', [AcUnitController::class, 'index']);
@@ -222,10 +219,6 @@ Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
 Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
 Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
 
-Route::get('/rooms', [RoomController::class, 'index']);
-Route::post('/rooms', [RoomController::class, 'store']);
-Route::get('/rooms/{id}/ac', [AcUnitController::class, 'index']);
-Route::post('/rooms/{id}/ac', [AcUnitController::class, 'store']);
 
 Route::delete('/rooms/{id}', [RoomController::class, 'destroy']);
 Route::delete('/ac/{id}', [AcUnitController::class, 'destroy']);
