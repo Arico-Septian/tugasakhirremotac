@@ -74,7 +74,7 @@
         <div data-aos="zoom-in" class="text-6xl mb-6">❄️</div>
 
         <!-- TITLE -->
-        <h1 data-aos="fade-up" class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+        <h1 data-aos="fade-up" class="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             Intelligent Climate Control
             <span class="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200">
                 Powered by IoT Technology
@@ -95,7 +95,7 @@
         </p>
 
         <!-- BUTTON -->
-        <div data-aos="fade-up" data-aos-delay="400" class="flex gap-4">
+        <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
             <a href="/login"
                 class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow
                   hover:scale-110 hover:shadow-xl transition duration-300">
@@ -106,7 +106,7 @@
     </section>
 
     <!-- ILUSTRASI -->
-    <section class="py-16 px-8 flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
+    <section class="py-12 px-4 sm:px-8 flex flex-col md:flex-row items-center gap-10 max-w-6xl mx-auto">
 
         <div data-aos="fade-right" class="flex-1 tilt">
             <img src="https://cdn-icons-png.flaticon.com/512/1048/1048943.png" class="w-full max-w-md mx-auto">
@@ -133,7 +133,7 @@
             Key Features
         </h2>
 
-        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
             <div class="tilt p-6 rounded-2xl shadow hover:shadow-xl transition">
                 <h3 class="font-bold text-lg mb-2">⚡ Real-Time Intelligence</h3>
@@ -174,27 +174,30 @@
             once: true
         });
 
-        tsParticles.load("tsparticles", {
-            particles: {
-                number: {
-                    value: 60
-                },
-                size: {
-                    value: 3
-                },
-                move: {
-                    speed: 1
-                },
-                links: {
-                    enable: true,
-                    color: "#ffffff",
-                    opacity: 0.2
-                },
-                opacity: {
-                    value: 0.3
+        if (window.innerWidth > 768) {
+            tsParticles.load("tsparticles", {
+                particles: {
+                    number: {
+                        value: 60
+                    },
+                    size: {
+                        value: 3
+                    },
+                    move: {
+                        speed: 1
+                    },
+                    links: {
+                        enable: true,
+                        color: "#ffffff",
+                        opacity: 0.2
+                    },
+                    opacity: {
+                        value: 0.3
+                    }
                 }
-            }
-        });
+            });
+        }
+
 
         VanillaTilt.init(document.querySelectorAll(".tilt"), {
             max: 10,
@@ -203,14 +206,16 @@
             "max-glare": 0.2
         });
 
-        document.addEventListener("mousemove", (e) => {
-            document.querySelectorAll(".parallax-layer").forEach(layer => {
-                let speed = 20;
-                let x = (window.innerWidth - e.pageX * speed) / 100;
-                let y = (window.innerHeight - e.pageY * speed) / 100;
-                layer.style.transform = `translate(${x}px, ${y}px)`;
+        if (window.innerWidth > 768) {
+            document.addEventListener("mousemove", (e) => {
+                document.querySelectorAll(".parallax-layer").forEach(layer => {
+                    let speed = 20;
+                    let x = (window.innerWidth - e.pageX * speed) / 100;
+                    let y = (window.innerHeight - e.pageY * speed) / 100;
+                    layer.style.transform = `translate(${x}px, ${y}px)`;
+                });
             });
-        });
+        }
     </script>
 
 </body>

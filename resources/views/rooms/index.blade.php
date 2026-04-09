@@ -47,7 +47,7 @@
         .room-card {
             background: white;
             border-radius: 20px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             transition: all 0.25s ease;
             backdrop-filter: blur(6px);
@@ -83,6 +83,12 @@
 
         button:active {
             transform: scale(0.97);
+        }
+
+        @media (min-width: 768px) {
+            .room-card {
+                padding: 24px;
+            }
         }
     </style>
 
@@ -218,7 +224,7 @@
         <div class="p-4 md:p-8">
 
             <!-- ROOM GRID -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 @foreach ($rooms as $room)
                     <div
                         class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
@@ -282,7 +288,7 @@
                             </span>
                         </div>
 
-                        <div class="flex gap-3">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <a href="/rooms/{{ $room->id }}/ac"
                                 class="flex-1 text-center bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
 

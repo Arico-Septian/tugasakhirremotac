@@ -393,16 +393,35 @@
             @endphp
 
             <div
-                class="header-wrap flex flex-col md:flex-row gap-3 md:gap-0 justify-between items-start md:items-center mb-6 px-4 md:px-6 py-4">
+                class="flex items-center justify-between px-4 py-3 mb-4 bg-white/70 backdrop-blur-md rounded-xl shadow-sm">
 
                 <!-- LEFT -->
-                <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-4 w-full">
+                <div class="flex items-center gap-3">
+
+                    <!-- MENU -->
+                    <button onclick="toggleSidebar()" class="text-lg text-gray-600">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <!-- TITLE -->
+                    <div>
+                        <h1 class="text-base font-semibold text-gray-800">
+                            Centralized AC Management
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-wrap flex items-center justify-between gap-2 px-3 py-3 mb-6">
+
+                <!-- LEFT -->
+                <div class="flex items-center gap-2 min-w-0">
 
                     <!-- SELECT AC  -->
                     <div onclick="toggleDropdown()"
-                        class="flex items-center gap-3 px-5 py-3 bg-white border rounded-full shadow-sm cursor-pointer hover:shadow w-full max-w-[200px]">
+                        class="flex items-center gap-3 px-3 py-2 text-sm bg-white border rounded-full shadow-sm cursor-pointer hover:shadow w-auto max-w-[120px]">
 
-                        <span id="selectedAC" class="font-medium text-gray-700">
+                        <span id="selectedAC" class="font-medium text-gray-700 truncate max-w-[80px]">
                             {{ $firstAc ? 'AC ' . $firstAc->ac_number : 'No AC' }}
                         </span>
 
@@ -416,15 +435,10 @@
                 </div>
 
                 <!-- RIGHT -->
-                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-
-                    <button onclick="toggleSidebar()" class="text-xl text-gray-600">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
+                <div class="flex items-center gap-1 shrink-0">
                     @auth
                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                            <button onclick="openModal()"
-                                class="bg-blue-600 text-white px-3 md:px-5 py-2 text-sm md:text-base rounded-lg">
+                            <button onclick="openModal()" class="bg-blue-600 text-white px-2 py-1.5 text-xs rounded-lg">
                                 + Add AC
                             </button>
                         @endif
@@ -438,7 +452,7 @@
                                 @method('DELETE')
 
                                 <button {{ !$firstAc ? 'disabled' : '' }}
-                                    class="w-10 h-10 rounded-full border border-red-400 text-red-500 hover:bg-red-50 disabled:opacity-50">
+                                    class="w-8 h-8 flex items-center justify-center rounded-full border border-red-400 text-red-500">
 
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
