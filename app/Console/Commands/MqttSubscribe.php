@@ -77,7 +77,6 @@ class MqttSubscribe extends Command
                     ]);
 
                     event(new DeviceStatusUpdated($deviceId, 'offline'));
-
                 } elseif ($message === 'online') {
 
                     $this->info("STATUS ONLINE: {$deviceId}");
@@ -86,6 +85,42 @@ class MqttSubscribe extends Command
 
                     event(new DeviceStatusUpdated($deviceId, 'online'));
                 }
+            },
+
+            'room/+/ac/+/control' => function ($topic, $message) {
+
+                $data = json_decode($message, true);
+
+                if (!$data) {
+                    $this->warn("CONTROL tidak valid");
+                    return;
+                }
+
+                $parts = explode('/', $topic);
+                $roomName = strtolower($parts[1] ?? '');
+                $acId = $parts[3] ?? null;
+
+                if (!$roomName || !$acId) return;
+
+                $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+                if (!$room) return;
+
+                $ac = \App\Models\AcUnit::where('room_id', $room->id)
+                    ->where('ac_number', $acId)
+                    ->first();
+
+                if (!$ac) return;
+
+                AcStatus::updateOrCreate(
+                    ['ac_unit_id' => $ac->id],
+                    [
+                        'power' => $data['power'] ?? 'OFF',
+                        'mode'  => $data['mode'] ?? 'COOL',
+                        'set_temperature' => (int)($data['temp'] ?? 24),
+                    ]
+                );
+
+                $this->info("AC {$acId} di {$roomName} diupdate");
             },
 
             /* === HEARTBEAT === */

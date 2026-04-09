@@ -11,7 +11,7 @@ class MqttService
 
     public function __construct()
     {
-        $server = '192.168.18.194';
+        $server = '10.218.5.60';
         $port = 1883;
         $clientId = 'laravel_' . uniqid();
 
@@ -23,9 +23,9 @@ class MqttService
         $this->mqtt->connect($connectionSettings, true);
     }
 
-    public function publish($topic, $message)
+    public function publish($topic, $message, $qos = 1, $retain = false)
     {
-        $this->mqtt->publish($topic, $message, 1, false);
+        $this->mqtt->publish($topic, $message, $qos, $retain);
     }
 
     public function subscribe($topic, $callback)
@@ -50,10 +50,32 @@ class MqttService
                     "id" => (int)$ac->ac_number,
                     "brand" => $ac->brand
                 ])
-            ])
+            ]),
+            1,
+            true
         );
 
-        echo "CONFIG + AC LIST DIKIRIM KE {$deviceId}\n";
+        foreach ($acs as $ac) {
+
+            $status = \App\Models\AcStatus::where('ac_unit_id', $ac->id)->first();
+
+            if (!$status) continue;
+
+            $topic = "room/" . strtolower($room->name) . "/ac/{$ac->ac_number}/control";
+
+            $this->publish(
+                $topic,
+                json_encode([
+                    "power" => $status->power,
+                    "mode"  => $status->mode,
+                    "temp"  => (int)($status->set_temperature ?? 24)
+                ]),
+                1,
+                true
+            );
+        }
+
+        echo "CONFIG + STATUS DIKIRIM KE {$deviceId}\n";
     }
 
     public function subscribeMultiple(array $topics)

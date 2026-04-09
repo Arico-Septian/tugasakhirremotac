@@ -54,13 +54,7 @@ class AcUnitController extends Controller
 
         $mqtt = new \App\Services\MqttService();
 
-        $mqtt->publish(
-            "room/{$room->name}/ac/add",
-            json_encode([
-                "id" => (int)$ac->ac_number,
-                "brand" => $ac->brand
-            ])
-        );
+        $mqtt->resendConfig($room->device_id);
 
         UserLog::create([
             'user_id' => Auth::id(),
@@ -78,15 +72,6 @@ class AcUnitController extends Controller
 
         $room = Room::findOrFail($ac->room_id);
 
-        $mqtt = new \App\Services\MqttService();
-
-        $mqtt->publish(
-            "room/{$room->name}/ac/remove",
-            json_encode([
-                "id" => (int)$ac->ac_number
-            ])
-        );
-
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
@@ -97,6 +82,10 @@ class AcUnitController extends Controller
         $room_id = $ac->room_id;
 
         $ac->delete();
+
+        $mqtt = new \App\Services\MqttService();
+
+        $mqtt->resendConfig($room->device_id);
 
         return redirect('/rooms/' . $room_id . '/ac');
     }
