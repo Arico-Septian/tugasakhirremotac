@@ -36,7 +36,7 @@
         }
 
         .sidebar {
-            transition: all .3s ease;
+            transition: transform 0.3s ease;
         }
 
         .sidebar.close {
@@ -71,9 +71,10 @@
         .stat-card {
             background: white;
             border-radius: 18px;
-            padding: 20px;
+            padding: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all .25s ease;
+            backdrop-filter: blur(6px);
         }
 
         .stat-card:hover {
@@ -89,6 +90,7 @@
             padding: 24px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
             transition: all .25s ease;
+            backdrop-filter: blur(10px);
         }
 
         .room-card:hover {
@@ -126,11 +128,25 @@
             }
 
         }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        a:active {
+            transform: scale(0.97);
+        }
     </style>
 
 </head>
 
 <body class="bg-gray-100">
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+
+    <div id="loader" class="fixed inset-0 bg-white flex items-center justify-center hidden z-50">
+        <span class="text-blue-500 font-semibold text-lg">Loading...</span>
+    </div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
@@ -151,7 +167,7 @@
             @auth
                 <li>
                     <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100">
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -160,7 +176,8 @@
                 {{-- Admin + Operator --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
-                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/rooms"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -170,7 +187,8 @@
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
-                        <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/users"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
                             <i class="fa-solid fa-users"></i>
                             <span class="menu-text">User Management</span>
                         </a>
@@ -180,7 +198,8 @@
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
-                        <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/logs"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             <span class="menu-text">Activity Log</span>
                         </a>
@@ -230,13 +249,12 @@
     </div>
 
     <!-- MAIN -->
-    <div class="main-content min-h-screen flex flex-col">
+    <div class="main-content min-h-screen flex flex-col w-full">
 
         <!-- HEADER -->
-        <header
-            class="sticky top-0 bg-white px-6 py-4 flex items-center justify-between shadow-sm transition-all duration-300">
+        <header class="sticky top-0 bg-white px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
             @auth
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3 md:gap-6">
 
                     <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
                         <i class="fa-solid fa-bars"></i>
@@ -244,8 +262,7 @@
 
                     <div>
 
-                        <h1 class="text-2xl font-bold text-gray-800">
-                            Centralized AC Management
+                        <h1 class="text-lg md:text-2xl font-bold text-gray-800"> Centralized AC Management
                         </h1>
 
                         <p class="text-sm text-gray-400">
@@ -269,10 +286,10 @@
         </header>
 
         <!-- CONTENT -->
-        <div class="px-6 py-6">
+        <div class="px-4 md:px-6 py-4 md:py-6">
 
             <!-- STATISTICS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
                 <div class="stat-card">
                     <div class="flex justify-between items-center">
                         <div>
@@ -363,7 +380,7 @@
                 Server Rooms
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($rooms as $room)
                     <div class="room-card">
 
@@ -416,13 +433,24 @@
 
     <script>
         function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            let overlay = document.getElementById("overlay");
 
-            let sidebar = document.getElementById("sidebar")
-
-            sidebar.classList.toggle("close")
-            sidebar.classList.toggle("open")
-
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("hidden");
         }
+
+        document.getElementById("overlay").onclick = function() {
+            document.getElementById("sidebar").classList.remove("open");
+            this.classList.add("hidden");
+        };
+
+        document.querySelectorAll("#sidebar a").forEach(link => {
+            link.addEventListener("click", () => {
+                document.getElementById("sidebar").classList.remove("open");
+                document.getElementById("overlay").classList.add("hidden");
+            });
+        });
 
         function toggleProfile() {
 
