@@ -49,7 +49,8 @@
             border-radius: 20px;
             padding: 24px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            transition: all .25s ease;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(6px);
         }
 
         .room-card:hover {
@@ -63,11 +64,33 @@
             background: rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(4px);
         }
+
+        @media(max-width:900px) {
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
     </style>
 
 </head>
 
 <body class="bg-gray-50">
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
@@ -86,8 +109,8 @@
 
         </div>
 
-        @auth
-            <ul class="space-y-3">
+        <ul class="space-y-3">
+            @auth
                 <li>
                     <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
                         <i class="fa-solid fa-chart-pie"></i>
@@ -169,8 +192,13 @@
 
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
-        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+        <header class="sticky top-0 bg-white border-b px-4 md:px-8 py-3 md:py-5 flex justify-between items-center">
             <div class="flex items-center gap-4">
+
+                <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
                 <h1 class="text-2xl font-bold text-gray-800">
                     Room Management
                 </h1>
@@ -187,9 +215,10 @@
         </header>
 
         <!-- CONTENT -->
-        <div class="p-8">
+        <div class="p-4 md:p-8">
+
             <!-- ROOM GRID -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($rooms as $room)
                     <div
                         class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
@@ -317,8 +346,24 @@
 
     <script>
         function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("close")
+            let sidebar = document.getElementById("sidebar");
+            let overlay = document.getElementById("overlay");
+
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("hidden");
         }
+
+        document.getElementById("overlay").onclick = function() {
+            document.getElementById("sidebar").classList.remove("open");
+            this.classList.add("hidden");
+        };
+
+        document.querySelectorAll("#sidebar a").forEach(link => {
+            link.addEventListener("click", () => {
+                document.getElementById("sidebar").classList.remove("open");
+                document.getElementById("overlay").classList.add("hidden");
+            });
+        });
 
         function openModal() {
             document.getElementById("modal").classList.remove("hidden")

@@ -15,8 +15,15 @@
     <style>
         /* ===== SIDEBAR ===== */
 
+        button,
+        a,
+        .ac-card,
+        .mode-btn {
+            transition: all 0.2s ease;
+        }
+
         .sidebar {
-            transition: .3s;
+            transition: transform 0.3s ease;
         }
 
         .sidebar.close {
@@ -49,7 +56,7 @@
             backdrop-filter: blur(16px);
             border-radius: 22px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
             transition: .3s;
         }
 
@@ -161,7 +168,7 @@
             gap: 6px;
             background: #f9fafb;
             border-radius: 16px;
-            height: 68px;
+            height: 60px;
             font-size: 12px;
             transition: .25s;
             border: 1px solid #eee;
@@ -238,11 +245,49 @@
             transform-origin: top left;
             will-change: transform, opacity;
         }
+
+        @media(max-width:900px) {
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        @media(min-width:768px) {
+            .mode-btn {
+                height: 68px;
+            }
+        }
+
+        @media(max-width:640px) {
+            .ac-card {
+                border-radius: 18px;
+                padding: 18px !important;
+            }
+        }
+
+        html,
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
     </style>
 
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50">
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-x-hidden">
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r">
@@ -341,20 +386,21 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <!-- CONTENT -->
-        <div class="p-8">
+        <div class="p-4 md:p-8">
 
             @php
                 $firstAc = $acs->first();
             @endphp
 
-            <div class="header-wrap flex justify-between items-center mb-6 px-6 py-4">
+            <div
+                class="header-wrap flex flex-col md:flex-row gap-3 md:gap-0 justify-between items-start md:items-center mb-6 px-4 md:px-6 py-4">
 
                 <!-- LEFT -->
-                <div class="flex items-center gap-4">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-4 w-full">
 
                     <!-- SELECT AC  -->
                     <div onclick="toggleDropdown()"
-                        class="flex items-center gap-3 px-5 py-3 bg-white border rounded-full shadow-sm cursor-pointer hover:shadow min-w-[200px] justify-between">
+                        class="flex items-center gap-3 px-5 py-3 bg-white border rounded-full shadow-sm cursor-pointer hover:shadow w-full max-w-[200px]">
 
                         <span id="selectedAC" class="font-medium text-gray-700">
                             {{ $firstAc ? 'AC ' . $firstAc->ac_number : 'No AC' }}
@@ -364,17 +410,21 @@
                     </div>
 
                     <!-- ROOM -->
-                    <span class="text-gray-400 tracking-widest text-sm">
+                    <span class="text-gray-400 tracking-widest text-xs md:text-sm">
                         {{ strtoupper($room->name) }}
                     </span>
                 </div>
 
                 <!-- RIGHT -->
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+
+                    <button onclick="toggleSidebar()" class="text-xl text-gray-600">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
                     @auth
                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
                             <button onclick="openModal()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+                                class="bg-blue-600 text-white px-3 md:px-5 py-2 text-sm md:text-base rounded-lg">
                                 + Add AC
                             </button>
                         @endif
@@ -412,28 +462,30 @@
                 </div>
             </div>
 
-            <div class="p-8 pt-0">
+            <div class="p-4 md:p-8 pt-0">
                 @foreach ($acs as $ac)
                     <div id="ac-{{ $ac->id }}" class="ac-panel hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-[350px_1fr] gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-6">
 
                             <!-- LEFT -->
-                            <div class="ac-card flex flex-col items-center justify-center text-center">
+                            <div class="ac-card p-5 md:p-8 flex flex-col items-center justify-center text-center">
 
                                 <!-- POWER -->
                                 <form action="/ac/{{ $ac->id }}/toggle" method="POST"
                                     onsubmit="return handleSubmit({{ $ac->id }})">
                                     @csrf
                                     <button type="submit"
-                                        class="w-20 h-20 rounded-full flex items-center justify-center
-                                        {{ $ac->status && $ac->status?->power == 'ON' ? 'bg-green-500 shadow-green-300' : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:scale-110 transition">
+                                        class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center
+                                        {{ $ac->status && $ac->status?->power == 'ON'
+                                            ? 'bg-green-500 shadow-green-300 ring-4 ring-green-200 animate-pulse'
+                                            : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:scale-110 transition">
                                         <i class="fa-solid fa-power-off"></i>
                                     </button>
                                 </form>
 
                                 <!-- TEMPERATURE -->
                                 <div class="mt-6">
-                                    <div class="text-6xl font-bold text-blue-600">
+                                    <div class="text-3xl md:text-6xl font-bold text-blue-600">
                                         {{ $ac->status?->set_temperature ?? 24 }}°C
                                     </div>
 
@@ -443,16 +495,16 @@
                                 </div>
 
                                 <!-- BUTTON -->
-                                <div class="flex gap-6 mt-6">
+                                <div class="flex gap-3 md:gap-6 mt-6">
                                     <button
                                         onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
-                                        class="w-12 h-12 bg-gray-200 rounded-full text-xl hover:scale-110">
+                                        class="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full text-xl hover:scale-110">
                                         −
                                     </button>
 
                                     <button
                                         onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) + 1 }})"
-                                        class="w-12 h-12 bg-blue-600 text-white rounded-full text-xl hover:scale-110">
+                                        class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:scale-110">
                                         +
                                     </button>
                                 </div>
@@ -461,7 +513,7 @@
                             <!-- RIGHT -->
                             <div class="flex flex-col gap-5">
                                 <!-- INFO -->
-                                <div class="grid grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="ac-card text-center">
                                         <p class="text-xs text-gray-400">SET TEMP</p>
                                         <p class="text-xl font-semibold">
@@ -487,23 +539,28 @@
                                 <!-- MODE -->
                                 <div class="ac-card">
                                     <p class="text-gray-500 mb-4 text-sm">OPERATING MODE</p>
-                                    <div class="grid grid-cols-5 gap-2">
-                                        <a href="/ac/{{ $ac->id }}/mode/cool" class="mode-btn">
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                        <a href="/ac/{{ $ac->id }}/mode/cool"
+                                            class="mode-btn {{ ($ac->status?->mode ?? '') == 'COOL' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                             <i class="fa-solid fa-snowflake"></i> Cool
                                         </a>
 
-                                        <a href="/ac/{{ $ac->id }}/mode/heat" class="mode-btn">
+                                        <a href="/ac/{{ $ac->id }}/mode/heat"
+                                            class="mode-btn {{ ($ac->status?->mode ?? '') == 'HEAT' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                             <i class="fa-solid fa-fire"></i> Heat
                                         </a>
 
-                                        <a href="/ac/{{ $ac->id }}/mode/dry" class="mode-btn">
+                                        <a href="/ac/{{ $ac->id }}/mode/dry"
+                                            class="mode-btn {{ ($ac->status?->mode ?? '') == 'DRY' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                             <i class="fa-solid fa-droplet"></i> Dry
                                         </a>
 
-                                        <a href="/ac/{{ $ac->id }}/mode/fan" class="mode-btn">
+                                        <a href="/ac/{{ $ac->id }}/mode/fan"
+                                            class="mode-btn {{ ($ac->status?->mode ?? '') == 'FAN' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                             <i class="fa-solid fa-fan"></i> Fan
                                         </a>
-                                        <a href="/ac/{{ $ac->id }}/mode/auto" class="mode-btn">
+                                        <a href="/ac/{{ $ac->id }}/mode/auto"
+                                            class="mode-btn {{ ($ac->status?->mode ?? '') == 'AUTO' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                             <i class="fa-solid fa-rotate"></i> Auto
                                         </a>
                                     </div>
@@ -635,8 +692,22 @@
 
     <script>
         function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("close")
+            let sidebar = document.getElementById("sidebar");
+            let overlay = document.getElementById("overlay");
+
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("hidden");
         }
+        document.getElementById("overlay").onclick = function() {
+            document.getElementById("sidebar").classList.remove("open");
+            this.classList.add("hidden");
+        };
+        document.querySelectorAll("#sidebar a").forEach(link => {
+            link.addEventListener("click", () => {
+                document.getElementById("sidebar").classList.remove("open");
+                document.getElementById("overlay").classList.add("hidden");
+            });
+        });
 
         function openModal() {
             document.getElementById('modal').classList.remove('hidden')
