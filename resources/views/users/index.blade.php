@@ -40,10 +40,18 @@
         }
 
         .card {
-            background: white;
-            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         @media(max-width:900px) {
@@ -66,8 +74,8 @@
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         body {
@@ -81,15 +89,22 @@
         .sidebar {
             will-change: transform;
         }
+
+        .custom-bg {
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="custom-bg">
 
     <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
 
     <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 p-6 bg-white shadow-lg h-full z-50">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 p-6 bg-slate-900 text-white shadow-lg h-full z-50">
 
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
@@ -98,7 +113,7 @@
                 <span class="menu-text">AC System</span>
             </h2>
 
-            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-300 hover:text-blue-500">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
@@ -108,7 +123,7 @@
 
             @auth
                 <li>
-                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -117,7 +132,7 @@
                 {{-- Admin + Operator --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
-                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -129,7 +144,7 @@
                 @if (Auth::user()->role == 'admin')
                     <li>
                         <a href="/users"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100">
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold hover:bg-blue-100">
                             <i class="fa-solid fa-users"></i>
                             <span class="menu-text">User Management</span>
                         </a>
@@ -162,7 +177,7 @@
                         </div>
 
                         <div class="text-left menu-text">
-                            <p class="text-sm font-semibold text-gray-800">
+                            <p class="text-sm font-semibold text-white">
                                 {{ Auth::user()->name }}
                             </p>
                             <p class="text-xs text-gray-400">
@@ -194,22 +209,22 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <header
-            class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-5 flex items-center justify-between shadow-sm">
+            class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
 
             <div class="flex items-center gap-3 md:gap-6">
 
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 text-base">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-300 text-base">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800">
+                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white">
                     User Management
                 </h1>
 
             </div>
 
             <button onclick="openModal()"
-                class="bg-blue-600 text-white px-3 py-1 md:px-4 md:py-1 rounded-lg text-sm shadow hover:bg-blue-700">
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-4 md:py-2.5 text-sm rounded-lg shadow flex items-center gap-1">
                 + Add User
             </button>
 
@@ -219,13 +234,19 @@
             <div class="w-full max-w-7xl mx-auto">
 
                 <!-- STATS -->
-                <div class="card mb-6 flex justify-between items-center gap-2 max-w-sm mx-auto md:max-w-full">
+                <div class="card mb-6 flex items-center justify-between px-6 py-5">
+
                     <div>
-                        <p class="text-gray-500 text-sm">Total Users</p>
-                        <h2 class="text-2xl md:text-3xl font-bold">
-                            {{ $users->count() }}</h2>
+                        <p class="text-gray-300 text-sm">Total Users</p>
+                        <h2 class="text-3xl font-bold text-white">
+                            {{ $users->count() }}
+                        </h2>
                     </div>
-                    <i class="fa-solid fa-users text-lg md:text-3xl text-blue-500"></i>
+
+                    <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
+                        <i class="fa-solid fa-users text-lg"></i>
+                    </div>
+
                 </div>
 
                 <!-- TABLE -->
@@ -235,34 +256,36 @@
                     <!--  MOBILE (HP) -->
                     <div class="block md:hidden space-y-3 px-2">
                         @foreach ($users as $user)
-                            <div class="border rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition w-full sm:max-w-sm mx-auto">
+                            <div
+                                class="border rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition w-full sm:max-w-sm mx-auto">
 
-                                <p class="font-semibold text-gray-800">{{ $user->name }}</p>
+                                <p class="font-semibold text-white">{{ $user->name }}</p>
 
                                 <div class="mt-2 flex justify-between text-xs sm:text-sm">
-                                    <span class="text-gray-500">Role</span>
+                                    <span class="text-gray-300">Role</span>
                                     <span
                                         class="px-2 py-1 rounded-full text-xs
                                         {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
-                                        {{ $user->role == 'operator' ? 'bg-green-100 text-green-600' : '' }}
-                                        {{ $user->role == 'user' ? 'bg-gray-100 text-gray-600' : '' }}">
+                                        {{ $user->role == 'operator' ? 'bg-green-500/20 text-green-300' : '' }}
+                                        {{ $user->role == 'user' ? 'bg-white/10 text-gray-300' : '' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </div>
 
                                 <div class="mt-2 flex justify-between text-sm">
-                                    <span class="text-gray-500">Status</span>
+                                    <span class="text-gray-300">Status</span>
                                     @if ($user->is_online)
                                         <span class="text-green-600 text-xs">Online</span>
                                     @else
-                                        <span class="text-gray-500 text-xs">Offline</span>
+                                        <span class="text-gray-300 text-xs">Offline</span>
                                     @endif
                                 </div>
 
                                 <form action="/users/{{ $user->id }}" method="POST" class="mt-3">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2 rounded text-sm">
+                                    <button
+                                        class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2 rounded text-sm">
                                         Delete
                                     </button>
                                 </form>
@@ -273,10 +296,10 @@
 
                     <!-- DESKTOP -->
                     <div class="hidden md:block overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full text-white">
 
-                            <thead class="border-b bg-gray-50">
-                                <tr class="text-left text-gray-500 text-sm">
+                            <thead class="border-b border-white/10 bg-white/5">
+                                <tr class="text-left text-gray-300 text-sm">
                                     <th class="p-3">Name</th>
                                     <th class="p-3">Role</th>
                                     <th class="p-3">Status</th>
@@ -286,16 +309,16 @@
 
                             <tbody>
                                 @foreach ($users as $user)
-                                    <tr class="border-b hover:bg-gray-50 transition">
+                                    <tr class="border-b hover:bg-white/5 transition">
 
                                         <td class="p-3 font-medium">{{ $user->name }}</td>
 
                                         <td class="p-3">
                                             <span
                                                 class="px-3 py-1 rounded-full text-xs md:text-sm
-                                                {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
-                                                {{ $user->role == 'operator' ? 'bg-green-100 text-green-600' : '' }}
-                                                {{ $user->role == 'user' ? 'bg-gray-100 text-gray-600' : '' }}">
+                                                {{ $user->role == 'admin' ? 'bg-white/10 text-blue-400' : '' }}
+                                                {{ $user->role == 'operator' ? 'bg-green-500/20 text-green-300' : '' }}
+                                                {{ $user->role == 'user' ? 'bg-white/10 text-gray-300' : '' }}">
                                                 {{ ucfirst($user->role) }}
                                             </span>
                                         </td>
@@ -303,10 +326,10 @@
                                         <td class="p-3">
                                             @if ($user->is_online)
                                                 <span
-                                                    class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">Online</span>
+                                                    class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Online</span>
                                             @else
                                                 <span
-                                                    class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">Offline</span>
+                                                    class="bg-white/10 text-gray-400 px-2 py-1 rounded text-xs">Offline</span>
                                             @endif
                                         </td>
 
@@ -333,37 +356,62 @@
         </div>
 
         <!-- MODAL -->
-        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div id="modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
 
-            <div class="bg-white p-8 rounded-xl w-[90%] max-w-md">
+            <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
 
-                <div class="flex justify-between mb-4">
-                    <h2 class="text-xl font-bold">Add New User</h2>
-                    <button onclick="closeModal()" class="text-gray-500">✕</button>
-                </div>
+                <!-- ❌ CLOSE BUTTON -->
+                <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">
+                    ✕
+                </button>
+
+                <!-- TITLE -->
+                <h2 class="text-lg md:text-xl font-semibold text-white mb-5">
+                    Add New User
+                </h2>
 
                 <form method="POST" action="/users">
                     @csrf
 
-                    <input type="text" name="name" placeholder="Name" class="border p-3 w-full mb-3 rounded"
+                    <!-- NAME -->
+                    <input type="text" name="name" placeholder="Name"
+                        class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                         required>
 
+                    <!-- PASSWORD -->
                     <input type="password" name="password" placeholder="Password"
-                        class="border p-3 w-full mb-3 rounded" required>
+                        class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required>
 
-                    <select name="role" class="border p-3 w-full mb-4 rounded">
-                        <option value="admin">Admin</option>
-                        <option value="operator">Operator</option>
-                        <option value="user">User</option>
-                    </select>
+                    <!-- ROLE -->
+                    <div class="relative mb-4">
 
-                    <button class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
+                        <select name="role"
+                            class="w-full p-3 pr-10 rounded-lg border border-gray-300 bg-white text-gray-700
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
+               transition shadow-sm appearance-none">
+
+                            <option value="admin">Admin</option>
+                            <option value="operator">Operator</option>
+                            <option value="user">User</option>
+                        </select>
+
+                        <!-- ICON -->
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            <i class="fa-solid fa-chevron-down text-sm"></i>
+                        </div>
+
+                    </div>
+                    <!-- BUTTON -->
+                    <button
+                        class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">
                         Create User
                     </button>
+
                 </form>
 
             </div>
-
         </div>
 
         <script>

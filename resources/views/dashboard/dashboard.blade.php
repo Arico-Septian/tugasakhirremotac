@@ -14,8 +14,9 @@
 
     <style>
         header {
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
         }
 
         body {
@@ -117,14 +118,12 @@
 
         /* CARD */
 
-        .stat-card {
-            background: white;
-            border-radius: 18px;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: all 0.25s ease;
-            backdrop-filter: blur(6px);
-            cursor: pointer;
+        .room-card {
+            background: rgba(15, 23, 42, 0.8);
+            color: white;
+            border-radius: 20px;
+            padding: 16px;
+            backdrop-filter: blur(12px);
         }
 
         .stat-card:hover {
@@ -135,23 +134,18 @@
         /* ROOM CARD */
 
         .room-card {
-            background: white;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
             border-radius: 20px;
             padding: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            transition: all .25s ease;
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 100%;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
         }
 
         .room-card:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        }
-
-        .room-card {
-            transition: all 0.25s ease;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* ICON */
@@ -163,7 +157,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f3f4f6;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
         /* MOBILE */
@@ -209,7 +204,18 @@
         }
 
         .stat-card {
-            min-height: 80px;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            border-radius: 16px;
+            padding: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -223,11 +229,18 @@
         .main-content {
             max-width: 1400px;
         }
+
+        .custom-bg {
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
     </style>
 
 </head>
 
-<body class="bg-gray-100">
+<body class="custom-bg">
     <div class="flex">
 
         <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
@@ -237,7 +250,7 @@
         </div>
 
         <!-- SIDEBAR -->
-        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
+        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 z-50">
             <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
                 <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -340,22 +353,23 @@
         <div class="main-content min-h-screen flex flex-col">
 
             <!-- HEADER -->
-            <header class="sticky top-0 bg-white px-4 md:px-6 py-2 md:py-3 flex items-center justify-between shadow-sm">
+            <header
+                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3 flex items-center justify-between shadow-sm">
                 @auth
                     <div class="flex items-center gap-3 md:gap-6">
 
-                        <button class="lg:hidden text-1xl text-gray-600 text-lg p-2 rounded-md hover:bg-gray-100 transition"
-                        onclick="toggleSidebar()">
+                        <button class="text-gray-300 text-lg p-2 rounded-lg hover:bg-gray-100 transition"
+                            onclick="toggleSidebar()">
                             <i class="fa-solid fa-bars"></i>
                         </button>
 
                         <div>
 
-                            <h1 class="text-base sm:text-lg md:text-xl lg:text-xl font-bold leading-tight text-gray-800">
+                            <h1 class="text-sm md:text-lg font-semibold text-white">
                                 Centralized AC Management
                             </h1>
 
-                            <p class="text-sm text-gray-400">
+                            <p class="text-xs font-bold text-gray-300">
                                 Server Room Cooling Control System
                             </p>
 
@@ -364,7 +378,7 @@
 
                     <div class="flex items-center gap-2 md:gap-6">
                         <div id="systemStatus"
-                            class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
+                            class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs md:text-sm font-medium">
 
                             <span class="w-2 h-2 bg-green-500 rounded-full"></span>
 
@@ -384,8 +398,8 @@
                         <div class="flex justify-between items-center">
                             <div>
 
-                                <p class="text-gray-500 text-sm">Rooms</p>
-                                <h2 class="text-xl md:text-2xl font-bold">{{ $rooms->count() }}</h2>
+                                <p class="font-semibold text-lg text-white">Rooms</p>
+                                <h2 class="text-xl md:text-2xl font-bold text-white">{{ $rooms->count() }}</h2>
 
                             </div>
 
@@ -400,8 +414,8 @@
                         <div class="flex justify-between items-center">
                             <div>
 
-                                <p class="text-gray-500 text-sm">AC Units</p>
-                                <h2 class="text-2xl font-bold">{{ $totalAc }}</h2>
+                                <p class="font-semibold text-lg text-white">AC Units</p>
+                                <h2 class="text-2xl font-bold text-white">{{ $totalAc }}</h2>
 
                             </div>
 
@@ -417,7 +431,7 @@
 
                             <div>
 
-                                <p class="text-gray-500 text-sm">Active AC Units</p>
+                                <p class="font-semibold text-lg text-white">Active AC Units</p>
                                 <h2 class="text-2xl font-bold">{{ $activeAc }}</h2>
 
                             </div>
@@ -434,8 +448,8 @@
 
                             <div>
 
-                                <p class="text-gray-500 text-sm">Users</p>
-                                <h2 class="text-2xl font-bold">{{ $users }}</h2>
+                                <h3 class="font-semibold text-lg text-white">Users</p>
+                                    <h2 class="text-2xl font-bold">{{ $users }}</h2>
 
                             </div>
 
@@ -451,10 +465,10 @@
 
                             <div>
 
-                                <p class="text-gray-500 text-sm">Users Online</p>
-                                <h2 id="usersOnlineCount" class="text-2xl font-bold">
-                                    {{ $usersOnline }}
-                                </h2>
+                                <h3 class="font-semibold text-lg text-white">Users Online</p>
+                                    <h2 id="usersOnlineCount" class="text-2xl font-bold">
+                                        {{ $usersOnline }}
+                                    </h2>
                             </div>
 
                             <div class="icon-box text-orange-500">
@@ -466,7 +480,7 @@
                 </div>
 
                 <!-- SERVER ROOMS -->
-                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">
                     Server Rooms
                 </h2>
 
@@ -478,7 +492,7 @@
 
                                 <div class="flex justify-between mb-3">
 
-                                    <h3 class="font-semibold text-lg">{{ $room->name }}</h3>
+                                    <h3 class="font-semibold text-lg text-white">{{ $room->name }}</h3>
 
                                     <i class="fa-solid fa-server text-gray-400"></i>
 
@@ -488,8 +502,26 @@
                                     Total : {{ $room->acUnits->count() }} units
                                 </p>
 
+                                <!-- SUHU RUANGAN -->
+                                @php
+                                    $temp = $room->temperature;
+                                @endphp
+
                                 <div
-                                    class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
+                                    class="p-2.5 md:p-3 rounded mb-3 text-sm flex justify-between
+                                    {{ $temp > 30 ? 'bg-red-500/20 text-red-300' : ($temp > 25 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-blue-500/20 text-blue-300') }}">
+
+                                    <span>
+                                        Temp Ruangan
+                                    </span>
+
+                                    <span id="temp-{{ $room->id }}" class="font-semibold">
+                                        {{ $temp ?? '--' }} °C
+                                    </span>
+                                </div>
+
+                                <div
+                                    class="bg-green-500/20 text-green-300 p-3 rounded-lg mb-2 flex justify-between text-sm">
 
                                     <span>Active Units</span>
 
@@ -500,7 +532,7 @@
                                 </div>
 
                                 <div
-                                    class="bg-gray-100 text-gray-600 p-3 rounded-lg mb-4 flex justify-between text-sm">
+                                    class="bg-white/10 text-gray-300 p-3 rounded-lg mb-4 flex justify-between text-sm">
 
                                     <span>Inactive Units</span>
 
@@ -513,7 +545,7 @@
                                 <a href="/rooms/{{ $room->id }}/status">
 
                                     <button
-                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-gray-900 text-white hover:bg-black transition active:scale-95 hover:scale-[1.02]">
+                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-blue-600 hover:bg-blue-700 text-white hover:bg-black transition active:scale-95 hover:scale-[1.02]">
 
                                         View Details
 

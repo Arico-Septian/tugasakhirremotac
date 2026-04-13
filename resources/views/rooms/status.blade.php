@@ -311,9 +311,22 @@
 
                             </div>
 
-                            <div class="bg-gray-100 text-gray-500 p-3 rounded-lg text-center text-sm">
+                            <!-- TIMER -->
+                            <div class="bg-yellow-50 text-yellow-700 p-3 rounded-lg mt-3 flex justify-between text-sm">
 
-                                No Status Data
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Timer
+                                </span>
+
+                                <span id="timer-{{ $ac->id }}" class="font-semibold">
+                                    @if ($ac->timer_on || $ac->timer_off)
+                                        {{ $ac->timer_on ? 'ON ' . substr($ac->timer_on, 0, 5) : '' }}
+                                        {{ $ac->timer_off ? '| OFF ' . substr($ac->timer_off, 0, 5) : '' }}
+                                    @else
+                                        OFF
+                                    @endif
+                                </span>
 
                             </div>
 
@@ -356,6 +369,7 @@
                         let powerEl = document.getElementById('power-' + id);
                         let tempEl = document.getElementById('temp-' + id);
                         let modeEl = document.getElementById('mode-' + id);
+                        let timerEl = document.getElementById('timer-' + id);
 
                         if (powerEl) {
                             powerEl.innerText = ac.power ?? 'OFF';
@@ -368,10 +382,41 @@
                         if (modeEl) {
                             modeEl.innerText = ac.mode ?? 'AUTO';
                         }
+
+                        if (timerEl) {
+                            let onTime = ac.ac_unit?.timer_on;
+                            let offTime = ac.ac_unit?.timer_off;
+
+                            if (onTime || offTime) {
+                                let onText = onTime ? 'ON ' + formatTime(onTime) : '';
+                                let offText = offTime ? 'OFF ' + formatTime(offTime) : '';
+
+                                timerEl.innerText = [onText, offText].filter(Boolean).join(' | ');
+
+                                timerEl.classList.add('text-green-600');
+                                timerEl.classList.remove('text-gray-500');
+                            } else {
+                                timerEl.innerText = 'OFF';
+
+                                timerEl.classList.add('text-gray-500');
+                                timerEl.classList.remove('text-green-600');
+                            }
+
+                            timerEl.innerText = timer;
+                        }
                     });
                 })
                 .catch(err => console.error("Fetch error:", err));
         }
+
+        function formatTime(t) {
+            return t ? t.substring(0, 5) : '';
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadStatus();
+            setInterval(loadStatus, 3000);
+        });
     </script>
 
 </body>

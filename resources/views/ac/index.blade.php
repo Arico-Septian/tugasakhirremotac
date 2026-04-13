@@ -52,7 +52,8 @@
         /* ===== CARD ===== */
 
         .ac-card {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(15, 23, 42, 0.85);
+            color: white;
             backdrop-filter: blur(16px);
             border-radius: 22px;
             padding: 30px;
@@ -161,31 +162,33 @@
         /* ===== MODE BUTTON ===== */
 
         .mode-btn {
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            background: #f9fafb;
+            background: rgba(30, 41, 59, 0.8);
             border-radius: 16px;
             height: 60px;
             font-size: 12px;
             transition: .25s;
-            border: 1px solid #eee;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .mode-btn:hover {
-            background: #eef2ff;
+            background: rgba(59, 130, 246, 0.2);
             transform: translateY(-3px) scale(1.05);
         }
 
         /* ===== HEADER ===== */
 
         .header-wrap {
-            position: relative;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
             border-radius: 999px;
-            background: white;
-            backdrop-filter: none;
+            backdrop-filter: blur(12px);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
@@ -215,6 +218,13 @@
             transition: all 0.25s ease;
             transform: translateY(10px);
             opacity: 0;
+        }
+
+        #dropdownAC {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 160px;
         }
 
         #dropdownAC.show {
@@ -262,16 +272,20 @@
             max-width: 100%;
             overflow-x: hidden;
         }
+
+        body {
+            background-attachment: fixed;
+        }
     </style>
 
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-x-hidden">
+<body class="bg-[url('/images/wallpaper.jpeg')] bg-cover bg-center overflow-x-hidden">
 
     <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
     <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r border-white/5">
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
                 <i class="fa-solid fa-layer-group"></i>
@@ -338,10 +352,10 @@
                         </div>
 
                         <div class="text-left menu-text">
-                            <p class="text-sm font-semibold text-gray-800">
+                            <p class="text-sm font-semibold text-white">
                                 {{ Auth::user()->name }}
                             </p>
-                            <p class="text-xs text-gray-400">
+                            <p class="text-xs text-gray0">
                                 {{ Auth::user()->role ?? 'Administrator' }}
                             </p>
                         </div>
@@ -364,58 +378,58 @@
     </div>
 
     <!-- MAIN -->
-    <div class="main-content min-h-screen flex flex-col">
+    <div class="main-content min-h-screen flex flex-col bg-transparent">
 
         <!-- CONTENT -->
-        <div class="p-4 md:p-8">
+        <div class="pt-0 pb-6">
 
             @php
                 $firstAc = $acs->first();
             @endphp
 
-            <div
-                class="flex items-center justify-between h-[64px] px-4 md:px-6 mb-4 bg-white/70 backdrop-blur-md rounded-xl shadow-sm">
+            <header
+                 class="flex items-center justify-between px-6 py-4 bg-slate-900 text-white w-full -ml-2">
                 <!-- LEFT -->
                 <div class="flex items-center gap-3 h-full">
 
                     <!-- MENU -->
-                    <button onclick="toggleSidebar()" class="text-lg text-gray-600">
+                    <button onclick="toggleSidebar()" class="text-lg text-white">
                         <i class="fa-solid fa-bars"></i>
                     </button>
 
                     <!-- TITLE -->
                     <div>
-                        <h1 class="text-base md:text-xl font-semibold text-gray-800 leading-none">
+                        <h1 class="text-base md:text-xl font-semibold text-white leading-none">
                             Centralized AC Management
                         </h1>
                     </div>
                 </div>
             </div>
 
-            <div class="header-wrap flex items-center justify-between h-[64px] px-3 md:px-6 mb-6">
+            <div class="header-wrap relative flex items-center justify-between h-[64px] px-3 md:px-6 mb-2">
 
                 <!-- LEFT -->
                 <div class="flex items-center gap-2 min-w-0">
 
                     <!-- SELECT AC  -->
                     <div onclick="toggleDropdown()"
-                        class="flex items-center gap-3 px-3 py-2 text-sm bg-white border rounded-full shadow-sm cursor-pointer hover:shadow w-auto max-w-[120px]">
+                        class="flex items-center gap-3 px-3 py-2 text-sm bg-slate-800 text-white border border-white/10 rounded-full">
 
-                        <span id="selectedAC" class="font-medium text-gray-700 truncate max-w-[80px]">
+                        <span id="selectedAC" class="font-medium text-white truncate max-w-[80px]">
                             {{ $firstAc ? 'AC ' . $firstAc->ac_number : 'No AC' }}
                         </span>
 
-                        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                        <i class="fa-solid fa-chevron-down text-xs text-white"></i>
                     </div>
 
                     <!-- ROOM -->
-                    <span class="text-gray-400 tracking-widest text-xs md:text-sm">
+                    <span class="text-white tracking-widest text-xs md:text-sm">
                         {{ strtoupper($room->name) }}
                     </span>
                 </div>
 
                 <!-- RIGHT -->
-                <div class="flex items-center gap-1 shrink-0">
+                <div class="flex items-center gap-3 shrink-0">
                     @auth
                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
                             <button onclick="openModal()"
@@ -444,11 +458,11 @@
 
                 <!-- DROPDOWN BARU -->
                 <div id="dropdownAC"
-                    class="hidden absolute top-full left-0 mt-2 w-64 bg-white border rounded-xl shadow-lg z-[9999]">
+                    class="absolute bg-[rgba(15,23,42,0.95)] border border-white/10 text-white rounded-xl shadow-lg">
 
                     @foreach ($acs as $ac)
                         <div onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }}')"
-                            class="px-4 py-3 hover:bg-blue-100 cursor-pointer">
+                            class="px-4 py-3 hover:bg-blue-500/20" cursor-pointer">
 
                             AC {{ $ac->ac_number }}
 
@@ -457,7 +471,7 @@
                 </div>
             </div>
 
-            <div class="p-4 md:p-8 pt-0">
+            <div class="p-4 md:p-8 pt-2  ">
                 @foreach ($acs as $ac)
                     <div id="ac-{{ $ac->id }}" class="ac-panel hidden">
                         <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-6">
@@ -484,7 +498,7 @@
                                         {{ $ac->status?->set_temperature ?? 24 }}°C
                                     </div>
 
-                                    <p class="text-xs text-gray-400 tracking-widest">
+                                    <p class="text-xs text-white tracking-widest">
                                         TEMPERATURE
                                     </p>
                                 </div>
@@ -493,7 +507,7 @@
                                 <div class="flex gap-3 md:gap-6 mt-6">
                                     <button
                                         onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
-                                        class="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full text-xl hover:scale-110">
+                                        class="w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600 hover:scale-110">
                                         −
                                     </button>
 
@@ -510,7 +524,7 @@
                                 <!-- INFO -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="ac-card text-center">
-                                        <p class="text-xs text-gray-400">SET TEMP</p>
+                                        <p class="text-xs text-white">SET TEMP</p>
                                         <p class="text-xl font-semibold">
                                             {{ $ac->status?->set_temperature ?? 24 }}°C
                                         </p>
@@ -524,7 +538,7 @@
 
                                     <div class="ac-card text-center">
                                         <p
-                                            class="text-xl font-semibold {{ ($ac->status?->power ?? 'OFF') == 'ON' ? 'text-green-600' : 'text-gray-400' }}">
+                                            class="text-xl font-semibold {{ ($ac->status?->power ?? 'OFF') == 'ON' ? 'text-green-600' : 'text-white' }}">
 
                                             {{ $ac->status?->power ?? 'OFF' }}
                                         </p>
@@ -579,6 +593,11 @@
                                     </div>
 
                                     <!-- DEFAULT VIEW -->
+                                    @if (session('success'))
+                                        <p class="text-green-500 text-sm mb-2">
+                                            {{ session('success') }}
+                                        </p>
+                                    @endif
                                     <div id="timerView-{{ $ac->id }}">
                                         @if ($ac->timer_on || $ac->timer_off)
                                             <p class="text-gray-600 text-sm">
@@ -589,11 +608,15 @@
                                                 {{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->format('H:i') : '--:--' }}
                                             </p>
 
-                                            <p class="text-green-500 text-xs mt-1">
-                                                Timer aktif
-                                            </p>
+                                            @if ($ac->timer_on)
+                                                <p class="text-green-500 text-xs mt-1">Timer ON aktif</p>
+                                            @elseif ($ac->timer_off)
+                                                <p class="text-yellow-500 text-xs mt-1">Timer OFF aktif</p>
+                                            @else
+                                                <p class="text-white text-xs mt-1">Timer tidak aktif</p>
+                                            @endif
                                         @else
-                                            <p class="text-gray-400 text-sm">
+                                            <p class="text-white text-sm">
                                                 No timer set
                                             </p>
                                         @endif
@@ -614,25 +637,28 @@
 
                                             <!-- ON -->
                                             <div>
-                                                <p class="text-xs text-gray-400 mb-1">TURN ON</p>
+                                                <p class="text-xs text-white mb-1">TURN ON</p>
                                                 <input type="time" name="timer_on"
                                                     value="{{ $ac->timer_on ? \Carbon\Carbon::parse($ac->timer_on)->format('H:i') : '' }}"
-                                                    class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
+                                                    class="w-full
+                                                    bg-slate-800 text-white border border-white/10 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
                                             </div>
 
                                             <!-- OFF -->
                                             <div>
-                                                <p class="text-xs text-gray-400 mb-1">TURN OFF</p>
+                                                <p class="text-xs text-white mb-1">TURN OFF</p>
                                                 <input type="time" name="timer_off"
                                                     value="{{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->format('H:i') : '' }}"
-                                                    class="w-full bg-gray-100 border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
+                                                    class="w-full bg-slate-800 text-white border border-white/10 rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none">
                                             </div>
                                         </div>
 
                                         <!-- BUTTON -->
                                         <div class="flex gap-3">
 
-                                            <button class="flex-1 bg-blue-600 text-white py-3 rounded-full">
+                                            <button
+                                                onclick="this.disabled=true; this.innerText='Saving...'; this.form.submit();"
+                                                class="flex-1 bg-blue-600 text-white py-3 rounded-full">
                                                 ✓ Save
                                             </button>
 

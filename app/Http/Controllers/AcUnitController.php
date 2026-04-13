@@ -92,6 +92,19 @@ class AcUnitController extends Controller
 
     public function schedule(Request $request, $id)
     {
+        $request->validate([
+            'timer_on' => 'nullable|date_format:H:i',
+            'timer_off' => 'nullable|date_format:H:i',
+        ]);
+
+        if ($request->timer_on && $request->timer_off) {
+            if ($request->timer_off <= $request->timer_on) {
+                return back()->withErrors([
+                    'Timer OFF harus lebih besar dari ON'
+                ])->withInput();
+            }
+        }
+
         $ac = AcUnit::findOrFail($id);
 
         $ac->update([
