@@ -245,7 +245,7 @@
                     <span class="menu-text">AC System</span>
                 </h2>
 
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
@@ -344,7 +344,8 @@
                 @auth
                     <div class="flex items-center gap-3 md:gap-6">
 
-                        <button class="lg:hidden text-1xl text-gray-600" onclick="toggleSidebar()">
+                        <button class="lg:hidden text-1xl text-gray-600 text-lg p-2 rounded-md hover:bg-gray-100 transition"
+                        onclick="toggleSidebar()">
                             <i class="fa-solid fa-bars"></i>
                         </button>
 

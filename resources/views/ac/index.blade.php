@@ -278,7 +278,7 @@
                 <span class="menu-text">AC System</span>
             </h2>
 
-            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>

@@ -89,7 +89,7 @@
     <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
 
     <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 p-6 bg-white shadow-lg h-full z-50">
 
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
@@ -98,7 +98,7 @@
                 <span class="menu-text">AC System</span>
             </h2>
 
-            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
@@ -194,7 +194,7 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <header
-            class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+            class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-5 flex items-center justify-between shadow-sm">
 
             <div class="flex items-center gap-3 md:gap-6">
 
@@ -209,7 +209,7 @@
             </div>
 
             <button onclick="openModal()"
-                class="bg-blue-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm shadow hover:bg-blue-700">
+                class="bg-blue-600 text-white px-3 py-1 md:px-4 md:py-1 rounded-lg text-sm shadow hover:bg-blue-700">
                 + Add User
             </button>
 

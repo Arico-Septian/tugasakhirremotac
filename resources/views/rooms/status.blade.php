@@ -34,7 +34,7 @@
         /* ===== CONTENT SHIFT ===== */
 
         .main-content {
-            margin-left: 260px;
+            margin-left: 256px;
             transition: all .3s ease;
         }
 
@@ -123,7 +123,7 @@
 
                 </h2>
 
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
@@ -217,7 +217,7 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <!-- HEADER -->
-        <header class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+        <header class="sticky top-0 bg-white border-b px-4 md:px-6 py-4 md:py-5 flex justify-between items-center ">
             <div class="flex items-center gap-4">
 
                 <button onclick="toggleSidebar()" class="md:hidden text-gray-600 text-lg">

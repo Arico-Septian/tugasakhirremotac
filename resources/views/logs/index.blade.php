@@ -92,10 +92,21 @@
                 padding: 20px;
             }
         }
+
+        @media(max-width:900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
+    <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
@@ -106,7 +117,7 @@
                 <span class="menu-text">AC System</span>
             </h2>
 
-            <button onclick="toggleSidebar()" class="text-gray-500">
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
@@ -197,10 +208,25 @@
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
 
-        <header class="sticky top-0 bg-white h-[64px] px-4 md:px-6 flex items-center justify-between shadow-sm">
-            <div>
-                <h1 class="text-base md:text-xl font-semibold text-gray-800 leading-none">Activity Log</h1>
-                <p class="text-xs text-gray-400 hidden sm:block">System & User Activity Monitoring</p>
+        <header
+            class="sticky top-0 z-40 bg-white px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+
+            <!-- LEFT -->
+            <div class="flex items-center gap-3">
+
+                <!-- HAMBURGER -->
+                <button
+                    class="md:hidden text-gray-600 text-lg p-2 rounded-md hover:bg-gray-100 active:scale-95 transition"
+                    onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <h1 class="text-base md:text-xl font-semibold text-gray-800 leading-none">
+                        Activity Log
+                    </h1>
+                    <p class="text-xs text-gray-400 hidden sm:block">System & User Activity Monitoring</p>
+                </div>
             </div>
         </header>
 
@@ -317,10 +343,21 @@
 
     <script>
         function toggleSidebar() {
-            let sidebar = document.getElementById("sidebar")
-            sidebar.classList.toggle("close")
-            sidebar.classList.toggle("open")
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
+
+            if (window.innerWidth <= 900) {
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("hidden");
+            } else {
+                sidebar.classList.toggle("close");
+            }
         }
+
+        document.getElementById("overlay").onclick = function() {
+            document.getElementById("sidebar").classList.remove("open");
+            this.classList.add("hidden");
+        };
     </script>
 
 </body>
