@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        header {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
         body {
             font-family: ui-sans-serif, system-ui;
         }
@@ -58,12 +63,56 @@
         /* CONTENT SHIFT */
 
         .main-content {
-            margin-left: 256px;
-            transition: all .3s ease;
+            margin-left: 0;
+            width: 100%;
         }
 
+        /* collapse */
         .sidebar.close+.main-content {
             margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        /* MOBILE FIX */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex: 1;
+
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: relative;
+                width: 256px;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .main-content {
+                margin-left: 256px;
+                padding-left: 1px;
+                width: calc(100% - 256px);
+            }
+
+            .sidebar.close+.main-content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            max-width: 100%;
         }
 
         /* CARD */
@@ -71,14 +120,15 @@
         .stat-card {
             background: white;
             border-radius: 18px;
-            padding: 16px;
+            padding: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: all .25s ease;
+            transition: all 0.25s ease;
             backdrop-filter: blur(6px);
+            cursor: pointer;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px) scale(1.01);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
@@ -87,15 +137,21 @@
         .room-card {
             background: white;
             border-radius: 20px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
             transition: all .25s ease;
             backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 100%;
         }
 
         .room-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.01);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .room-card {
+            transition: all 0.25s ease;
         }
 
         /* ICON */
@@ -120,13 +176,19 @@
 
             .sidebar {
                 transform: translateX(-100%);
-                position: fixed;
+                position: relative;
             }
 
             .sidebar.open {
                 transform: translateX(0);
             }
 
+        }
+
+        @media (min-width: 1024px) {
+            .main-content {
+                overflow-x: hidden;
+            }
         }
 
         html {
@@ -136,370 +198,405 @@
         a:active {
             transform: scale(0.97);
         }
+
+        #overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #overlay.active {
+            opacity: 1;
+        }
+
+        .stat-card {
+            min-height: 80px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .main-content {
+            max-width: 1400px;
+        }
     </style>
 
 </head>
 
 <body class="bg-gray-100">
+    <div class="flex">
 
-    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+        <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
-    <div id="loader" class="fixed inset-0 bg-white flex items-center justify-center hidden z-50">
-        <span class="text-blue-500 font-semibold text-lg">Loading...</span>
-    </div>
-
-    <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
-        <div class="flex justify-between items-center pb-5 mb-8 border-b">
-
-            <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
-                <i class="fa-solid fa-layer-group"></i>
-                <span class="menu-text">AC System</span>
-            </h2>
-
-            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
+        <div id="loader" class="fixed inset-0 bg-white flex items-center justify-center hidden z-50">
+            <span class="text-blue-500 font-semibold text-lg">Loading...</span>
         </div>
 
-        <ul class="space-y-3">
+        <!-- SIDEBAR -->
+        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
+            <div class="flex justify-between items-center pb-5 mb-8 border-b">
+
+                <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="menu-text">AC System</span>
+                </h2>
+
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-500">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+            <ul class="space-y-3">
+                @auth
+                    <li>
+                        <a href="/dashboard"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    {{-- Admin + Operator --}}
+                    @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                        <li>
+                            <a href="/rooms"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fa-solid fa-server"></i>
+                                <span class="menu-text">Manage Rooms</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- Admin only --}}
+                    @if (Auth::user()->role == 'admin')
+                        <li>
+                            <a href="/users"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fa-solid fa-users"></i>
+                                <span class="menu-text">User Management</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- Admin only --}}
+                    @if (Auth::user()->role == 'admin')
+                        <li>
+                            <a href="/logs"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span class="menu-text">Activity Log</span>
+                            </a>
+                        </li>
+                    @endif
+                @endauth
+            </ul>
+
+            <!-- PROFILE PINDAH KE BAWAH -->
             @auth
-                <li>
-                    <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
-                        <i class="fa-solid fa-chart-pie"></i>
-                        <span class="menu-text">Dashboard</span>
-                    </a>
-                </li>
+                <div class="absolute bottom-6 left-6 right-6">
 
-                {{-- Admin + Operator --}}
-                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                    <li>
-                        <a href="/rooms"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
-                            <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms</span>
-                        </a>
-                    </li>
-                @endif
+                    <!-- MODE NORMAL -->
+                    <div class="profile-full">
+                        <button class="w-full flex items-center gap-3 px-3 py-2">
 
-                {{-- Admin only --}}
-                @if (Auth::user()->role == 'admin')
-                    <li>
-                        <a href="/users"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
-                            <i class="fa-solid fa-users"></i>
-                            <span class="menu-text">User Management</span>
-                        </a>
-                    </li>
-                @endif
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
 
-                {{-- Admin only --}}
-                @if (Auth::user()->role == 'admin')
-                    <li>
-                        <a href="/logs"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span class="menu-text">Activity Log</span>
-                        </a>
-                    </li>
-                @endif
-            @endauth
-        </ul>
+                            <div class="text-left menu-text">
+                                <p class="text-sm font-semibold text-gray-800">
+                                    {{ Auth::user()->name }}
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    {{ Auth::user()->role ?? 'Administrator' }}
+                                </p>
+                            </div>
 
-        <!-- PROFILE PINDAH KE BAWAH -->
-        @auth
-            <div class="absolute bottom-6 left-6 right-6">
+                            <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
 
-                <!-- MODE NORMAL -->
-                <div class="profile-full">
-                    <button class="w-full flex items-center gap-3 px-3 py-2">
+                        </button>
+                    </div>
 
-                        <div
-                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </div>
-
-                        <div class="text-left menu-text">
-                            <p class="text-sm font-semibold text-gray-800">
-                                {{ Auth::user()->name }}
-                            </p>
-                            <p class="text-xs text-gray-400">
-                                {{ Auth::user()->role ?? 'Administrator' }}
-                            </p>
-                        </div>
-
-                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
-                            onclick="event.stopPropagation()">
+                    <!-- MODE COLLAPSE -->
+                    <div class="profile-collapse hidden text-center">
+                        <a href="/logout" class="text-red-500 text-xl">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </a>
-
-                    </button>
-                </div>
-
-                <!-- MODE COLLAPSE -->
-                <div class="profile-collapse hidden text-center">
-                    <a href="/logout" class="text-red-500 text-xl">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
-                </div>
-            </div>
-        @endauth
-    </div>
-
-    <!-- MAIN -->
-    <div class="main-content min-h-screen flex flex-col w-full">
-
-        <!-- HEADER -->
-        <header class="sticky top-0 bg-white px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
-            @auth
-                <div class="flex items-center gap-3 md:gap-6">
-
-                    <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-
-                    <div>
-
-                        <h1 class="text-lg md:text-2xl font-bold text-gray-800"> Centralized AC Management
-                        </h1>
-
-                        <p class="text-sm text-gray-400">
-                            Server Room Cooling Control System
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <div id="systemStatus"
-                        class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
-
-                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-
-                        Online
-
                     </div>
                 </div>
             @endauth
-        </header>
+        </div>
 
-        <!-- CONTENT -->
-        <div class="px-4 md:px-6 py-4 md:py-6">
+        <!-- MAIN -->
+        <div class="main-content min-h-screen flex flex-col">
 
-            <!-- STATISTICS -->
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-                <div class="stat-card">
-                    <div class="flex justify-between items-center">
-                        <div>
+            <!-- HEADER -->
+            <header class="sticky top-0 bg-white px-4 md:px-6 py-2 md:py-3 flex items-center justify-between shadow-sm">
+                @auth
+                    <div class="flex items-center gap-3 md:gap-6">
 
-                            <p class="text-gray-500 text-sm">Rooms</p>
-                            <h2 class="text-2xl font-bold">{{ $rooms->count() }}</h2>
-
-                        </div>
-
-                        <div class="icon-box text-blue-500">
-                            <i class="fa-solid fa-server"></i>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-center">
-                        <div>
-
-                            <p class="text-gray-500 text-sm">AC Units</p>
-                            <h2 class="text-2xl font-bold">{{ $totalAc }}</h2>
-
-                        </div>
-
-                        <div class="icon-box text-indigo-500">
-                            <i class="fa-solid fa-snowflake"></i>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-center">
+                        <button class="lg:hidden text-1xl text-gray-600" onclick="toggleSidebar()">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
 
                         <div>
 
-                            <p class="text-gray-500 text-sm">Active AC Units</p>
-                            <h2 class="text-2xl font-bold">{{ $activeAc }}</h2>
+                            <h1 class="text-base sm:text-lg md:text-xl lg:text-xl font-bold leading-tight text-gray-800">
+                                Centralized AC Management
+                            </h1>
+
+                            <p class="text-sm text-gray-400">
+                                Server Room Cooling Control System
+                            </p>
 
                         </div>
+                    </div>
 
-                        <div class="icon-box text-green-500">
-                            <i class="fa-solid fa-wind"></i>
+                    <div class="flex items-center gap-2 md:gap-6">
+                        <div id="systemStatus"
+                            class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-sm font-semibold">
+
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+
+                            Online
+
                         </div>
+                    </div>
+                @endauth
+            </header>
 
+            <!-- CONTENT -->
+            <div class="w-full max-w-7xl mx-auto px-4 md:px-6 py-6">
+
+                <!-- STATISTICS -->
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8 md:mb-12">
+                    <div class="stat-card">
+                        <div class="flex justify-between items-center">
+                            <div>
+
+                                <p class="text-gray-500 text-sm">Rooms</p>
+                                <h2 class="text-xl md:text-2xl font-bold">{{ $rooms->count() }}</h2>
+
+                            </div>
+
+                            <div class="icon-box text-blue-500">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex justify-between items-center">
+                            <div>
+
+                                <p class="text-gray-500 text-sm">AC Units</p>
+                                <h2 class="text-2xl font-bold">{{ $totalAc }}</h2>
+
+                            </div>
+
+                            <div class="icon-box text-indigo-500">
+                                <i class="fa-solid fa-snowflake"></i>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm">Active AC Units</p>
+                                <h2 class="text-2xl font-bold">{{ $activeAc }}</h2>
+
+                            </div>
+
+                            <div class="icon-box text-green-500">
+                                <i class="fa-solid fa-wind"></i>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm">Users</p>
+                                <h2 class="text-2xl font-bold">{{ $users }}</h2>
+
+                            </div>
+
+                            <div class="icon-box text-purple-500">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm">Users Online</p>
+                                <h2 id="usersOnlineCount" class="text-2xl font-bold">
+                                    {{ $usersOnline }}
+                                </h2>
+                            </div>
+
+                            <div class="icon-box text-orange-500">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="flex justify-between items-center">
+                <!-- SERVER ROOMS -->
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                    Server Rooms
+                </h2>
 
-                        <div>
+                <div class="w-full">
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 gap-6 justify-items-start lg:justify-items-start">
+                        @foreach ($rooms as $room)
+                            <div class="room-card w-full">
 
-                            <p class="text-gray-500 text-sm">Users</p>
-                            <h2 class="text-2xl font-bold">{{ $users }}</h2>
+                                <div class="flex justify-between mb-3">
 
-                        </div>
+                                    <h3 class="font-semibold text-lg">{{ $room->name }}</h3>
 
-                        <div class="icon-box text-purple-500">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
+                                    <i class="fa-solid fa-server text-gray-400"></i>
 
+                                </div>
+
+                                <p class="text-gray-500 text-sm mb-4">
+                                    Total : {{ $room->acUnits->count() }} units
+                                </p>
+
+                                <div
+                                    class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
+
+                                    <span>Active Units</span>
+
+                                    <span class="font-semibold">
+                                        {{ $room->acUnits->where('status.power', 'ON')->count() }}
+                                    </span>
+
+                                </div>
+
+                                <div
+                                    class="bg-gray-100 text-gray-600 p-3 rounded-lg mb-4 flex justify-between text-sm">
+
+                                    <span>Inactive Units</span>
+
+                                    <span class="font-semibold">
+                                        {{ $room->acUnits->where('status.power', 'OFF')->count() }}
+                                    </span>
+
+                                </div>
+
+                                <a href="/rooms/{{ $room->id }}/status">
+
+                                    <button
+                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-gray-900 text-white hover:bg-black transition active:scale-95 hover:scale-[1.02]">
+
+                                        View Details
+
+                                    </button>
+
+                                </a>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-center">
-
-                        <div>
-
-                            <p class="text-gray-500 text-sm">Users Online</p>
-                            <h2 id="usersOnlineCount" class="text-2xl font-bold">
-                                {{ $usersOnline }}
-                            </h2>
-                        </div>
-
-                        <div class="icon-box text-orange-500">
-                            <i class="fa-solid fa-user-check"></i>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- SERVER ROOMS -->
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">
-                Server Rooms
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach ($rooms as $room)
-                    <div class="room-card">
-
-                        <div class="flex justify-between mb-3">
-
-                            <h3 class="font-semibold text-lg">{{ $room->name }}</h3>
-
-                            <i class="fa-solid fa-server text-gray-400"></i>
-
-                        </div>
-
-                        <p class="text-gray-500 text-sm mb-4">
-                            Total : {{ $room->acUnits->count() }} units
-                        </p>
-
-                        <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-2 flex justify-between text-sm">
-
-                            <span>Active Units</span>
-
-                            <span class="font-semibold">
-                                {{ $room->acUnits->where('status.power', 'ON')->count() }}
-                            </span>
-
-                        </div>
-
-                        <div class="bg-gray-100 text-gray-600 p-3 rounded-lg mb-4 flex justify-between text-sm">
-
-                            <span>Inactive Units</span>
-
-                            <span class="font-semibold">
-                                {{ $room->acUnits->where('status.power', 'OFF')->count() }}
-                            </span>
-
-                        </div>
-
-                        <a href="/rooms/{{ $room->id }}/status">
-
-                            <button class="w-full py-2 rounded-lg bg-gray-900 text-white hover:bg-black transition">
-
-                                View Details
-
-                            </button>
-
-                        </a>
-                    </div>
-                @endforeach
             </div>
         </div>
-    </div>
 
-    <script>
-        function toggleSidebar() {
-            let sidebar = document.getElementById("sidebar");
-            let overlay = document.getElementById("overlay");
+        <script>
+            function toggleSidebar() {
+                let sidebar = document.getElementById("sidebar");
+                let overlay = document.getElementById("overlay");
 
-            sidebar.classList.toggle("open");
-            overlay.classList.toggle("hidden");
-        }
-
-        document.getElementById("overlay").onclick = function() {
-            document.getElementById("sidebar").classList.remove("open");
-            this.classList.add("hidden");
-        };
-
-        document.querySelectorAll("#sidebar a").forEach(link => {
-            link.addEventListener("click", () => {
-                document.getElementById("sidebar").classList.remove("open");
-                document.getElementById("overlay").classList.add("hidden");
-            });
-        });
-
-        function toggleProfile() {
-
-            document.getElementById("profileMenu").classList.toggle("hidden")
-
-        }
-        setInterval(() => {
-            fetch('/users-online')
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('usersOnlineCount').innerText = data.count;
-                });
-        }, 5000);
-
-        let role = "{{ Auth::check() ? Auth::user()->role : '' }}";
-
-        let idleTime;
-
-        if (role === 'admin') {
-            idleTime = 10 * 60 * 1000;
-        } else if (role === 'operator') {
-            idleTime = 5 * 60 * 1000;
-        } else {
-            idleTime = 2 * 60 * 1000;
-        }
-
-        let timeout;
-
-        function resetTimer() {
-            clearTimeout(timeout);
-
-            timeout = setTimeout(() => {
-                window.location.href = "/logout";
-            }, idleTime);
-        }
-
-        window.onload = resetTimer;
-
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
-
-        document.addEventListener("visibilitychange", function() {
-            if (!document.hidden) {
-                resetTimer();
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("hidden");
+                overlay.classList.toggle("active");
             }
-        });
-    </script>
+
+            document.getElementById("overlay").onclick = function() {
+                document.getElementById("sidebar").classList.remove("open");
+                this.classList.add("hidden");
+            };
+
+            document.querySelectorAll("#sidebar a").forEach(link => {
+                link.addEventListener("click", () => {
+                    document.getElementById("sidebar").classList.remove("open");
+                    document.getElementById("overlay").classList.add("hidden");
+                });
+            });
+
+            function toggleProfile() {
+
+                document.getElementById("profileMenu").classList.toggle("hidden")
+
+            }
+            setInterval(() => {
+                fetch('/users-online')
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('usersOnlineCount').innerText = data.count;
+                    });
+            }, 5000);
+
+            let role = "{{ Auth::check() ? Auth::user()->role : '' }}";
+
+            let idleTime;
+
+            if (role === 'admin') {
+                idleTime = 10 * 60 * 1000;
+            } else if (role === 'operator') {
+                idleTime = 5 * 60 * 1000;
+            } else {
+                idleTime = 2 * 60 * 1000;
+            }
+
+            let timeout;
+
+            function resetTimer() {
+                clearTimeout(timeout);
+
+                timeout = setTimeout(() => {
+                    window.location.href = "/logout";
+                }, idleTime);
+            }
+
+            window.onload = resetTimer;
+
+            document.onmousemove = resetTimer;
+            document.onkeypress = resetTimer;
+            document.onclick = resetTimer;
+            document.onscroll = resetTimer;
+
+            document.addEventListener("visibilitychange", function() {
+                if (!document.hidden) {
+                    resetTimer();
+                }
+            });
+        </script>
+    </div>
 </body>
 
 </html>

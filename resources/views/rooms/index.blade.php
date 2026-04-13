@@ -16,7 +16,8 @@
         /* ===== SIDEBAR ===== */
 
         .sidebar {
-            transition: all .3s ease;
+            transition: transform 0.3s ease;
+            will-change: transform;
         }
 
         .sidebar.close {
@@ -34,7 +35,7 @@
         /* ===== CONTENT SHIFT ===== */
 
         .main-content {
-            margin-left: 260px;
+            margin-left: 256px;
             transition: all .3s ease;
         }
 
@@ -51,11 +52,20 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             transition: all 0.25s ease;
             backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease, transform 0.2s ease;
+            min-height: 220px;
         }
 
         .room-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px) scale(1.01);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .room-card:active {
+            transform: scale(0.98);
         }
 
         /* ===== MODAL ===== */
@@ -89,6 +99,17 @@
             .room-card {
                 padding: 24px;
             }
+        }
+
+        @media (max-width: 640px) {
+            .room-card {
+                padding: 10px;
+                border-radius: 10px;
+            }
+        }
+
+        .room-card {
+            height: 100%;
         }
     </style>
 
@@ -163,7 +184,7 @@
                         <button class="w-full flex items-center gap-3 px-3 py-2">
 
                             <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm">
+                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs md:text-sm">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                             </div>
 
@@ -198,14 +219,14 @@
 
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
-        <header class="sticky top-0 bg-white border-b px-4 md:px-8 py-3 md:py-5 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-
-                <button class="lg:hidden text-xl text-gray-600" onclick="toggleSidebar()">
+        <header class="sticky top-0 bg-white px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+            <!-- KIRI -->
+            <div class="flex items-center gap-3 md:gap-6">
+                <button class="lg:hidden text-sm md:text-lg text-gray-600" onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <h1 class="text-2xl font-bold text-gray-800">
+                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight text-gray-800">
                     Room Management
                 </h1>
             </div>
@@ -213,7 +234,7 @@
             @auth
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <button onclick="openModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 md:px-4 md:py-2.5 text-sm rounded-lg shadow flex items-center gap-1">
                         + Add Room
                     </button>
                 @endif
@@ -221,17 +242,18 @@
         </header>
 
         <!-- CONTENT -->
-        <div class="p-4 md:p-8">
+        <div class="w-full max-w-7xl mx-auto p-4 md:p-8">
 
             <!-- ROOM GRID -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 justify-items-stretch">
                 @foreach ($rooms as $room)
                     <div
                         class="room-card border {{ $room->device_status == 'online' ? 'border-green-200' : 'border-red-200' }}">
                         <div class="flex justify-between items-start mb-2">
 
                             <div>
-                                <h2 class="text-lg font-semibold">
+                                <h2 class="text-sm sm:text-base md:text-lg font-semibold break-words">
                                     {{ $room->name }}
                                 </h2>
 
@@ -255,7 +277,7 @@
 
                             </div>
 
-                            <i class="fa-solid fa-server text-gray-400 text-lg"></i>
+                            <i class="fa-solid fa-server text-gray-400 text-base md:text-lg"></i>
 
                         </div>
 
@@ -264,7 +286,8 @@
                         </p>
 
                         @if ($room->temperature)
-                            <div class="bg-blue-50 text-blue-700 p-2 rounded mb-3 text-sm flex justify-between">
+                            <div
+                                class="bg-blue-50 text-blue-700 p-2.5 md:p-3 rounded mb-3 text-sm flex justify-between">
                                 <span>🌡️ Temperature</span>
                                 <span class="font-semibold">{{ $room->temperature }} °C</span>
                             </div>
@@ -288,7 +311,7 @@
                             </span>
                         </div>
 
-                        <div class="flex flex-col sm:flex-row gap-2">
+                        <div class="flex flex-col gap-2 mt-auto pt-3">
                             <a href="/rooms/{{ $room->id }}/ac"
                                 class="flex-1 text-center bg-gray-900 text-white py-2 rounded-lg hover:bg-black">
 
@@ -324,7 +347,7 @@
         @if (in_array(Auth::user()->role, ['admin', 'operator']))
             <div id="modal" class="hidden fixed inset-0 modal-bg flex items-center justify-center">
 
-                <div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
+                <div class="bg-white p-5 sm:p-8 rounded-2xl w-[90%] sm:w-96 shadow-lg">
 
                     <h2 class="text-xl font-bold mb-5">
                         Add New Room

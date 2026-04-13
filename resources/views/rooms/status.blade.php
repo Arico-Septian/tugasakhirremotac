@@ -47,7 +47,7 @@
         .ac-card {
             background: white;
             border-radius: 20px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             transition: all .25s ease;
         }
@@ -56,11 +56,60 @@
             transform: translateY(-6px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
         }
+
+        @media (min-width: 768px) {
+            .ac-card {
+                padding: 24px;
+            }
+        }
+
+        @media(max-width:900px) {
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar {
+            transition: all .3s ease;
+            z-index: 50;
+        }
+
+        @media(max-width:900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .ac-card {
+                padding: 12px;
+                border-radius: 14px;
+            }
+        }
+
+        #overlay {
+            backdrop-filter: blur(2px);
+        }
     </style>
 
 </head>
 
 <body class="bg-gray-50">
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
     <!-- SIDEBAR -->
     @auth
@@ -168,49 +217,50 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <!-- HEADER -->
-        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
+        <header class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
 
-                <!-- BACK BUTTON -->
-                <a href="/dashboard" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 text-lg">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
 
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                </a>
-
-                <h1 class="text-2xl font-bold text-gray-800">
+                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800">
                     {{ strtoupper($room->name) }} AC Units
                 </h1>
 
             </div>
+
+            <div class="w-6"></div>
+
         </header>
 
         <!-- CONTENT -->
-        <div class="p-8">
+        <div class="px-4 py-4 md:px-6 md:py-6">
+            <div class="max-w-7xl mx-auto">
 
-            <!-- AC GRID -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach ($acs as $ac)
-                    <div class="ac-card">
-                        <div class="flex justify-between items-center mb-4">
+                <!-- AC GRID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                    @foreach ($acs as $ac)
+                        <div class="ac-card">
+                            <div class="flex justify-between items-center mb-4">
 
-                            <h2 class="text-lg font-semibold">
+                                <h2 class="text-lg font-semibold">
 
-                                AC {{ $ac->ac_number }}
+                                    AC {{ $ac->ac_number }}
 
-                            </h2>
+                                </h2>
 
-                            <i class="fa-solid fa-snowflake text-blue-500"></i>
+                                <i class="fa-solid fa-snowflake text-blue-500"></i>
 
-                        </div>
+                            </div>
 
-                        <p class="text-gray-500 text-sm mb-4">
+                            <p class="text-gray-500 text-sm mb-4">
 
-                            Brand : {{ $ac->brand }}
+                                Brand : {{ $ac->brand }}
 
-                        </p>
+                            </p>
 
-                        <!-- POWER -->
+                            <!-- POWER -->
                             <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
@@ -267,16 +317,30 @@
 
                             </div>
 
-                    </div>
-                @endforeach
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("close")
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
+
+            if (window.innerWidth <= 900) {
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("hidden");
+            } else {
+                sidebar.classList.toggle("close");
+            }
         }
+
+        document.getElementById("overlay").onclick = function() {
+            document.getElementById("sidebar").classList.remove("open");
+            this.classList.add("hidden");
+        };
 
         function loadStatus() {
             fetch('/api/ac-status')

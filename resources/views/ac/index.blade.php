@@ -184,32 +184,13 @@
         .header-wrap {
             position: relative;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.06),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            background: white;
+            backdrop-filter: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        /* ===== GARIS MELINGKAR ===== */
         .header-wrap::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(120deg,
-                    rgba(255, 255, 255, 0.9),
-                    rgba(200, 200, 255, 0.4),
-                    rgba(255, 255, 255, 0.6));
-
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-
-            pointer-events: none;
+            display: none;
         }
 
         .header-wrap {
@@ -393,10 +374,9 @@
             @endphp
 
             <div
-                class="flex items-center justify-between px-4 py-3 mb-4 bg-white/70 backdrop-blur-md rounded-xl shadow-sm">
-
+                class="flex items-center justify-between h-[64px] px-4 md:px-6 mb-4 bg-white/70 backdrop-blur-md rounded-xl shadow-sm">
                 <!-- LEFT -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 h-full">
 
                     <!-- MENU -->
                     <button onclick="toggleSidebar()" class="text-lg text-gray-600">
@@ -405,14 +385,14 @@
 
                     <!-- TITLE -->
                     <div>
-                        <h1 class="text-base font-semibold text-gray-800">
+                        <h1 class="text-base md:text-xl font-semibold text-gray-800 leading-none">
                             Centralized AC Management
                         </h1>
                     </div>
                 </div>
             </div>
 
-            <div class="header-wrap flex items-center justify-between gap-2 px-3 py-3 mb-6">
+            <div class="header-wrap flex items-center justify-between h-[64px] px-3 md:px-6 mb-6">
 
                 <!-- LEFT -->
                 <div class="flex items-center gap-2 min-w-0">
@@ -438,7 +418,8 @@
                 <div class="flex items-center gap-1 shrink-0">
                     @auth
                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                            <button onclick="openModal()" class="bg-blue-600 text-white px-2 py-1.5 text-xs rounded-lg">
+                            <button onclick="openModal()"
+                                class="bg-blue-600 text-white px-3 py-1.5 text-xs rounded-lg flex items-center">
                                 + Add AC
                             </button>
                         @endif

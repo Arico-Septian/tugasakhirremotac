@@ -31,7 +31,7 @@
         }
 
         .main-content {
-            margin-left: 260px;
+            margin-left: 256px;
             transition: all .3s ease;
         }
 
@@ -60,10 +60,33 @@
                 transform: translateX(0);
             }
         }
+
+        .card {
+            transition: all .2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        #modal {
+            transition: all .2s ease;
+        }
+
+        .sidebar {
+            will-change: transform;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
+
+    <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 z-50">
@@ -170,176 +193,205 @@
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
 
-        <header class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
+        <header
+            class="sticky top-0 bg-white border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
 
-            <button onclick="openModal()" class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+            <div class="flex items-center gap-3 md:gap-6">
+
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 text-base">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800">
+                    User Management
+                </h1>
+
+            </div>
+
+            <button onclick="openModal()"
+                class="bg-blue-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm shadow hover:bg-blue-700">
                 + Add User
             </button>
+
         </header>
 
-        <div class="p-8">
+        <div class="px-4 py-4 md:px-6 md:py-6">
+            <div class="w-full max-w-7xl mx-auto">
 
-            <!-- STATS -->
-            <div class="card mb-6 flex justify-between items-center">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Users</p>
-                    <h2 class="text-3xl font-bold">{{ $users->count() }}</h2>
+                <!-- STATS -->
+                <div class="card mb-6 flex justify-between items-center gap-2 max-w-sm mx-auto md:max-w-full">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Users</p>
+                        <h2 class="text-2xl md:text-3xl font-bold">
+                            {{ $users->count() }}</h2>
+                    </div>
+                    <i class="fa-solid fa-users text-lg md:text-3xl text-blue-500"></i>
                 </div>
-                <i class="fa-solid fa-users text-3xl text-blue-500"></i>
-            </div>
 
-            <!-- TABLE -->
-            <div class="card overflow-x-auto">
+                <!-- TABLE -->
+                <!-- TABLE / MOBILE CARD -->
+                <div class="card">
 
-                <table class="w-full">
-
-                    <thead class="border-b">
-                        <tr class="text-left text-gray-500 text-sm">
-                            <th class="p-3">Name</th>
-                            <th class="p-3">Role</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3">Login</th>
-                            <th class="p-3">Last Login</th>
-                            <th class="p-3">Last Logout</th>
-                            <th class="p-3">Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
+                    <!--  MOBILE (HP) -->
+                    <div class="block md:hidden space-y-3 px-2">
                         @foreach ($users as $user)
-                            <tr class="border-b hover:bg-gray-50">
+                            <div class="border rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition w-full sm:max-w-sm mx-auto">
 
-                                <td class="p-3 font-medium">{{ $user->name }}</td>
+                                <p class="font-semibold text-gray-800">{{ $user->name }}</p>
 
-                                <!-- ROLE -->
-                                <td class="p-3">
+                                <div class="mt-2 flex justify-between text-xs sm:text-sm">
+                                    <span class="text-gray-500">Role</span>
                                     <span
-                                        class="px-3 py-1 rounded-full text-sm
-                            {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
-                            {{ $user->role == 'operator' ? 'bg-green-100 text-green-600' : '' }}
-                            {{ $user->role == 'user' ? 'bg-gray-100 text-gray-600' : '' }}">
+                                        class="px-2 py-1 rounded-full text-xs
+                                        {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
+                                        {{ $user->role == 'operator' ? 'bg-green-100 text-green-600' : '' }}
+                                        {{ $user->role == 'user' ? 'bg-gray-100 text-gray-600' : '' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
-                                </td>
+                                </div>
 
-                                <!-- STATUS -->
-                                <td class="p-3">
-                                    @if ($user->is_active)
-                                        <span
-                                            class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">Active</span>
-                                    @else
-                                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">Inactive</span>
-                                    @endif
-                                </td>
-
-                                <!-- LOGIN -->
-                                <td class="p-3">
+                                <div class="mt-2 flex justify-between text-sm">
+                                    <span class="text-gray-500">Status</span>
                                     @if ($user->is_online)
-                                        <span
-                                            class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">Online</span>
+                                        <span class="text-green-600 text-xs">Online</span>
                                     @else
-                                        <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">Offline</span>
+                                        <span class="text-gray-500 text-xs">Offline</span>
                                     @endif
-                                </td>
+                                </div>
 
-                                <!-- LAST LOGIN -->
-                                <td class="p-3 text-sm text-gray-600">
-                                    {{ $user->last_login_at ?? '-' }}
-                                </td>
+                                <form action="/users/{{ $user->id }}" method="POST" class="mt-3">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2 rounded text-sm">
+                                        Delete
+                                    </button>
+                                </form>
 
-                                <!-- LAST LOGOUT -->
-                                <td class="p-3 text-sm text-gray-600">
-                                    {{ $user->last_logout_at ?? '-' }}
-                                </td>
-
-                                <!-- ACTION -->
-                                <td class="p-3 flex gap-2">
-
-                                    <!-- ACTIVATE / DEACTIVATE -->
-                                    <form action="/users/status/{{ $user->id }}" method="POST">
-                                        @csrf
-                                        <button
-                                            class="px-3 py-1 rounded text-sm text-white
-                                {{ $user->is_active ? 'bg-yellow-500' : 'bg-green-500' }}">
-                                            {{ $user->is_active ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
-
-                                    <!-- DELETE -->
-                                    <form action="/users/{{ $user->id }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button onclick="return confirm('Delete this user?')"
-                                            class="bg-red-500 text-white px-3 py-1 rounded text-sm">
-                                            Delete
-                                        </button>
-                                    </form>
-
-                                </td>
-
-                            </tr>
+                            </div>
                         @endforeach
-                    </tbody>
+                    </div>
 
-                </table>
+                    <!-- DESKTOP -->
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full">
+
+                            <thead class="border-b bg-gray-50">
+                                <tr class="text-left text-gray-500 text-sm">
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Role</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($users as $user)
+                                    <tr class="border-b hover:bg-gray-50 transition">
+
+                                        <td class="p-3 font-medium">{{ $user->name }}</td>
+
+                                        <td class="p-3">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs md:text-sm
+                                                {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
+                                                {{ $user->role == 'operator' ? 'bg-green-100 text-green-600' : '' }}
+                                                {{ $user->role == 'user' ? 'bg-gray-100 text-gray-600' : '' }}">
+                                                {{ ucfirst($user->role) }}
+                                            </span>
+                                        </td>
+
+                                        <td class="p-3">
+                                            @if ($user->is_online)
+                                                <span
+                                                    class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">Online</span>
+                                            @else
+                                                <span
+                                                    class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">Offline</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="p-3">
+                                            <form action="/users/{{ $user->id }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="bg-red-500 text-white px-3 py-1 rounded text-sm">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL -->
+        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+
+            <div class="bg-white p-8 rounded-xl w-[90%] max-w-md">
+
+                <div class="flex justify-between mb-4">
+                    <h2 class="text-xl font-bold">Add New User</h2>
+                    <button onclick="closeModal()" class="text-gray-500">✕</button>
+                </div>
+
+                <form method="POST" action="/users">
+                    @csrf
+
+                    <input type="text" name="name" placeholder="Name" class="border p-3 w-full mb-3 rounded"
+                        required>
+
+                    <input type="password" name="password" placeholder="Password"
+                        class="border p-3 w-full mb-3 rounded" required>
+
+                    <select name="role" class="border p-3 w-full mb-4 rounded">
+                        <option value="admin">Admin</option>
+                        <option value="operator">Operator</option>
+                        <option value="user">User</option>
+                    </select>
+
+                    <button class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
+                        Create User
+                    </button>
+                </form>
 
             </div>
 
         </div>
 
-    </div>
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
 
-    <!-- MODAL -->
-    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.toggle("open");
+                    overlay.classList.toggle("hidden");
+                } else {
+                    sidebar.classList.toggle("close");
+                }
+            }
 
-        <div class="bg-white p-8 rounded-xl w-96">
+            document.getElementById("overlay").onclick = function() {
+                document.getElementById("sidebar").classList.remove("open");
+                this.classList.add("hidden");
+            };
 
-            <div class="flex justify-between mb-4">
-                <h2 class="text-xl font-bold">Add New User</h2>
-                <button onclick="closeModal()" class="text-gray-500">✕</button>
-            </div>
+            function openModal() {
+                document.getElementById("modal").classList.remove("hidden")
+            }
 
-            <form method="POST" action="/users">
-                @csrf
-
-                <input type="text" name="name" placeholder="Name" class="border p-3 w-full mb-3 rounded"
-                    required>
-
-                <input type="password" name="password" placeholder="Password" class="border p-3 w-full mb-3 rounded"
-                    required>
-
-                <select name="role" class="border p-3 w-full mb-4 rounded">
-                    <option value="admin">Admin</option>
-                    <option value="operator">Operator</option>
-                    <option value="user">User</option>
-                </select>
-
-                <button class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
-                    Create User
-                </button>
-            </form>
-
-        </div>
-
-    </div>
-
-    <script>
-        function toggleSidebar() {
-            let sidebar = document.getElementById("sidebar")
-            sidebar.classList.toggle("close")
-            sidebar.classList.toggle("open")
-        }
-
-        function openModal() {
-            document.getElementById("modal").classList.remove("hidden")
-        }
-
-        function closeModal() {
-            document.getElementById("modal").classList.add("hidden")
-        }
-    </script>
+            function closeModal() {
+                document.getElementById("modal").classList.add("hidden")
+            }
+        </script>
 
 </body>
 
