@@ -14,11 +14,12 @@ class UpdateLastActivity
         if (Auth::check()) {
 
             /** @var \App\Models\User $user */
-
             $user = Auth::user();
 
-            $user->last_activity = now();
-            $user->save();
+            if (!$user->last_activity || now()->diffInSeconds($user->last_activity) > 60) {
+                $user->last_activity = now();
+                $user->save();
+            }
         }
 
         return $next($request);

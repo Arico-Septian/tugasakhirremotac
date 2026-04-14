@@ -96,6 +96,14 @@
                 url('/images/wallpaper.jpeg') no-repeat center center fixed;
             background-size: cover;
         }
+
+        header {
+            height: 72px;
+        }
+
+        #modal {
+            backdrop-filter: blur(6px);
+        }
     </style>
 </head>
 
@@ -119,7 +127,7 @@
 
         </div>
 
-        <ul class="space-y-3">
+        <ul class="space-y-4">
 
             @auth
                 <li>
@@ -154,7 +162,7 @@
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
-                        <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             <span class="menu-text">Activity Log</span>
                         </a>
@@ -209,7 +217,7 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <header
-            class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+            class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-2.5 flex items-center justify-between shadow-sm">
 
             <div class="flex items-center gap-3 md:gap-6">
 
@@ -223,12 +231,29 @@
 
             </div>
 
-            <button onclick="openModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-4 md:py-2.5 text-sm rounded-lg shadow flex items-center gap-1">
-                + Add User
-            </button>
-
         </header>
+
+        <div class="w-full max-w-7xl mx-auto px-4 md:px-6 mt-4 mb-4">
+
+            <div class="flex items-center gap-3">
+
+                <!-- SEARCH -->
+                <div class="relative flex-1">
+                    <input id="searchUser" type="text" placeholder="Search user..."
+                        class="w-full h-[40px] bg-white/10 text-white placeholder-gray-300 px-4 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <i class="fa fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                </div>
+
+                <!-- BUTTON -->
+                <button onclick="openModal()"
+                    class="h-[40px] bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm whitespace-nowrap transition">
+                    + Add User
+                </button>
+
+            </div>
+
+        </div>
 
         <div class="px-4 py-4 md:px-6 md:py-6">
             <div class="w-full max-w-7xl mx-auto">
@@ -257,15 +282,16 @@
                     <div class="block md:hidden space-y-3 px-2">
                         @foreach ($users as $user)
                             <div
-                                class="border rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition w-full sm:max-w-sm mx-auto">
-
-                                <p class="font-semibold text-white">{{ $user->name }}</p>
+                                class="bg-slate-800/70 border border-white/10 rounded-xl p-4 shadow-sm hover:shadow-md transition w-full max-w-sm mx-auto space-y-2">
+                                <p class="font-semibold text-base text-white leading-tight">
+                                    {{ $user->name }}
+                                </p>
 
                                 <div class="mt-2 flex justify-between text-xs sm:text-sm">
                                     <span class="text-gray-300">Role</span>
                                     <span
                                         class="px-2 py-1 rounded-full text-xs
-                                        {{ $user->role == 'admin' ? 'bg-blue-100 text-blue-600' : '' }}
+                                        {{ $user->role == 'admin' ? 'bg-blue-500/20 text-blue-300' : '' }}
                                         {{ $user->role == 'operator' ? 'bg-green-500/20 text-green-300' : '' }}
                                         {{ $user->role == 'user' ? 'bg-white/10 text-gray-300' : '' }}">
                                         {{ ucfirst($user->role) }}
@@ -274,10 +300,18 @@
 
                                 <div class="mt-2 flex justify-between text-sm">
                                     <span class="text-gray-300">Status</span>
-                                    @if ($user->is_online)
-                                        <span class="text-green-600 text-xs">Online</span>
+                                    @php
+                                        $isOnline =
+                                            $user->last_activity &&
+                                            \Carbon\Carbon::parse($user->last_activity)->diffInMinutes(now()) < 2;
+                                    @endphp
+
+                                    @if ($isOnline)
+                                        <span
+                                            class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Online</span>
                                     @else
-                                        <span class="text-gray-300 text-xs">Offline</span>
+                                        <span
+                                            class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">Offline</span>
                                     @endif
                                 </div>
 
@@ -285,7 +319,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button
-                                        class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2 rounded text-sm">
+                                        class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2.5 rounded-lg text-sm font-medium">
                                         Delete
                                     </button>
                                 </form>
@@ -298,7 +332,7 @@
                     <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-white">
 
-                            <thead class="border-b border-white/10 bg-white/5">
+                            <thead class="border-b border-white/10 bg-white/5 text-xs md:text-sm">
                                 <tr class="text-left text-gray-300 text-sm">
                                     <th class="p-3">Name</th>
                                     <th class="p-3">Role</th>
@@ -324,7 +358,14 @@
                                         </td>
 
                                         <td class="p-3">
-                                            @if ($user->is_online)
+                                            @php
+                                                $isOnline =
+                                                    $user->last_activity &&
+                                                    \Carbon\Carbon::parse($user->last_activity)->diffInMinutes(now()) <
+                                                        2;
+                                            @endphp
+
+                                            @if ($isOnline)
                                                 <span
                                                     class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Online</span>
                                             @else
@@ -439,6 +480,35 @@
             function closeModal() {
                 document.getElementById("modal").classList.add("hidden")
             }
+
+            const searchUser = document.getElementById('searchUser');
+
+            searchUser.addEventListener('keyup', function() {
+                const keyword = this.value.toLowerCase();
+
+                const cards = document.querySelectorAll('.block.md\\:hidden .rounded-xl');
+
+                cards.forEach(card => {
+                    const name = card.querySelector('p').innerText.toLowerCase();
+                    card.style.display = name.includes(keyword) ? "block" : "none";
+                });
+
+                const rows = document.querySelectorAll('tbody tr');
+
+                rows.forEach(row => {
+                    const name = row.querySelector('td').innerText.toLowerCase();
+                    row.style.display = name.includes(keyword) ? "" : "none";
+                });
+            });
+
+            setInterval(() => {
+                fetch('/update-activity', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+            }, 60000);
         </script>
 
 </body>

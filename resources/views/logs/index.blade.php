@@ -123,7 +123,7 @@
 
     <!-- SIDEBAR -->
     <div id="sidebar"
-        class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r z-50">
+        class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r border-slate-900 z-50">
         <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
             <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">

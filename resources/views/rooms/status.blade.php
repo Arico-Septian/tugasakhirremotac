@@ -103,6 +103,10 @@
         #overlay {
             backdrop-filter: blur(2px);
         }
+
+        header {
+                height: 72px;
+            }
     </style>
 
 </head>

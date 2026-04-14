@@ -14,6 +14,7 @@ use App\Http\Controllers\UserLogController;
 use App\Models\AcStatus;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\TimerController;
+use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', function () {
@@ -298,4 +299,18 @@ Route::get('/device-status', function () {
         ];
     });
 
+});
+
+Route::post('/update-activity', function () {
+
+    if (Auth::check()) {
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $user->last_activity = now();
+        $user->save();
+    }
+
+    return response()->json(['status' => 'ok']);
 });

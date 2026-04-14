@@ -43,6 +43,7 @@
 
         .sidebar {
             transition: transform 0.3s ease;
+            border-right: none;
         }
 
         .sidebar.close {
@@ -94,10 +95,14 @@
             }
         }
 
+        header {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
         @media (min-width: 1024px) {
             .main-content {
                 margin-left: 256px;
-                padding-left: 1px;
+                padding-left: 0px;
                 width: calc(100% - 256px);
             }
 
@@ -211,6 +216,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
+            line-height: 1.3;
         }
 
         .stat-card:hover {
@@ -236,6 +242,49 @@
                 url('/images/wallpaper.jpeg') no-repeat center center fixed;
             background-size: cover;
         }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-card h2 {
+                font-size: 18px;
+                text-shadow: 0 3px 12px rgba(0,0,0,0.5);
+            }
+
+            .stat-card p {
+                font-size: 13px;
+            }
+        }
+
+        body {
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+
+            h1,
+            h2,
+            h3 {
+                line-height: 1.2;
+            }
+
+            .stat-card p {
+                font-size: 13px;
+                letter-spacing: 0.5px;
+            }
+        }
+        header {
+                height: 72px;
+            }
+
     </style>
 
 </head>
@@ -354,11 +403,11 @@
 
             <!-- HEADER -->
             <header
-                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3 flex items-center justify-between shadow-sm">
+                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3.5 flex items-center justify-between shadow-sm">
                 @auth
                     <div class="flex items-center gap-3 md:gap-6">
 
-                        <button class="text-gray-300 text-lg p-2 rounded-lg hover:bg-gray-100 transition"
+                        <button class="lg:hidden text-gray-300 text-lg p-2 rounded-lg hover:bg-gray-100 transition"
                             onclick="toggleSidebar()">
                             <i class="fa-solid fa-bars"></i>
                         </button>
@@ -369,7 +418,7 @@
                                 Centralized AC Management
                             </h1>
 
-                            <p class="text-xs font-bold text-gray-300">
+                            <p class="text-[10px] md:text-xs text-gray-300">
                                 Server Room Cooling Control System
                             </p>
 
@@ -393,13 +442,18 @@
             <div class="w-full max-w-7xl mx-auto px-4 md:px-6 py-6">
 
                 <!-- STATISTICS -->
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8 md:mb-12">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8 md:mb-12">
                     <div class="stat-card">
                         <div class="flex justify-between items-center">
                             <div>
 
-                                <p class="font-semibold text-lg text-white">Rooms</p>
-                                <h2 class="text-xl md:text-2xl font-bold text-white">{{ $rooms->count() }}</h2>
+                                <p class="text-xs md:text-sm text-gray-300 font-bold">
+                                    Rooms
+                                </p>
+
+                                <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                    {{ $rooms->count() }}
+                                </h2>
 
                             </div>
 
@@ -414,8 +468,13 @@
                         <div class="flex justify-between items-center">
                             <div>
 
-                                <p class="font-semibold text-lg text-white">AC Units</p>
-                                <h2 class="text-2xl font-bold text-white">{{ $totalAc }}</h2>
+                                <p class="text-xs md:text-sm text-gray-300 font-bold">
+                                    AC Units
+                                </p>
+
+                                <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                    {{ $totalAc }}
+                                </h2>
 
                             </div>
 
@@ -431,8 +490,12 @@
 
                             <div>
 
-                                <p class="font-semibold text-lg text-white">Active AC Units</p>
-                                <h2 class="text-2xl font-bold">{{ $activeAc }}</h2>
+                                <p class="text-xs md:text-sm text-gray-300 font-bold">
+                                    Active AC Units
+                                </p>
+                                <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                    {{ $activeAc }}
+                                </h2>
 
                             </div>
 
@@ -448,8 +511,13 @@
 
                             <div>
 
-                                <h3 class="font-semibold text-lg text-white">Users</p>
-                                    <h2 class="text-2xl font-bold">{{ $users }}</h2>
+                                <p class="text-xs md:text-sm text-gray-300 font-bold">
+                                    Users
+                                </p>
+
+                                <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                    {{ $users }}
+                                </h2>
 
                             </div>
 
@@ -465,10 +533,13 @@
 
                             <div>
 
-                                <h3 class="font-semibold text-lg text-white">Users Online</p>
-                                    <h2 id="usersOnlineCount" class="text-2xl font-bold">
-                                        {{ $usersOnline }}
-                                    </h2>
+                                <p class="text-xs md:text-sm text-gray-300 font-bold">
+                                    Users Online
+                                </p>
+
+                                <h2 id="usersOnlineCount" class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                    {{ $usersOnline }}
+                                </h2>
                             </div>
 
                             <div class="icon-box text-orange-500">
@@ -492,13 +563,15 @@
 
                                 <div class="flex justify-between mb-3">
 
-                                    <h3 class="font-semibold text-lg text-white">{{ $room->name }}</h3>
+                                    <h3 class="font-semibold text-sm md:text-lg text-white leading-tight">
+                                        {{ $room->name }}
+                                    </h3>
 
                                     <i class="fa-solid fa-server text-gray-400"></i>
 
                                 </div>
 
-                                <p class="text-gray-500 text-sm mb-4">
+                                <p class="text-gray-400 text-xs md:text-sm">
                                     Total : {{ $room->acUnits->count() }} units
                                 </p>
 
