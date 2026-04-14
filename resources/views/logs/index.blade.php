@@ -71,7 +71,7 @@
         }
 
         tbody tr:hover {
-            background: #f9fafb;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .card:active {
@@ -115,6 +115,10 @@
                 url('/images/wallpaper.jpeg') no-repeat center center fixed;
             background-size: cover;
         }
+
+        .card:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
     </style>
 </head>
 
@@ -136,10 +140,10 @@
             </button>
         </div>
 
-        <ul class="space-y-3">
+        <ul class="space-y-4">
             @auth
                 <li>
-                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -148,7 +152,7 @@
                 {{-- Admin + Operator --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
-                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -158,7 +162,7 @@
                 {{-- Admin only --}}
                 @if (Auth::user()->role == 'admin')
                     <li>
-                        <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-users"></i>
                             <span class="menu-text">User Management</span>
                         </a>
@@ -259,10 +263,11 @@
             <div class="card">
 
                 <!-- 📱 MOBILE -->
-                <div class="block md:hidden space-y-3 px-2">
+                <div class="block md:hidden space-y-4 px-2">
 
                     @foreach ($logs as $log)
-                        <div class="bg-slate-900/70 border border-white/10 backdrop-blur-md w-full hover:shadow-md transition">
+                        <div
+                            class="bg-slate-800/70 border border-white/10 rounded-xl p-4 space-y-3 shadow-sm hover:shadow-md transition w-full max-w-sm mx-auto">
 
                             <div class="text-sm font-semibold text-white">
                                 {{ $log->user->name ?? '-' }}
@@ -274,20 +279,27 @@
 
                             <div class="mt-2">
                                 @if ($log->activity == 'add_room')
-                                    <span class="bg-purple-100 text-purple-600 px-2 py-1 rounded text-xs">ADD
+                                    <span class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded text-xs">ADD
                                         ROOM</span>
                                 @elseif($log->activity == 'delete_room')
-                                    <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">DELETE ROOM</span>
+                                    <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs">DELETE
+                                        ROOM</span>
                                 @elseif($log->activity == 'add_ac')
-                                    <span class="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs">ADD AC</span>
+                                    <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">ADD AC</span>
                                 @elseif($log->activity == 'delete_ac')
-                                    <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">DELETE AC</span>
+                                    <span class="bg-orange-500/20 text-orange-300 px-2 py-1 rounded text-xs">DELETE
+                                        AC</span>
                                 @elseif($log->activity == 'on')
-                                    <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">ON</span>
+                                    <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">ON</span>
                                 @elseif($log->activity == 'off')
-                                    <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">OFF</span>
+                                    <span class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">OFF</span>
+                                @elseif($log->activity == 'mode')
+                                    <span class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs">MODE</span>
+                                @elseif($log->activity == 'set_timer')
+                                    <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">SET
+                                        TIMER</span>
                                 @else
-                                    <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">
+                                    <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
                                         {{ strtoupper($log->activity) }}
                                     </span>
                                 @endif
@@ -321,16 +333,53 @@
                             @foreach ($logs as $log)
                                 <tr class="border-b hover:bg-white/5 transition">
 
-                                    <td class="p-3">{{ $log->user->name ?? '-' }}</td>
-
-                                    <td class="p-3">{{ $log->room }}</td>
-
-                                    <td class="p-3">{{ $log->ac }}</td>
+                                    <td class="p-3">
+                                        {{ $log->user->name ?? '-' }}
+                                    </td>
 
                                     <td class="p-3">
-                                        <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">
-                                            {{ strtoupper($log->activity) }}
-                                        </span>
+                                        {{ $log->room }}
+                                    </td>
+
+                                    <td class="p-3">
+                                        {{ $log->ac }}
+                                    </td>
+
+                                    <td class="p-3">
+
+                                        @if ($log->activity == 'add_room')
+                                            <span
+                                                class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded text-xs">ADD
+                                                ROOM</span>
+                                        @elseif($log->activity == 'delete_room')
+                                            <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs">DELETE
+                                                ROOM</span>
+                                        @elseif($log->activity == 'add_ac')
+                                            <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">ADD
+                                                AC</span>
+                                        @elseif($log->activity == 'delete_ac')
+                                            <span
+                                                class="bg-orange-500/20 text-orange-300 px-2 py-1 rounded text-xs">DELETE
+                                                AC</span>
+                                        @elseif($log->activity == 'on')
+                                            <span
+                                                class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">ON</span>
+                                        @elseif($log->activity == 'off')
+                                            <span
+                                                class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">OFF</span>
+                                        @elseif($log->activity == 'mode')
+                                            <span
+                                                class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs">MODE</span>
+                                        @elseif($log->activity == 'set_timer')
+                                            <span
+                                                class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">SET
+                                                TIMER</span>
+                                        @else
+                                            <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
+                                                {{ strtoupper($log->activity) }}
+                                            </span>
+                                        @endif
+
                                     </td>
 
                                     <td class="p-3 whitespace-nowrap">
