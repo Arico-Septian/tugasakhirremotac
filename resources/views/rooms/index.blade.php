@@ -167,7 +167,7 @@
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
                         <a href="/rooms"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold">
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -238,18 +238,23 @@
 
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
-        <header
-class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <header class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
             <!-- KIRI -->
             <div class="flex items-center gap-3 md:gap-5">
                 <button class="lg:hidden text-gray-300 text-lg" onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <h1 class="text-base md:text-xl font-bold text-white">
-                    Room Management
-                </h1>
-            </div>
+                <div class="flex flex-col leading-tight">
+
+                    <h1 class="text-base md:text-xl font-bold text-white">
+                        Room Management
+                    </h1>
+
+                    <p class="text-sm text-blue-200 font-medium">
+                        Control Ac Unit
+                    </p>
+                </div>
         </header>
 
         <!-- CONTENT -->

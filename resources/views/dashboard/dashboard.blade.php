@@ -17,14 +17,13 @@
             backdrop-filter: blur(10px);
             background: rgba(15, 23, 42, 0.7);
             color: white;
+            height: 72px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-bottom: none;
         }
 
         body {
             font-family: ui-sans-serif, system-ui;
-        }
-
-        header {
-            border-bottom: none;
         }
 
         /* SIDEBAR */
@@ -76,12 +75,6 @@
         }
 
         /* MOBILE FIX */
-        @media (max-width: 1024px) {
-            .main-content {
-                flex: 1;
-
-            }
-        }
 
         @media (max-width: 1024px) {
             .sidebar {
@@ -93,10 +86,11 @@
             .sidebar.open {
                 transform: translateX(0);
             }
-        }
 
-        header {
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            .main-content {
+                flex: 1;
+
+            }
         }
 
         @media (min-width: 1024px) {
@@ -119,16 +113,6 @@
 
         .main-content {
             max-width: 100%;
-        }
-
-        /* CARD */
-
-        .room-card {
-            background: rgba(15, 23, 42, 0.8);
-            color: white;
-            border-radius: 20px;
-            padding: 16px;
-            backdrop-filter: blur(12px);
         }
 
         .stat-card:hover {
@@ -282,10 +266,6 @@
             }
         }
 
-        header {
-            height: 72px;
-        }
-
         @media (max-width: 768px) {
             .stat-card {
                 padding: 10px;
@@ -325,7 +305,7 @@
                 @auth
                     <li>
                         <a href="/dashboard"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('dashboard') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('dashboard') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-chart-pie"></i>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -335,7 +315,7 @@
                     @if (in_array(Auth::user()->role, ['admin', 'operator']))
                         <li>
                             <a href="/rooms"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-server"></i>
                                 <span class="menu-text">Manage Rooms</span>
                             </a>
@@ -346,7 +326,7 @@
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/users"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -357,7 +337,7 @@
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/logs"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-gray-100' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span class="menu-text">Activity Log</span>
                             </a>
@@ -380,10 +360,10 @@
                             </div>
 
                             <div class="text-left menu-text">
-                                <p class="text-sm font-semibold text-gray-800">
+                                <p class="text-sm font-semibold text-white">
                                     {{ Auth::user()->name }}
                                 </p>
-                                <p class="text-xs text-gray-400">
+                                <p class="text-xs text-white font-medium">
                                     {{ Auth::user()->role ?? 'Administrator' }}
                                 </p>
                             </div>
@@ -411,9 +391,9 @@
 
             <!-- HEADER -->
             <header
-                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3.5 flex items-center justify-between shadow-sm">
+                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px- md:px-6 py-3.5 flex items-center justify-between shadow-sm">
                 @auth
-                    <div class="flex items-center gap-3 md:gap-6">
+                    <div class="flex items-center gap-3">
 
                         <button class="lg:hidden text-gray-300 text-lg p-2 rounded-lg hover:bg-gray-100 transition"
                             onclick="toggleSidebar()">
@@ -435,12 +415,13 @@
 
                     <div class="flex items-center gap-2 md:gap-6">
                         <div id="systemStatus"
-                            class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs md:text-sm font-medium">
+                            class="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
 
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
 
                             Online
 
+                            </span>
                         </div>
                     </div>
                 @endauth
@@ -539,16 +520,16 @@
                 </div>
 
                 <!-- TEMPERATURE CHART -->
-                <div class="bg-slate-900/70 rounded-xl p-4 md:p-6">
+                <div class="bg-slate-900/70 rounded-xl p-3 md:p-4 max-w-3xl mx-auto">
                     <h2 class="text-lg font-semibold text-white mb-4">
                         Room Temperature Overview
                     </h2>
 
-                    <canvas id="tempChart" class="h-[220px] md:h-[100px]"></canvas>
+                    <canvas id="tempChart" class="h-[180px] md:h-[320px]"></canvas>
                 </div>
 
                 <!-- SERVER ROOMS -->
-                <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">
+                <h2 class="text-xl md:text-2xl font-bold text-white text-center mt-8 mb-6">
                     Server Rooms
                 </h2>
 
@@ -634,8 +615,36 @@
             const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => $t ?? rand(24, 30)));
             const ctx = document.getElementById('tempChart');
 
+            const valueLabelPlugin = {
+                id: 'valueLabel',
+                afterDatasetsDraw(chart) {
+                    const {
+                        ctx
+                    } = chart;
+                    const isMobile = window.innerWidth < 768;
+
+                    chart.data.datasets.forEach((dataset, i) => {
+                        if (dataset.type !== 'bar') return;
+
+                        const meta = chart.getDatasetMeta(i);
+
+                        meta.data.forEach((bar, index) => {
+                            const value = dataset.data[index];
+
+                            ctx.save();
+                            ctx.fillStyle = "#ffffff";
+                            ctx.font = isMobile ? "bold 10px sans-serif" : "bold 13px sans-serif";
+                            ctx.textAlign = "center";
+
+                            ctx.fillText(value + "°C", bar.x, bar.y - 6);
+                        });
+                    });
+                }
+            };
+
             if (ctx) {
                 new Chart(ctx, {
+                    plugins: [valueLabelPlugin],
                     data: {
                         labels: roomNames,
                         datasets: [{
@@ -645,18 +654,20 @@
                                 backgroundColor: roomTemps.map(t =>
                                     t > 30 ? 'red' : t > 25 ? 'yellow' : '#3b82f6'
                                 ),
-                                borderRadius: 6
+                                borderRadius: 6,
+                                barPercentage: 0.75,
+                                categoryPercentage: 0.85
                             },
 
                             {
                                 type: 'line',
                                 label: 'Trend',
                                 data: roomTemps,
-                                borderColor: '#ffffff',
+                                borderColor: 'rgba(255,255,255,0.6)',
                                 backgroundColor: 'transparent',
                                 tension: 0.4,
                                 pointBackgroundColor: '#ffffff',
-                                pointRadius: 4,
+                                pointRadius: 2,
                                 borderWidth: 2
                             }
 
@@ -667,7 +678,15 @@
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: 'white'
+                                    color: 'white',
+                                    boxWidth: 12
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw + ' °C';
+                                    }
                                 }
                             }
                         },
@@ -679,6 +698,9 @@
                                     minRotation: 0,
                                     autoSkip: true,
                                     maxTicksLimit: 5,
+                                    grid: {
+                                        display: false
+                                    },
                                     font: {
                                         size: 10
                                     }
@@ -689,6 +711,9 @@
                                 max: 40,
                                 ticks: {
                                     color: 'white'
+                                },
+                                grid: {
+                                    color: 'rgba(255,255,255,0.1)'
                                 }
                             }
                         }

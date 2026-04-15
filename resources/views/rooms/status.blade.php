@@ -45,16 +45,18 @@
         /* ===== CARD STYLE ===== */
 
         .ac-card {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            color: white;
+            backdrop-filter: blur(16px);
             border-radius: 20px;
             padding: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            transition: all .25s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
         .ac-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         }
 
         @media (min-width: 768px) {
@@ -105,19 +107,27 @@
         }
 
         header {
-                height: 72px;
-            }
+            height: 72px;
+        }
+
+        .custom-bg {
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
     </style>
 
 </head>
 
-<body class="bg-gray-50">
+<body class="custom-bg overflow-x-hidden">
 
     <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
     <!-- SIDEBAR -->
     @auth
-        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-white shadow-lg h-full p-6 border-r z-50">
+        <div id="sidebar"
+            class="sidebar fixed top-0 left-0 w-64 bg-[#0f172a] text-white h-full p-6 border-r border-white/10 z-50">
             <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
                 <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -127,7 +137,7 @@
 
                 </h2>
 
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-blue-500">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-300 hover:text-blue-500">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
@@ -138,7 +148,7 @@
                 {{-- Dashboard --}}
                 <li>
                     <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-500/20 text-blue-400 font-semibold">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -147,7 +157,7 @@
                 {{-- Rooms --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
-                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -156,7 +166,7 @@
                     {{-- User Management --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -166,7 +176,7 @@
                     {{-- Admin only --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span class="menu-text">Activity Log</span>
                             </a>
@@ -189,10 +199,10 @@
                             </div>
 
                             <div class="text-left menu-text">
-                                <p class="text-sm font-semibold text-gray-800">
+                                <p class="text-sm font-semibold text-white">
                                     {{ Auth::user()->name }}
                                 </p>
-                                <p class="text-xs text-gray-400">
+                                <p class="text-xs text-white">
                                     {{ Auth::user()->role ?? 'Administrator' }}
                                 </p>
                             </div>
@@ -221,14 +231,15 @@
     <div class="main-content min-h-screen flex flex-col">
 
         <!-- HEADER -->
-        <header class="sticky top-0 bg-white border-b px-4 md:px-6 py-4 md:py-5 flex justify-between items-center ">
+        <header
+            class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
             <div class="flex items-center gap-4">
 
                 <button onclick="toggleSidebar()" class="md:hidden text-gray-600 text-lg">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800">
+                <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white">
                     {{ strtoupper($room->name) }} AC Units
                 </h1>
 
@@ -258,14 +269,15 @@
 
                             </div>
 
-                            <p class="text-gray-500 text-sm mb-4">
+                            <p class="text-gray-300 text-sm mb-4">
 
                                 Brand : {{ $ac->brand }}
 
                             </p>
 
                             <!-- POWER -->
-                            <div class="bg-green-50 text-green-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                            <div
+                                class="bg-green-500/20 text-green-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
 
@@ -282,7 +294,7 @@
                             </div>
 
                             <!-- TEMP -->
-                            <div class="bg-blue-50 text-blue-700 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                            <div class="bg-blue-500/20 text-blue-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
 
@@ -299,7 +311,7 @@
                             </div>
 
                             <!-- MODE -->
-                            <div class="bg-purple-50 text-purple-700 p-3 rounded-lg flex justify-between text-sm">
+                            <div class="bg-purple-500/20 text-purple-400 p-3 rounded-lg flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
 
@@ -316,14 +328,16 @@
                             </div>
 
                             <!-- TIMER -->
-                            <div class="bg-yellow-50 text-yellow-700 p-3 rounded-lg mt-3 flex justify-between text-sm">
+                            <div
+                                class="bg-yellow-500/20 text-yellow-300 p-3 rounded-lg mt-3 flex justify-between text-sm">
 
                                 <span class="flex items-center gap-2">
                                     <i class="fa-solid fa-clock"></i>
                                     Timer
                                 </span>
 
-                                <span id="timer-{{ $ac->id }}" class="font-semibold">
+                                <span id="timer-{{ $ac->id }}"
+                                    class="font-medium text-sm leading-tight text-right">
                                     @if ($ac->timer_on || $ac->timer_off)
                                         {{ $ac->timer_on ? 'ON ' . substr($ac->timer_on, 0, 5) : '' }}
                                         {{ $ac->timer_off ? '| OFF ' . substr($ac->timer_off, 0, 5) : '' }}
@@ -392,21 +406,29 @@
                             let offTime = ac.ac_unit?.timer_off;
 
                             if (onTime || offTime) {
-                                let onText = onTime ? 'ON ' + formatTime(onTime) : '';
-                                let offText = offTime ? 'OFF ' + formatTime(offTime) : '';
+                                let text = '';
 
-                                timerEl.innerText = [onText, offText].filter(Boolean).join(' | ');
+                                if (onTime) {
+                                    text += 'ON ' + formatTime(onTime);
+                                }
 
-                                timerEl.classList.add('text-green-600');
-                                timerEl.classList.remove('text-gray-500');
+                                if (offTime) {
+                                    text += (text ? '\n' : '') + 'OFF ' + formatTime(offTime);
+                                }
+
+                                timerEl.innerText = text;
+                                timerEl.style.whiteSpace = "pre-line";
+
+                                timerEl.classList.add('text-green-400');
+                                timerEl.classList.remove('text-gray-300');
                             } else {
                                 timerEl.innerText = 'OFF';
 
-                                timerEl.classList.add('text-gray-500');
-                                timerEl.classList.remove('text-green-600');
-                            }
+                                timerEl.style.whiteSpace = "normal";
 
-                            timerEl.innerText = timer;
+                                timerEl.classList.add('text-gray-300');
+                                timerEl.classList.remove('text-green-400');
+                            }
                         }
                     });
                 })

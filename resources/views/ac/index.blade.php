@@ -383,11 +383,17 @@
                     transform: translateX(0);
                 }
             }
+            .custom-bg {
+                background:
+                    linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                    url('/images/wallpaper.jpeg') no-repeat center center fixed;
+                background-size: cover;
+            }
         </style>
 
     </head>
 
-    <body class="bg-[url('/images/wallpaper.jpeg')] bg-cover bg-center overflow-x-hidden">
+    <body class="custom-bg overflow-x-hidden">
 
         <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
@@ -408,7 +414,7 @@
                 @auth
                     {{-- Dashboard --}}
                     <li>
-                        <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                        <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                             <i class="fa-solid fa-chart-pie"></i>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -416,8 +422,7 @@
 
                     @if (in_array(Auth::user()->role, ['admin', 'operator']))
                         <li>
-                            <a href="/rooms"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                            <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                                 <i class="fa-solid fa-server"></i>
                                 <span class="menu-text">Manage Rooms</span>
                             </a>
@@ -427,7 +432,7 @@
                     {{-- Admin only --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -437,7 +442,7 @@
                     {{-- Admin only --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100">
+                            <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span class="menu-text">Activity Log</span>
                             </a>

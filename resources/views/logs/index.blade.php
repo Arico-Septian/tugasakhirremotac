@@ -109,6 +109,10 @@
             }
         }
 
+        header {
+            height: 72px;
+        }
+
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
@@ -173,7 +177,7 @@
                 @if (Auth::user()->role == 'admin')
                     <li>
                         <a href="/logs"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold">
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('logs*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             <span class="menu-text">Activity Log</span>
                         </a>
@@ -233,17 +237,18 @@
             <div class="flex items-center gap-3">
 
                 <!-- HAMBURGER -->
-                <button
-                    class="md:hidden text-gray-600 text-lg p-2 rounded-md hover:bg-white/10 active:scale-95 transition"
+                <button class="md:hidden text-white text-lg p-2 rounded-md hover:bg-white/10 active:scale-95 transition"
                     onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <div>
-                    <h1 class="text-base md:text-xl font-semibold text-white leading-none">
+                <div class="flex flex-col leading-tight">
+                    <h1 class="text-base md:text-xl font-bold text-white">
                         Activity Log
                     </h1>
-                    <p class="text-xs text-gray-300 hidden sm:block">System & User Activity Monitoring</p>
+                    <p class="text-sm text-blue-200 font-medium">
+                        System & User Activity Monitoring
+                    </p>
                 </div>
             </div>
         </header>
@@ -251,12 +256,22 @@
         <div class="pt-2 px-4 md:px-6 pb-4 md:pb-8">
 
             <!-- STATS -->
-            <div class="card mb-4 flex justify-between items-center gap-2">
+            <div class="card mb-6 flex items-center justify-between px-6 py-5">
+
                 <div>
-                    <p class="text-gray-300 text-sm">Total Activity</p>
-                    <h2 class="text-2xl md:text-3xl font-bold">{{ $logs->total() }}</h2>
+                    <p class="text-gray-300 text-sm mb-1">
+                        Total Activity
+                    </p>
+
+                    <h2 class="text-4xl font-bold text-white">
+                        {{ $logs->total() }}
+                    </h2>
                 </div>
-                <i class="fa-solid fa-clock text-xl md:text-3xl text-blue-400"></i>
+
+                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+
             </div>
 
             <!-- TABLE -->

@@ -109,7 +109,7 @@
 
             @media (max-width: 768px) {
                 header {
-                    height: 56px;
+                    height: 72px;
                 }
             }
         </style>
@@ -160,7 +160,7 @@
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/users"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold hover:bg-blue-100">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('users*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -224,20 +224,25 @@
         <!-- MAIN -->
         <div class="main-content min-h-screen flex flex-col">
 
-            <header
-class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+            <header class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
 
-                <div class="flex items-center gap-3 md:gap-6">
+                <div class="flex items-center gap-3">
 
-                    <button onclick="toggleSidebar()" class="md:hidden text-gray-300 text-base">
+                    <button onclick="toggleSidebar()" class="md:hidden text-white text-lg">
                         <i class="fa-solid fa-bars"></i>
                     </button>
 
-                    <h1 class="text-base md:text-xl font-bold text-white">
-                        User Management
-                    </h1>
+                    <div class="flex flex-col leading-tight">
 
-                </div>
+                        <h1 class="text-base md:text-xl font-bold text-white">
+                            User Management
+                        </h1>
+
+                        <p class="text-sm text-blue-200 font-medium">
+                            Manage System Users & Roles
+                        </p>
+
+                    </div>
 
             </header>
 
@@ -272,19 +277,19 @@ class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center
                     <div class="card mb-6 flex items-center justify-between px-6 py-5">
 
                         <div>
-                            <p class="text-gray-300 text-sm">
+                            <p class="text-gray-300 text-sm mb-1">
                                 Total Users
                             </p>
 
-                            <h2 class="text-3xl font-bold text-white">
+                            <h2 class="text-4xl font-bold text-white">
                                 {{ $totalUsers }}
                             </h2>
-
                         </div>
 
                         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
                             <i class="fa-solid fa-users text-lg"></i>
                         </div>
+
                     </div>
 
                     <p class="text-sm text-gray-400 mt-2 mb-4">
@@ -351,7 +356,8 @@ class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center
                         <div class="hidden md:block overflow-x-auto max-h-[500px] overflow-y-auto">
                             <table class="w-full text-white">
 
-                                <thead class="sticky top-0 bg-slate-900/90 backdrop-blur z-10 border-b border-white/10">
+                                <thead
+                                    class="sticky top-0 bg-slate-900/90 backdrop-blur z-10 border-b border-white/10">
                                     <tr class="text-left text-gray-300 text-sm">
                                         <th class="p-3">Name</th>
                                         <th class="p-3">Role</th>
