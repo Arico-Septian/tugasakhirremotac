@@ -239,14 +239,14 @@
     <!-- MAIN -->
     <div class="main-content min-h-screen flex flex-col">
         <header
-            class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-4 md:px-6 py-3 md:py-6 flex items-center justify-between shadow-sm">
+class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
             <!-- KIRI -->
             <div class="flex items-center gap-3 md:gap-5">
                 <button class="lg:hidden text-gray-300 text-lg" onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <h1 class="text-sm md:text-lg font-semibold text-white">
+                <h1 class="text-base md:text-xl font-bold text-white">
                     Room Management
                 </h1>
             </div>

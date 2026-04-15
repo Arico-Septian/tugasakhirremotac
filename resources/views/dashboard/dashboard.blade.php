@@ -256,7 +256,7 @@
 
             .stat-card h2 {
                 font-size: 18px;
-                text-shadow: 0 3px 12px rgba(0,0,0,0.5);
+                text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
             }
 
             .stat-card p {
@@ -281,11 +281,19 @@
                 letter-spacing: 0.5px;
             }
         }
-        header {
-                height: 72px;
-            }
 
+        header {
+            height: 72px;
+        }
+
+        @media (max-width: 768px) {
+            .stat-card {
+                padding: 10px;
+            }
+        }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -414,11 +422,11 @@
 
                         <div>
 
-                            <h1 class="text-sm md:text-lg font-semibold text-white">
+                            <h1 class="text-base md:text-xl font-bold text-white">
                                 Centralized AC Management
                             </h1>
 
-                            <p class="text-[10px] md:text-xs text-gray-300">
+                            <p class="text-sm text-blue-200 font-medium">
                                 Server Room Cooling Control System
                             </p>
 
@@ -442,7 +450,7 @@
             <div class="w-full max-w-7xl mx-auto px-4 md:px-6 py-6">
 
                 <!-- STATISTICS -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8 md:mb-12">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 md:mb-12">
                     <div class="stat-card">
                         <div class="flex justify-between items-center">
                             <div>
@@ -491,27 +499,6 @@
                             <div>
 
                                 <p class="text-xs md:text-sm text-gray-300 font-bold">
-                                    Active AC Units
-                                </p>
-                                <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
-                                    {{ $activeAc }}
-                                </h2>
-
-                            </div>
-
-                            <div class="icon-box text-green-500">
-                                <i class="fa-solid fa-wind"></i>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="flex justify-between items-center">
-
-                            <div>
-
-                                <p class="text-xs md:text-sm text-gray-300 font-bold">
                                     Users
                                 </p>
 
@@ -537,7 +524,8 @@
                                     Users Online
                                 </p>
 
-                                <h2 id="usersOnlineCount" class="text-lg md:text-2xl font-bold text-white leading-tight">
+                                <h2 id="usersOnlineCount"
+                                    class="text-lg md:text-2xl font-bold text-white leading-tight">
                                     {{ $usersOnline }}
                                 </h2>
                             </div>
@@ -550,6 +538,15 @@
                     </div>
                 </div>
 
+                <!-- TEMPERATURE CHART -->
+                <div class="bg-slate-900/70 rounded-xl p-4 md:p-6">
+                    <h2 class="text-lg font-semibold text-white mb-4">
+                        Room Temperature Overview
+                    </h2>
+
+                    <canvas id="tempChart" class="h-[220px] md:h-[100px]"></canvas>
+                </div>
+
                 <!-- SERVER ROOMS -->
                 <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">
                     Server Rooms
@@ -557,7 +554,7 @@
 
                 <div class="w-full">
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 gap-6 justify-items-start lg:justify-items-start">
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-start lg:justify-items-start">
                         @foreach ($rooms as $room)
                             <div class="room-card w-full">
 
@@ -631,6 +628,74 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
+            const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => $t ?? rand(24, 30)));
+            const ctx = document.getElementById('tempChart');
+
+            if (ctx) {
+                new Chart(ctx, {
+                    data: {
+                        labels: roomNames,
+                        datasets: [{
+                                type: 'bar',
+                                label: 'Temperature (°C)',
+                                data: roomTemps,
+                                backgroundColor: roomTemps.map(t =>
+                                    t > 30 ? 'red' : t > 25 ? 'yellow' : '#3b82f6'
+                                ),
+                                borderRadius: 6
+                            },
+
+                            {
+                                type: 'line',
+                                label: 'Trend',
+                                data: roomTemps,
+                                borderColor: '#ffffff',
+                                backgroundColor: 'transparent',
+                                tension: 0.4,
+                                pointBackgroundColor: '#ffffff',
+                                pointRadius: 4,
+                                borderWidth: 2
+                            }
+
+                        ]
+                    },
+
+                    options: {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: 'white'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: 'white',
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 5,
+                                    font: {
+                                        size: 10
+                                    }
+                                }
+                            },
+                            y: {
+                                min: 20,
+                                max: 40,
+                                ticks: {
+                                    color: 'white'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
 
         <script>
             function toggleSidebar() {

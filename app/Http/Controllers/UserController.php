@@ -8,10 +8,18 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
+        $totalUsers = User::toBase()->count();
+
+        $users = User::select('id', 'name', 'role', 'last_activity')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->latest()
+            ->get();
+
+        return view('users.index', compact('users', 'totalUsers'));
     }
 
     public function store(Request $request)

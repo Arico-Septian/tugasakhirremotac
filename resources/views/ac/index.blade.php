@@ -819,8 +819,15 @@
         <!-- MODAL -->
         @auth
             @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                    <div class="bg-white p-8 rounded-2xl w-96 shadow-lg">
+                <div id="modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+
+                    <div class="bg-white p-8 rounded-2xl w-96 shadow-lg relative">
+
+                        <!-- CLOSE BUTTON -->
+                        <button onclick="closeModal()"
+                            class="absolute top-4 right-4 text-black text-2xl z-50 hover:text-red-500">
+                            ✕
+                        </button>
 
                         <h2 class="text-xl font-bold mb-5">
                             Add New AC
@@ -829,8 +836,8 @@
                         <form method="POST" action="/rooms/{{ $room->id }}/ac">
                             @csrf
 
-                            <input type="number" name="ac_number" min="1" max="15"
-                                placeholder="AC Number" class="border p-3 w-full mb-3 rounded-lg">
+                            <input type="number" name="ac_number" placeholder="AC Number"
+                                class="border p-3 w-full mb-3 rounded-lg">
 
                             <input type="text" name="name" placeholder="AC Name"
                                 class="border p-3 w-full mb-3 rounded-lg">
@@ -838,12 +845,11 @@
                             <input type="text" name="brand" placeholder="Brand"
                                 class="border p-3 w-full mb-4 rounded-lg">
 
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
-
+                            <button class="bg-blue-600 text-white w-full py-2 rounded-lg">
                                 Create AC
-
                             </button>
                         </form>
+
                     </div>
                 </div>
             @endif
@@ -870,6 +876,13 @@
 
             function openModal() {
                 document.getElementById('modal').classList.remove('hidden')
+            }
+
+            function closeModal() {
+                document.getElementById('modal').classList.add('hidden');
+
+                const form = document.querySelector('#modal form');
+                if (form) form.reset();
             }
 
             function setTemp(id, temp) {
