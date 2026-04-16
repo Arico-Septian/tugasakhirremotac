@@ -28,7 +28,7 @@ class MqttListener extends Command
      */
     public function handle()
     {
-        $server = '192.168.79.28';
+        $server = '192.168.18.194';
         $port = 1883;
 
         $mqtt = new MqttClient($server, $port, 'laravel-client');

@@ -16,7 +16,7 @@ class UpdateLastActivity
             /** @var \App\Models\User $user */
             $user = Auth::user();
 
-            if (!$user->last_activity || now()->diffInSeconds($user->last_activity) > 60) {
+            if (!$user->last_activity || now()->diffInSeconds($user->last_activity) > 10) {
                 $user->last_activity = now();
                 $user->save();
             }

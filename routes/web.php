@@ -314,3 +314,22 @@ Route::post('/update-activity', function () {
 
     return response()->json(['status' => 'ok']);
 });
+
+Route::get('/my-status', function () {
+
+    $user = Auth::user();
+
+    if (!$user || !$user->last_activity) {
+        return response()->json(['status' => 'offline']);
+    }
+
+    $isOnline = now()->diffInSeconds($user->last_activity) < 60;
+
+    return response()->json([
+        'status' => $isOnline ? 'online' : 'offline'
+    ]);
+});
+
+Route::get('/temperatures', function () {
+    return \App\Models\Room::select('name','temperature')->get();
+});

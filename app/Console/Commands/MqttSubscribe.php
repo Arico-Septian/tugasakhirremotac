@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\AcStatus;
 use App\Events\DeviceStatusUpdated;
 use App\Models\Room;
+use Illuminate\Support\Facades\Log;
 
 class MqttSubscribe extends Command
 {
@@ -121,6 +122,86 @@ class MqttSubscribe extends Command
                 );
 
                 $this->info("AC {$acId} di {$roomName} diupdate");
+            },
+
+            'room/+/ac/+/status' => function ($topic, $message) {
+
+                try {
+
+                    $data = json_decode($message, true);
+
+                    if (!is_array($data)) {
+                        Log::warning("MQTT STATUS INVALID JSON", [
+                            'topic' => $topic,
+                            'message' => $message
+                        ]);
+                        return;
+                    }
+
+                    $parts = explode('/', $topic);
+
+                    if (count($parts) < 5) {
+                        Log::warning("MQTT TOPIC INVALID", [
+                            'topic' => $topic
+                        ]);
+                        return;
+                    }
+
+                    $roomName = strtolower(trim($parts[1]));
+                    $acNumber = (int) $parts[3];
+
+                    if (!$roomName || !$acNumber) {
+                        Log::warning("MQTT DATA TIDAK LENGKAP", compact('topic'));
+                        return;
+                    }
+
+                    $room = \App\Models\Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+
+                    if (!$room) {
+                        Log::warning("ROOM TIDAK DITEMUKAN", [
+                            'room' => $roomName
+                        ]);
+                        return;
+                    }
+
+                    $ac = \App\Models\AcUnit::where('room_id', $room->id)
+                        ->where('ac_number', $acNumber)
+                        ->first();
+
+                    if (!$ac) {
+                        Log::warning("AC TIDAK TERDAFTAR (DIABAIKAN)", [
+                            'room' => $roomName,
+                            'ac_number' => $acNumber
+                        ]);
+                    }
+
+                    $power = strtoupper($data['power'] ?? 'OFF');
+                    $mode  = strtoupper($data['mode'] ?? 'COOL');
+                    $temp  = (int) ($data['ac_temp'] ?? 24);
+
+                    \App\Models\AcStatus::updateOrCreate(
+                        ['ac_unit_id' => $ac->id],
+                        [
+                            'power' => $power,
+                            'mode' => $mode,
+                            'set_temperature' => $temp,
+                        ]
+                    );
+
+                    Log::info("MQTT STATUS UPDATED", [
+                        'room' => $roomName,
+                        'ac' => $acNumber,
+                        'power' => $power,
+                        'mode' => $mode,
+                        'temp' => $temp
+                    ]);
+                } catch (\Throwable $e) {
+
+                    Log::error("MQTT STATUS ERROR", [
+                        'topic' => $topic,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             },
 
             /* === HEARTBEAT === */

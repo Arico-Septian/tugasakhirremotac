@@ -391,7 +391,8 @@
         <div class="main-content min-h-screen flex flex-col">
 
             <!-- HEADER -->
-            <header class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-md border-b border-white/10">
+            <header
+                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-md border-b border-white/10">
                 @auth
                     <div class="flex items-center gap-3">
 
@@ -421,7 +422,6 @@
 
                             Online
 
-                            </span>
                         </div>
                     </div>
                 @endauth
@@ -612,7 +612,7 @@
 
         <script>
             const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
-            const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => $t ?? rand(24, 30)));
+            const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => $t ?? 0));
             const ctx = document.getElementById('tempChart');
 
             const valueLabelPlugin = {
@@ -643,7 +643,7 @@
             };
 
             if (ctx) {
-                new Chart(ctx, {
+                const tempChart = new Chart(ctx, {
                     plugins: [valueLabelPlugin],
                     data: {
                         labels: roomNames,
@@ -719,6 +719,11 @@
                         }
                     }
                 });
+                updateChart(tempChart);
+
+                setInterval(() => {
+                    updateChart(tempChart);
+                }, 5000);
             }
         </script>
 
@@ -791,7 +796,89 @@
                     resetTimer();
                 }
             });
+
+            function updateChart(chart) {
+                fetch('/temperatures')
+                    .then(res => res.json())
+                    .then(data => {
+
+                        const temps = data.map(r => r.temperature ?? 0);
+
+                        chart.data.labels = data.map(r => r.name.replace('server ', 'srv '));
+                        chart.data.datasets[0].data = temps;
+                        chart.data.datasets[1].data = temps;
+
+                        // 🔥 update warna realtime
+                        chart.data.datasets[0].backgroundColor = temps.map(t =>
+                            t > 30 ? 'red' :
+                            t > 25 ? 'yellow' :
+                            '#3b82f6'
+                        );
+
+                        chart.update();
+                    });
+            }
         </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                updateStatus();
+                setInterval(updateStatus, 5000);
+            });
+
+            function updateStatus() {
+                let el = document.getElementById('systemStatus');
+
+                if (!navigator.onLine) {
+                    el.innerHTML = `
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            No Connection
+        `;
+
+                    el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-red-500/10', 'text-red-400');
+                    el.classList.add('bg-gray-500/10', 'text-gray-400');
+
+                    return;
+                }
+
+                fetch('/my-status')
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (data.status === 'online') {
+
+                            el.innerHTML = `
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Online
+                `;
+
+                            el.classList.remove('bg-red-500/10', 'text-red-400', 'bg-gray-500/10', 'text-gray-400');
+                            el.classList.add('bg-green-500/10', 'text-green-400');
+
+                        } else {
+
+                            el.innerHTML = `
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    Offline
+                `;
+
+                            el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-gray-500/10', 'text-gray-400');
+                            el.classList.add('bg-red-500/10', 'text-red-400');
+                        }
+                    })
+                    .catch(() => {
+
+                        el.innerHTML = `
+                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                No Connection
+            `;
+
+                        el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-red-500/10', 'text-red-400');
+                        el.classList.add('bg-gray-500/10', 'text-gray-400');
+                    });
+            }
+        </script>
+
     </div>
 </body>
 
