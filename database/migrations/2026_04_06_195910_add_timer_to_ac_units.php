@@ -11,21 +11,35 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ac_units', function (Blueprint $table) {
+        $hasTimerOn = Schema::hasColumn('ac_units', 'timer_on');
+        $hasTimerOff = Schema::hasColumn('ac_units', 'timer_off');
 
-            $table->time('timer_on')->nullable();
-            $table->time('timer_off')->nullable();
-        });
+        if (!$hasTimerOn || !$hasTimerOff) {
+
+            Schema::table('ac_units', function (Blueprint $table) use ($hasTimerOn, $hasTimerOff) {
+
+                if (!$hasTimerOn) {
+                    $table->time('timer_on')->nullable()->comment('Waktu nyala AC');
+                }
+
+                if (!$hasTimerOff) {
+                    $table->time('timer_off')->nullable()->comment('Waktu mati AC');
+                }
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('ac_units', function (Blueprint $table) {
 
-            $table->dropColumn(['timer_on', 'timer_off']);
+            if (Schema::hasColumn('ac_units', 'timer_on')) {
+                $table->dropColumn('timer_on');
+            }
+
+            if (Schema::hasColumn('ac_units', 'timer_off')) {
+                $table->dropColumn('timer_off');
+            }
         });
     }
 };

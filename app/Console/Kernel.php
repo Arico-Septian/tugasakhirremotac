@@ -9,11 +9,17 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('clean:logs')->daily();
+        $schedule->command('clean:logs')
+            ->daily();
 
-        $schedule->command('device:check-status')->everyTenSeconds()->runInBackground();
+        $schedule->command('device:check-status')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->runInBackground();
 
-        $schedule->command('ac:run-timer')->everyMinute();
+        $schedule->command('ac:run-timer')
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 
     protected function commands()

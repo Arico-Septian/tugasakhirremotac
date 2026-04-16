@@ -95,7 +95,7 @@
         </p>
 
         <!-- BUTTON -->
-        <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
+        <div data-aos="fade-up" data-aos-delay="400" class="flex justify-center items-center gap-3 w-full mt-6">
             <a href="/login"
                 class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow
                   hover:scale-110 hover:shadow-xl transition duration-300">

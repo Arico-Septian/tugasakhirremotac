@@ -280,14 +280,15 @@
 <body class="custom-bg">
     <div class="flex">
 
-        <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+        <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
 
         <div id="loader" class="fixed inset-0 bg-white flex items-center justify-center hidden z-50">
             <span class="text-blue-500 font-semibold text-lg">Loading...</span>
         </div>
 
         <!-- SIDEBAR -->
-        <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 z-50">
+        <div id="sidebar"
+            class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r border-slate-900 z-50">
             <div class="flex justify-between items-center pb-5 mb-8 border-b">
 
                 <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -301,7 +302,7 @@
 
             </div>
 
-            <ul class="space-y-3">
+            <ul class="space-y-4">
                 @auth
                     <li>
                         <a href="/dashboard"
@@ -315,7 +316,7 @@
                     @if (in_array(Auth::user()->role, ['admin', 'operator']))
                         <li>
                             <a href="/rooms"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl  {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-server"></i>
                                 <span class="menu-text">Manage Rooms</span>
                             </a>
@@ -326,7 +327,7 @@
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/users"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -337,7 +338,7 @@
                     @if (Auth::user()->role == 'admin')
                         <li>
                             <a href="/logs"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10' }}">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span class="menu-text">Activity Log</span>
                             </a>
@@ -390,8 +391,7 @@
         <div class="main-content min-h-screen flex flex-col">
 
             <!-- HEADER -->
-            <header
-                class="sticky top-0 bg-slate-900/70 backdrop-blur-md px- md:px-6 py-3.5 flex items-center justify-between shadow-sm">
+            <header class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-md border-b border-white/10">
                 @auth
                     <div class="flex items-center gap-3">
 
@@ -402,7 +402,7 @@
 
                         <div>
 
-                            <h1 class="text-base md:text-xl font-bold text-white">
+                            <h1 class="text-base md:text-xl font-bold text-white leading-tight">
                                 Centralized AC Management
                             </h1>
 
@@ -542,14 +542,14 @@
                                 <div class="flex justify-between mb-3">
 
                                     <h3 class="font-semibold text-sm md:text-lg text-white leading-tight">
-                                        {{ $room->name }}
+                                        {{ ucfirst($room->name) }}
                                     </h3>
 
                                     <i class="fa-solid fa-server text-gray-400"></i>
 
                                 </div>
 
-                                <p class="text-gray-400 text-xs md:text-sm">
+                                <p class="text-gray-400 -mt-1 text-sm">
                                     Total : {{ $room->acUnits->count() }} units
                                 </p>
 

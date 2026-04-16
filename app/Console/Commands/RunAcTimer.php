@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\AcUnit;
 use App\Services\MqttService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class RunAcTimer extends Command
@@ -13,64 +14,91 @@ class RunAcTimer extends Command
     protected $signature = 'ac:run-timer';
     protected $description = 'Run AC timer ON/OFF (Anti Miss + Anti Double)';
 
+    const WINDOW_BEFORE = -30; // detik sebelum
+    const WINDOW_AFTER = 60;   // detik setelah
+    const EXECUTION_BUFFER = 60; // anti double 1 menit
+
     public function handle()
     {
-        $now = Carbon::now();
+        $now   = Carbon::now('Asia/Jakarta');
+        $today = Carbon::today('Asia/Jakarta');
 
         $mqtt = new MqttService();
 
-        $acs = AcUnit::with('room')->get();
+        $acs = AcUnit::with('room:id,name')
+            ->select('id', 'room_id', 'ac_number', 'timer_on', 'timer_off', 'power_status')
+            ->whereHas('room')
+            ->where(function ($q) {
+                $q->whereNotNull('timer_on')
+                  ->orWhereNotNull('timer_off');
+            })
+            ->get();
 
         foreach ($acs as $ac) {
 
+            $version = Cache::get("timer_version_{$ac->id}", 1);
+            $topic   = "room/{$ac->room->name}/ac/{$ac->ac_number}/control";
 
-            if (!$ac->room) continue;
+            foreach (['on', 'off'] as $type) {
 
-            $topic = "room/{$ac->room->name}/ac/{$ac->ac_number}/control";
+                $timerField     = "timer_{$type}";
+                $expectedStatus = strtoupper($type);
 
-            if ($ac->timer_on) {
+                if (!$ac->$timerField) continue;
 
-                $timerOn = Carbon::parse($ac->timer_on);
+                $timer = $today->copy()->setTimeFromTimeString($ac->$timerField);
 
-                $diff = $now->diffInSeconds($timerOn, false);
+                $diff = $now->diffInSeconds($timer, false);
+                $alreadyExecuted = $now->gt($timer->copy()->addSeconds(self::EXECUTION_BUFFER));
 
-                if ($diff >= 0 && $diff <= 60) {
+                $key = "timer_{$type}_{$ac->id}_v{$version}_" . $timer->format('Y-m-d_H:i');
 
-                    $key = "timer_on_{$ac->id}_" . $timerOn->format('H:i');
+                if (
+                    $diff >= self::WINDOW_BEFORE &&
+                    $diff <= self::WINDOW_AFTER &&
+                    !$alreadyExecuted &&
+                    $ac->power_status !== $expectedStatus
+                ) {
 
-                    if (!Cache::has($key)) {
+                    $lock = Cache::lock("lock:{$key}", 10);
 
-                        $mqtt->publish($topic, json_encode([
-                            "power" => "ON"
-                        ]));
-
-                        Cache::put($key, true, 120);
-
-                        $this->info("TIMER ON → AC {$ac->ac_number}");
+                    if (!$lock->get()) {
+                        continue;
                     }
-                }
-            }
 
+                    try {
 
-            if ($ac->timer_off) {
-
-                $timerOff = Carbon::parse($ac->timer_off);
-
-                $diff = $now->diffInSeconds($timerOff, false);
-
-                if ($diff >= 0 && $diff <= 60) {
-
-                    $key = "timer_off_{$ac->id}_" . $timerOff->format('H:i');
-
-                    if (!Cache::has($key)) {
+                        // double check (extra safety)
+                        if (Cache::has($key)) {
+                            continue;
+                        }
 
                         $mqtt->publish($topic, json_encode([
-                            "power" => "OFF"
+                            "power" => $expectedStatus
                         ]));
 
-                        Cache::put($key, true, 120);
+                        $ac->update([
+                            'power_status' => $expectedStatus
+                        ]);
 
-                        $this->info("TIMER OFF → AC {$ac->ac_number}");
+                        Cache::put($key, true, 300);
+
+                        Log::info("TIMER {$expectedStatus} SUCCESS", [
+                            'ac'   => $ac->ac_number,
+                            'time' => $now->toDateTimeString()
+                        ]);
+
+                        $this->info("TIMER {$expectedStatus} → AC {$ac->ac_number}");
+
+                    } catch (\Exception $e) {
+
+                        Log::error("MQTT {$expectedStatus} ERROR", [
+                            'ac'    => $ac->ac_number,
+                            'error' => $e->getMessage()
+                        ]);
+
+                    } finally {
+                        optional($lock)->release();
                     }
                 }
             }
