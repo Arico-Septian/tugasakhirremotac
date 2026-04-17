@@ -170,7 +170,7 @@
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-server"></i>
-                        <span class="menu-text">Manage Rooms & Ac</span>
+                        <span class="menu-text">Manage Rooms & Control Ac</span>
                     </a>
                 </li>
             @endif
@@ -517,11 +517,7 @@
             return true;
         }
 
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                startSSE();
-            }, 500);
-        });
+        window.addEventListener("load", startSSE);
 
         window.addEventListener("beforeunload", () => {
             if (source) source.close();

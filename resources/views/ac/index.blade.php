@@ -237,7 +237,7 @@
                             class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Ac</span>
+                            <span class="menu-text">Manage Rooms & Control Ac</span>
                         </a>
                     </li>
                 @endif
@@ -284,19 +284,16 @@
                             </p>
                         </div>
 
-                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </a>
-
                     </button>
-                </div>
 
-                <div class="profile-collapse hidden text-center">
-                    <a href="/logout" class="text-red-500 text-xl">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
-                </div>
+                    <form action="/logout" method="POST">
+                        @csrf
+                        <button class="ml-auto text-red-500 hover:text-red-600 text-lg">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
 
+                </div>
             </div>
         </div>
 
@@ -366,7 +363,7 @@
                         <!-- DELETE AC -->
                         @auth
                             @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                <form id="deleteForm" method="POST" action="">
+                                <form id="deleteForm" method="POST" action="{{ $firstAc ? '/ac/' . $firstAc->id : '' }}">
                                     @csrf
                                     @method('DELETE')
 
@@ -485,15 +482,16 @@
                                         </div>
 
                                         <div class="ac-card text-center">
+                                            <p class="text-xs text-white">MODE</p>
                                             <p class="text-xl font-semibold">
                                                 {{ ucfirst($ac->status?->mode ?? 'cool') }}
                                             </p>
                                         </div>
 
                                         <div class="ac-card text-center">
+                                            <p class="text-xs text-white">POWER</p>
                                             <p
                                                 class="text-xl font-semibold {{ ($ac->status?->power ?? 'OFF') == 'ON' ? 'text-green-600' : 'text-white' }}">
-
                                                 {{ $ac->status?->power ?? 'OFF' }}
                                             </p>
                                         </div>
@@ -504,26 +502,26 @@
                                         <p class="text-gray-500 mb-4 text-sm">OPERATING MODE</p>
                                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                             <a href="/ac/{{ $ac->id }}/mode/cool"
-                                                class="mode-btn {{ ($ac->status?->mode ?? '') == 'COOL' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == 'COOL' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                                 <i class="fa-solid fa-snowflake"></i> Cool
                                             </a>
 
                                             <a href="/ac/{{ $ac->id }}/mode/heat"
-                                                class="mode-btn {{ ($ac->status?->mode ?? '') == 'HEAT' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == 'HEAT' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                                 <i class="fa-solid fa-fire"></i> Heat
                                             </a>
 
                                             <a href="/ac/{{ $ac->id }}/mode/dry"
-                                                class="mode-btn {{ ($ac->status?->mode ?? '') == 'DRY' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == 'DRY' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                                 <i class="fa-solid fa-droplet"></i> Dry
                                             </a>
 
                                             <a href="/ac/{{ $ac->id }}/mode/fan"
-                                                class="mode-btn {{ ($ac->status?->mode ?? '') == 'FAN' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == 'FAN' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                                 <i class="fa-solid fa-fan"></i> Fan
                                             </a>
                                             <a href="/ac/{{ $ac->id }}/mode/auto"
-                                                class="mode-btn {{ ($ac->status?->mode ?? '') == 'AUTO' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == 'AUTO' ? 'bg-blue-600 text-white shadow-lg' : '' }}">
                                                 <i class="fa-solid fa-rotate"></i> Auto
                                             </a>
                                         </div>

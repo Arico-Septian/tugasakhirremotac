@@ -150,7 +150,7 @@
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-server"></i>
-                        <span class="menu-text">Manage Rooms & Ac</span>
+                        <span class="menu-text">Manage Rooms & Control Ac</span>
                     </a>
                 </li>
             @endif
@@ -375,15 +375,15 @@
                         let modeEl = document.getElementById('mode-' + id);
                         let timerEl = document.getElementById('timer-' + id);
 
-                        if (powerEl) {
+                        if (powerEl && powerEl.innerText !== (ac.power ?? 'OFF')) {
                             powerEl.innerText = ac.power ?? 'OFF';
                         }
 
-                        if (tempEl) {
+                        if (tempEl && tempEl.innerText !== ((ac.set_temperature ?? 24) + '°C')) {
                             tempEl.innerText = (ac.set_temperature ?? 24) + '°C';
                         }
 
-                        if (modeEl) {
+                        if (modeEl && modeEl.innerText !== (ac.mode ?? 'AUTO')) {
                             modeEl.innerText = ac.mode ?? 'AUTO';
                         }
 
@@ -413,15 +413,24 @@
                                     return;
                                 }
 
-                                timerEl.innerText = text;
-                                timerEl.style.whiteSpace = "pre-line";
+                                if (timerEl.innerText !== text) {
+                                    timerEl.innerText = text;
+                                    timerEl.style.whiteSpace = "pre-line";
+                                }
+
                             } else {
                                 timerEl.innerText = 'OFF';
                             }
                         }
                     });
                 })
-                .catch(err => console.error("Fetch error:", err));
+                .catch(err => {
+                    console.error("Fetch error:", err);
+
+                    document.querySelectorAll('[id^="power-"]').forEach(el => {
+                        el.innerText = 'OFF';
+                    });
+                });
         }
 
         function formatTime(t) {

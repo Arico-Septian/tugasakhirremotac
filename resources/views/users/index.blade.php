@@ -142,7 +142,7 @@
                             class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Ac</span>
+                            <span class="menu-text">Manage Rooms & Control Ac</span>
                         </a>
                     </li>
                 @endif
@@ -512,10 +512,12 @@
 
                             if (u.online) {
                                 el.innerText = "Online";
-                                el.className = "bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs";
+                                el.classList.remove('bg-gray-500/20', 'text-gray-300');
+                                el.classList.add('bg-green-500/20', 'text-green-300');
                             } else {
                                 el.innerText = "Offline";
-                                el.className = "bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs";
+                                el.classList.remove('bg-green-500/20', 'text-green-300');
+                                el.classList.add('bg-gray-500/20', 'text-gray-300');
                             }
 
                         });
@@ -531,11 +533,7 @@
                     };
                 }
 
-                window.addEventListener("load", () => {
-                    setTimeout(() => {
-                        startUserStatusSSE();
-                    }, 500);
-                });
+                window.addEventListener("load", startUserStatusSSE);
 
                 window.addEventListener("beforeunload", () => {
                     if (userStatusSource) userStatusSource.close();

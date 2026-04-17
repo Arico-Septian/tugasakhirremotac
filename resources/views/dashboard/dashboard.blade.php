@@ -212,7 +212,7 @@
                             class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Ac</span>
+                            <span class="menu-text">Manage Rooms & Control Ac</span>
                         </a>
                     </li>
                 @endif
@@ -468,7 +468,7 @@
                                     <span>Active Units</span>
 
                                     <span class="font-semibold">
-                                        {{ $room->acUnits->where('status.power', 'ON')->count() }}
+                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count() }}
                                     </span>
 
                                 </div>
@@ -479,7 +479,7 @@
                                     <span>Inactive Units</span>
 
                                     <span class="font-semibold">
-                                        {{ $room->acUnits->where('status.power', 'OFF')->count() }}
+                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'OFF')->count() }}
                                     </span>
 
                                 </div>
@@ -547,7 +547,9 @@
                                 label: 'Temperature (°C)',
                                 data: roomTemps,
                                 backgroundColor: roomTemps.map(t =>
-                                    t > 30 ? 'red' : t > 25 ? 'yellow' : '#3b82f6'
+                                    t > 30 ? '#ef4444' :
+                                    t > 25 ? '#facc15' :
+                                    '#3b82f6'
                                 ),
                                 borderRadius: 6,
                                 barPercentage: 0.75,
@@ -602,8 +604,8 @@
                                 }
                             },
                             y: {
-                                min: 20,
-                                max: 40,
+                                suggestedMin: 20,
+                                suggestedMax: 40,
                                 ticks: {
                                     color: 'white'
                                 },
@@ -689,13 +691,8 @@
             });
 
             window.addEventListener("load", () => {
-                setTimeout(() => {
-                    initChart();
-                }, 300);
-
-                setTimeout(() => {
-                    startSSE();
-                }, 800);
+                initChart();
+                startSSE();
             });
 
             window.addEventListener("beforeunload", () => {
@@ -721,11 +718,11 @@
                 this.classList.add("hidden");
             };
 
-            document.querySelectorAll("#sidebar a").forEach(link => {
-
-                link.addEventListener("click", () => {
-
-                    if (source) source.close();
+            document.addEventListener("DOMContentLoaded", () => {
+                document.querySelectorAll("#sidebar a").forEach(link => {
+                    link.addEventListener("click", () => {
+                        if (source) source.close();
+                    });
                 });
             });
 
@@ -764,7 +761,7 @@
                 }, idleTime);
             }
 
-            window.onload = resetTimer;
+            window.addEventListener("load", resetTimer);
 
             document.onmousemove = resetTimer;
             document.onkeypress = resetTimer;
@@ -792,7 +789,7 @@
                 if (navigator.onLine) {
                     el.innerHTML = `
             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            Internet Online
+            Online
         `;
 
                     el.classList.remove('bg-gray-500/10', 'text-gray-400');
@@ -801,7 +798,7 @@
                 } else {
                     el.innerHTML = `
             <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-            No Internet
+            offline
         `;
 
                     el.classList.remove('bg-green-500/10', 'text-green-400');

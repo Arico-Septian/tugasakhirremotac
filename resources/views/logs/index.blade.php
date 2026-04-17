@@ -145,7 +145,7 @@
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                 {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-server"></i>
-                        <span class="menu-text">Manage Rooms & Ac</span>
+                        <span class="menu-text">Manage Rooms & Control Ac</span>
                     </a>
                 </li>
             @endif
@@ -265,6 +265,23 @@
 
             </div>
 
+            @php
+                function activityBadge($activity)
+                {
+                    return match ($activity) {
+                        'add_room' => ['ADD ROOM', 'bg-emerald-500/20 text-emerald-300'],
+                        'delete_room' => ['DELETE ROOM', 'bg-red-500/20 text-red-300'],
+                        'add_ac' => ['ADD AC', 'bg-blue-500/20 text-blue-300'],
+                        'delete_ac' => ['DELETE AC', 'bg-orange-500/20 text-orange-300'],
+                        'on' => ['ON', 'bg-green-500/20 text-green-300'],
+                        'off' => ['OFF', 'bg-gray-500/20 text-gray-300'],
+                        'mode' => ['MODE', 'bg-cyan-500/20 text-cyan-300'],
+                        'set_timer' => ['SET TIMER', 'bg-yellow-500/20 text-yellow-300'],
+                        default => [strtoupper($activity), 'bg-purple-500/20 text-purple-300'],
+                    };
+                }
+            @endphp
+
             <!-- TABLE -->
             <div class="card">
 
@@ -284,37 +301,16 @@
                             </div>
 
                             <div class="mt-2">
-                                @if ($log->activity == 'add_room')
-                                    <span class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded text-xs">ADD
-                                        ROOM</span>
-                                @elseif($log->activity == 'delete_room')
-                                    <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs">DELETE
-                                        ROOM</span>
-                                @elseif($log->activity == 'add_ac')
-                                    <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">ADD AC</span>
-                                @elseif($log->activity == 'delete_ac')
-                                    <span class="bg-orange-500/20 text-orange-300 px-2 py-1 rounded text-xs">DELETE
-                                        AC</span>
-                                @elseif($log->activity == 'on')
-                                    <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">ON</span>
-                                @elseif($log->activity == 'off')
-                                    <span class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">OFF</span>
-                                @elseif($log->activity == 'mode')
-                                    <span class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs">MODE</span>
-                                @elseif($log->activity == 'set_timer')
-                                    <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">SET
-                                        TIMER</span>
-                                @else
-                                    <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
-                                        {{ strtoupper($log->activity) }}
-                                    </span>
-                                @endif
-                            </div>
+                                @php([$label, $class] = activityBadge($log->activity))
+                                <span class="{{ $class }} px-2 py-1 rounded text-xs">
+                                    {{ $label }}
+                                </span>
 
-                            <div class="mt-2 text-xs text-gray-300">
-                                {{ $log->created_at->format('d M Y H:i') }}
-                            </div>
+                                <div class="mt-2 text-xs text-gray-300">
+                                    {{ $log->created_at->format('d M Y H:i') }}
+                                </div>
 
+                            </div>
                         </div>
                     @endforeach
 
@@ -353,39 +349,10 @@
 
                                     <td class="p-3">
 
-                                        @if ($log->activity == 'add_room')
-                                            <span
-                                                class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded text-xs">ADD
-                                                ROOM</span>
-                                        @elseif($log->activity == 'delete_room')
-                                            <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs">DELETE
-                                                ROOM</span>
-                                        @elseif($log->activity == 'add_ac')
-                                            <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">ADD
-                                                AC</span>
-                                        @elseif($log->activity == 'delete_ac')
-                                            <span
-                                                class="bg-orange-500/20 text-orange-300 px-2 py-1 rounded text-xs">DELETE
-                                                AC</span>
-                                        @elseif($log->activity == 'on')
-                                            <span
-                                                class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">ON</span>
-                                        @elseif($log->activity == 'off')
-                                            <span
-                                                class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">OFF</span>
-                                        @elseif($log->activity == 'mode')
-                                            <span
-                                                class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs">MODE</span>
-                                        @elseif($log->activity == 'set_timer')
-                                            <span
-                                                class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">SET
-                                                TIMER</span>
-                                        @else
-                                            <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
-                                                {{ strtoupper($log->activity) }}
-                                            </span>
-                                        @endif
-
+                                        @php([$label, $class] = activityBadge($log->activity))
+                                        <span class="{{ $class }} px-2 py-1 rounded text-xs">
+                                            {{ $label }}
+                                        </span>
                                     </td>
 
                                     <td class="p-3 whitespace-nowrap">
