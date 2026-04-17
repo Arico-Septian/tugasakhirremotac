@@ -17,8 +17,12 @@ class UserController extends Controller
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
             ->latest()
-            ->get();
+            ->paginate(10)->withQueryString();
 
+        $users->getCollection()->transform(function ($u) {
+            $u->isOnline = $u->last_activity && $u->last_activity >= now()->subMinutes(2);
+            return $u;
+        });
         return view('users.index', compact('users', 'totalUsers'));
     }
 

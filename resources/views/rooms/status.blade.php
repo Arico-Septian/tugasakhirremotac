@@ -8,15 +8,16 @@
 
     <title>AC Status</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/app.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         /* ===== SIDEBAR ===== */
-
         .sidebar {
-            transition: all .3s ease;
+            width: 256px;
+            transition: all 0.3s ease;
+            z-index: 50;
         }
 
         .sidebar.close {
@@ -31,19 +32,17 @@
             justify-content: center;
         }
 
-        /* ===== CONTENT SHIFT ===== */
-
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 256px;
-            transition: all .3s ease;
+            transition: none !important;
         }
 
         .sidebar.close+.main-content {
-            margin-left: 100px;
+            margin-left: 80px;
         }
 
-        /* ===== CARD STYLE ===== */
-
+        /* ===== CARD ===== */
         .ac-card {
             background: rgba(15, 23, 42, 0.85);
             color: white;
@@ -52,6 +51,7 @@
             padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
 
         .ac-card:hover {
@@ -59,39 +59,10 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (min-width: 768px) {
             .ac-card {
                 padding: 24px;
-            }
-        }
-
-        @media(max-width:900px) {
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
-        .sidebar {
-            transition: all .3s ease;
-            z-index: 50;
-        }
-
-        @media(max-width:900px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
             }
         }
 
@@ -102,14 +73,35 @@
             }
         }
 
-        #overlay {
-            backdrop-filter: blur(2px);
+        /* ===== MOBILE ===== */
+        @media(max-width:900px) {
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
         }
 
+        /* ===== HEADER ===== */
         header {
             height: 72px;
         }
 
+        /* ===== OVERLAY ===== */
+        #overlay {
+            backdrop-filter: blur(2px);
+        }
+
+        /* ===== BACKGROUND ===== */
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | AC System</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/app.css" rel="stylesheet">
+
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-sky-400 to-cyan-300">
@@ -31,15 +33,14 @@
             <form method="POST" action="/login" class="space-y-4">
                 @csrf
 
-                <input type="text" name="name" required
-                    placeholder="Username"
+                <input type="text" name="name" required placeholder="Username"
                     class="w-full px-4 py-3 rounded-lg bg-white/80 focus:ring-2 focus:ring-blue-400 outline-none">
 
-                <input type="password" name="password" required
-                    placeholder="Password"
+                <input type="password" name="password" required placeholder="Password"
                     class="w-full px-4 py-3 rounded-lg bg-white/80 focus:ring-2 focus:ring-blue-400 outline-none">
 
-                <button class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                <button
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
                     Login
                 </button>
             </form>
@@ -49,4 +50,5 @@
     </div>
 
 </body>
+
 </html>

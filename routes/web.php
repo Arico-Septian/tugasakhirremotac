@@ -333,3 +333,62 @@ Route::get('/my-status', function () {
 Route::get('/temperatures', function () {
     return \App\Models\Room::select('name','temperature')->get();
 });
+
+Route::get('/temperature-stream', function () {
+
+    return response()->stream(function () {
+
+        while (true) {
+
+            $rooms = \App\Models\Room::with('temperatureData')->get();
+
+            $data = $rooms->map(function ($room) {
+                return [
+                    'id' => $room->id,
+                    'name' => $room->name,
+                    'temperature' => optional($room->temperatureData)->temperature
+                ];
+            });
+
+            echo "data: " . json_encode($data) . "\n\n";
+
+            ob_flush();
+            flush();
+
+            sleep(1);
+        }
+
+    }, 200, [
+        "Content-Type" => "text/event-stream",
+        "Cache-Control" => "no-cache",
+        "Connection" => "keep-alive",
+    ]);
+});
+
+Route::get('/users-status-stream', function () {
+
+    return response()->stream(function () {
+
+        while (true) {
+
+            $users = \App\Models\User::all()->map(function ($u) {
+                return [
+                    'id' => $u->id,
+                    'online' => $u->last_activity >= now()->subMinutes(2)
+                ];
+            });
+
+            echo "data: " . json_encode($users) . "\n\n";
+
+            ob_flush();
+            flush();
+
+            sleep(5);
+        }
+
+    }, 200, [
+        "Content-Type" => "text/event-stream",
+        "Cache-Control" => "no-cache",
+        "Connection" => "keep-alive",
+    ]);
+});

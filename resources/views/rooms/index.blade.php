@@ -8,15 +8,15 @@
 
     <title>Manage Rooms</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/app.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         /* ===== SIDEBAR ===== */
-
         .sidebar {
-            transition: transform 0.3s ease;
+            width: 256px;
+            transition: all 0.3s ease;
             will-change: transform;
         }
 
@@ -32,19 +32,17 @@
             justify-content: center;
         }
 
-        /* ===== CONTENT SHIFT ===== */
-
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 256px;
-            transition: all .3s ease;
+            transition: none !important;
         }
 
         .sidebar.close+.main-content {
-            margin-left: 100px;
+            margin-left: 80px;
         }
 
         /* ===== ROOM CARD ===== */
-
         .room-card {
             background: rgba(15, 23, 42, 0.7);
             color: white;
@@ -54,6 +52,11 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
             min-height: 220px;
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .room-card:hover {
@@ -61,37 +64,41 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
+        /* ❌ HAPUS efek zoom */
         .room-card:active {
-            transform: scale(0.98);
+            transform: none;
         }
 
         /* ===== MODAL ===== */
-
         .modal-bg {
             background: rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(4px);
         }
 
-        @media(max-width:900px) {
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
+        /* ===== INPUT ===== */
+        input {
+            transition: all 0.2s ease;
         }
 
+        /* ===== HEADER ===== */
+        header {
+            height: 72px;
+        }
+
+        /* ===== BACKGROUND ===== */
+        .custom-bg {
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        /* ===== REMOVE CLICK ZOOM GLOBAL ===== */
         button:active {
-            transform: scale(0.97);
+            transform: none;
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (min-width: 768px) {
             .room-card {
                 padding: 24px;
@@ -105,29 +112,21 @@
             }
         }
 
-        .room-card {
-            height: 100%;
-        }
+        @media(max-width:900px) {
 
-        .custom-bg {
-            background:
-                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                url('/images/wallpaper.jpeg') no-repeat center center fixed;
-            background-size: cover;
-        }
+            .main-content {
+                margin-left: 0 !important;
+            }
 
-        .room-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
 
-        header {
-            height: 72px;
-        }
-
-        input {
-            transition: all 0.2s ease;
+            .sidebar.open {
+                transform: translateX(0);
+            }
         }
     </style>
 
@@ -192,47 +191,47 @@
                         </a>
                     </li>
                 @endif
-            </ul>
+            @endauth
+        </ul>
 
-            <!-- PROFILE PINDAH KE BAWAH -->
-            @auth
-                <div class="absolute bottom-6 left-6 right-6">
+        <!-- PROFILE PINDAH KE BAWAH -->
+        @auth
+            <div class="absolute bottom-6 left-6 right-6">
 
-                    <!-- MODE NORMAL -->
-                    <div class="profile-full">
-                        <button class="w-full flex items-center gap-3 px-3 py-2">
+                <!-- MODE NORMAL -->
+                <div class="profile-full">
+                    <button class="w-full flex items-center gap-3 px-3 py-2">
 
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs md:text-sm">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            </div>
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs md:text-sm">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
 
-                            <div class="text-left menu-text">
-                                <p class="text-sm font-semibold text-white">
-                                    {{ Auth::user()->name }}
-                                </p>
-                                <p class="text-xs text-white/60">
-                                    {{ Auth::user()->role ?? 'Administrator' }}
-                                </p>
-                            </div>
+                        <div class="text-left menu-text">
+                            <p class="text-sm font-semibold text-white">
+                                {{ Auth::user()->name }}
+                            </p>
+                            <p class="text-xs text-white/60">
+                                {{ Auth::user()->role ?? 'Administrator' }}
+                            </p>
+                        </div>
 
-                            <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
-                                onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </a>
-
-                        </button>
-                    </div>
-
-                    <!-- MODE COLLAPSE -->
-                    <div class="profile-collapse hidden text-center">
-                        <a href="/logout" class="text-red-500 text-xl">
+                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg"
+                            onclick="event.stopPropagation()">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </a>
-                    </div>
 
+                    </button>
                 </div>
-            @endauth
+
+                <!-- MODE COLLAPSE -->
+                <div class="profile-collapse hidden text-center">
+                    <a href="/logout" class="text-red-500 text-xl">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+
+            </div>
         @endauth
     </div>
 
@@ -262,12 +261,27 @@
             <div class="flex items-center gap-3">
 
                 <!-- SEARCH -->
-                <div class="relative flex-1">
-                    <input id="searchInput" type="text" placeholder="Search room..."
-                        class="w-full h-[40px] bg-white/10 text-white placeholder-gray-300 px-4 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <form method="GET" class="flex-1">
+                    <div
+                        class="flex items-center bg-white/10 border border-white/20 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
 
-                    <i class="fa fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                </div>
+                        <!-- ICON -->
+                        <span class="px-3 text-gray-300">
+                            <i class="fa fa-search"></i>
+                        </span>
+
+                        <!-- INPUT -->
+                        <input name="search" value="{{ request('search') }}" type="text"
+                            placeholder="Search room..." autocomplete="off"
+                            class="flex-1 bg-transparent text-white px-2 py-2 outline-none placeholder-gray-300">
+
+                        <!-- BUTTON -->
+                        <button type="submit" class="px-3 py-2 text-gray-300 hover:text-white transition">
+                            <i class="fa fa-search"></i>
+                        </button>
+
+                    </div>
+                </form>
 
                 @auth
                     @if (in_array(Auth::user()->role, ['admin', 'operator']))
@@ -327,7 +341,7 @@
                             <span>
                                 Temp Ruangan
                             </span>
-                            <span class="font-semibold">
+                            <span id="temp-{{ $room->id }}" class="font-semibold">
                                 {{ $room->temperature ?? '--' }} °C
                             </span>
                         </div>
@@ -423,11 +437,15 @@
 
     <script>
         function toggleSidebar() {
-            let sidebar = document.getElementById("sidebar");
-            let overlay = document.getElementById("overlay");
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
 
-            sidebar.classList.toggle("open");
-            overlay.classList.toggle("hidden");
+            if (window.innerWidth <= 900) {
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("hidden");
+            } else {
+                sidebar.classList.toggle("close");
+            }
         }
 
         document.getElementById("overlay").onclick = function() {
@@ -437,6 +455,11 @@
 
         document.querySelectorAll("#sidebar a").forEach(link => {
             link.addEventListener("click", () => {
+
+                if (typeof source !== "undefined" && source) {
+                    source.close();
+                }
+
                 document.getElementById("sidebar").classList.remove("open");
                 document.getElementById("overlay").classList.add("hidden");
             });
@@ -449,22 +472,56 @@
         function closeModal() {
             document.getElementById("modal").classList.add("hidden");
         }
+    </script>
 
-        const searchInput = document.getElementById('searchInput');
+    <script>
+        let source;
+        let lastTemps = [];
 
-        searchInput.addEventListener('keyup', function() {
-            const keyword = this.value.toLowerCase();
-            const rooms = document.querySelectorAll('.room-card');
+        function startSSE() {
 
-            rooms.forEach(room => {
-                const name = room.querySelector('h2').innerText.toLowerCase();
+            if (source) source.close();
 
-                if (name.includes(keyword)) {
-                    room.style.display = "block";
-                } else {
-                    room.style.display = "none";
-                }
-            });
+            source = new EventSource('/temperature-stream');
+
+            source.onmessage = function(event) {
+
+                const data = JSON.parse(event.data);
+                const temps = data.map(r => r.temperature ?? 0);
+
+                if (isSame(temps, lastTemps)) return;
+
+                lastTemps = temps;
+
+                data.forEach((r) => {
+                    let el = document.getElementById('temp-' + r.id);
+                    if (el) {
+                        el.innerText = (r.temperature ?? '--') + " °C";
+                    }
+                });
+            };
+
+            source.onerror = function() {
+                console.log("Reconnect SSE...");
+                source.close();
+                setTimeout(startSSE, 2000);
+            };
+        }
+
+        function isSame(a, b) {
+            if (a.length !== b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+
+        setTimeout(() => {
+            startSSE();
+        }, 1000);
+
+        window.addEventListener("beforeunload", () => {
+            if (source) source.close();
         });
     </script>
 

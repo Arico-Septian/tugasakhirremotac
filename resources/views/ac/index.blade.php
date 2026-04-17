@@ -8,22 +8,27 @@
 
         <title>AC Units</title>
 
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="/css/app.css" rel="stylesheet">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
         <style>
-            /* ===== SIDEBAR ===== */
-
-            button,
-            a,
-            .ac-card,
-            .mode-btn {
-                transition: all 0.2s ease;
+            /* ===== GLOBAL ===== */
+            body,
+            html {
+                margin: 0;
+                max-width: 100%;
+                overflow-x: hidden;
             }
 
+            button {
+                transition: 0.2s ease;
+            }
+
+            /* ===== SIDEBAR ===== */
             .sidebar {
-                transition: transform 0.3s ease;
+                width: 256px;
+                transition: all 0.3s ease;
             }
 
             .sidebar.close {
@@ -38,38 +43,37 @@
                 justify-content: center;
             }
 
-            /* ===== CONTENT SHIFT ===== */
-
+            /* ===== CONTENT ===== */
             .main-content {
                 margin-left: 256px;
-                transition: .3s;
+                transition: all 0.3s ease;
             }
 
             .sidebar.close+.main-content {
-                margin-left: 100px;
+                margin-left: 80px;
             }
 
             /* ===== CARD ===== */
-
             .ac-card {
                 background: rgba(15, 23, 42, 0.85);
                 color: white;
                 backdrop-filter: blur(16px);
-                border-radius: 22px;
-                padding: 30px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-                transition: .3s;
+                border-radius: 20px;
+                padding: 24px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                transition: 0.2s ease;
             }
 
             .ac-card:hover {
-                transform: translateY(-6px) scale(1.01);
-                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             }
 
+            /* ===== PANEL ANIMATION ===== */
             .ac-panel {
-                transition: all 0.25s ease;
+                transition: 0.25s ease;
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(8px);
             }
 
             .ac-panel:not(.hidden) {
@@ -77,53 +81,31 @@
                 transform: translateY(0);
             }
 
-
-            /* ===== POWER SWITCH ===== */
-
+            /* ===== SWITCH ===== */
             .switch {
                 position: relative;
-                display: inline-block;
                 width: 50px;
                 height: 26px;
             }
 
-            .switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
             .slider {
                 position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                inset: 0;
                 background: #d1d5db;
-                transition: .3s;
                 border-radius: 16px;
-                box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+                transition: 0.3s;
             }
 
             .slider:before {
-                position: absolute;
                 content: "";
+                position: absolute;
                 height: 20px;
                 width: 20px;
                 left: 3px;
                 bottom: 3px;
                 background: white;
-                transition: .3s;
                 border-radius: 50%;
-            }
-
-            .power-on {
-                box-shadow: 0 0 25px rgba(34, 197, 94, 0.6);
-            }
-
-            button:active {
-                transform: scale(0.96);
+                transition: 0.3s;
             }
 
             input:checked+.slider {
@@ -134,110 +116,63 @@
                 transform: translateX(24px);
             }
 
-
-            /* ===== TEMPERATURE SLIDER ===== */
-
-            .temp-slider {
-                width: 100%;
-                height: 6px;
-                border-radius: 999px;
-                background: #e5e7eb;
-                outline: none;
-                appearance: none;
-            }
-
-            .temp-slider::-webkit-slider-thumb {
-                appearance: none;
-                width: 18px;
-                height: 18px;
-                border-radius: 50%;
-                background: #2563eb;
-                cursor: pointer;
-            }
-
-
             /* ===== MODE BUTTON ===== */
-
             .mode-btn {
-                color: white;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 6px;
+                gap: 5px;
                 background: rgba(30, 41, 59, 0.8);
-                border-radius: 16px;
+                border-radius: 14px;
                 height: 60px;
                 font-size: 12px;
-                transition: .25s;
                 border: 1px solid rgba(255, 255, 255, 0.05);
+                transition: 0.2s ease;
             }
 
             .mode-btn:hover {
                 background: rgba(59, 130, 246, 0.2);
-                transform: translateY(-3px) scale(1.05);
+                transform: translateY(-2px);
             }
 
             /* ===== HEADER ===== */
-
-            .header-wrap {
-                background: rgba(15, 23, 42, 0.85);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                color: white;
-                border-radius: 999px;
-                backdrop-filter: blur(12px);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            header {
+                height: 72px;
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
             }
 
-            .header-wrap::before {
-                display: none;
-            }
-
-            .header-wrap {
-                position: relative;
-                z-index: 1;
-            }
-
-            .header-wrap * {
-                position: relative;
-                z-index: 2;
-            }
-
-            .header-wrap {
-                overflow: visible;
-            }
-
-            #dropdownAC {
-                z-index: 9999;
-            }
-
-            #dropdownAC {
-                transition: all 0.25s ease;
-                transform: translateY(10px);
-                opacity: 0;
-            }
-
+            /* ===== DROPDOWN ===== */
             #dropdownAC {
                 position: absolute;
                 top: 60px;
                 left: 0;
                 width: 160px;
+                background: rgba(15, 23, 42, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: 0.25s ease;
             }
 
             #dropdownAC.show {
-                transform: translateY(0);
                 opacity: 1;
+                transform: translateY(0);
             }
 
-            #dropdownAC {
-                transform-origin: top left;
-                will-change: transform, opacity;
+            /* ===== BACKGROUND ===== */
+            .custom-bg {
+                background:
+                    linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
+                    url('/images/wallpaper.jpeg') no-repeat center center fixed;
+                background-size: cover;
             }
 
+            /* ===== RESPONSIVE ===== */
             @media(max-width:900px) {
-
                 .main-content {
-                    margin-left: 0;
+                    margin-left: 0 !important;
                 }
 
                 .sidebar {
@@ -251,143 +186,14 @@
                 }
             }
 
-            @media(min-width:768px) {
-                .mode-btn {
-                    height: 68px;
-                }
-            }
-
-            @media(max-width:640px) {
+            @media(max-width:768px) {
                 .ac-card {
-                    border-radius: 18px;
-                    padding: 18px !important;
-                }
-            }
-
-            html,
-            body {
-                max-width: 100%;
-                overflow-x: hidden;
-            }
-
-            body {
-                background-attachment: fixed;
-            }
-
-            button {
-                transition: all 0.2s ease;
-            }
-
-            header {
-                margin: 0;
-                border-radius: 0;
-            }
-
-            .main-content {
-                margin-left: 256px;
-            }
-
-            .sidebar.close+.main-content {
-                margin-left: 80px;
-            }
-
-            body {
-                margin: 0;
-            }
-
-            .sidebar {
-                left: 0;
-                top: 0;
-            }
-
-            header {
-                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-            }
-
-            @media (max-width: 768px) {
-                .ac-card {
-                    padding: 16px !important;
+                    padding: 16px;
                 }
 
                 .ac-panel>div {
                     grid-template-columns: 1fr !important;
                 }
-            }
-
-            @media (max-width: 768px) {
-                .ac-card {
-                    width: 100%;
-                }
-            }
-
-            @media (max-width: 768px) {
-                header {
-                    padding-left: 16px;
-                    padding-right: 16px;
-                }
-
-                header h1 {
-                    font-size: 14px;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .flex.gap-3.md\:gap-6 {
-                    justify-content: center;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .main-content {
-                    margin-left: 0 !important;
-                    width: 100% !important;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .sidebar {
-                    transform: translateX(-100%);
-                    position: fixed;
-                }
-
-                .sidebar.open {
-                    transform: translateX(0);
-                }
-            }
-
-            body,
-            html {
-                overflow-x: hidden;
-            }
-
-            .main-content {
-                max-width: 100%;
-            }
-
-            @media (max-width: 768px) {
-                .ac-panel {
-                    padding: 0;
-                }
-
-                .grid {
-                    gap: 12px;
-                }
-            }
-
-            header {
-                height: 73px;
-            }
-
-            @media (min-width: 1024px) {
-                .sidebar {
-                    transform: translateX(0);
-                }
-            }
-            .custom-bg {
-                background:
-                    linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                    url('/images/wallpaper.jpeg') no-repeat center center fixed;
-                background-size: cover;
             }
         </style>
 
@@ -552,10 +358,10 @@
                             @endif
                         @endauth
 
-                        <!-- DELETE PINDAH KE SINI -->
+                        <!-- DELETE AC -->
                         @auth
                             @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                <form id="deleteForm" method="POST" action="/ac/{{ $firstAc?->id }}">
+                                <form id="deleteForm" method="POST" action="">
                                     @csrf
                                     @method('DELETE')
 
@@ -571,7 +377,7 @@
 
                     <!-- DROPDOWN BARU -->
                     <div id="dropdownAC"
-                        class="absolute bg-[rgba(15,23,42,0.95)] border border-white/10 text-white rounded-xl shadow-lg">
+                        class="hidden absolute bg-[rgba(15,23,42,0.95)] border border-white/10 text-white rounded-xl shadow-lg">
 
                         @foreach ($acs as $ac)
                             <div onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }}')"
@@ -630,7 +436,7 @@
                                             class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center
                                             {{ $ac->status && $ac->status?->power == 'ON'
                                                 ? 'bg-green-500 shadow-green-300 ring-4 ring-green-200 animate-pulse'
-                                                : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:scale-110 transition">
+                                                : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:opacity-80 transition">
                                             <i class="fa-solid fa-power-off"></i>
                                         </button>
                                     </form>
@@ -650,13 +456,13 @@
                                     <div class="flex gap-3 md:gap-6 mt-6">
                                         <button
                                             onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
-                                            class="w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600 hover:scale-110">
+                                            class="w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600 hover:opacity-80">
                                             −
                                         </button>
 
                                         <button
                                             onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) + 1 }})"
-                                            class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:scale-110">
+                                            class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:bg-blue-700 hover:opacity-80">
                                             +
                                         </button>
                                     </div>
@@ -862,11 +668,15 @@
 
         <script>
             function toggleSidebar() {
-                let sidebar = document.getElementById("sidebar");
-                let overlay = document.getElementById("overlay");
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
 
-                sidebar.classList.toggle("open");
-                overlay.classList.toggle("hidden");
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.toggle("open");
+                    overlay.classList.toggle("hidden");
+                } else {
+                    sidebar.classList.toggle("close");
+                }
             }
             document.getElementById("overlay").onclick = function() {
                 document.getElementById("sidebar").classList.remove("open");

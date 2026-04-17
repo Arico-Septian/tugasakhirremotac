@@ -4,24 +4,26 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>User Management</title>
 
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="/css/app.css" rel="stylesheet">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
         <style>
+            /* ===== SIDEBAR ===== */
             .sidebar {
-                transition: all .3s ease;
+                width: 256px;
+                transition: all 0.3s ease;
+                will-change: transform;
             }
 
             .sidebar.close {
                 width: 80px;
             }
 
-            .sidebar.close .menu-text {
-                display: none;
-            }
-
+            .sidebar.close .menu-text,
             .sidebar.close h2 span {
                 display: none;
             }
@@ -30,15 +32,17 @@
                 justify-content: center;
             }
 
+            /* ===== MAIN CONTENT ===== */
             .main-content {
                 margin-left: 256px;
-                transition: all .3s ease;
+                transition: none !important;
             }
 
             .sidebar.close+.main-content {
-                margin-left: 100px;
+                margin-left: 80px;
             }
 
+            /* ===== CARD ===== */
             .card {
                 background: rgba(15, 23, 42, 0.7);
                 color: white;
@@ -46,7 +50,7 @@
                 padding: 20px;
                 backdrop-filter: blur(12px);
                 border: 1px solid rgba(255, 255, 255, 0.08);
-                transition: all 0.3s ease;
+                transition: all 0.2s ease;
             }
 
             .card:hover {
@@ -54,42 +58,25 @@
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             }
 
-            @media(max-width:900px) {
-                .main-content {
-                    margin-left: 0;
-                }
-
-                .sidebar {
-                    transform: translateX(-100%);
-                    position: fixed;
-                }
-
-                .sidebar.open {
-                    transform: translateX(0);
-                }
+            /* ===== MODAL ===== */
+            #modal {
+                transition: all 0.2s ease;
+                backdrop-filter: blur(6px);
             }
 
-            .card {
-                transition: all .2s ease;
-            }
-
-            .card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            }
-
+            /* ===== BODY ===== */
             body {
                 overflow-x: hidden;
             }
 
-            #modal {
-                transition: all .2s ease;
+            /* ===== HEADER ===== */
+            header {
+                height: 72px;
+                display: flex;
+                align-items: center;
             }
 
-            .sidebar {
-                will-change: transform;
-            }
-
+            /* ===== BACKGROUND ===== */
             .custom-bg {
                 background:
                     linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
@@ -97,19 +84,21 @@
                 background-size: cover;
             }
 
-            header {
-                height: 72px;
-                display: flex;
-                align-items: center;
-            }
+            /* ===== MOBILE ===== */
+            @media(max-width:900px) {
 
-            #modal {
-                backdrop-filter: blur(6px);
-            }
+                .main-content {
+                    margin-left: 0 !important;
+                }
 
-            @media (max-width: 768px) {
-                header {
-                    height: 72px;
+                .sidebar {
+                    transform: translateX(-100%);
+                    position: fixed;
+                    z-index: 50;
+                }
+
+                .sidebar.open {
+                    transform: translateX(0);
                 }
             }
         </style>
@@ -251,13 +240,26 @@
                 <div class="flex items-center gap-3">
 
                     <!-- SEARCH -->
-                    <form method="GET" class="relative flex-1">
-                        <input name="search" value="{{ request('search') }}"
-                            oninput="clearTimeout(this.delay); this.delay = setTimeout(() => this.form.submit(), 500)"
-                            type="text" placeholder="Search user..."
-                            class="w-full h-[40px] bg-white/10 text-white placeholder-gray-300 px-4 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <form method="GET" class="flex-1">
+                        <div
+                            class="flex items-center bg-white/10 border border-white/20 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
 
-                        <i class="fa fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                            <!-- ICON -->
+                            <span class="px-3 text-gray-300">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                            <!-- INPUT -->
+                            <input name="search" value="{{ request('search') }}" type="text"
+                                placeholder="Search user..." autocomplete="off"
+                                class="flex-1 bg-transparent text-white px-2 py-2 outline-none placeholder-gray-300">
+
+                            <!-- BUTTON -->
+                            <button type="submit" class="px-3 py-2 text-gray-300 hover:text-white transition">
+                                <i class="fa fa-search"></i>
+                            </button>
+
+                        </div>
                     </form>
 
                     <!-- BUTTON -->
@@ -299,10 +301,10 @@
                         <span class="text-white font-semibold">{{ $totalUsers }}</span> users
                     </p>
 
-                    <!-- TABLE / MOBILE CARD -->
+                    <!-- MOBILE CARD -->
                     <div class="card">
 
-                        <!--  MOBILE (HP) -->
+                        <!-- MOBILE -->
                         <div class="block md:hidden space-y-3 px-2 max-h-[500px] overflow-y-auto">
                             @foreach ($users as $user)
                                 <div
@@ -323,20 +325,10 @@
                                     </div>
 
                                     <div class="mt-2 flex justify-between text-sm">
-                                        <span class="text-gray-300">Status</span>
-                                        @php
-                                            $isOnline =
-                                                $user->last_activity &&
-                                                \Carbon\Carbon::parse($user->last_activity)->diffInMinutes(now()) < 2;
-                                        @endphp
-
-                                        @if ($isOnline)
-                                            <span
-                                                class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Online</span>
-                                        @else
-                                            <span
-                                                class="bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs">Offline</span>
-                                        @endif
+                                        <span id="user-status-{{ $user->id }}"
+                                            class="{{ $user->isOnline ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300' }} px-2 py-1 rounded text-xs">
+                                            {{ $user->isOnline ? 'Online' : 'Offline' }}
+                                        </span>
                                     </div>
 
                                     <form action="/users/{{ $user->id }}" method="POST" class="mt-3">
@@ -383,21 +375,10 @@
                                             </td>
 
                                             <td class="p-3">
-                                                @php
-                                                    $isOnline =
-                                                        $user->last_activity &&
-                                                        \Carbon\Carbon::parse($user->last_activity)->diffInMinutes(
-                                                            now(),
-                                                        ) < 2;
-                                                @endphp
-
-                                                @if ($isOnline)
-                                                    <span
-                                                        class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Online</span>
-                                                @else
-                                                    <span
-                                                        class="bg-white/10 text-gray-400 px-2 py-1 rounded text-xs">Offline</span>
-                                                @endif
+                                                <span id="user-status-{{ $user->id }}"
+                                                    class="{{ $user->isOnline ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300' }} px-2 py-1 rounded text-xs">
+                                                    {{ $user->isOnline ? 'Online' : 'Offline' }}
+                                                </span>
                                             </td>
 
                                             <td class="p-3">
@@ -514,7 +495,51 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
-                }, 60000);
+                }, 180000);
+
+                let userStatusSource;
+
+                function startUserStatusSSE() {
+
+                    if (userStatusSource) userStatusSource.close();
+
+                    userStatusSource = new EventSource('/users-status-stream');
+
+                    userStatusSource.onmessage = function(event) {
+
+                        const users = JSON.parse(event.data);
+
+                        users.forEach(u => {
+
+                            let el = document.getElementById('user-status-' + u.id);
+
+                            if (!el) return;
+
+                            if (u.online) {
+                                el.innerText = "Online";
+                                el.className = "bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs";
+                            } else {
+                                el.innerText = "Offline";
+                                el.className = "bg-gray-500/20 text-gray-300 px-2 py-1 rounded text-xs";
+                            }
+
+                        });
+                    };
+
+                    userStatusSource.onerror = function() {
+                        console.log("Reconnect User Status SSE...");
+                        userStatusSource.close();
+                        setTimeout(startUserStatusSSE, 2000);
+                    };
+                }
+
+                setTimeout(() => {
+                    startUserStatusSSE();
+                }, 1000);
+
+                window.addEventListener("beforeunload", () => {
+                    if (userStatusSource) userStatusSource.close();
+                });
             </script>
 
     </body>

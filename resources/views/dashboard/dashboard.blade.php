@@ -8,26 +8,46 @@
 
     <title>Centralized AC Dashboard</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/app.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        /* ===== GLOBAL ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            font-family: ui-sans-serif, system-ui;
+            -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth;
+        }
+
+        /* ===== HEADER ===== */
         header {
             backdrop-filter: blur(10px);
             background: rgba(15, 23, 42, 0.7);
             color: white;
             height: 72px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            border-bottom: none;
         }
 
-        body {
-            font-family: ui-sans-serif, system-ui;
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 256px;
+            transition: all 0.3s ease;
         }
 
-        /* SIDEBAR */
+        .sidebar.close {
+            width: 80px;
+        }
 
+        /* collapse text */
+        .sidebar.close .menu-text,
+        .sidebar.close h2 span,
         .sidebar.close .profile-full {
             display: none;
         }
@@ -36,109 +56,42 @@
             display: block;
         }
 
-        .sidebar.close .absolute .menu-text {
-            display: none;
-        }
-
-        .sidebar {
-            transition: transform 0.3s ease;
-            border-right: none;
-        }
-
-        .sidebar.close {
-            width: 80px;
-        }
-
-        .sidebar.close .menu-text {
-            display: none;
-        }
-
-        .sidebar.close h2 span {
-            display: none;
-        }
-
         .sidebar.close ul li a {
             justify-content: center;
         }
 
-        /* CONTENT SHIFT */
-
+        /* ===== MAIN CONTENT ===== */
         .main-content {
-            margin-left: 0;
-            width: 100%;
+            margin-left: 256px;
+            width: calc(100% - 256px);
+            max-width: 1400px;
+            transition: none !important;
         }
 
-        /* collapse */
         .sidebar.close+.main-content {
             margin-left: 80px;
             width: calc(100% - 80px);
         }
 
-        /* MOBILE FIX */
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                position: relative;
-                width: 256px;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                flex: 1;
-
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .main-content {
-                margin-left: 256px;
-                padding-left: 0px;
-                width: calc(100% - 256px);
-            }
-
-            .sidebar.close+.main-content {
-                margin-left: 80px;
-                width: calc(100% - 80px);
-            }
-        }
-
-        html,
-        body {
-            overflow-x: hidden;
-        }
-
-        .main-content {
-            max-width: 100%;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        /* ROOM CARD */
-
-        .room-card {
+        /* ===== CARD ===== */
+        .room-card,
+        .stat-card {
             background: rgba(15, 23, 42, 0.7);
             color: white;
-            border-radius: 20px;
-            padding: 16px;
-            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 14px;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
         }
 
-        .room-card:hover {
+        .room-card:hover,
+        .stat-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        /* ICON */
-
+        /* ===== ICON ===== */
         .icon-box {
             width: 40px;
             height: 40px;
@@ -150,39 +103,7 @@
             color: white;
         }
 
-        /* MOBILE */
-
-        @media(max-width:900px) {
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                position: relative;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-        }
-
-        @media (min-width: 1024px) {
-            .main-content {
-                overflow-x: hidden;
-            }
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        a:active {
-            transform: scale(0.97);
-        }
-
+        /* ===== OVERLAY ===== */
         #overlay {
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -192,34 +113,7 @@
             opacity: 1;
         }
 
-        .stat-card {
-            background: rgba(15, 23, 42, 0.7);
-            color: white;
-            border-radius: 16px;
-            padding: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
-            line-height: 1.3;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .main-content {
-            max-width: 1400px;
-        }
-
+        /* ===== BACKGROUND ===== */
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
@@ -227,53 +121,55 @@
             background-size: cover;
         }
 
-        @media (min-width: 1024px) {
+        /* ===== MOBILE ===== */
+        @media (max-width: 1024px) {
+
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+
             .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .sidebar.open {
                 transform: translateX(0);
             }
         }
 
+        /* ===== SMALL SCREEN ===== */
         @media (max-width: 768px) {
+
             .stat-card {
-                padding: 12px;
+                padding: 10px;
             }
 
             .stat-card h2 {
                 font-size: 18px;
-                text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
             }
 
             .stat-card p {
                 font-size: 13px;
             }
-        }
-
-        body {
-            font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
 
             h1,
             h2,
             h3 {
                 line-height: 1.2;
             }
-
-            .stat-card p {
-                font-size: 13px;
-                letter-spacing: 0.5px;
-            }
         }
 
-        @media (max-width: 768px) {
-            .stat-card {
-                padding: 10px;
-            }
+        /* ===== REMOVE CLICK ZOOM ===== */
+        a:active,
+        button:active {
+            transform: none !important;
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/chart.umd.js"></script>
 
 </head>
 
@@ -281,10 +177,6 @@
     <div class="flex">
 
         <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
-
-        <div id="loader" class="fixed inset-0 bg-white flex items-center justify-center hidden z-50">
-            <span class="text-blue-500 font-semibold text-lg">Loading...</span>
-        </div>
 
         <!-- SIDEBAR -->
         <div id="sidebar"
@@ -525,7 +417,10 @@
                         Room Temperature Overview
                     </h2>
 
-                    <canvas id="tempChart" class="h-[180px] md:h-[320px]"></canvas>
+                    <div style="height:300px;">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+
                 </div>
 
                 <!-- SERVER ROOMS -->
@@ -596,7 +491,7 @@
                                 <a href="/rooms/{{ $room->id }}/status">
 
                                     <button
-                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-blue-600 hover:bg-blue-700 text-white hover:bg-black transition active:scale-95 hover:scale-[1.02]">
+                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
 
                                         View Details
 
@@ -642,8 +537,9 @@
                 }
             };
 
+            let tempChart;
             if (ctx) {
-                const tempChart = new Chart(ctx, {
+                tempChart = new Chart(ctx, {
                     plugins: [valueLabelPlugin],
                     data: {
                         labels: roomNames,
@@ -718,23 +614,99 @@
                             }
                         }
                     }
-                });
-                updateChart(tempChart);
 
-                setInterval(() => {
-                    updateChart(tempChart);
-                }, 5000);
+                });
             }
+
+            let source;
+            let lastTemps = [];
+
+            function startSSE() {
+
+                if (source) source.close();
+
+                source = new EventSource('/temperature-stream');
+
+                source.onmessage = handleMessage;
+
+                source.onerror = function() {
+                    console.log("Reconnect SSE...");
+
+                    source.close();
+
+                    if (navigator.onLine) {
+                        setTimeout(startSSE, 2000);
+                    }
+                };
+            }
+
+            function isSame(a, b) {
+                if (a.length !== b.length) return false;
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) return false;
+                }
+                return true;
+            }
+
+            function handleMessage(event) {
+
+                if (!tempChart) return;
+
+                const data = JSON.parse(event.data);
+                const temps = data.map(r => r.temperature ?? 0);
+
+                if (isSame(temps, lastTemps)) return;
+
+                lastTemps = temps;
+
+                tempChart.data.labels = data.map(r => r.name.replace('server ', 'srv '));
+                tempChart.data.datasets[0].data = temps;
+                tempChart.data.datasets[1].data = temps;
+
+                tempChart.data.datasets[0].backgroundColor = temps.map(t =>
+                    t > 30 ? 'red' :
+                    t > 25 ? 'yellow' :
+                    '#3b82f6'
+                );
+
+                requestAnimationFrame(() => {
+                    tempChart.update();
+                });
+
+                data.forEach((r) => {
+                    let el = document.getElementById('temp-' + r.id);
+                    if (el) {
+                        el.innerText = (r.temperature ?? '--') + " °C";
+                    }
+                });
+            }
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden && source) {
+                    source.close();
+                } else if (!source || source.readyState === 2) {
+                    startSSE();
+                }
+            });
+
+            startSSE();
+
+            window.addEventListener("beforeunload", () => {
+                if (source) source.close();
+            });
         </script>
 
         <script>
             function toggleSidebar() {
-                let sidebar = document.getElementById("sidebar");
-                let overlay = document.getElementById("overlay");
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
 
-                sidebar.classList.toggle("open");
-                overlay.classList.toggle("hidden");
-                overlay.classList.toggle("active");
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.toggle("open");
+                    overlay.classList.toggle("hidden");
+                } else {
+                    sidebar.classList.toggle("close");
+                }
             }
 
             document.getElementById("overlay").onclick = function() {
@@ -743,9 +715,10 @@
             };
 
             document.querySelectorAll("#sidebar a").forEach(link => {
+
                 link.addEventListener("click", () => {
-                    document.getElementById("sidebar").classList.remove("open");
-                    document.getElementById("overlay").classList.add("hidden");
+
+                    if (source) source.close();
                 });
             });
 
@@ -760,7 +733,7 @@
                     .then(data => {
                         document.getElementById('usersOnlineCount').innerText = data.count;
                     });
-            }, 5000);
+            }, 10000);
 
             let role = "{{ Auth::check() ? Auth::user()->role : '' }}";
 
@@ -796,86 +769,37 @@
                     resetTimer();
                 }
             });
-
-            function updateChart(chart) {
-                fetch('/temperatures')
-                    .then(res => res.json())
-                    .then(data => {
-
-                        const temps = data.map(r => r.temperature ?? 0);
-
-                        chart.data.labels = data.map(r => r.name.replace('server ', 'srv '));
-                        chart.data.datasets[0].data = temps;
-                        chart.data.datasets[1].data = temps;
-
-                        // 🔥 update warna realtime
-                        chart.data.datasets[0].backgroundColor = temps.map(t =>
-                            t > 30 ? 'red' :
-                            t > 25 ? 'yellow' :
-                            '#3b82f6'
-                        );
-
-                        chart.update();
-                    });
-            }
         </script>
 
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 updateStatus();
-                setInterval(updateStatus, 5000);
+
+                window.addEventListener('online', updateStatus);
+                window.addEventListener('offline', updateStatus);
             });
 
             function updateStatus() {
                 let el = document.getElementById('systemStatus');
 
-                if (!navigator.onLine) {
+                if (navigator.onLine) {
                     el.innerHTML = `
-            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-            No Connection
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            Internet Online
         `;
 
-                    el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-red-500/10', 'text-red-400');
+                    el.classList.remove('bg-gray-500/10', 'text-gray-400');
+                    el.classList.add('bg-green-500/10', 'text-green-400');
+
+                } else {
+                    el.innerHTML = `
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            No Internet
+        `;
+
+                    el.classList.remove('bg-green-500/10', 'text-green-400');
                     el.classList.add('bg-gray-500/10', 'text-gray-400');
-
-                    return;
                 }
-
-                fetch('/my-status')
-                    .then(res => res.json())
-                    .then(data => {
-
-                        if (data.status === 'online') {
-
-                            el.innerHTML = `
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    Online
-                `;
-
-                            el.classList.remove('bg-red-500/10', 'text-red-400', 'bg-gray-500/10', 'text-gray-400');
-                            el.classList.add('bg-green-500/10', 'text-green-400');
-
-                        } else {
-
-                            el.innerHTML = `
-                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                    Offline
-                `;
-
-                            el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-gray-500/10', 'text-gray-400');
-                            el.classList.add('bg-red-500/10', 'text-red-400');
-                        }
-                    })
-                    .catch(() => {
-
-                        el.innerHTML = `
-                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                No Connection
-            `;
-
-                        el.classList.remove('bg-green-500/10', 'text-green-400', 'bg-red-500/10', 'text-red-400');
-                        el.classList.add('bg-gray-500/10', 'text-gray-400');
-                    });
             }
         </script>
 

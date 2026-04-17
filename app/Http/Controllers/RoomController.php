@@ -13,17 +13,23 @@ use App\Models\RoomTemperature;
 
 class RoomController extends Controller
 {
-    /* === LIST ROOM + STATUS ESP ===*/
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::with(['acUnits.status'])->get();
+        $rooms = Room::with(['acUnits.status'])
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->get();
+
+        $temps = RoomTemperature::latest()
+            ->get()
+            ->groupBy('room');
 
         foreach ($rooms as $room) {
 
             $deviceId = strtolower($room->device_id);
 
             $status = Cache::get("device_status_{$deviceId}", 'offline');
-
             $lastSeen = Cache::get("device_{$deviceId}_last_seen");
 
             if ($lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
@@ -32,10 +38,7 @@ class RoomController extends Controller
 
             $room->device_status = $status;
 
-            $latestTemp = RoomTemperature::where('room', $room->name)
-                ->latest()
-                ->first();
-
+            $latestTemp = $temps[$room->name][0] ?? null;
             $room->temperature = $latestTemp ? $latestTemp->temperature : null;
         }
 

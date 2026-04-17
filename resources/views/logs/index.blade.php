@@ -6,22 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activity Log</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/app.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        /* ===== SIDEBAR ===== */
         .sidebar {
-            transition: all .3s ease;
+            width: 256px;
+            transition: all 0.3s ease;
         }
 
         .sidebar.close {
             width: 80px;
         }
 
-        .sidebar.close .menu-text {
-            display: none;
-        }
-
+        .sidebar.close .menu-text,
         .sidebar.close h2 span {
             display: none;
         }
@@ -30,15 +30,17 @@
             justify-content: center;
         }
 
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 256px;
-            transition: all .3s ease;
+            transition: none !important;
         }
 
         .sidebar.close+.main-content {
-            margin-left: 100px;
+            margin-left: 80px;
         }
 
+        /* ===== CARD ===== */
         .card {
             background: rgba(15, 23, 42, 0.7);
             color: white;
@@ -54,65 +56,31 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
-        table tr:active {
-            background: #f3f4f6;
+        /* ❌ HAPUS efek zoom klik */
+        .card:active {
+            transform: none;
         }
 
+        /* ===== TABLE ===== */
         tbody tr {
             border-bottom: 1px solid #f1f5f9;
-        }
-
-        tbody tr {
             transition: background 0.2s ease;
-        }
-
-        tbody tr:active {
-            background: #eef2ff;
         }
 
         tbody tr:hover {
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .card:active {
-            transform: scale(0.98);
+        tbody tr:active {
+            background: #eef2ff;
         }
 
-        @media(max-width:900px) {
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
-        @media (min-width: 768px) {
-            .card {
-                padding: 20px;
-            }
-        }
-
-        @media(max-width:900px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
+        /* ===== HEADER ===== */
         header {
             height: 72px;
         }
 
+        /* ===== BACKGROUND ===== */
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
@@ -120,8 +88,22 @@
             background-size: cover;
         }
 
-        .card:hover {
-            transform: translateY(-3px) scale(1.01);
+        /* ===== MOBILE ===== */
+        @media(max-width:900px) {
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -237,7 +219,8 @@
             <div class="flex items-center gap-3">
 
                 <!-- HAMBURGER -->
-                <button class="md:hidden text-white text-lg p-2 rounded-md hover:bg-white/10 active:scale-95 transition"
+                <button
+                    class="md:hidden text-white text-lg p-2 rounded-md hover:bg-white/10 active:opacity-80 transition"
                     onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
@@ -264,7 +247,7 @@
                     </p>
 
                     <h2 class="text-4xl font-bold text-white">
-                        {{ $logs->total() }}
+                        {{ $logs->count() }}
                     </h2>
                 </div>
 
@@ -414,11 +397,11 @@
 
                     <!-- INFO -->
                     <p class="text-sm text-gray-400">
-                        Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} results
+                        Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} results
                     </p>
 
-                    <!-- PAGINATION -->
-                    <div class="flex items-center gap-1 flex-wrap">
+                    <!-- PAGE NUMBERS -->
+                    <div class="flex items-center gap-2">
 
                         <!-- PREV -->
                         @if ($logs->onFirstPage())
@@ -429,20 +412,6 @@
                                 «
                             </a>
                         @endif
-
-                        <!-- PAGE NUMBERS -->
-                        @foreach ($logs->getUrlRange(max(1, $logs->currentPage() - 2), min($logs->lastPage(), $logs->currentPage() + 2)) as $page => $url)
-                            @if ($page == $logs->currentPage())
-                                <span class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a href="{{ $url }}"
-                                    class="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm">
-                                    {{ $page }}
-                                </a>
-                            @endif
-                        @endforeach
 
                         <!-- NEXT -->
                         @if ($logs->hasMorePages())
@@ -456,25 +425,26 @@
 
                     </div>
                 </div>
+            </div>
 
-                <script>
-                    function toggleSidebar() {
-                        const sidebar = document.getElementById("sidebar");
-                        const overlay = document.getElementById("overlay");
+            <script>
+                function toggleSidebar() {
+                    const sidebar = document.getElementById("sidebar");
+                    const overlay = document.getElementById("overlay");
 
-                        if (window.innerWidth <= 900) {
-                            sidebar.classList.toggle("open");
-                            overlay.classList.toggle("hidden");
-                        } else {
-                            sidebar.classList.toggle("close");
-                        }
+                    if (window.innerWidth <= 900) {
+                        sidebar.classList.toggle("open");
+                        overlay.classList.toggle("hidden");
+                    } else {
+                        sidebar.classList.toggle("close");
                     }
+                }
 
-                    document.getElementById("overlay").onclick = function() {
-                        document.getElementById("sidebar").classList.remove("open");
-                        this.classList.add("hidden");
-                    };
-                </script>
+                document.getElementById("overlay").onclick = function() {
+                    document.getElementById("sidebar").classList.remove("open");
+                    this.classList.add("hidden");
+                };
+            </script>
 
 </body>
 
