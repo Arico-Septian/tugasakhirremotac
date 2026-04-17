@@ -17,9 +17,9 @@ class CheckDeviceStatus extends Command
     const STATUS_ONLINE  = 'online';
     const STATUS_OFFLINE = 'offline';
 
-    const OFFLINE_THRESHOLD = 15; // detik
-    const STATUS_TTL = 300;       // cache status 5 menit
-    const UNKNOWN_TTL = 60;       // unknown 1 menit
+    const OFFLINE_THRESHOLD = 15;
+    const STATUS_TTL = 300;
+    const UNKNOWN_TTL = 60;
 
     public function handle()
     {
@@ -31,9 +31,9 @@ class CheckDeviceStatus extends Command
 
         try {
 
-            for ($i = 0; $i < 6; $i++) {
+            for ($i = 0; $i < 12; $i++) {
 
-                $now = now('Asia/Jakarta'); // 🔥 ambil sekali
+                $now = now('Asia/Jakarta');
 
                 Room::whereNotNull('device_id')
                     ->select('id', 'device_id')
@@ -49,9 +49,7 @@ class CheckDeviceStatus extends Command
                             $statusKey  = "device_status_{$deviceId}";
                             $unknownKey = "device_unknown_{$deviceId}";
 
-                            // ======================
                             // UNKNOWN
-                            // ======================
                             if (!$lastSeen) {
 
                                 if (!Cache::get($unknownKey)) {
@@ -59,15 +57,15 @@ class CheckDeviceStatus extends Command
                                         'device' => $deviceId
                                     ]);
 
+                                    $this->warn("UNKNOWN → $deviceId");
+
                                     Cache::put($unknownKey, true, self::UNKNOWN_TTL);
                                 }
 
                                 continue;
                             }
 
-                            // ======================
                             // SAFE PARSE
-                            // ======================
                             try {
                                 if (!$lastSeen instanceof Carbon) {
                                     $lastSeen = Carbon::parse($lastSeen);
@@ -82,17 +80,13 @@ class CheckDeviceStatus extends Command
                                 continue;
                             }
 
-                            // ======================
                             // CHECK STATUS
-                            // ======================
                             $diff = max(0, $now->diffInSeconds($lastSeen));
                             $isOffline = $diff > self::OFFLINE_THRESHOLD;
 
                             $currentStatus = Cache::get($statusKey);
 
-                            // ======================
                             // OFFLINE
-                            // ======================
                             if ($isOffline && $currentStatus !== self::STATUS_OFFLINE) {
 
                                 Log::info("Device OFFLINE", [
@@ -100,19 +94,13 @@ class CheckDeviceStatus extends Command
                                     'diff'   => $diff
                                 ]);
 
+                                $this->error("OFFLINE → $deviceId ({$diff}s)");
+
                                 Cache::put($statusKey, self::STATUS_OFFLINE, self::STATUS_TTL);
                                 Cache::forget($unknownKey);
-
-                                AcStatus::whereHas('acUnit', function ($q) use ($room) {
-                                    $q->where('room_id', $room->id);
-                                })
-                                ->where('power', '!=', 'OFF')
-                                ->update(['power' => 'OFF']);
                             }
 
-                            // ======================
                             // ONLINE
-                            // ======================
                             elseif (!$isOffline && $currentStatus !== self::STATUS_ONLINE) {
 
                                 Log::info("Device ONLINE", [
@@ -120,15 +108,16 @@ class CheckDeviceStatus extends Command
                                     'diff'   => $diff
                                 ]);
 
+                                $this->info("ONLINE → $deviceId ({$diff}s)");
+
                                 Cache::put($statusKey, self::STATUS_ONLINE, self::STATUS_TTL);
                                 Cache::forget($unknownKey);
                             }
                         }
                     });
 
-                sleep(10);
+                sleep(5);
             }
-
         } finally {
             optional($lock)->release();
         }
