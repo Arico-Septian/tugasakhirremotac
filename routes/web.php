@@ -394,3 +394,7 @@ Route::get('/users-status-stream', function () {
 });
 
 Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
+
+Route::get('/ac-status', function () {
+    return \App\Models\AcStatus::with('acUnit')->get();
+});

@@ -140,7 +140,8 @@
                 {{-- Dashboard --}}
                 <li>
                     <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-500/20 text-blue-400 font-semibold">
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                        {{ request()->is('dashboard') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -149,7 +150,9 @@
                 {{-- Rooms --}}
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
-                        <a href="/rooms" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
+                        <a href="/rooms"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                            {{ request()->is('rooms*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
                             <span class="menu-text">Manage Rooms</span>
                         </a>
@@ -158,7 +161,9 @@
                     {{-- User Management --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
+                            <a href="/users"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                                {{ request()->is('users*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                                 <i class="fa-solid fa-users"></i>
                                 <span class="menu-text">User Management</span>
                             </a>
@@ -168,7 +173,9 @@
                     {{-- Admin only --}}
                     @if (Auth::user()->role == 'admin')
                         <li>
-                            <a href="/logs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10">
+                            <a href="/logs"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                                {{ request()->is('logs*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span class="menu-text">Activity Log</span>
                             </a>
@@ -331,8 +338,8 @@
                                 <span id="timer-{{ $ac->id }}"
                                     class="font-medium text-sm leading-tight text-right">
                                     @if ($ac->timer_on || $ac->timer_off)
-                                        {{ $ac->timer_on ? 'ON ' . substr($ac->timer_on, 0, 5) : '' }}
-                                        {{ $ac->timer_off ? '| OFF ' . substr($ac->timer_off, 0, 5) : '' }}
+                                        {{ $ac->timer_on ? 'ON ' . \Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i') : '' }}
+                                        {{ $ac->timer_off ? '| OFF ' . \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') : '' }}
                                     @else
                                         OFF
                                     @endif
@@ -372,9 +379,9 @@
                     if (!Array.isArray(data)) return;
 
                     data.forEach(ac => {
-                        if (!ac.ac_unit) return;
+                        if (!ac.acUnit) return;
 
-                        let id = ac.ac_unit.id;
+                        let id = ac.acUnit.id;
 
                         let powerEl = document.getElementById('power-' + id);
                         let tempEl = document.getElementById('temp-' + id);
@@ -394,32 +401,35 @@
                         }
 
                         if (timerEl) {
-                            let onTime = ac.ac_unit?.timer_on;
-                            let offTime = ac.ac_unit?.timer_off;
+                            let onTime = ac.acUnit?.timer_on;
+                            let offTime = ac.acUnit?.timer_off;
 
                             if (onTime || offTime) {
                                 let text = '';
 
-                                if (onTime) {
-                                    text += 'ON ' + formatTime(onTime);
+                                if (onTime && onTime !== "0000-00-00 00:00:00") {
+                                    let t = formatTime(onTime);
+                                    if (t !== '--:--') {
+                                        text += 'ON ' + t;
+                                    }
                                 }
 
-                                if (offTime) {
-                                    text += (text ? '\n' : '') + 'OFF ' + formatTime(offTime);
+                                if (offTime && offTime !== "0000-00-00 00:00:00") {
+                                    let t = formatTime(offTime);
+                                    if (t !== '--:--') {
+                                        text += (text ? '\n' : '') + 'OFF ' + t;
+                                    }
+                                }
+
+                                if (!text) {
+                                    timerEl.innerText = 'OFF';
+                                    return;
                                 }
 
                                 timerEl.innerText = text;
                                 timerEl.style.whiteSpace = "pre-line";
-
-                                timerEl.classList.add('text-green-400');
-                                timerEl.classList.remove('text-gray-300');
                             } else {
                                 timerEl.innerText = 'OFF';
-
-                                timerEl.style.whiteSpace = "normal";
-
-                                timerEl.classList.add('text-gray-300');
-                                timerEl.classList.remove('text-green-400');
                             }
                         }
                     });
@@ -428,7 +438,20 @@
         }
 
         function formatTime(t) {
-            return t ? t.substring(0, 5) : '';
+            if (!t) return '';
+
+            // FIX FORMAT untuk JS
+            let fixed = t.replace(' ', 'T');
+
+            let date = new Date(fixed);
+
+            if (isNaN(date)) return '--:--';
+
+            return date.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Jakarta'
+            });
         }
 
         document.addEventListener("DOMContentLoaded", function() {

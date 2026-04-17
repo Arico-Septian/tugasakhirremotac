@@ -551,10 +551,10 @@
                                             @if ($ac->timer_on || $ac->timer_off)
                                                 <p class="text-gray-600 text-sm">
                                                     ON:
-                                                    {{ $ac->timer_on ? \Carbon\Carbon::parse($ac->timer_on)->format('H:i') : '--:--' }}
+                                                    {{ $ac->timer_on ? \Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i') : '--:--' }}
                                                     &nbsp;&nbsp;
                                                     OFF:
-                                                    {{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->format('H:i') : '--:--' }}
+                                                    {{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') : '--:--' }}
                                                 </p>
 
                                                 @if ($ac->timer_on)
