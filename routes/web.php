@@ -392,3 +392,5 @@ Route::get('/users-status-stream', function () {
         "Connection" => "keep-alive",
     ]);
 });
+
+Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);

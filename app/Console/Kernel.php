@@ -9,8 +9,8 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('clean:logs')
-            ->daily();
+        $schedule->command('logs:clean')
+            ->dailyAt('07:00');
 
         $schedule->command('device:check-status')
             ->everyMinute()
@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ac:run-timer')
             ->everyMinute()
             ->withoutOverlapping();
+
     }
 
     protected function commands()

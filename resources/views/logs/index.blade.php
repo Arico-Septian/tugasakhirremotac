@@ -255,6 +255,19 @@
                     <i class="fa-solid fa-clock text-lg"></i>
                 </div>
 
+                @if (Auth::user()->role == 'admin')
+                    <div class="flex justify-end mb-4">
+                        <form action="/logs/delete-all" method="POST" onsubmit="return confirm('Hapus SEMUA log?')">
+                            @csrf
+                            @method('DELETE')
+
+                            <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fa-solid fa-trash"></i> Delete All Logs
+                            </button>
+                        </form>
+                    </div>
+                @endif
+
             </div>
 
             <!-- TABLE -->
