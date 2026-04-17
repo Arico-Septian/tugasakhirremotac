@@ -138,7 +138,7 @@
             <li>
                 <a href="/dashboard"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                {{ request()->is('dashboard') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                    {{ request()->is('/') || request()->is('dashboard') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span class="menu-text">Dashboard</span>
                 </a>
@@ -148,7 +148,7 @@
                 <li>
                     <a href="/rooms"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                        {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-server"></i>
                         <span class="menu-text">Manage Rooms & Control Ac</span>
                     </a>
@@ -159,7 +159,7 @@
                 <li>
                     <a href="/users"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                {{ request()->is('users*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                        {{ request()->is('users*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-users"></i>
                         <span class="menu-text">User Management</span>
                     </a>
@@ -168,7 +168,7 @@
                 <li>
                     <a href="/logs"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                {{ request()->is('logs*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                        {{ request()->is('logs*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         <span class="menu-text">Activity Log</span>
                     </a>
