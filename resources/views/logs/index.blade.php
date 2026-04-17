@@ -247,7 +247,7 @@
                     </p>
 
                     <h2 class="text-4xl font-bold text-white">
-                        {{ $logs->count() }}
+                        {{ $logs->total() }}
                     </h2>
                 </div>
 
@@ -397,7 +397,7 @@
 
                     <!-- INFO -->
                     <p class="text-sm text-gray-400">
-                        Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} results
+                        Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} results
                     </p>
 
                     <!-- PAGE NUMBERS -->

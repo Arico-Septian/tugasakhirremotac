@@ -8,7 +8,7 @@ class UserLogController extends Controller
 {
     public function index()
     {
-        $logs = UserLog::with('user:id,name')->latest()->simplePaginate(10);
+        $logs = UserLog::with('user:id,name')->latest()->paginate(10);
 
         return view('logs.index', compact('logs'));
     }

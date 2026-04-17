@@ -538,7 +538,10 @@
             };
 
             let tempChart;
-            if (ctx) {
+
+            function initChart() {
+                if (!ctx) return;
+
                 tempChart = new Chart(ctx, {
                     plugins: [valueLabelPlugin],
                     data: {
@@ -670,7 +673,7 @@
                 );
 
                 requestAnimationFrame(() => {
-                    tempChart.update();
+                    tempChart.update('none');
                 });
 
                 data.forEach((r) => {
@@ -689,7 +692,15 @@
                 }
             });
 
-            startSSE();
+            window.addEventListener("load", () => {
+                setTimeout(() => {
+                    initChart();
+                }, 300);
+
+                setTimeout(() => {
+                    startSSE();
+                }, 800);
+            });
 
             window.addEventListener("beforeunload", () => {
                 if (source) source.close();

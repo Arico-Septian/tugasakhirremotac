@@ -504,7 +504,10 @@
             source.onerror = function() {
                 console.log("Reconnect SSE...");
                 source.close();
-                setTimeout(startSSE, 2000);
+
+                if (navigator.onLine) {
+                    setTimeout(startSSE, 2000);
+                }
             };
         }
 
@@ -516,12 +519,22 @@
             return true;
         }
 
-        setTimeout(() => {
-            startSSE();
-        }, 1000);
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                startSSE();
+            }, 500);
+        });
 
         window.addEventListener("beforeunload", () => {
             if (source) source.close();
+        });
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && source) {
+                source.close();
+            } else if (!source || source.readyState === 2) {
+                startSSE();
+            }
         });
     </script>
 

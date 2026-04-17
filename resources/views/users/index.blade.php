@@ -529,16 +529,29 @@
                     userStatusSource.onerror = function() {
                         console.log("Reconnect User Status SSE...");
                         userStatusSource.close();
-                        setTimeout(startUserStatusSSE, 2000);
+
+                        if (navigator.onLine) {
+                            setTimeout(startUserStatusSSE, 2000);
+                        }
                     };
                 }
 
-                setTimeout(() => {
-                    startUserStatusSSE();
-                }, 1000);
+                window.addEventListener("load", () => {
+                    setTimeout(() => {
+                        startUserStatusSSE();
+                    }, 500);
+                });
 
                 window.addEventListener("beforeunload", () => {
                     if (userStatusSource) userStatusSource.close();
+                });
+
+                document.addEventListener("visibilitychange", () => {
+                    if (document.hidden && userStatusSource) {
+                        userStatusSource.close();
+                    } else if (!userStatusSource || userStatusSource.readyState === 2) {
+                        startUserStatusSSE();
+                    }
                 });
             </script>
 
