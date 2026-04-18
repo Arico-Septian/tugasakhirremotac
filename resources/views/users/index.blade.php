@@ -35,7 +35,7 @@
             /* ===== MAIN CONTENT ===== */
             .main-content {
                 margin-left: 256px;
-                transition: none !important;
+                transition: margin-left 0.3s ease;
             }
 
             .sidebar.close+.main-content {
@@ -80,7 +80,7 @@
             .custom-bg {
                 background:
                     linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                    url('/images/wallpaper.jpeg') no-repeat center center fixed;
+                    url('/images/wallpaper.jpeg') no-repeat center center;
                 background-size: cover;
             }
 
@@ -110,7 +110,7 @@
 
         <!-- SIDEBAR -->
         <div id="sidebar"
-            class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r border-white/10 z-50">
+            class="sidebar fixed top-0 left-0 w-64 bg-slate-900 text-white shadow-lg h-full p-6 border-r border-white/10 z-[999]">
 
             <!-- HEADER -->
             <div class="flex justify-between items-center pb-5 mb-8 border-b border-white/10">
@@ -173,7 +173,7 @@
             <div class="absolute bottom-6 left-6 right-6">
 
                 <div class="profile-full">
-                    <button class="w-full flex items-center gap-3 px-3 py-2">
+                    <div class="w-full flex items-center gap-3 px-3 py-2">
 
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
@@ -193,7 +193,7 @@
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </a>
 
-                    </button>
+                    </div>
                 </div>
 
                 <div class="profile-collapse hidden text-center">
@@ -206,11 +206,12 @@
         </div>
 
         <!-- MAIN -->
-        <div class="main-content min-h-screen flex flex-col">
+        <div class="main-content min-h-screen flex flex-col pt-[72px]">
 
-            <header class="sticky top-0 bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+            <header
+                class="sticky top-0 z-[999] bg-slate-900/70 backdrop-blur-md px-6 py-4 flex items-center justify-between">
 
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2">
 
                     <button onclick="toggleSidebar()" class="md:hidden text-white text-lg">
                         <i class="fa-solid fa-bars"></i>
@@ -227,326 +228,418 @@
                         </p>
 
                     </div>
+                </div>
 
             </header>
 
-            <div class="w-full max-w-7xl mx-auto px-4 md:px-6 mt-4 mb-4">
-
-                <div class="flex items-center gap-3">
-
-                    <!-- SEARCH -->
-                    <form method="GET" class="flex-1">
-                        <div
-                            class="flex items-center bg-white/10 border border-white/20 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-
-                            <!-- ICON -->
-                            <span class="px-3 text-gray-300">
-                                <i class="fa fa-search"></i>
-                            </span>
-
-                            <!-- INPUT -->
-                            <input name="search" value="{{ request('search') }}" type="text"
-                                placeholder="Search user..." autocomplete="off"
-                                class="flex-1 bg-transparent text-white px-2 py-2 outline-none placeholder-gray-300">
-
-                            <!-- BUTTON -->
-                            <button type="submit" class="px-3 py-2 text-gray-300 hover:text-white transition">
-                                <i class="fa fa-search"></i>
-                            </button>
-
-                        </div>
-                    </form>
-
-                    <!-- BUTTON -->
-                    <button onclick="openModal()"
-                        class="h-[40px] bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm whitespace-nowrap transition">
-                        + Add User
-                    </button>
-
-                </div>
-
-            </div>
-
             <div class="px-4 py-4 md:px-6 md:py-6">
-                <div class="w-full max-w-7xl mx-auto">
+                <div class="w-full">
 
                     <!-- STATS -->
-                    <div class="card mb-6 flex items-center justify-between px-6 py-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
-                        <div>
-                            <p class="text-gray-300 text-sm mb-1">
-                                Total Users
-                            </p>
+                        <!-- TOTAL USERS -->
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
 
-                            <h2 class="text-4xl font-bold text-white">
-                                {{ $totalUsers }}
-                            </h2>
-                        </div>
+                            <div class="flex justify-between items-center">
 
-                        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
-                            <i class="fa-solid fa-users text-lg"></i>
-                        </div>
-
-                    </div>
-
-                    <p class="text-sm text-gray-400 mt-2 mb-4">
-                        Showing
-                        <span class="text-white font-semibold">{{ $users->count() }}</span>
-                        of
-                        <span class="text-white font-semibold">{{ $totalUsers }}</span> users
-                    </p>
-
-                    <!-- MOBILE CARD -->
-                    <div class="card">
-
-                        <!-- MOBILE -->
-                        <div class="block md:hidden space-y-3 px-2 max-h-[500px] overflow-y-auto">
-                            @foreach ($users as $user)
-                                <div
-                                    class="bg-slate-800/70 border border-white/10 rounded-xl p-4 shadow-sm hover:shadow-md transition w-full max-w-sm mx-auto space-y-2">
-                                    <p class="font-semibold text-base text-white leading-tight">
-                                        {{ $user->name }}
-                                    </p>
-
-                                    <div class="mt-2 flex justify-between text-xs sm:text-sm">
-                                        <span class="text-gray-300">Role</span>
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs
-                                            {{ $user->role == 'admin' ? 'bg-blue-500/20 text-blue-300' : '' }}
-                                            {{ $user->role == 'operator' ? 'bg-green-500/20 text-green-300' : '' }}
-                                            {{ $user->role == 'user' ? 'bg-white/10 text-gray-300' : '' }}">
-                                            {{ ucfirst($user->role) }}
-                                        </span>
-                                    </div>
-
-                                    <div class="mt-2 flex justify-between text-sm">
-                                        <span id="user-status-{{ $user->id }}"
-                                            class="{{ $user->isOnline ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300' }} px-2 py-1 rounded text-xs">
-                                            {{ $user->isOnline ? 'Online' : 'Offline' }}
-                                        </span>
-                                    </div>
-
-                                    <form action="/users/{{ $user->id }}" method="POST" class="mt-3">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button onclick="return confirm('Yakin hapus user ini?')"
-                                            class="w-full bg-red-500 hover:bg-red-600 transition text-white py-2.5 rounded-lg text-sm font-medium">
-                                            Delete
-                                        </button>
-                                    </form>
-
+                                <div>
+                                    <p class="text-gray-400 text-sm mb-1">TOTAL USERS</p>
+                                    <h2 class="text-3xl font-bold text-white">{{ $totalUsers }}</h2>
+                                    <p class="text-green-400 text-sm mt-1">+2 this week</p>
                                 </div>
-                            @endforeach
-                        </div>
 
-                        <!-- DESKTOP -->
-                        <div class="hidden md:block overflow-x-auto max-h-[500px] overflow-y-auto">
-                            <table class="w-full text-white">
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
+                                    <i class="fa-solid fa-users text-lg"></i>
+                                </div>
 
-                                <thead
-                                    class="sticky top-0 bg-slate-900/90 backdrop-blur z-10 border-b border-white/10">
-                                    <tr class="text-left text-gray-300 text-sm">
-                                        <th class="p-3">Name</th>
-                                        <th class="p-3">Role</th>
-                                        <th class="p-3">Status</th>
-                                        <th class="p-3">Action</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @foreach ($users as $user)
-                                        <tr class="border-b hover:bg-white/5 transition">
-
-                                            <td class="p-3 font-medium">{{ $user->name }}</td>
-
-                                            <td class="p-3">
-                                                <span
-                                                    class="px-3 py-1 rounded-full text-xs md:text-sm
-                                                    {{ $user->role == 'admin' ? 'bg-white/10 text-blue-400' : '' }}
-                                                    {{ $user->role == 'operator' ? 'bg-green-500/20 text-green-300' : '' }}
-                                                    {{ $user->role == 'user' ? 'bg-white/10 text-gray-300' : '' }}">
-                                                    {{ ucfirst($user->role) }}
-                                                </span>
-                                            </td>
-
-                                            <td class="p-3">
-                                                <span id="user-status-{{ $user->id }}"
-                                                    class="{{ $user->isOnline ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300' }} px-2 py-1 rounded text-xs">
-                                                    {{ $user->isOnline ? 'Online' : 'Offline' }}
-                                                </span>
-                                            </td>
-
-                                            <td class="p-3">
-                                                <form action="/users/{{ $user->id }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button onclick="return confirm('Yakin hapus user ini?')"
-                                                        class="bg-red-500 text-white px-3 py-1 rounded text-sm">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </td>
-
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- MODAL -->
-            <div id="modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
-
-                <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
-
-                    <!-- ❌ CLOSE BUTTON -->
-                    <button onclick="closeModal()"
-                        class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">
-                        ✕
-                    </button>
-
-                    <!-- TITLE -->
-                    <h2 class="text-lg md:text-xl font-semibold text-white mb-5">
-                        Add New User
-                    </h2>
-
-                    <form method="POST" action="/users">
-                        @csrf
-
-                        <!-- NAME -->
-                        <input type="text" name="name" placeholder="Name"
-                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            required>
-
-                        <!-- PASSWORD -->
-                        <input type="password" name="password" placeholder="Password"
-                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            required>
-
-                        <!-- ROLE -->
-                        <div class="relative mb-4">
-
-                            <select name="role"
-                                class="w-full p-3 pr-10 rounded-lg border border-gray-300 bg-white text-gray-700
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
-                transition shadow-sm appearance-none">
-
-                                <option value="admin">Admin</option>
-                                <option value="operator">Operator</option>
-                                <option value="user">User</option>
-                            </select>
-
-                            <!-- ICON -->
-                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <i class="fa-solid fa-chevron-down text-sm"></i>
                             </div>
 
                         </div>
-                        <!-- BUTTON -->
-                        <button
-                            class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">
-                            Create User
-                        </button>
 
-                    </form>
+                        <!-- ONLINE NOW -->
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
 
+                            <div class="flex justify-between items-center">
+
+                                <div>
+                                    <p class="text-gray-400 text-sm mb-1">ONLINE NOW</p>
+                                    <h2 class="text-3xl font-bold text-white">
+                                        {{ $onlineUsers }}
+                                    </h2>
+                                    <p class="text-green-400 text-sm mt-1">50% active</p>
+                                </div>
+
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-500/20 text-green-300">
+                                    <i class="fa-solid fa-user-check text-lg"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ADMIN -->
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+                                    <p class="text-gray-400 text-sm mb-1">ADMINISTRATORS</p>
+                                    <h2 class="text-3xl font-bold text-white">
+                                        {{ $adminUsers }}
+                                    </h2>
+                                    <p class="text-gray-400 text-sm mt-1">System privileges</p>
+                                </div>
+
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-yellow-500/20 text-yellow-300">
+                                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MOBILE CARD -->
+                    <div class="card">
+                        <div class="mb-4 space-y-4">
+
+                            <!-- TOP BAR -->
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+                                <!-- LEFT: SEARCH -->
+                                <form method="GET" action="/users">
+                                    <input name="search" placeholder="Search by username..."
+                                        class="bg-white/10 border border-white/10 text-white px-4 py-2.5 rounded-xl w-full">
+                                </form>
+
+                                <!-- RIGHT: FILTER + BUTTON -->
+                                <div class="flex items-center justify-end gap-2 ml-auto">
+
+                                    <div class="flex bg-white/5 border border-white/10 rounded-xl p-1 gap-1">
+                                        <a href="/users"
+                                            class="filter-btn px-3 py-1.5 rounded-lg text-sm bg-white/10 text-white">All</a>
+
+                                        <a href="/users?role=admin"
+                                            class="filter-btn px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:bg-white/10">Admin</a>
+
+                                        <a href="/users?role=operator"
+                                            class="filter-btn px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:bg-white/10">Moderator</a>
+
+                                        <a href="/users?role=user"
+                                            class="filter-btn px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:bg-white/10">User</a>
+                                    </div>
+
+                                    <!-- BUTTON -->
+                                    <button onclick="openModal()"
+                                        class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-5 py-2 rounded-xl shadow-md hover:shadow-lg transition whitespace-nowrap">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                        Add User
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- INFO BAR -->
+                            <div
+                                class="flex justify-between items-center text-sm text-gray-400 border-t border-white/10 pt-3">
+
+                                <p>
+                                    Showing <span class="text-white font-semibold">{{ $users->count() }}</span>
+                                    of <span class="text-white font-semibold">{{ $totalUsers }}</span> users
+                                </p>
+
+                                <div class="flex items-center gap-2 text-green-400">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    Live
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- LIST USER -->
+                        <div id="user-list">
+                            <div class="bg-slate-900/40 border border-white/10 rounded-2xl overflow-visible">
+
+                                <div class="divide-y divide-white/10">
+
+                                    @foreach ($users as $user)
+                                        @php
+                                            $isOnline = $user->isOnline;
+
+                                            $statusText = $isOnline
+                                                ? 'Online'
+                                                : ($user->last_activity
+                                                    ? \Carbon\Carbon::parse($user->last_activity)->diffForHumans()
+                                                    : 'Offline');
+
+                                            $statusColor = $isOnline ? 'text-green-400' : 'text-gray-400';
+                                            $statusDot = $isOnline ? 'bg-green-400' : 'bg-gray-500';
+                                        @endphp
+
+                                        <div
+                                            class="flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-all duration-200">
+
+                                            <!-- LEFT -->
+                                            <div class="flex items-center gap-4">
+
+                                                <!-- AVATAR -->
+                                                <div class="relative">
+                                                    <div
+                                                        class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
+                                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                    </div>
+
+                                                    <!-- ONLINE DOT -->
+                                                    <span
+                                                        class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 {{ $statusDot }}"></span>
+                                                </div>
+
+                                                <!-- NAME -->
+                                                <div>
+                                                    <p class="text-white font-semibold leading-tight">
+                                                        {{ $user->name }}
+                                                    </p>
+                                                    <p class="text-gray-400 text-sm">
+                                                        {{ '@' . strtolower($user->name) }}
+                                                    </p>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- RIGHT -->
+                                            <div class="flex items-center gap-4">
+
+                                                <!-- ROLE -->
+                                                @if ($user->role == 'admin')
+                                                    <span
+                                                        class="px-3 py-1 text-xs rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                        <i class="fa-solid fa-shield-halved mr-1 text-[10px]"></i>
+                                                        ADMIN
+                                                    </span>
+                                                @elseif($user->role == 'operator')
+                                                    <span
+                                                        class="px-3 py-1 text-xs rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                                                        <i class="fa-solid fa-user-gear mr-1 text-[10px]"></i>
+                                                        MODERATOR
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="px-3 py-1 text-xs rounded-full bg-gray-500/20 text-gray-300 border border-gray-500/30">
+                                                        <i class="fa-solid fa-user mr-1 text-[10px]"></i> USER
+                                                    </span>
+                                                @endif
+
+                                                <!-- STATUS -->
+                                                <div
+                                                    class="flex items-center gap-2 text-sm min-w-[90px] justify-start">
+                                                    <span class="w-2 h-2 rounded-full {{ $statusDot }}"></span>
+                                                    <span class="{{ $statusColor }}">
+                                                        {{ $statusText }}
+                                                    </span>
+                                                </div>
+
+                                                <!-- MENU -->
+                                                <!-- MENU -->
+                                                <div class="relative">
+
+                                                    <!-- BUTTON -->
+                                                    <button onclick="toggleMenu({{ $user->id }})"
+                                                        class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition">
+                                                        <i class="fa-solid fa-ellipsis"></i>
+                                                    </button>
+
+                                                    <!-- DROPDOWN -->
+                                                    <div id="menu-{{ $user->id }}"
+                                                        class="hidden absolute right-0 top-10 w-32 bg-slate-800 border border-white/10 rounded-lg shadow-lg z-50">
+
+                                                        <button onclick="deleteUser({{ $user->id }})"
+                                                            class="w-full text-left px-4 py-2 text-red-400 hover:bg-white/10 flex items-center gap-2">
+
+                                                            <i class="fa-solid fa-trash text-sm"></i>
+                                                            Delete
+
+                                                        </button>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    @endforeach
+
+                                </div>
+
+                            </div>
+
+                            <div class="p-4">
+                                {{ $users->links() }}
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <script>
-                function toggleSidebar() {
-                    const sidebar = document.getElementById("sidebar");
-                    const overlay = document.getElementById("overlay");
+        </div>
 
-                    if (window.innerWidth <= 900) {
-                        sidebar.classList.toggle("open");
-                        overlay.classList.toggle("hidden");
-                    } else {
-                        sidebar.classList.toggle("close");
-                    }
+        <!-- MODAL -->
+        <div id="modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+
+            <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
+
+                <!-- CLOSE BUTTON -->
+                <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">
+                    ✕
+                </button>
+
+                <!-- TITLE -->
+                <h2 class="text-lg md:text-xl font-semibold text-white mb-5">
+                    Add New User
+                </h2>
+
+                <form method="POST" action="/users">
+                    @csrf
+
+                    <!-- NAME -->
+                    <input type="text" name="name" placeholder="Name"
+                        class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required>
+
+                    <!-- PASSWORD -->
+                    <input type="password" name="password" placeholder="Password"
+                        class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required>
+
+                    <!-- ROLE -->
+                    <div class="relative mb-4">
+
+                        <select name="role"
+                            class="w-full p-3 pr-10 rounded-lg border border-gray-300 bg-white text-gray-700
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
+                                transition shadow-sm appearance-none">
+
+                            <option value="admin">Admin</option>
+                            <option value="operator">Operator</option>
+                            <option value="user">User</option>
+                        </select>
+
+                        <!-- ICON -->
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            <i class="fa-solid fa-chevron-down text-sm"></i>
+                        </div>
+
+                    </div>
+                    <!-- BUTTON -->
+                    <button
+                        class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">
+                        Create User
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
+
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.toggle("open");
+                    overlay.classList.toggle("hidden");
+                } else {
+                    sidebar.classList.toggle("close");
                 }
+            }
 
-                document.getElementById("overlay").onclick = function() {
-                    document.getElementById("sidebar").classList.remove("open");
-                    this.classList.add("hidden");
-                };
+            document.getElementById("overlay").onclick = function() {
+                document.getElementById("sidebar").classList.remove("open");
+                this.classList.add("hidden");
+            };
 
-                function openModal() {
-                    document.getElementById("modal").classList.remove("hidden")
-                }
+            function openModal() {
+                document.getElementById("modal").classList.remove("hidden")
+            }
 
-                function closeModal() {
-                    document.getElementById("modal").classList.add("hidden")
-                }
+            function closeModal() {
+                document.getElementById("modal").classList.add("hidden")
+            }
 
-                setInterval(() => {
+            setInterval(() => {
+                if (!document.hidden) {
                     fetch('/update-activity', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
-                }, 180000);
-
-                let userStatusSource;
-
-                function startUserStatusSSE() {
-
-                    if (userStatusSource) userStatusSource.close();
-
-                    userStatusSource = new EventSource('/users-status-stream');
-
-                    userStatusSource.onmessage = function(event) {
-
-                        const users = JSON.parse(event.data);
-
-                        users.forEach(u => {
-
-                            let el = document.getElementById('user-status-' + u.id);
-
-                            if (!el) return;
-
-                            if (u.online) {
-                                el.innerText = "Online";
-                                el.classList.remove('bg-gray-500/20', 'text-gray-300');
-                                el.classList.add('bg-green-500/20', 'text-green-300');
-                            } else {
-                                el.innerText = "Offline";
-                                el.classList.remove('bg-green-500/20', 'text-green-300');
-                                el.classList.add('bg-gray-500/20', 'text-gray-300');
-                            }
-
-                        });
-                    };
-
-                    userStatusSource.onerror = function() {
-                        console.log("Reconnect User Status SSE...");
-                        userStatusSource.close();
-
-                        if (navigator.onLine) {
-                            setTimeout(startUserStatusSSE, 2000);
-                        }
-                    };
                 }
+            }, 60000);
+        </script>
 
-                window.addEventListener("load", startUserStatusSSE);
+        <script>
+            function toggleMenu(id) {
 
-                window.addEventListener("beforeunload", () => {
-                    if (userStatusSource) userStatusSource.close();
-                });
-
-                document.addEventListener("visibilitychange", () => {
-                    if (document.hidden && userStatusSource) {
-                        userStatusSource.close();
-                    } else if (!userStatusSource || userStatusSource.readyState === 2) {
-                        startUserStatusSSE();
+                document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                    if (menu.id !== 'menu-' + id) {
+                        menu.classList.add('hidden');
                     }
                 });
-            </script>
+
+                const menu = document.getElementById('menu-' + id);
+                menu.classList.toggle('hidden');
+            }
+
+            document.addEventListener('click', function(e) {
+
+                const isToggleBtn = e.target.closest('[onclick^="toggleMenu"]');
+                const isMenu = e.target.closest('[id^="menu-"]');
+
+                if (!isToggleBtn && !isMenu) {
+                    document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                        menu.classList.add('hidden');
+                    });
+                }
+
+            });
+        </script>
+
+
+
+        <script>
+            function deleteUser(id) {
+
+                if (!confirm("Yakin hapus user?")) return;
+
+                fetch(`/users/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(() => location.reload())
+                    .catch(() => alert("Gagal hapus user"));
+
+            }
+        </script>
 
     </body>
 

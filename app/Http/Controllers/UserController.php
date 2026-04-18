@@ -10,26 +10,46 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $totalUsers = User::toBase()->count();
-
         $users = User::select('id', 'name', 'role', 'last_activity')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
+            ->when($request->filled('role'), function ($query) use ($request) {
+                $query->where('role', $request->role);
+            })
             ->latest()
-            ->paginate(10)->withQueryString();
+            ->paginate(10)
+            ->withQueryString();
 
-        $users->getCollection()->transform(function ($u) {
-            $u->isOnline = $u->last_activity && $u->last_activity >= now()->subMinutes(2);
-            return $u;
-        });
-        return view('users.index', compact('users', 'totalUsers'));
+        $totalUsers = User::count();
+
+        $stats = User::selectRaw("
+            SUM(CASE WHEN last_activity >= ? THEN 1 ELSE 0 END) as online,
+            SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admin
+        ", [now()->subMinutes(2)])->first();
+
+        $onlineUsers = $stats->online ?? 0;
+        $adminUsers = $stats->admin ?? 0;
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('users.partials.list', compact('users'))->render()
+            ]);
+        }
+
+        // ===== VIEW =====
+        return view('users.index', compact(
+            'users',
+            'totalUsers',
+            'onlineUsers',
+            'adminUsers'
+        ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:users',
+            'name' => 'required|string|max:255|unique:users,name',
             'password' => 'required|min:6',
             'role' => 'required|in:admin,operator,user'
         ]);
@@ -45,8 +65,17 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        if ($id == Auth::id()) {
+            return response()->json([
+                'error' => 'Tidak bisa hapus diri sendiri'
+            ], 403);
+        }
+
         User::findOrFail($id)->delete();
-        return back()->with('success', 'User berhasil dihapus');
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
     public function profile()

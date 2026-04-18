@@ -48,7 +48,7 @@
             color: white;
             border-radius: 20px;
             padding: 16px;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
             min-height: 220px;
@@ -89,7 +89,7 @@
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+                url('/images/wallpaper.jpeg') no-repeat center center;
             background-size: cover;
         }
 
@@ -252,6 +252,7 @@
                         Control Ac Unit
                     </p>
                 </div>
+            </div>
         </header>
 
         <!-- CONTENT -->
@@ -454,10 +455,6 @@
         document.querySelectorAll("#sidebar a").forEach(link => {
             link.addEventListener("click", () => {
 
-                if (typeof source !== "undefined" && source) {
-                    source.close();
-                }
-
                 document.getElementById("sidebar").classList.remove("open");
                 document.getElementById("overlay").classList.add("hidden");
             });
@@ -470,66 +467,17 @@
         function closeModal() {
             document.getElementById("modal").classList.add("hidden");
         }
-    </script>
 
-    <script>
-        let source;
-        let lastTemps = [];
-
-        function startSSE() {
-
-            if (source) source.close();
-
-            source = new EventSource('/temperature-stream');
-
-            source.onmessage = function(event) {
-
-                const data = JSON.parse(event.data);
-                const temps = data.map(r => r.temperature ?? 0);
-
-                if (isSame(temps, lastTemps)) return;
-
-                lastTemps = temps;
-
-                data.forEach((r) => {
-                    let el = document.getElementById('temp-' + r.id);
-                    if (el) {
-                        el.innerText = (r.temperature ?? '--') + " °C";
-                    }
+        setInterval(() => {
+            fetch('/temperature')
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(room => {
+                        const el = document.getElementById(`temp-${room.id}`);
+                        if (el) el.innerText = room.temp + ' °C';
+                    });
                 });
-            };
-
-            source.onerror = function() {
-                console.log("Reconnect SSE...");
-                source.close();
-
-                if (navigator.onLine) {
-                    setTimeout(startSSE, 2000);
-                }
-            };
-        }
-
-        function isSame(a, b) {
-            if (a.length !== b.length) return false;
-            for (let i = 0; i < a.length; i++) {
-                if (a[i] !== b[i]) return false;
-            }
-            return true;
-        }
-
-        window.addEventListener("load", startSSE);
-
-        window.addEventListener("beforeunload", () => {
-            if (source) source.close();
-        });
-
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden && source) {
-                source.close();
-            } else if (!source || source.readyState === 2) {
-                startSSE();
-            }
-        });
+        }, 5000);
     </script>
 
 </body>

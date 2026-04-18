@@ -404,7 +404,7 @@
                                 if (offTime && offTime !== "0000-00-00 00:00:00") {
                                     let t = formatTime(offTime);
                                     if (t !== '--:--') {
-                                        text += (text ? '\n' : '') + 'OFF ' + t;
+                                        text += (text ? ' | ' : '') + 'OFF ' + t;
                                     }
                                 }
 
@@ -452,7 +452,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             loadStatus();
-            setInterval(loadStatus, 3000);
+            setInterval(loadStatus, 5000);
         });
     </script>
 

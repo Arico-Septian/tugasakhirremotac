@@ -401,25 +401,26 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <script>
-                function toggleSidebar() {
-                    const sidebar = document.getElementById("sidebar");
-                    const overlay = document.getElementById("overlay");
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
 
-                    if (window.innerWidth <= 900) {
-                        sidebar.classList.toggle("open");
-                        overlay.classList.toggle("hidden");
-                    } else {
-                        sidebar.classList.toggle("close");
-                    }
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.toggle("open");
+                    overlay.classList.toggle("hidden");
+                } else {
+                    sidebar.classList.toggle("close");
                 }
+            }
 
-                document.getElementById("overlay").onclick = function() {
-                    document.getElementById("sidebar").classList.remove("open");
-                    this.classList.add("hidden");
-                };
-            </script>
+            document.getElementById("overlay").onclick = function() {
+                document.getElementById("sidebar").classList.remove("open");
+                this.classList.add("hidden");
+            };
+        </script>
 
 </body>
 

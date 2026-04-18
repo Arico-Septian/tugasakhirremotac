@@ -15,6 +15,7 @@ use App\Models\AcStatus;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\TimerController;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 
 Route::get('/', function () {
@@ -319,7 +320,11 @@ Route::get('/my-status', function () {
 
     $user = Auth::user();
 
-    if (!$user || !$user->last_activity) {
+    if (!$user) {
+        return response()->json(['status' => 'offline']);
+    }
+
+    if (!$user->last_activity) {
         return response()->json(['status' => 'offline']);
     }
 
@@ -334,67 +339,20 @@ Route::get('/temperatures', function () {
     return \App\Models\Room::select('name','temperature')->get();
 });
 
-Route::get('/temperature-stream', function () {
-
-    return response()->stream(function () {
-
-        while (true) {
-
-            $rooms = \App\Models\Room::with('temperatureData')->get();
-
-            $data = $rooms->map(function ($room) {
-                return [
-                    'id' => $room->id,
-                    'name' => $room->name,
-                    'temperature' => optional($room->temperatureData)->temperature
-                ];
-            });
-
-            echo "data: " . json_encode($data) . "\n\n";
-
-            ob_flush();
-            flush();
-
-            sleep(1);
-        }
-
-    }, 200, [
-        "Content-Type" => "text/event-stream",
-        "Cache-Control" => "no-cache",
-        "Connection" => "keep-alive",
-    ]);
-});
-
-Route::get('/users-status-stream', function () {
-
-    return response()->stream(function () {
-
-        while (true) {
-
-            $users = \App\Models\User::all()->map(function ($u) {
-                return [
-                    'id' => $u->id,
-                    'online' => $u->last_activity >= now()->subMinutes(2)
-                ];
-            });
-
-            echo "data: " . json_encode($users) . "\n\n";
-
-            ob_flush();
-            flush();
-
-            sleep(5);
-        }
-
-    }, 200, [
-        "Content-Type" => "text/event-stream",
-        "Cache-Control" => "no-cache",
-        "Connection" => "keep-alive",
-    ]);
-});
-
 Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
 Route::get('/ac-status', function () {
     return \App\Models\AcStatus::with('acUnit')->get();
+});
+
+Route::post('/update-activity', function () {
+
+    /** @var User $user */
+    $user = Auth::user();
+
+    if ($user) {
+        $user->last_activity = now();
+        $user->save();
+    }
+
 });

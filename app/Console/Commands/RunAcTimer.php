@@ -14,9 +14,9 @@ class RunAcTimer extends Command
     protected $signature = 'ac:run-timer';
     protected $description = 'Run AC timer ON/OFF (Anti Miss + Anti Double)';
 
-    const WINDOW_BEFORE = -30; // detik sebelum
-    const WINDOW_AFTER = 60;   // detik setelah
-    const EXECUTION_BUFFER = 60; // anti double 1 menit
+    const WINDOW_BEFORE = -30;
+    const WINDOW_AFTER = 60;
+    const EXECUTION_BUFFER = 60;
 
     public function handle()
     {

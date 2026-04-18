@@ -16,7 +16,7 @@ class MqttListener extends Command
 
     public function handle()
     {
-        $server = '192.168.1.55';
+        $server = '192.168.18.194';
         $port = 1883;
 
         while (true) {

@@ -117,7 +117,7 @@
         .custom-bg {
             background:
                 linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+                url('/images/wallpaper.jpeg') no-repeat center center;
             background-size: cover;
         }
 
@@ -572,18 +572,13 @@
                     },
 
                     options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: 'white',
-                                    boxWidth: 12
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.raw + ' °C';
-                                    }
+                                    color: 'white'
                                 }
                             }
                         },
@@ -619,85 +614,28 @@
                 });
             }
 
-            let source;
-            let lastTemps = [];
+            setInterval(() => {
+                fetch('/temperature')
+                    .then(res => res.json())
+                    .then(data => {
 
-            function startSSE() {
+                        const safeData = data.map(t => t || 0);
 
-                if (source) source.close();
+                        tempChart.data.datasets[0].data = safeData;
+                        tempChart.data.datasets[1].data = safeData;
 
-                source = new EventSource('/temperature-stream');
+                        tempChart.data.datasets[0].backgroundColor = safeData.map(t =>
+                            t > 30 ? '#ef4444' :
+                            t > 25 ? '#facc15' :
+                            '#3b82f6'
+                        );
 
-                source.onmessage = handleMessage;
+                        tempChart.options.scales.y.min = Math.min(...safeData) - 2;
+                        tempChart.options.scales.y.max = Math.max(...safeData) + 5;
 
-                source.onerror = function() {
-                    console.log("Reconnect SSE...");
-
-                    source.close();
-
-                    if (navigator.onLine) {
-                        setTimeout(startSSE, 2000);
-                    }
-                };
-            }
-
-            function isSame(a, b) {
-                if (a.length !== b.length) return false;
-                for (let i = 0; i < a.length; i++) {
-                    if (a[i] !== b[i]) return false;
-                }
-                return true;
-            }
-
-            function handleMessage(event) {
-
-                if (!tempChart) return;
-
-                const data = JSON.parse(event.data);
-                const temps = data.map(r => r.temperature ?? 0);
-
-                if (isSame(temps, lastTemps)) return;
-
-                lastTemps = temps;
-
-                tempChart.data.labels = data.map(r => r.name.replace('server ', 'srv '));
-                tempChart.data.datasets[0].data = temps;
-                tempChart.data.datasets[1].data = temps;
-
-                tempChart.data.datasets[0].backgroundColor = temps.map(t =>
-                    t > 30 ? 'red' :
-                    t > 25 ? 'yellow' :
-                    '#3b82f6'
-                );
-
-                requestAnimationFrame(() => {
-                    tempChart.update('none');
-                });
-
-                data.forEach((r) => {
-                    let el = document.getElementById('temp-' + r.id);
-                    if (el) {
-                        el.innerText = (r.temperature ?? '--') + " °C";
-                    }
-                });
-            }
-
-            document.addEventListener("visibilitychange", () => {
-                if (document.hidden && source) {
-                    source.close();
-                } else if (!source || source.readyState === 2) {
-                    startSSE();
-                }
-            });
-
-            window.addEventListener("load", () => {
-                initChart();
-                startSSE();
-            });
-
-            window.addEventListener("beforeunload", () => {
-                if (source) source.close();
-            });
+                        tempChart.update();
+                    });
+            }, 5000);
         </script>
 
         <script>
@@ -717,14 +655,6 @@
                 document.getElementById("sidebar").classList.remove("open");
                 this.classList.add("hidden");
             };
-
-            document.addEventListener("DOMContentLoaded", () => {
-                document.querySelectorAll("#sidebar a").forEach(link => {
-                    link.addEventListener("click", () => {
-                        if (source) source.close();
-                    });
-                });
-            });
 
             function toggleProfile() {
 
@@ -761,8 +691,6 @@
                 }, idleTime);
             }
 
-            window.addEventListener("load", resetTimer);
-
             document.onmousemove = resetTimer;
             document.onkeypress = resetTimer;
             document.onclick = resetTimer;
@@ -772,6 +700,10 @@
                 if (!document.hidden) {
                     resetTimer();
                 }
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                initChart();
             });
         </script>
 

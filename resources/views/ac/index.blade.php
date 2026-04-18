@@ -375,7 +375,8 @@
                         <!-- DELETE AC -->
                         @auth
                             @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                <form id="deleteForm" method="POST" action="{{ $firstAc ? '/ac/' . $firstAc->id : '' }}">
+                                <form id="deleteForm" method="POST" onsubmit="return confirm('Hapus AC ini?')"
+                                    action="{{ $firstAc ? '/ac/' . $firstAc->id : '' }}">
                                     @csrf
                                     @method('DELETE')
 
@@ -716,7 +717,11 @@
             }
 
             function setTemp(id, temp) {
-                window.location = "/ac/" + id + "/temp/" + temp
+
+                if (temp < 16) temp = 16;
+                if (temp > 30) temp = 30;
+
+                window.location = "/ac/" + id + "/temp/" + temp;
             }
 
             function toggleTimer(id) {
@@ -782,6 +787,17 @@
                     document.getElementById('dropdownAC').classList.add('hidden');
                 }, 200);
             }
+
+            document.addEventListener('click', function(e) {
+
+                const dropdown = document.getElementById('dropdownAC');
+                const trigger = document.querySelector('#selectedAC')?.parentElement;
+
+                if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    dropdown.classList.add('hidden');
+                }
+            });
 
             document.addEventListener("DOMContentLoaded", function() {
 
