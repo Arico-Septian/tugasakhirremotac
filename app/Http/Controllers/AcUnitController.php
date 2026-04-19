@@ -47,6 +47,14 @@ class AcUnitController extends Controller
             'ac_number' => $request->ac_number,
         ]);
 
+        \App\Models\AcStatus::create([
+            'ac_unit_id' => $ac->id,
+            'power' => 'OFF',
+            'mode' => 'COOL',
+            'set_temperature' => 24,
+            'room_temperature' => 24,
+        ]);
+
         (new \App\Services\MqttService())->resendConfig($room->device_id);
 
         UserLog::create([

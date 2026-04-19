@@ -105,6 +105,13 @@
             flex: 1;
             overflow-y: auto;
             scroll-behavior: smooth;
+            padding-bottom: 100px;
+        }
+
+        @media (min-width: 1024px) {
+            .page-body {
+                padding-bottom: 0;
+            }
         }
 
         /* ===== AC CARD ===== */
@@ -448,28 +455,36 @@
                     <!-- AC PANELS -->
                     <div class="p-2 md:p-8 pt-2">
                         @foreach ($acs as $ac)
-                            <div id="ac-{{ $ac->id }}" class="ac-panel hidden">
+                            <div id="ac-{{ $ac->id }}" class="ac-panel {{ $loop->first ? '' : 'hidden' }}">
                                 <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[350px_1fr] gap-2">
 
-                                    <!-- Mobile Status Bar -->
-                                    <div class="ac-card mb-4 md:hidden px-4 py-3">
-                                        <div class="flex justify-between items-center text-sm">
-                                            <div class="flex flex-col items-center flex-1">
-                                                <span class="text-xs text-gray-400">POWER</span>
-                                                <span
-                                                    class="text-green-400 font-semibold">{{ $ac->status?->power ?? 'OFF' }}</span>
-                                            </div>
-                                            <div class="flex flex-col items-center flex-1">
-                                                <span class="text-xs text-gray-400">SET TEMP</span>
-                                                <span
-                                                    class="text-yellow-300">{{ $ac->status?->set_temperature ?? 24 }}°C</span>
-                                            </div>
-                                            <div class="flex flex-col items-center flex-1">
-                                                <span class="text-xs text-gray-400">MODE</span>
-                                                <span
-                                                    class="text-blue-400">{{ strtoupper($ac->status?->mode ?? 'cool') }}</span>
-                                            </div>
+                                    <!-- STATUS MOBILE ONLY -->
+                                    <div class="flex gap-2 mb-4 md:hidden">
+
+                                        <!-- POWER -->
+                                        <div class="ac-card flex-1 text-center py-2">
+                                            <p class="text-xs text-gray-400">POWER</p>
+                                            <p class="text-sm font-semibold text-green-400">
+                                                {{ $ac->status?->power ?? 'OFF' }}
+                                            </p>
                                         </div>
+
+                                        <!-- TEMP -->
+                                        <div class="ac-card flex-1 text-center py-2">
+                                            <p class="text-xs text-gray-400">TEMP</p>
+                                            <p class="text-sm font-semibold text-yellow-300">
+                                                {{ $ac->status?->set_temperature ?? 24 }}°C
+                                            </p>
+                                        </div>
+
+                                        <!-- MODE -->
+                                        <div class="ac-card flex-1 text-center py-2">
+                                            <p class="text-xs text-gray-400">MODE</p>
+                                            <p class="text-sm font-semibold text-blue-400">
+                                                {{ strtoupper($ac->status?->mode ?? 'cool') }}
+                                            </p>
+                                        </div>
+
                                     </div>
 
                                     <!-- LEFT: Power + Temp -->
@@ -513,23 +528,29 @@
                                     <!-- RIGHT: Info + Mode + Timer -->
                                     <div class="flex flex-col gap-5">
 
-                                        <!-- Info Cards -->
-                                        <div class="hidden md:grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <div class="ac-card text-center">
-                                                <p class="text-xs text-white">SET TEMP</p>
-                                                <p class="text-xl font-semibold">
-                                                    {{ $ac->status?->set_temperature ?? 24 }}°C</p>
-                                            </div>
-                                            <div class="ac-card text-center">
-                                                <p class="text-xs text-white">MODE</p>
-                                                <p class="text-xl font-semibold">
-                                                    {{ ucfirst($ac->status?->mode ?? 'cool') }}</p>
-                                            </div>
-                                            <div class="ac-card text-center">
-                                                <p class="text-xs text-white">POWER</p>
-                                                <p
-                                                    class="text-xl font-semibold {{ ($ac->status?->power ?? 'OFF') == 'ON' ? 'text-green-400' : 'text-white' }}">
+                                        <!-- STATUS DESKTOP ONLY -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                                            <!-- POWER -->
+                                            <div class="ac-card text-center py-3">
+                                                <p class="text-xs text-gray-400">POWER</p>
+                                                <p class="text-lg font-semibold text-green-400">
                                                     {{ $ac->status?->power ?? 'OFF' }}
+                                                </p>
+                                            </div>
+
+                                            <!-- TEMP -->
+                                            <div class="ac-card text-center py-3">
+                                                <p class="text-xs text-gray-400">SET TEMP</p>
+                                                <p class="text-lg font-semibold text-yellow-300">
+                                                    {{ $ac->status?->set_temperature ?? 24 }}°C
+                                                </p>
+                                            </div>
+
+                                            <!-- MODE -->
+                                            <div class="ac-card text-center py-3">
+                                                <p class="text-xs text-gray-400">MODE</p>
+                                                <p class="text-lg font-semibold text-blue-400">
+                                                    {{ strtoupper($ac->status?->mode ?? 'cool') }}
                                                 </p>
                                             </div>
                                         </div>
