@@ -22,39 +22,32 @@ class AcUnitController extends Controller
 
     public function store(Request $request, $roomId)
     {
+        $room = Room::findOrFail($roomId);
+
+        if ($room->acUnits()->count() >= 15) {
+            return back()->with('error', 'Maksimal 15 AC per ruangan');
+        }
+
         $request->validate([
-            'name' => 'required',
-            'brand' => 'required',
+            'name' => 'required|string|max:50',
+            'brand' => 'required|string|max:50',
             'ac_number' => [
                 'required',
                 'integer',
                 'min:1',
                 'max:15',
-                Rule::unique('ac_units')->where(function ($q) use ($roomId) {
-                    return $q->where('room_id', $roomId);
-                })
+                Rule::unique('ac_units')->where(fn($q) => $q->where('room_id', $roomId))
             ]
         ]);
-
-        $count = AcUnit::where('room_id', $roomId)->count();
-
-        if ($count >= 15) {
-            return back()->with('error', 'Maksimal 15 AC per ruangan');
-        }
-
-        $room = Room::findOrFail($roomId);
 
         $ac = AcUnit::create([
             'name' => $request->name,
             'room_id' => $roomId,
             'brand' => $request->brand,
             'ac_number' => $request->ac_number,
-            'status' => 'OFF'
         ]);
 
-        $mqtt = new \App\Services\MqttService();
-
-        $mqtt->resendConfig($room->device_id);
+        (new \App\Services\MqttService())->resendConfig($room->device_id);
 
         UserLog::create([
             'user_id' => Auth::id(),
@@ -63,7 +56,7 @@ class AcUnitController extends Controller
             'activity' => 'add_ac'
         ]);
 
-        return redirect()->back()->with('new_ac_id', $ac->id);
+        return back()->with('new_ac_id', $ac->id);
     }
 
     public function destroy($id)

@@ -11,10 +11,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // ambil room + relasi AC
         $rooms = Room::with('acUnits.status')->get();
 
-        // 🔥 ambil suhu terbaru per room (PALING AMAN)
         foreach ($rooms as $room) {
             $latestTemp = RoomTemperature::where('room', $room->name)
                 ->latest()
@@ -23,7 +21,6 @@ class DashboardController extends Controller
             $room->temperature = $latestTemp ? $latestTemp->temperature : null;
         }
 
-        // statistik
         $totalRooms = $rooms->count();
         $totalAc = AcUnit::count();
 
@@ -31,31 +28,16 @@ class DashboardController extends Controller
             $q->where('power', 'ON');
         })->count();
 
-        $users = User::count();
-
-        $usersOnline = User::where('is_online', true)
-            ->where('last_activity', '>=', now()->subMinutes(5))
-            ->count();
-
-        $onlineUsers = User::where('is_online', true)
-            ->where('last_activity', '>=', now()->subMinute())
-            ->get();
-
-        $idleUsers = User::where('is_online', true)
-            ->where('last_activity', '<', now()->subMinute())
-            ->where('last_activity', '>=', now()->subMinutes(5))
-            ->get();
+        $inactiveAc = AcUnit::whereDoesntHave('status', function ($q) {
+            $q->where('power', 'ON');
+        })->count();
 
         return view('dashboard.dashboard', compact(
             'rooms',
             'totalRooms',
             'totalAc',
             'activeAc',
-            'users',
-            'usersOnline',
-            'onlineUsers',
-            'idleUsers'
+            'inactiveAc'
         ));
     }
 }
-

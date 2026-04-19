@@ -201,12 +201,6 @@ Route::get('/system-check', function () {
     return response()->json(['status' => 'online']);
 });
 
-// setting melalui dashboard
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-});
-
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::post('/rooms', [RoomController::class, 'store']);
 
@@ -237,16 +231,13 @@ Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
 
 Route::middleware(['auth'])->group(function () {
 
-    // semua role (admin, operator, user)
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // hanya admin + operator
     Route::middleware(['role:admin,operator'])->group(function () {
         Route::resource('/rooms', RoomController::class);
         Route::resource('/ac', AcUnitController::class);
     });
 
-    // hanya admin
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('/users', UserController::class);
     });
@@ -265,7 +256,7 @@ Route::get('/api/ac-status', function () {
 
 Route::get('/users-online', function () {
     return response()->json([
-        'count' => \App\Models\User::where('last_activity', '>=', now()->subMinutes(5))->count()
+        'count' => User::where('last_activity', '>=', now()->subMinutes(5))->count()
     ]);
 });
 
@@ -336,13 +327,13 @@ Route::get('/my-status', function () {
 });
 
 Route::get('/temperatures', function () {
-    return \App\Models\Room::select('name','temperature')->get();
+    return Room::select('name', 'temperature')->get();
 });
 
 Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
 Route::get('/ac-status', function () {
-    return \App\Models\AcStatus::with('acUnit')->get();
+    return AcStatus::with('acUnit')->get();
 });
 
 Route::post('/update-activity', function () {
