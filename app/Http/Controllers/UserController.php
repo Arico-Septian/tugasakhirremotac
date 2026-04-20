@@ -31,6 +31,12 @@ class UserController extends Controller
         $onlineUsers = $stats->online ?? 0;
         $adminUsers = $stats->admin ?? 0;
 
+        // PERBAIKAN 1: Hitung persentase online
+        $onlinePercentage = $totalUsers > 0 ? round(($onlineUsers / $totalUsers) * 100) : 0;
+
+        // PERBAIKAN 2: Hitung user baru minggu ini
+        $newUsersThisWeek = User::where('created_at', '>=', now()->subWeek())->count();
+
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('users.partials.list', compact('users'))->render()
@@ -42,7 +48,9 @@ class UserController extends Controller
             'users',
             'totalUsers',
             'onlineUsers',
-            'adminUsers'
+            'adminUsers',
+            'onlinePercentage',    // Tambahkan ini
+            'newUsersThisWeek'      // Tambahkan ini
         ));
     }
 
@@ -61,6 +69,32 @@ class UserController extends Controller
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan');
+    }
+
+    public function update(Request $request, $id)
+    {
+        // PERBAIKAN 3: Tambahkan method update untuk edit role
+        $request->validate([
+            'role' => 'required|in:admin,operator,user'
+        ]);
+
+        $user = User::findOrFail($id);
+
+        // Cek tidak bisa mengubah role sendiri
+        if ($id == Auth::id()) {
+            return response()->json([
+                'error' => 'Tidak bisa mengubah role sendiri'
+            ], 403);
+        }
+
+        $user->role = $request->role;
+        $user->save();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', 'Role user berhasil diubah');
     }
 
     public function destroy($id)

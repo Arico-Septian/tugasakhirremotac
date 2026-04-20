@@ -210,7 +210,7 @@
                             class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('rooms*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Control Ac</span>
+                            <span class="menu-text">Manage Rooms & Ac Unit</span>
                         </a>
                     </li>
                 @endif

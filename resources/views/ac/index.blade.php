@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC Units</title>
+    <title>AC Units - Management Control</title>
 
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -84,7 +84,7 @@
             width: calc(100% - 80px);
         }
 
-        /* ===== HEADER — diam di atas ===== */
+        /* ===== HEADER ===== */
         .main-header {
             flex-shrink: 0;
             height: 72px;
@@ -100,7 +100,7 @@
             z-index: 30;
         }
 
-        /* ===== PAGE BODY — area yang scroll ===== */
+        /* ===== PAGE BODY ===== */
         .page-body {
             flex: 1;
             overflow-y: auto;
@@ -142,41 +142,6 @@
             transform: translateY(0);
         }
 
-        /* ===== SWITCH ===== */
-        .switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-        }
-
-        .slider {
-            position: absolute;
-            inset: 0;
-            background: #d1d5db;
-            border-radius: 16px;
-            transition: 0.3s;
-        }
-
-        .slider:before {
-            content: "";
-            position: absolute;
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-
-        input:checked+.slider {
-            background: #22c55e;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(24px);
-        }
-
         /* ===== MODE BUTTON ===== */
         .mode-btn {
             display: flex;
@@ -191,6 +156,8 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: 0.2s ease;
             color: white;
+            cursor: pointer;
+            text-decoration: none;
         }
 
         .mode-btn:hover {
@@ -198,16 +165,24 @@
             transform: translateY(-2px);
         }
 
+        .mode-btn.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         /* ===== DROPDOWN ===== */
         #dropdownAC {
             position: absolute;
             top: 60px;
             left: 0;
-            width: 160px;
+            width: 200px;
             background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             opacity: 0;
+            visibility: hidden;
             transform: translateY(10px);
             transition: 0.25s ease;
             z-index: 40;
@@ -215,16 +190,118 @@
 
         #dropdownAC.show {
             opacity: 1;
+            visibility: visible;
             transform: translateY(0);
         }
 
         /* ===== OVERLAY ===== */
         #overlay {
             opacity: 0;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        /* ===== MOBILE ===== */
+        #overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .toast.success {
+            background: #22c55e;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.info {
+            background: #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== LOADING STATE ===== */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: wait;
+        }
+
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== RESPONSIVE: Sembunyikan status desktop di mobile ===== */
+        @media (max-width: 768px) {
+            .desktop-status {
+                display: none !important;
+            }
+
+            .ac-card {
+                padding: 16px;
+            }
+        }
+
+        /* ===== MOBILE SIDEBAR ===== */
         @media (max-width: 1024px) {
             .main-content {
                 margin-left: 0 !important;
@@ -242,34 +319,35 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .ac-card {
-                padding: 16px;
-            }
+        /* ===== ACCESSIBILITY ===== */
+        button:focus-visible,
+        a:focus-visible,
+        .mode-btn:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
         }
 
-        @media (max-width: 640px) {
-            .ac-card {
-                padding: 16px;
-            }
+        button:active {
+            transform: scale(0.98);
         }
 
-        /* ===== REMOVE TAP ZOOM ===== */
-        button:active,
-        a:active {
-            transform: none !important;
+        /* Hide scrollbar for cleaner look */
+        .page-body::-webkit-scrollbar {
+            width: 8px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
+        .page-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .page-body::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.5);
+            border-radius: 4px;
+        }
+
+        .page-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.8);
         }
     </style>
 </head>
@@ -280,7 +358,7 @@
     <div class="layout">
 
         <!-- OVERLAY (mobile) -->
-        <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+        <div id="overlay" class="fixed inset-0 bg-black/50 z-40"></div>
 
         <!-- ==================== SIDEBAR ==================== -->
         <div id="sidebar" class="sidebar bg-slate-900 text-white shadow-lg p-6 border-r border-white/10">
@@ -310,7 +388,7 @@
                             class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Control Ac</span>
+                            <span class="menu-text">Manage Rooms & Ac Unit</span>
                         </a>
                     </li>
                 @endif
@@ -319,7 +397,7 @@
                     <li>
                         <a href="/users"
                             class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
-                            {{ request()->is('users*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                            {{ request()->is('users*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-users"></i>
                             <span class="menu-text">User Management</span>
                         </a>
@@ -346,9 +424,9 @@
                         <p class="text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
                         <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
                     </div>
-                    <form action="/logout" method="POST" class="ml-auto">
+                    <form action="/logout" method="POST" class="ml-auto" id="logoutForm">
                         @csrf
-                        <button class="text-red-500 hover:text-red-600 text-lg">
+                        <button type="submit" class="text-red-500 hover:text-red-600 text-lg">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
                     </form>
@@ -369,7 +447,7 @@
         <!-- ==================== MAIN CONTENT ==================== -->
         <div class="main-content">
 
-            <!-- HEADER — tidak ikut scroll -->
+            <!-- HEADER -->
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="goBack()"
@@ -378,18 +456,17 @@
                     </button>
                     <div>
                         <h1 class="text-base md:text-xl font-semibold text-white leading-none">
-                            Centralized Management
+                            Management Control Ac
                         </h1>
-
                         <p class="text-sm text-blue-200 font-medium">
-                            Control Ac
+                            Centralized Ac
                         </p>
                     </div>
                 </div>
             </header>
             <!-- END HEADER -->
 
-            <!-- PAGE BODY — hanya bagian ini yang scroll -->
+            <!-- PAGE BODY -->
             <div class="page-body">
                 <div class="px-2 pr-3 md:px-6 py-4">
 
@@ -402,7 +479,7 @@
                         <!-- Left: Dropdown + Room Name -->
                         <div class="flex items-center gap-2 min-w-0">
                             <div onclick="toggleDropdown()"
-                                class="flex items-center gap-2 px-2 py-2 text-xs md:text-sm bg-slate-800 text-white border border-white/10 rounded-xl cursor-pointer">
+                                class="flex items-center gap-2 px-2 py-2 text-xs md:text-sm bg-slate-800 text-white border border-white/10 rounded-xl cursor-pointer hover:bg-slate-700 transition">
                                 <span id="selectedAC" class="font-medium text-white">
                                     {{ $firstAc ? 'AC ' . $firstAc->ac_number . ' ' . $firstAc->name : 'No AC' }}
                                 </span>
@@ -419,17 +496,17 @@
                                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                                     <button {{ $acs->count() >= 15 ? 'disabled' : '' }}
                                         onclick="{{ $acs->count() >= 15 ? '' : 'openModal()' }}"
-                                        class="bg-blue-600 text-white px-3 py-1.5 text-xs rounded-lg flex items-center
+                                        class="bg-blue-600 text-white px-3 py-1.5 text-xs rounded-lg flex items-center transition hover:bg-blue-700
                                         {{ $acs->count() >= 15 ? 'opacity-50 cursor-not-allowed' : '' }}">
                                         + Add AC
                                     </button>
 
-                                    <form id="deleteForm" method="POST" onsubmit="return confirm('Hapus AC ini?')"
+                                    <form id="deleteForm" method="POST" onsubmit="return confirmDelete(event)"
                                         action="{{ $firstAc ? '/ac/' . $firstAc->id : '' }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button {{ !$firstAc ? 'disabled' : '' }}
-                                            class="w-8 h-8 flex items-center justify-center rounded-full border border-red-400 text-red-500">
+                                        <button type="submit" {{ !$firstAc ? 'disabled' : '' }}
+                                            class="w-8 h-8 flex items-center justify-center rounded-full border border-red-400 text-red-500 hover:bg-red-500/10 transition">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
@@ -438,12 +515,11 @@
                         </div>
 
                         <!-- Dropdown -->
-                        <div id="dropdownAC"
-                            class="hidden absolute bg-[rgba(15,23,42,0.95)] border border-white/10 text-white rounded-xl shadow-lg">
+                        <div id="dropdownAC" class="absolute">
                             @foreach ($acs as $ac)
                                 <div data-id="{{ $ac->id }}"
                                     onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }} {{ $ac->name }}')"
-                                    class="px-4 py-3 hover:bg-blue-500/20 cursor-pointer">
+                                    class="px-4 py-3 hover:bg-blue-500/20 cursor-pointer transition whitespace-nowrap">
                                     AC {{ $ac->ac_number }} {{ $ac->name }}
                                 </div>
                             @endforeach
@@ -456,97 +532,83 @@
                     <div class="p-2 md:p-8 pt-2">
                         @foreach ($acs as $ac)
                             <div id="ac-{{ $ac->id }}" class="ac-panel {{ $loop->first ? '' : 'hidden' }}">
-                                <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[350px_1fr] gap-2">
+                                <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[350px_1fr] gap-4">
 
-                                    <!-- STATUS MOBILE ONLY -->
+                                    <!-- STATUS MOBILE ONLY (di atas) -->
                                     <div class="flex gap-2 mb-4 md:hidden">
-
-                                        <!-- POWER -->
                                         <div class="ac-card flex-1 text-center py-2">
                                             <p class="text-xs text-gray-400">POWER</p>
                                             <p class="text-sm font-semibold text-green-400">
                                                 {{ $ac->status?->power ?? 'OFF' }}
                                             </p>
                                         </div>
-
-                                        <!-- TEMP -->
                                         <div class="ac-card flex-1 text-center py-2">
                                             <p class="text-xs text-gray-400">TEMP</p>
                                             <p class="text-sm font-semibold text-yellow-300">
                                                 {{ $ac->status?->set_temperature ?? 24 }}°C
                                             </p>
                                         </div>
-
-                                        <!-- MODE -->
                                         <div class="ac-card flex-1 text-center py-2">
                                             <p class="text-xs text-gray-400">MODE</p>
                                             <p class="text-sm font-semibold text-blue-400">
                                                 {{ strtoupper($ac->status?->mode ?? 'cool') }}
                                             </p>
                                         </div>
-
                                     </div>
 
                                     <!-- LEFT: Power + Temp -->
                                     <div
                                         class="ac-card p-5 md:p-8 flex flex-col items-center justify-center text-center">
-
                                         <form action="/ac/{{ $ac->id }}/toggle" method="POST"
-                                            onsubmit="return handleSubmit({{ $ac->id }})">
+                                            class="power-form">
                                             @csrf
                                             <button type="submit"
-                                                class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center
+                                                class="power-btn w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center
                                                 {{ $ac->status && $ac->status?->power == 'ON'
-                                                    ? 'bg-green-500 shadow-green-300 ring-4 ring-green-200 animate-pulse'
-                                                    : 'bg-gray-300' }} text-white text-2xl shadow-lg hover:opacity-80 transition">
+                                                    ? 'bg-green-500 shadow-green-300 ring-4 ring-green-200'
+                                                    : 'bg-gray-500' }} text-white text-2xl shadow-lg hover:opacity-80 transition">
                                                 <i class="fa-solid fa-power-off"></i>
                                             </button>
                                         </form>
 
                                         <div class="mt-6">
-                                            <div class="text-3xl md:text-6xl font-bold text-blue-600">
-                                                {{ $ac->status?->set_temperature ?? 24 }}°C
+                                            <div class="text-3xl md:text-6xl font-bold text-blue-400">
+                                                <span
+                                                    class="temp-value">{{ $ac->status?->set_temperature ?? 24 }}</span>°C
                                             </div>
-                                            <p class="text-xs text-white tracking-widest">TEMPERATURE</p>
+                                            <p class="text-xs text-white tracking-widest mt-2">TEMPERATURE</p>
                                         </div>
 
                                         <div class="flex gap-3 md:gap-6 mt-6">
                                             <button
                                                 onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
-                                                class="w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600">
+                                                class="temp-btn w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600 transition">
                                                 −
                                             </button>
                                             <button
                                                 onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) + 1 }})"
-                                                class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:bg-blue-700">
+                                                class="temp-btn w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:bg-blue-700 transition">
                                                 +
                                             </button>
                                         </div>
-
                                     </div>
 
                                     <!-- RIGHT: Info + Mode + Timer -->
-                                    <div class="flex flex-col gap-5">
-
-                                        <!-- STATUS DESKTOP ONLY -->
-                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-                                            <!-- POWER -->
+                                    <div class="flex flex-col gap-4">
+                                        <!-- STATUS DESKTOP ONLY (sembunyikan di mobile) -->
+                                        <div class="desktop-status grid grid-cols-1 sm:grid-cols-3 gap-3">
                                             <div class="ac-card text-center py-3">
                                                 <p class="text-xs text-gray-400">POWER</p>
                                                 <p class="text-lg font-semibold text-green-400">
                                                     {{ $ac->status?->power ?? 'OFF' }}
                                                 </p>
                                             </div>
-
-                                            <!-- TEMP -->
                                             <div class="ac-card text-center py-3">
                                                 <p class="text-xs text-gray-400">SET TEMP</p>
                                                 <p class="text-lg font-semibold text-yellow-300">
                                                     {{ $ac->status?->set_temperature ?? 24 }}°C
                                                 </p>
                                             </div>
-
-                                            <!-- MODE -->
                                             <div class="ac-card text-center py-3">
                                                 <p class="text-xs text-gray-400">MODE</p>
                                                 <p class="text-lg font-semibold text-blue-400">
@@ -555,7 +617,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Mode -->
+                                        <!-- Mode Selection -->
                                         <div class="ac-card">
                                             <p class="text-gray-400 mb-4 text-sm">OPERATING MODE</p>
                                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -567,7 +629,7 @@
         'auto' => ['fa-rotate', 'Auto'],
     ] as $mode => [$icon, $label])
                                                     <a href="/ac/{{ $ac->id }}/mode/{{ $mode }}"
-                                                        class="mode-btn {{ strtoupper($ac->status?->mode ?? '') == strtoupper($mode) ? 'bg-blue-600 text-white shadow-lg' : '' }}">
+                                                        class="mode-btn {{ strtoupper($ac->status?->mode ?? 'cool') == strtoupper($mode) ? 'active' : '' }}">
                                                         <i class="fa-solid {{ $icon }}"></i>
                                                         {{ $label }}
                                                     </a>
@@ -575,7 +637,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Timer -->
+                                        <!-- Timer Schedule -->
                                         <div class="ac-card">
                                             <div class="flex justify-between items-center mb-4">
                                                 <div class="flex items-center gap-2 text-blue-400">
@@ -584,14 +646,10 @@
                                                 </div>
                                                 <button id="btnTimer-{{ $ac->id }}"
                                                     onclick="toggleTimer({{ $ac->id }})"
-                                                    class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
+                                                    class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium hover:bg-blue-200 transition">
                                                     Set Timer
                                                 </button>
                                             </div>
-
-                                            @if (session('success'))
-                                                <p class="text-green-500 text-sm mb-2">{{ session('success') }}</p>
-                                            @endif
 
                                             <!-- Timer View -->
                                             <div id="timerView-{{ $ac->id }}">
@@ -604,9 +662,9 @@
                                                         {{ $ac->timer_off ? \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') : '--:--' }}
                                                     </p>
                                                     @if ($ac->timer_on)
-                                                        <p class="text-green-500 text-xs mt-1">Timer ON aktif</p>
+                                                        <p class="text-green-500 text-xs mt-1">✓ Timer ON aktif</p>
                                                     @elseif ($ac->timer_off)
-                                                        <p class="text-yellow-500 text-xs mt-1">Timer OFF aktif</p>
+                                                        <p class="text-yellow-500 text-xs mt-1">⏰ Timer OFF aktif</p>
                                                     @endif
                                                 @else
                                                     <p class="text-white text-sm">No timer set</p>
@@ -614,11 +672,7 @@
                                             </div>
 
                                             <!-- Timer Edit Form -->
-                                            @if ($errors->any() && old('ac_id') == $ac->id)
-                                                <div class="text-red-500 text-sm mb-2">{{ $errors->first() }}</div>
-                                            @endif
-
-                                            <form id="timerEdit-{{ $ac->id }}" class="hidden"
+                                            <form id="timerEdit-{{ $ac->id }}" class="hidden timer-form"
                                                 action="/ac/{{ $ac->id }}/schedule" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="ac_id" value="{{ $ac->id }}">
@@ -637,158 +691,280 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex gap-3">
-                                                    <button
-                                                        onclick="this.disabled=true; this.innerText='Saving...'; this.form.submit();"
-                                                        class="flex-1 bg-blue-600 text-white py-3 rounded-full">
+                                                    <button type="submit"
+                                                        class="save-timer-btn flex-1 bg-blue-600 text-white py-3 rounded-full hover:bg-blue-700 transition">
                                                         ✓ Save
                                                     </button>
                                                     <button type="button" onclick="toggleTimer({{ $ac->id }})"
-                                                        class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-full">
+                                                        class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-full hover:bg-gray-300 transition">
                                                         Cancel
                                                     </button>
                                                 </div>
                                             </form>
-
                                         </div>
-                                        <!-- END Timer -->
-
                                     </div>
-                                    <!-- END RIGHT -->
-
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                    <!-- END AC PANELS -->
-
                 </div>
             </div>
-            <!-- END PAGE BODY -->
-
         </div>
-        <!-- ==================== END MAIN CONTENT ==================== -->
-
     </div>
-    <!-- ==================== END LAYOUT WRAPPER ==================== -->
 
-    <!-- ==================== MODAL ==================== -->
+    <!-- MODAL ADD AC -->
     @auth
         @if (in_array(Auth::user()->role, ['admin', 'operator']))
             <div id="modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-                <div class="bg-white p-8 rounded-2xl w-96 shadow-lg relative">
+                <div class="bg-white p-8 rounded-2xl w-96 shadow-lg relative animate-[fadeIn_0.3s_ease]">
                     <button onclick="closeModal()"
-                        class="absolute top-4 right-4 text-black text-2xl z-50 hover:text-red-500">✕</button>
+                        class="absolute top-4 right-4 text-gray-500 text-2xl hover:text-red-500 transition">✕</button>
                     <h2 class="text-xl font-bold mb-5">Add New AC</h2>
-                    <form method="POST" action="/rooms/{{ $room->id }}/ac">
+                    <form id="addACForm" method="POST" action="/rooms/{{ $room->id }}/ac">
                         @csrf
-                        <input type="number" name="ac_number" placeholder="AC Number"
-                            class="border p-3 w-full mb-3 rounded-lg">
-                        <input type="text" name="name" placeholder="AC Name"
-                            class="border p-3 w-full mb-3 rounded-lg">
-                        <input type="text" name="brand" placeholder="Brand"
-                            class="border p-3 w-full mb-4 rounded-lg">
-                        <button class="bg-blue-600 text-white w-full py-2 rounded-lg">Create AC</button>
+                        <input type="number" name="ac_number" placeholder="AC Number" required
+                            class="border p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                        <input type="text" name="name" placeholder="AC Name" required
+                            class="border p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                        <input type="text" name="brand" placeholder="Brand" required
+                            class="border p-3 w-full mb-4 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                        <button type="submit"
+                            class="bg-blue-600 text-white w-full py-2 rounded-lg hover:bg-blue-700 transition">
+                            Create AC
+                        </button>
                     </form>
                 </div>
             </div>
         @endif
     @endauth
-    <!-- ==================== END MODAL ==================== -->
 
-
-    <!-- ===== SCRIPTS — di luar semua div, sebelum </body> ===== -->
     <script>
-        // ---- Modal ----
+        // ==================== UTILITY FUNCTIONS ====================
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => existingToast.remove(), 300);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Show loading state on button
+        function showLoading(button) {
+            const originalText = button.textContent;
+            button.classList.add('btn-loading');
+            button.disabled = true;
+            button.setAttribute('data-original-text', originalText);
+            button.textContent = '';
+        }
+
+        function hideLoading(button) {
+            button.classList.remove('btn-loading');
+            button.disabled = false;
+            const originalText = button.getAttribute('data-original-text');
+            if (originalText) button.textContent = originalText;
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
         function openModal() {
-            if ({{ $acs->count() }} >= 15) {
-                showToast('Maksimal 15 AC sudah tercapai');
+            const acCount = {{ $acs->count() }};
+            if (acCount >= 15) {
+                showToast('Maksimal 15 AC sudah tercapai', 'error');
                 return;
             }
-            document.getElementById('modal').classList.remove('hidden');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            const form = document.querySelector('#modal form');
-            if (form) form.reset();
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                const form = document.querySelector('#modal form');
+                if (form) form.reset();
+            }
         }
 
-        // ---- Temperature ----
+        // Close modal when clicking outside
+        document.getElementById('modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ==================== TEMPERATURE CONTROL ====================
         function setTemp(id, temp) {
             if (temp < 16) temp = 16;
             if (temp > 30) temp = 30;
-            window.location = '/ac/' + id + '/temp/' + temp;
+
+            // Show loading state on temp buttons
+            const buttons = document.querySelectorAll(`#ac-${id} .temp-btn`);
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            });
+
+            window.location.href = '/ac/' + id + '/temp/' + temp;
         }
 
-        // ---- Timer ----
+        // ==================== TIMER FUNCTIONS ====================
         function toggleTimer(id) {
             const view = document.getElementById('timerView-' + id);
             const edit = document.getElementById('timerEdit-' + id);
             const btn = document.getElementById('btnTimer-' + id);
-            if (!view || !edit || !btn) return;
 
-            const isEdit = edit.classList.contains('hidden');
-            view.classList.toggle('hidden');
-            edit.classList.toggle('hidden');
-            isEdit ? btn.classList.add('hidden') : btn.classList.remove('hidden');
+            if (!view || !edit || !btn) {
+                console.error('Timer elements not found for ID:', id);
+                return;
+            }
+
+            const isEditHidden = edit.classList.contains('hidden');
+
+            if (isEditHidden) {
+                view.classList.add('hidden');
+                edit.classList.remove('hidden');
+                btn.textContent = 'Cancel';
+            } else {
+                view.classList.remove('hidden');
+                edit.classList.add('hidden');
+                btn.textContent = 'Set Timer';
+            }
         }
 
-        // ---- Dropdown ----
+        // Timer form validation
+        document.querySelectorAll('.timer-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const timerOn = this.querySelector('[name="timer_on"]').value;
+                const timerOff = this.querySelector('[name="timer_off"]').value;
+
+                if (timerOn === timerOff && timerOn !== '') {
+                    e.preventDefault();
+                    showToast('Timer ON and OFF cannot be the same time', 'error');
+                    return false;
+                }
+
+                const submitBtn = this.querySelector('.save-timer-btn');
+                if (submitBtn) {
+                    showLoading(submitBtn);
+                }
+            });
+        });
+
+        // ==================== DROPDOWN FUNCTIONS ====================
         function toggleDropdown() {
-            const el = document.getElementById('dropdownAC');
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                setTimeout(() => el.classList.add('show'), 10);
+            const dropdown = document.getElementById('dropdownAC');
+            if (!dropdown) return;
+
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
             } else {
-                el.classList.remove('show');
-                setTimeout(() => el.classList.add('hidden'), 200);
+                dropdown.classList.add('show');
             }
         }
 
         function selectAC(id, name) {
-            localStorage.setItem('selectedAC', id);
-            document.getElementById('selectedAC').innerText = name;
+            try {
+                localStorage.setItem('selectedAC', id);
+                const selectedSpan = document.getElementById('selectedAC');
+                if (selectedSpan) selectedSpan.innerText = name;
 
-            document.querySelectorAll('.ac-panel').forEach(el => el.classList.add('hidden'));
+                // Hide all panels
+                document.querySelectorAll('.ac-panel').forEach(el => {
+                    el.classList.add('hidden');
+                });
 
-            const target = document.getElementById('ac-' + id);
-            if (target) target.classList.remove('hidden');
+                // Show selected panel
+                const target = document.getElementById('ac-' + id);
+                if (target) {
+                    target.classList.remove('hidden');
+                } else {
+                    console.error('AC panel not found:', id);
+                    showToast('Error loading AC data', 'error');
+                }
 
-            const deleteForm = document.getElementById('deleteForm');
-            if (deleteForm) deleteForm.action = '/ac/' + id;
+                // Update delete form action
+                const deleteForm = document.getElementById('deleteForm');
+                if (deleteForm) {
+                    deleteForm.action = '/ac/' + id;
+                }
 
-            const dropdown = document.getElementById('dropdownAC');
-            dropdown.classList.remove('show');
-            setTimeout(() => dropdown.classList.add('hidden'), 200);
+                // Close dropdown
+                const dropdown = document.getElementById('dropdownAC');
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Error in selectAC:', error);
+                showToast('An error occurred', 'error');
+            }
         }
 
+        // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('dropdownAC');
             const trigger = document.querySelector('#selectedAC')?.parentElement;
-            if (!dropdown.contains(e.target) && !trigger?.contains(e.target)) {
-                dropdown.classList.remove('show');
-                dropdown.classList.add('hidden');
+
+            if (dropdown && trigger) {
+                if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
             }
         });
 
-        // ---- Toast ----
-        function showToast(msg) {
-            document.getElementById('toast-limit')?.remove();
-            document.body.insertAdjacentHTML('beforeend', `
-                <div id="toast-limit"
-                    class="fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-[fadeIn_0.3s_ease]">
-                    ${msg}
-                </div>
-            `);
-            setTimeout(() => document.getElementById('toast-limit')?.remove(), 2500);
+        // ==================== DELETE CONFIRMATION ====================
+        function confirmDelete(event) {
+            event.preventDefault();
+
+            if (confirm('Apakah Anda yakin ingin menghapus AC ini? Tindakan ini tidak dapat dibatalkan.')) {
+                const form = event.target;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    showLoading(submitBtn);
+                }
+                form.submit();
+            }
+            return false;
         }
 
-        function handleSubmit(id) {
-            return true;
-        }
+        // ==================== POWER BUTTON HANDLER ====================
+        document.querySelectorAll('.power-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const btn = this.querySelector('.power-btn');
+                if (btn) {
+                    showLoading(btn);
+                }
+            });
+        });
 
-        // ---- Init ----
+        // ==================== MODE BUTTON HANDLER ====================
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!this.hasAttribute('href')) return;
+
+                // Show loading on clicked mode button
+                const originalHtml = this.innerHTML;
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+                this.style.opacity = '0.7';
+                this.style.pointerEvents = 'none';
+            });
+        });
+
+        // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle session new AC
             @if (session('new_ac_id'))
                 const id = "{{ session('new_ac_id') }}";
                 localStorage.setItem('selectedAC', id);
@@ -796,7 +972,13 @@
                 const name = el ? el.innerText.trim() :
                     "{{ $firstAc ? 'AC ' . $firstAc->ac_number . ' ' . $firstAc->name : 'No AC' }}";
                 selectAC(id, name);
+
+                // Show success toast
+                @if (session('success'))
+                    showToast("{{ session('success') }}", 'success');
+                @endif
             @else
+                // Load saved AC selection
                 const saved = localStorage.getItem('selectedAC');
                 if (saved && document.getElementById('ac-' + saved)) {
                     const el = document.querySelector(`#dropdownAC div[data-id="${saved}"]`);
@@ -810,21 +992,55 @@
                     @endif
                 }
             @endif
-        });
-    </script>
 
-    <script>
+            // Show any session messages
+            @if (session('success') && !session('new_ac_id'))
+                showToast("{{ session('success') }}", 'success');
+            @endif
+
+            @if (session('error'))
+                showToast("{{ session('error') }}", 'error');
+            @endif
+
+            @if ($errors->any())
+                showToast("{{ $errors->first() }}", 'error');
+            @endif
+        });
+
+        // ==================== MOBILE SIDEBAR ====================
+        // Toggle sidebar on mobile (you can add a hamburger button)
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            }
+        }
+
+        // Close sidebar when clicking overlay
+        document.getElementById('overlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                this.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Menu link handler for mobile
         document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', function(e) {
-
                 if (window.innerWidth <= 1024) {
                     e.preventDefault();
-
                     const sidebar = document.getElementById('sidebar');
                     const overlay = document.getElementById('overlay');
 
-                    sidebar.classList.remove('open');
-                    overlay.classList.add('hidden');
+                    if (sidebar) sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                    document.body.style.overflow = '';
 
                     setTimeout(() => {
                         window.location.href = this.href;
@@ -833,6 +1049,7 @@
             });
         });
 
+        // Go back function
         function goBack() {
             if (window.innerWidth <= 1024) {
                 if (window.history.length > 1) {
@@ -842,8 +1059,23 @@
                 }
             }
         }
-    </script>
 
+        // Add keyboard shortcut for Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                const dropdown = document.getElementById('dropdownAC');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+
+        // Prevent accidental form resubmission
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 </body>
 
 </html>

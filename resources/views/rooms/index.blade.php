@@ -157,6 +157,55 @@
             transform: none !important;
         }
 
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: #22c55e;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.info {
+            background: #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (min-width: 768px) {
             .room-card {
@@ -229,7 +278,7 @@
                             class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('rooms*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Control Ac</span>
+                            <span class="menu-text">Manage Rooms & Ac Unit</span>
                         </a>
                     </li>
                 @endif
@@ -257,7 +306,7 @@
             <!-- Profile -->
             <div class="absolute bottom-6 left-6 right-6">
                 <div class="profile-full">
-                    <button class="w-full flex items-center gap-3 px-3 py-2">
+                    <div class="w-full flex items-center gap-3 px-3 py-2">
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -266,15 +315,22 @@
                             <p class="text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
                         </div>
-                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </a>
-                    </button>
+                        <!-- PERBAIKAN 1: Form logout dengan POST -->
+                        <form action="/logout" method="POST" class="ml-auto">
+                            @csrf
+                            <button type="submit" class="text-red-500 hover:text-red-600 text-lg">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="profile-collapse hidden text-center">
-                    <a href="/logout" class="text-red-500 text-xl">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
+                    <form action="/logout" method="POST">
+                        @csrf
+                        <button class="text-red-500 text-xl">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -339,7 +395,7 @@
                     <div
                         class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
 
-                        @foreach ($rooms as $room)
+                        @forelse ($rooms as $room)
                             @php $status = $room->device_status ?? 'offline'; @endphp
 
                             <div
@@ -405,17 +461,18 @@
                                 <!-- Actions -->
                                 <div class="flex flex-col gap-2 mt-auto pt-3">
                                     <a href="/rooms/{{ $room->id }}/ac"
-                                        class="text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+                                        class="text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition">
                                         Control Ac Units
                                     </a>
 
                                     @auth
                                         @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                            <form action="/rooms/{{ $room->id }}" method="POST">
+                                            <form action="/rooms/{{ $room->id }}" method="POST"
+                                                onsubmit="return confirmDelete(event)">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button onclick="return confirm('Delete this room?')"
-                                                    class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
+                                                <button type="submit"
+                                                    class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition">
                                                     Delete Room
                                                 </button>
                                             </form>
@@ -424,7 +481,12 @@
                                 </div>
 
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="col-span-full text-center text-white py-8">
+                                <i class="fa-solid fa-folder-open text-4xl mb-2 opacity-50"></i>
+                                <p>No rooms found</p>
+                            </div>
+                        @endforelse
 
                     </div>
                 </div>
@@ -452,13 +514,15 @@
 
                     <h2 class="text-xl font-bold mb-5">Add New Room</h2>
 
-                    <form method="POST" action="/rooms">
+                    <form id="addRoomForm" method="POST" action="/rooms">
                         @csrf
                         <input type="text" name="name" placeholder="Room Name"
-                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg" required>
+                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            required>
                         <input type="text" name="device_id" placeholder="ESP ID (contoh: esp32_01)"
-                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-4 rounded-lg" required>
-                        <button
+                            class="bg-white/10 border border-white/20 text-white p-3 w-full mb-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            required>
+                        <button type="submit"
                             class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition">
                             Create Room
                         </button>
@@ -471,9 +535,28 @@
     <!-- ==================== END MODAL ==================== -->
 
 
-    <!-- ===== SCRIPTS — di luar semua div, sebelum </body> ===== -->
+    <!-- ===== SCRIPTS ===== -->
     <script>
-        // ---- Sidebar Toggle ----
+        // ==================== TOAST NOTIFICATION ====================
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => existingToast.remove(), 300);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== SIDEBAR TOGGLE ====================
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -486,58 +569,173 @@
             }
         }
 
-        document.getElementById('overlay').onclick = function() {
-            document.getElementById('sidebar').classList.remove('open');
-            this.classList.add('hidden');
-        };
-
-        document.querySelectorAll('#sidebar a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('overlay').classList.add('hidden');
-            });
+        // Close sidebar when clicking overlay
+        document.getElementById('overlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && window.innerWidth <= 1024) {
+                sidebar.classList.remove('open');
+                this.classList.add('hidden');
+            }
         });
 
-        // ---- Modal ----
+        // ==================== MODAL FUNCTIONS ====================
         function openModal() {
-            document.getElementById('modal').classList.remove('hidden');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                // PERBAIKAN 4: Reset form saat close
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
         }
 
-        // ---- Temperature Auto-Refresh ----
-        setInterval(() => {
-            fetch('/temperature')
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(room => {
-                        const el = document.getElementById(`temp-${room.id}`);
-                        if (el) el.innerText = room.temp + ' °C';
-                    });
-                });
-        }, 5000);
-    </script>
+        // Close modal when clicking outside
+        document.getElementById('modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
 
-    <script>
+        // Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ==================== DELETE CONFIRMATION ====================
+        function confirmDelete(event) {
+            event.preventDefault();
+            if (confirm(
+                    'Apakah Anda yakin ingin menghapus room ini? Semua AC unit di dalamnya juga akan terhapus. Tindakan ini tidak dapat dibatalkan.'
+                )) {
+                event.target.submit();
+            }
+            return false;
+        }
+
+        // ==================== TEMPERATURE AUTO-REFRESH ====================
+        let tempRefreshInterval = null;
+
+        function startTemperatureRefresh() {
+            if (tempRefreshInterval) clearInterval(tempRefreshInterval);
+
+            tempRefreshInterval = setInterval(() => {
+                fetch('/temperature', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Network response was not ok');
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data && Array.isArray(data)) {
+                            data.forEach(room => {
+                                const el = document.getElementById(`temp-${room.id}`);
+                                if (el && room.temp !== undefined && room.temp !== null) {
+                                    const tempValue = typeof room.temp === 'number' ? room.temp :
+                                        parseFloat(room.temp);
+                                    if (!isNaN(tempValue)) {
+                                        el.innerText = tempValue + ' °C';
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to fetch temperature:', err);
+                        // Don't show toast to avoid spam
+                    });
+            }, 5000);
+        }
+
+        // ==================== IDLE TIMEOUT (Security) ====================
+        const role = "{{ Auth::check() ? Auth::user()->role : '' }}";
+        const idleTime = role === 'admin' ? 10 * 60 * 1000 :
+            role === 'operator' ? 5 * 60 * 1000 :
+            2 * 60 * 1000;
+
+        let idleTimeout;
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimeout);
+            idleTimeout = setTimeout(() => {
+                // Create form for logout via POST
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/logout';
+                form.style.display = 'none';
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+                form.appendChild(csrf);
+
+                document.body.appendChild(form);
+                form.submit();
+            }, idleTime);
+        }
+
+        // ==================== MENU LINK HANDLER ====================
         document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', function(e) {
-
                 if (window.innerWidth <= 1024) {
                     e.preventDefault();
-
                     const sidebar = document.getElementById('sidebar');
                     const overlay = document.getElementById('overlay');
 
-                    sidebar.classList.remove('open');
-                    overlay.classList.add('hidden');
+                    if (sidebar) sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.add('hidden');
 
                     setTimeout(() => {
                         window.location.href = this.href;
                     }, 250);
                 }
             });
+        });
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            startTemperatureRefresh();
+            resetIdleTimer();
+
+            // Show session messages
+            @if (session('success'))
+                showToast("{{ session('success') }}", 'success');
+            @endif
+
+            @if (session('error'))
+                showToast("{{ session('error') }}", 'error');
+            @endif
+
+            @if ($errors->any())
+                showToast("{{ $errors->first() }}", 'error');
+            @endif
+        });
+
+        // Event listeners for idle timer
+        const events = ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'];
+        events.forEach(event => {
+            document.addEventListener(event, resetIdleTimer);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) resetIdleTimer();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (tempRefreshInterval) clearInterval(tempRefreshInterval);
+            if (idleTimeout) clearTimeout(idleTimeout);
         });
     </script>
 

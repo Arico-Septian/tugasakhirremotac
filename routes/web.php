@@ -39,7 +39,7 @@ Route::get('/register', function () {
 });
 
 // logout
-Route::get('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 // Setting room manual
 Route::get('/set-room/{room}', function ($room) {
@@ -72,37 +72,6 @@ Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
     $mqtt->publish($topic, $payload);
 
     return "AC added";
-});
-
-Route::get('/set-room/{room}', function ($room) {
-
-    $mqtt = new MqttService();;
-
-    $topic = "device/esp32_01/config";
-
-    $payload = json_encode([
-        "room" => $room
-    ]);
-
-    $mqtt->publish($topic, $payload);
-
-    return "Room berhasil diset";
-});
-
-Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
-
-    $mqtt = new MqttService();;
-
-    $topic = "room/$room/ac/add";
-
-    $payload = json_encode([
-        "id" => $id,
-        "brand" => $brand
-    ]);
-
-    $mqtt->publish($topic, $payload);
-
-    return "AC berhasil ditambahkan";
 });
 
 Route::get('/remove-ac/{room}/{id}', function ($room, $id) {
@@ -221,7 +190,6 @@ Route::delete('/ac/{id}', [AcUnitController::class, 'destroy']);
 
 Route::get('/rooms/{id}/status', [RoomController::class, 'status']);
 
-Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
@@ -231,7 +199,7 @@ Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile']);
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware(['role:admin,operator'])->group(function () {
         Route::resource('/rooms', RoomController::class);
@@ -290,7 +258,6 @@ Route::get('/device-status', function () {
             'is_online' => $isOnline
         ];
     });
-
 });
 
 Route::post('/update-activity', function () {
@@ -345,5 +312,4 @@ Route::post('/update-activity', function () {
         $user->last_activity = now();
         $user->save();
     }
-
 });

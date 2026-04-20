@@ -241,7 +241,7 @@
                             class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('rooms*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Control Ac</span>
+                            <span class="menu-text">Manage Rooms & Ac Unit</span>
                         </a>
                     </li>
                 @endif
@@ -269,7 +269,7 @@
             <!-- Profile -->
             <div class="absolute bottom-6 left-6 right-6">
                 <div class="profile-full">
-                    <button class="w-full flex items-center gap-3 px-3 py-2">
+                    <div class="w-full flex items-center gap-3 px-3 py-2">
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -278,15 +278,22 @@
                             <p class="text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
                         </div>
-                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </a>
-                    </button>
+                        <!-- PERBAIKAN: Form logout dengan POST -->
+                        <form action="/logout" method="POST" class="ml-auto">
+                            @csrf
+                            <button type="submit" class="text-red-500 hover:text-red-600 text-lg">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="profile-collapse hidden text-center">
-                    <a href="/logout" class="text-red-500 text-xl">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
+                    <form action="/logout" method="POST">
+                        @csrf
+                        <button class="text-red-500 text-xl">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -469,9 +476,6 @@
     </div>
     <!-- ==================== END LAYOUT WRAPPER ==================== -->
 
-
-    <!-- ===== SCRIPTS — di luar semua div, sebelum </body> ===== -->
-
     <script>
         // ---- Chart ----
         const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
@@ -576,21 +580,28 @@
             });
         }
 
-        // ---- Temperature Auto-Refresh ----
+        // PERBAIKAN: Temperature Auto-Refresh dengan pengecekan chart
         setInterval(() => {
+            if (!tempChart) return;
+
             fetch('/temperature')
                 .then(res => res.json())
                 .then(data => {
-                    const safeData = data.map(t => t || 0);
+                    if (!tempChart) return;
+
+                    const safeData = data.map(t => {
+                        const temp = parseFloat(t);
+                        return isNaN(temp) ? 0 : temp;
+                    });
+
                     tempChart.data.datasets[0].data = safeData;
                     tempChart.data.datasets[1].data = safeData;
                     tempChart.data.datasets[0].backgroundColor = safeData.map(t =>
                         t > 30 ? '#ef4444' : t > 25 ? '#facc15' : '#3b82f6'
                     );
-                    tempChart.options.scales.y.min = Math.min(...safeData) - 2;
-                    tempChart.options.scales.y.max = Math.max(...safeData) + 5;
                     tempChart.update();
-                });
+                })
+                .catch(err => console.error('Error fetching temperature:', err));
         }, 5000);
     </script>
 
@@ -613,7 +624,7 @@
             this.classList.add('hidden');
         };
 
-        // ---- Idle Timeout ----
+        // PERBAIKAN: Idle Timeout dengan POST request
         const role = "{{ Auth::check() ? Auth::user()->role : '' }}";
 
         const idleTime = role === 'admin' ? 10 * 60 * 1000 :
@@ -625,7 +636,20 @@
         function resetTimer() {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                window.location.href = '/logout';
+                // Buat form untuk logout via POST
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/logout';
+                form.style.display = 'none';
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+                form.appendChild(csrf);
+
+                document.body.appendChild(form);
+                form.submit();
             }, idleTime);
         }
 

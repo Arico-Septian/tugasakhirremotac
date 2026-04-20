@@ -92,7 +92,7 @@
             width: calc(100% - 80px);
         }
 
-        /* ===== HEADER — diam di atas ===== */
+        /* ===== HEADER ===== */
         .main-header {
             position: sticky;
             top: 0;
@@ -110,7 +110,7 @@
             z-index: 30;
         }
 
-        /* ===== PAGE BODY — area yang scroll ===== */
+        /* ===== PAGE BODY ===== */
         .page-body {
             flex: 1;
             overflow-y: auto;
@@ -147,7 +147,56 @@
             backdrop-filter: blur(2px);
         }
 
-        /* ===== MOBILE ===== */
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: #22c55e;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.info {
+            background: #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-content {
                 margin-left: 0 !important;
@@ -187,7 +236,6 @@
             word-break: break-word;
         }
 
-        /* ===== REMOVE TAP ZOOM ===== */
         button:active,
         a:active {
             transform: none !important;
@@ -212,14 +260,17 @@
                     <i class="fa-solid fa-layer-group"></i>
                     <span class="menu-text">AC System</span>
                 </h2>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-300">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
 
             <!-- Menu -->
             <ul class="space-y-4">
                 <li>
-                    <a href="/dashboard"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                        {{ request()->is('dashboard') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
+                    <a href="{{ route('dashboard') }}"
+                        class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
+                        {{ request()->routeIs('dashboard*') || (Auth::user()->role == 'user' && request()->is('rooms*')) ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -228,10 +279,10 @@
                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                     <li>
                         <a href="/rooms"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('rooms*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Control Ac</span>
+                            <span class="menu-text">Manage Rooms & Ac Unit</span>
                         </a>
                     </li>
                 @endif
@@ -239,7 +290,7 @@
                 @if (Auth::user()->role == 'admin')
                     <li>
                         <a href="/users"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('users*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-users"></i>
                             <span class="menu-text">User Management</span>
@@ -247,7 +298,7 @@
                     </li>
                     <li>
                         <a href="/logs"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
                             {{ request()->is('logs*') ? 'bg-white/10 text-white font-semibold' : 'hover:bg-white/10 text-gray-300' }}">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             <span class="menu-text">Activity Log</span>
@@ -259,7 +310,7 @@
             <!-- Profile -->
             <div class="absolute bottom-6 left-6 right-6">
                 <div class="profile-full">
-                    <button class="w-full flex items-center gap-3 px-3 py-2">
+                    <div class="w-full flex items-center gap-3 px-3 py-2">
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -268,15 +319,22 @@
                             <p class="text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
                         </div>
-                        <a href="/logout" class="ml-auto text-red-500 hover:text-red-600 text-lg">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </a>
-                    </button>
+                        <!-- PERBAIKAN 1: Form logout dengan POST -->
+                        <form action="/logout" method="POST" class="ml-auto">
+                            @csrf
+                            <button type="submit" class="text-red-500 hover:text-red-600 text-lg">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="profile-collapse hidden text-center">
-                    <a href="/logout" class="text-red-500 text-xl">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
+                    <form action="/logout" method="POST">
+                        @csrf
+                        <button class="text-red-500 text-xl">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -286,7 +344,7 @@
         <!-- ==================== MAIN CONTENT ==================== -->
         <div class="main-content">
 
-            <!-- HEADER — tidak ikut scroll -->
+            <!-- HEADER -->
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="goBack()"
@@ -295,100 +353,102 @@
                     </button>
                     <div>
                         <h1 class="text-base md:text-xl font-bold text-white leading-tight">
-                            {{ ucwords($room->name) }} Room Units
+                            Room {{ ucwords($room->name) }}
                         </h1>
-
                         <p class="text-sm text-blue-200 font-medium">
-                            Status Room System
+                            Status Ac System
                         </p>
                     </div>
                 </div>
             </header>
             <!-- END HEADER -->
 
-            <!-- PAGE BODY — hanya bagian ini yang scroll -->
+            <!-- PAGE BODY -->
             <div class="page-body">
                 <div class="px-4 py-4 md:px-6 md:py-6">
                     <div class="max-w-7xl mx-auto">
 
                         <!-- AC GRID -->
-                        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 md:gap-4">
-                            @foreach ($acs as $ac)
-                                <div class="ac-card">
+                        @if ($acs->count() > 0)
+                            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 md:gap-4">
+                                @foreach ($acs as $ac)
+                                    <div class="ac-card">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h2 class="text-lg font-semibold">AC {{ $ac->ac_number }}</h2>
+                                            <i class="fa-solid fa-snowflake text-blue-500"></i>
+                                        </div>
 
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h2 class="text-lg font-semibold">AC {{ $ac->ac_number }}</h2>
-                                        <i class="fa-solid fa-snowflake text-blue-500"></i>
-                                    </div>
+                                        <p class="text-gray-300 text-sm mb-4">Brand : {{ $ac->brand }}</p>
 
-                                    <p class="text-gray-300 text-sm mb-4">Brand : {{ $ac->brand }}</p>
+                                        <!-- Power -->
+                                        <div
+                                            class="bg-green-500/20 text-green-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-power-off"></i> Power
+                                            </span>
+                                            <span id="power-{{ $ac->id }}"
+                                                class="font-semibold transition-all duration-300">
+                                                {{ $ac->status?->power ?? 'OFF' }}
+                                            </span>
+                                        </div>
 
-                                    <!-- Power -->
-                                    <div
-                                        class="bg-green-500/20 text-green-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
-                                        <span class="flex items-center gap-2">
-                                            <i class="fa-solid fa-power-off"></i> Power
-                                        </span>
-                                        <span id="power-{{ $ac->id }}" class="font-semibold">
-                                            {{ $ac->status?->power ?? 'OFF' }}
-                                        </span>
-                                    </div>
+                                        <!-- Temperature -->
+                                        <div
+                                            class="bg-blue-500/20 text-blue-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-temperature-half"></i> Temperature
+                                            </span>
+                                            <span id="temp-{{ $ac->id }}"
+                                                class="font-semibold transition-all duration-300">
+                                                {{ $ac->status?->set_temperature ?? 24 }}°C
+                                            </span>
+                                        </div>
 
-                                    <!-- Temperature -->
-                                    <div
-                                        class="bg-blue-500/20 text-blue-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
-                                        <span class="flex items-center gap-2">
-                                            <i class="fa-solid fa-temperature-half"></i> Temperature
-                                        </span>
-                                        <span id="temp-{{ $ac->id }}" class="font-semibold">
-                                            {{ $ac->status?->set_temperature ?? 24 }}°C
-                                        </span>
-                                    </div>
+                                        <!-- Mode -->
+                                        <div
+                                            class="bg-purple-500/20 text-purple-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-fan"></i> Mode
+                                            </span>
+                                            <span id="mode-{{ $ac->id }}"
+                                                class="font-semibold transition-all duration-300">
+                                                {{ strtoupper($ac->status?->mode ?? 'AUTO') }}
+                                            </span>
+                                        </div>
 
-                                    <!-- Mode -->
-                                    <div
-                                        class="bg-purple-500/20 text-purple-400 p-3 rounded-lg mb-3 flex justify-between text-sm">
-                                        <span class="flex items-center gap-2">
-                                            <i class="fa-solid fa-fan"></i> Mode
-                                        </span>
-                                        <span id="mode-{{ $ac->id }}" class="font-semibold">
-                                            {{ $ac->status?->mode ?? 'AUTO' }}
-                                        </span>
-                                    </div>
-
-                                    <!-- Timer -->
-                                    <div
-                                        class="bg-yellow-500/20 text-yellow-300 p-3 rounded-lg flex justify-between text-sm">
-                                        <span class="flex items-center gap-2">
-                                            <i class="fa-solid fa-clock"></i> Timer
-                                        </span>
-                                        <span id="timer-{{ $ac->id }}"
-                                            class="font-medium text-sm leading-tight text-right">
-
-                                            @if ($ac->timer_on)
-                                                <div>
-                                                    ON
-                                                    {{ \Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i') }}
-                                                </div>
-                                            @endif
-
-                                            @if ($ac->timer_off)
-                                                <div>
+                                        <!-- Timer -->
+                                        <div
+                                            class="bg-yellow-500/20 text-yellow-300 p-3 rounded-lg flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-clock"></i> Timer
+                                            </span>
+                                            <span id="timer-{{ $ac->id }}"
+                                                class="font-medium text-sm leading-tight text-right">
+                                                @if ($ac->timer_on)
+                                                    <div>ON
+                                                        {{ \Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i') }}
+                                                    </div>
+                                                @endif
+                                                @if ($ac->timer_off)
+                                                    <div>OFF
+                                                        {{ \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') }}
+                                                    </div>
+                                                @endif
+                                                @if (!$ac->timer_on && !$ac->timer_off)
                                                     OFF
-                                                    {{ \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') }}
-                                                </div>
-                                            @endif
-
-                                            @if (!$ac->timer_on && !$ac->timer_off)
-                                                OFF
-                                            @endif
-
-                                        </span>
+                                                @endif
+                                            </span>
+                                        </div>
                                     </div>
-
-                                </div>
-                            @endforeach
-                        </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center text-white py-12">
+                                <i class="fa-solid fa-snowflake text-6xl mb-4 opacity-30"></i>
+                                <p class="text-lg">No AC units found in this room</p>
+                                <p class="text-sm text-gray-400 mt-2">Please add AC units first</p>
+                            </div>
+                        @endif
                         <!-- END AC GRID -->
 
                     </div>
@@ -402,92 +462,249 @@
     </div>
     <!-- ==================== END LAYOUT WRAPPER ==================== -->
 
-
-    <!-- ===== SCRIPTS — di luar semua div, sebelum </body> ===== -->
     <script>
-        // ----Toggle Back ----
+        // ==================== TOAST NOTIFICATION ====================
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => existingToast.remove(), 300);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== SIDEBAR TOGGLE ====================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('hidden');
+            } else {
+                sidebar.classList.toggle('close');
+            }
+        }
+
+        // Close sidebar when clicking overlay
+        document.getElementById('overlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && window.innerWidth <= 1024) {
+                sidebar.classList.remove('open');
+                this.classList.add('hidden');
+            }
+        });
+
+        // ==================== GO BACK ====================
         function goBack() {
             if (window.innerWidth <= 1024) {
-
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
                     window.location.href = '/dashboard';
                 }
-
             }
         }
 
-        // ---- AC Status Live Update ----
-        function loadStatus() {
-            fetch('/api/ac-status')
-                .then(res => res.json())
-                .then(data => {
-                    if (!Array.isArray(data)) return;
+        // ==================== AC STATUS LIVE UPDATE ====================
+        let retryCount = 0;
+        const maxRetries = 3;
 
-                    data.forEach(ac => {
-                        if (!ac.acUnit) return;
-                        const id = ac.acUnit.id;
-
-                        updateElement('power-' + id, ac.power ?? 'OFF');
-                        updateElement('temp-' + id, (ac.set_temperature ?? 24) + '°C');
-                        updateElement('mode-' + id, (ac.mode ?? 'AUTO').toUpperCase());
-
-                        const timerEl = document.getElementById('timer-' + id);
-                        if (timerEl) {
-                            const onTime = ac.acUnit?.timer_on;
-                            const offTime = ac.acUnit?.timer_off;
-                            let textParts = [];
-
-                            if (onTime && onTime !== '0000-00-00 00:00:00') {
-                                const t = formatTime(onTime);
-                                if (t !== '--:--') textParts.push('ON ' + t);
-                            }
-
-                            if (offTime && offTime !== '0000-00-00 00:00:00') {
-                                const t = formatTime(offTime);
-                                if (t !== '--:--') textParts.push('OFF ' + t);
-                            }
-
-                            const finalText = textParts.length > 0 ? textParts.join(' | ') : 'OFF';
-                            updateElement('timer-' + id, finalText);
-                        }
-                    });
-                })
-                .catch(err => console.error("Update failed:", err));
+        function formatTime(t) {
+            if (!t || t === '0000-00-00 00:00:00') return '';
+            try {
+                const date = new Date(t.replace(/-/g, '/'));
+                if (isNaN(date.getTime())) return '';
+                return date.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (e) {
+                return '';
+            }
         }
 
         function updateElement(id, newValue) {
             const el = document.getElementById(id);
             if (el && el.innerText.trim() !== newValue.toString().trim()) {
-
+                // Add highlight effect
                 el.style.color = '#60a5fa';
-                el.style.transform = 'scale(1.1)';
+                el.style.transform = 'scale(1.05)';
+                el.style.display = 'inline-block';
 
                 el.innerText = newValue;
 
                 setTimeout(() => {
                     el.style.color = '';
-                    el.style.transform = 'scale(1)';
-                }, 1000);
+                    el.style.transform = '';
+                    el.style.display = '';
+                }, 500);
             }
         }
 
-        function formatTime(t) {
-            if (!t) return '';
+        let refreshInterval = null;
 
-            const date = new Date(t.replace(/-/g, '/'));
-            if (isNaN(date)) return '--:--';
-            return date.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
+        function loadStatus() {
+            // PERBAIKAN 3: Gunakan endpoint yang benar
+            fetch('/api/ac-status', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    retryCount = 0; // Reset retry counter on success
+
+                    if (!Array.isArray(data)) return;
+
+                    data.forEach(item => {
+                        const ac = item.acUnit || item;
+                        if (!ac || !ac.id) return;
+
+                        const id = ac.id;
+
+                        // Update power
+                        const power = item.power || ac.power || 'OFF';
+                        updateElement('power-' + id, power);
+
+                        // Update temperature
+                        const temp = item.set_temperature || ac.set_temperature || 24;
+                        updateElement('temp-' + id, temp + '°C');
+
+                        // Update mode
+                        const mode = (item.mode || ac.mode || 'AUTO').toUpperCase();
+                        updateElement('mode-' + id, mode);
+
+                        // Update timer
+                        const timerEl = document.getElementById('timer-' + id);
+                        if (timerEl) {
+                            const onTime = ac.timer_on || item.timer_on;
+                            const offTime = ac.timer_off || item.timer_off;
+                            let textParts = [];
+
+                            const onFormatted = formatTime(onTime);
+                            if (onFormatted) textParts.push('ON ' + onFormatted);
+
+                            const offFormatted = formatTime(offTime);
+                            if (offFormatted) textParts.push('OFF ' + offFormatted);
+
+                            const finalText = textParts.length > 0 ? textParts.join(' | ') : 'OFF';
+
+                            if (timerEl.innerText.trim() !== finalText) {
+                                timerEl.style.color = '#fbbf24';
+                                timerEl.style.transform = 'scale(1.05)';
+                                timerEl.innerText = finalText;
+                                setTimeout(() => {
+                                    timerEl.style.color = '';
+                                    timerEl.style.transform = '';
+                                }, 500);
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error("Update failed:", err);
+                    retryCount++;
+
+                    if (retryCount >= maxRetries) {
+                        if (refreshInterval) {
+                            clearInterval(refreshInterval);
+                            refreshInterval = null;
+                            showToast('Lost connection to server. Please refresh the page.', 'error');
+                        }
+                    }
+                });
         }
 
+        // ==================== IDLE TIMEOUT (Security) ====================
+        const role = "{{ Auth::check() ? Auth::user()->role : '' }}";
+        const idleTime = role === 'admin' ? 10 * 60 * 1000 :
+            role === 'operator' ? 5 * 60 * 1000 :
+            2 * 60 * 1000;
+
+        let idleTimeout;
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimeout);
+            idleTimeout = setTimeout(() => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/logout';
+                form.style.display = 'none';
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+                form.appendChild(csrf);
+
+                document.body.appendChild(form);
+                form.submit();
+            }, idleTime);
+        }
+
+        // ==================== MENU LINK HANDLER ====================
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.innerWidth <= 1024) {
+                    e.preventDefault();
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('overlay');
+
+                    if (sidebar) sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.add('hidden');
+
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 250);
+                }
+            });
+        });
+
+        // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
             loadStatus();
-            setInterval(loadStatus, 5000);
+            refreshInterval = setInterval(loadStatus, 5000);
+            resetIdleTimer();
+
+            // Show session messages
+            @if (session('success'))
+                showToast("{{ session('success') }}", 'success');
+            @endif
+
+            @if (session('error'))
+                showToast("{{ session('error') }}", 'error');
+            @endif
+        });
+
+        // Event listeners for idle timer
+        const events = ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'];
+        events.forEach(event => {
+            document.addEventListener(event, resetIdleTimer);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) resetIdleTimer();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (idleTimeout) clearTimeout(idleTimeout);
         });
     </script>
 </body>
