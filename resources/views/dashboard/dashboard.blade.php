@@ -8,6 +8,8 @@
 
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script src="/js/chart.umd.js"></script>
 
     <style>
@@ -20,7 +22,7 @@
         body {
             height: 100%;
             overflow: hidden;
-            font-family: ui-sans-serif, system-ui;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -432,7 +434,7 @@
                                 <div
                                     class="p-2.5 md:p-3 rounded mb-3 text-sm flex justify-between
                                     {{ $temp > 30 ? 'bg-red-500/20 text-red-300' : ($temp > 25 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-blue-500/20 text-blue-300') }}">
-                                    <span>Temp Ruangan</span>
+                                    <span>Room Temperature</span>
                                     <span id="temp-{{ $room->id }}" class="font-semibold">
                                         {{ $temp ?? '--' }} °C
                                     </span>
@@ -495,12 +497,14 @@
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((bar, index) => {
                         const value = dataset.data[index];
-                        ctx.save();
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = isMobile ? 'bold 10px sans-serif' : 'bold 13px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(value + '°C', bar.x, bar.y - 6);
-                        ctx.restore();
+                        if (value > 0) {
+                            ctx.save();
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = isMobile ? 'bold 10px "Inter"' : 'bold 12px "Inter"';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(value + '°C', bar.x, bar.y - 6);
+                            ctx.restore();
+                        }
                     });
                 });
             }
@@ -545,20 +549,40 @@
                     plugins: {
                         legend: {
                             labels: {
-                                color: 'white'
+                                color: '#94a3b8',
+                                font: {
+                                    family: 'Inter',
+                                    size: 11,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            padding: 8,
+                            cornerRadius: 8,
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 12
                             }
                         }
                     },
                     scales: {
                         x: {
                             ticks: {
-                                color: 'white',
+                                color: '#94a3b8',
                                 maxRotation: 0,
                                 minRotation: 0,
                                 autoSkip: true,
                                 maxTicksLimit: 5,
                                 font: {
-                                    size: 10
+                                    family: 'Inter',
+                                    size: 10,
+                                    weight: '500'
                                 }
                             },
                             grid: {
@@ -569,7 +593,11 @@
                             suggestedMin: 20,
                             suggestedMax: 40,
                             ticks: {
-                                color: 'white'
+                                color: '#94a3b8',
+                                font: {
+                                    family: 'Inter',
+                                    size: 10
+                                }
                             },
                             grid: {
                                 color: 'rgba(255,255,255,0.1)'

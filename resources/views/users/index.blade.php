@@ -9,7 +9,8 @@
 
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ===== GLOBAL ===== */
@@ -21,7 +22,7 @@
         body {
             height: 100%;
             overflow: hidden;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -267,6 +268,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -278,6 +280,7 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+
             to {
                 transform: translateX(100%);
                 opacity: 0;
@@ -333,7 +336,8 @@
             flex-wrap: wrap;
         }
 
-        .pagination a, .pagination span {
+        .pagination a,
+        .pagination span {
             padding: 8px 14px;
             border-radius: 12px;
             transition: all 0.2s ease;
@@ -474,40 +478,46 @@
                     <!-- STATS -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
-                        <div class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-gray-400 text-sm mb-1">TOTAL USERS</p>
                                     <h2 class="text-3xl font-bold text-white">{{ $totalUsers }}</h2>
                                     <p class="text-green-400 text-sm mt-1">{{ $newUsersThisWeek ?? 0 }} this week</p>
                                 </div>
-                                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-300">
                                     <i class="fa-solid fa-users text-lg"></i>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-gray-400 text-sm mb-1">ONLINE NOW</p>
                                     <h2 class="text-3xl font-bold text-white">{{ $onlineUsers }}</h2>
                                     <p class="text-green-400 text-sm mt-1">{{ $onlinePercentage }}% active</p>
                                 </div>
-                                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-500/20 text-green-300">
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-500/20 text-green-300">
                                     <i class="fa-solid fa-user-check text-lg"></i>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
+                        <div
+                            class="bg-gradient-to-r from-slate-900/80 to-slate-800/60 p-6 rounded-2xl border border-white/10 backdrop-blur">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-gray-400 text-sm mb-1">ADMINISTRATORS</p>
                                     <h2 class="text-3xl font-bold text-white">{{ $adminUsers }}</h2>
                                     <p class="text-gray-400 text-sm mt-1">System privileges</p>
                                 </div>
-                                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-yellow-500/20 text-yellow-300">
+                                <div
+                                    class="w-12 h-12 flex items-center justify-center rounded-xl bg-yellow-500/20 text-yellow-300">
                                     <i class="fa-solid fa-shield-halved text-lg"></i>
                                 </div>
                             </div>
@@ -523,7 +533,8 @@
                         <div class="flex flex-wrap items-center gap-3 px-5 py-4 border-b border-white/10">
 
                             <form method="GET" action="/users" class="flex-1 min-w-[200px]">
-                                <div class="flex items-center bg-slate-800/80 border border-white/10 rounded-xl px-4 py-2.5 gap-2">
+                                <div
+                                    class="flex items-center bg-slate-800/80 border border-white/10 rounded-xl px-4 py-2.5 gap-2">
                                     <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
                                     <input name="search" value="{{ request('search') }}"
                                         placeholder="Search by username..." autocomplete="off"
@@ -588,24 +599,33 @@
                                             : 'Offline');
                                     $statusColor = $isOnline ? 'text-green-400' : 'text-gray-500';
                                     $statusDotColor = $isOnline ? 'bg-green-500' : 'bg-gray-500';
-                                    $avatarClass = $user->role == 'admin' ? 'admin' : ($user->role == 'operator' ? 'operator' : 'user');
+                                    $avatarClass =
+                                        $user->role == 'admin'
+                                            ? 'admin'
+                                            : ($user->role == 'operator'
+                                                ? 'operator'
+                                                : 'user');
                                 @endphp
 
-                                <div class="user-row flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-b border-white/5">
+                                <div
+                                    class="user-row flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-b border-white/5">
 
                                     <!-- Left Section: Avatar + User Info -->
                                     <div class="flex items-center gap-4 flex-1 min-w-[200px]">
                                         <!-- Modern Avatar with Status -->
                                         <div class="relative">
-                                            <div class="w-12 h-12 rounded-full avatar-gradient {{ $avatarClass }} flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                            <div
+                                                class="w-12 h-12 rounded-full avatar-gradient {{ $avatarClass }} flex items-center justify-center text-white font-bold text-sm shadow-lg">
                                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
                                             <!-- Status Indicator -->
                                             <div class="absolute -bottom-0.5 -right-0.5">
                                                 <div class="relative">
-                                                    <span class="block w-3.5 h-3.5 rounded-full {{ $statusDotColor }} ring-2 ring-slate-900"></span>
-                                                    @if($isOnline)
-                                                        <span class="absolute inset-0 w-full h-full rounded-full bg-green-500 animate-ping opacity-75"></span>
+                                                    <span
+                                                        class="block w-3.5 h-3.5 rounded-full {{ $statusDotColor }} ring-2 ring-slate-900"></span>
+                                                    @if ($isOnline)
+                                                        <span
+                                                            class="absolute inset-0 w-full h-full rounded-full bg-green-500 animate-ping opacity-75"></span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -628,17 +648,20 @@
 
                                         <!-- Modern Role Badge -->
                                         @if ($user->role == 'admin')
-                                            <span class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 shadow-sm">
+                                            <span
+                                                class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 shadow-sm">
                                                 <i class="fa-solid fa-crown text-[10px]"></i>
                                                 ADMINISTRATOR
                                             </span>
                                         @elseif ($user->role == 'operator')
-                                            <span class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 shadow-sm">
+                                            <span
+                                                class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 shadow-sm">
                                                 <i class="fa-solid fa-gear text-[10px]"></i>
                                                 OPERATOR
                                             </span>
                                         @else
-                                            <span class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm">
+                                            <span
+                                                class="role-badge inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm">
                                                 <i class="fa-regular fa-user text-[10px]"></i>
                                                 USER
                                             </span>
@@ -646,12 +669,14 @@
 
                                         <!-- Status with Icon -->
                                         <div class="flex items-center gap-2 px-2 py-1 rounded-lg bg-white/5">
-                                            @if($isOnline)
-                                                <i class="fa-solid fa-circle text-[8px] text-green-500 animate-pulse"></i>
+                                            @if ($isOnline)
+                                                <i
+                                                    class="fa-solid fa-circle text-[8px] text-green-500 animate-pulse"></i>
                                             @else
                                                 <i class="fa-solid fa-circle text-[8px] text-gray-500"></i>
                                             @endif
-                                            <span class="text-xs {{ $statusColor }} font-medium">{{ $statusText }}</span>
+                                            <span
+                                                class="text-xs {{ $statusColor }} font-medium">{{ $statusText }}</span>
                                         </div>
 
                                         <!-- Action Buttons with Tooltips -->
@@ -672,7 +697,8 @@
                                 </div>
                             @empty
                                 <div class="text-center py-16">
-                                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
+                                    <div
+                                        class="w-20 h-20 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
                                         <i class="fa-solid fa-users text-3xl text-gray-500"></i>
                                     </div>
                                     <p class="text-gray-400 font-medium">No users found</p>
@@ -705,16 +731,20 @@
     <!-- ==================== END LAYOUT WRAPPER ==================== -->
 
     <!-- ==================== MODAL ADD USER ==================== -->
-    <div id="modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div id="modal"
+        class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">✕</button>
+            <button onclick="closeModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">✕</button>
             <h2 class="text-lg md:text-xl font-semibold text-white mb-5">Add New User</h2>
             <form id="addUserForm" method="POST" action="/users">
                 @csrf
                 <input type="text" name="name" placeholder="Name"
-                    class="bg-slate-800 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    class="bg-slate-800 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    required>
                 <input type="password" name="password" placeholder="Password"
-                    class="bg-slate-800 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    class="bg-slate-800 border border-white/20 text-white p-3 w-full mb-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    required>
                 <div class="relative mb-4">
                     <select name="role"
                         class="w-full p-3 pr-10 rounded-lg border border-white/20 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer">
@@ -726,15 +756,19 @@
                         <i class="fa-solid fa-chevron-down text-sm"></i>
                     </div>
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">Create User</button>
+                <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">Create
+                    User</button>
             </form>
         </div>
     </div>
 
     <!-- ==================== MODAL EDIT ROLE ==================== -->
-    <div id="editRoleModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div id="editRoleModal"
+        class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
-            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">✕</button>
+            <button onclick="closeEditModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl transition">✕</button>
             <h2 class="text-lg md:text-xl font-semibold text-white mb-5">Edit User Role</h2>
             <form id="editRoleForm" method="POST">
                 @csrf
@@ -751,7 +785,9 @@
                         <i class="fa-solid fa-chevron-down text-sm"></i>
                     </div>
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">Update Role</button>
+                <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg shadow transition">Update
+                    Role</button>
             </form>
         </div>
     </div>
@@ -852,27 +888,28 @@
         function deleteUser(id) {
             if (!confirm('Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.')) return;
             fetch(`/users/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Delete failed');
-                return res.json();
-            })
-            .then(() => {
-                showToast('User deleted successfully', 'success');
-                setTimeout(() => location.reload(), 1000);
-            })
-            .catch(err => {
-                console.error('Delete error:', err);
-                showToast('Failed to delete user', 'error');
-            });
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Delete failed');
+                    return res.json();
+                })
+                .then(() => {
+                    showToast('User deleted successfully', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                })
+                .catch(err => {
+                    console.error('Delete error:', err);
+                    showToast('Failed to delete user', 'error');
+                });
         }
 
         let pingInterval = null;
+
         function startActivityPing() {
             if (pingInterval) clearInterval(pingInterval);
             pingInterval = setInterval(() => {
@@ -917,7 +954,9 @@
                     const overlay = document.getElementById('overlay');
                     if (sidebar) sidebar.classList.remove('open');
                     if (overlay) overlay.classList.add('hidden');
-                    setTimeout(() => { window.location.href = this.href; }, 250);
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 250);
                 }
             });
         });
@@ -937,8 +976,12 @@
         });
 
         const events = ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'];
-        events.forEach(event => { document.addEventListener(event, resetIdleTimer); });
-        document.addEventListener('visibilitychange', () => { if (!document.hidden) resetIdleTimer(); });
+        events.forEach(event => {
+            document.addEventListener(event, resetIdleTimer);
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) resetIdleTimer();
+        });
         window.addEventListener('beforeunload', () => {
             if (pingInterval) clearInterval(pingInterval);
             if (idleTimeout) clearTimeout(idleTimeout);

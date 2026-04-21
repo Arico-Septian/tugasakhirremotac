@@ -313,3 +313,19 @@ Route::post('/update-activity', function () {
         $user->save();
     }
 });
+
+
+
+Route::get('/suhu-raspi', function () {
+    $data = file_get_contents("http://192.168.79.28:8000/suhu.php");
+
+    preg_match('/([0-9.]+)/', $data, $matches);
+
+    return [
+        'suhu' => $matches[1] . ' °C'
+    ];
+});
+
+Route::get('/monitoring', function () {
+    return view('suhu');
+});

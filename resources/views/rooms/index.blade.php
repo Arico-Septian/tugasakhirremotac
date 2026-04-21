@@ -8,6 +8,8 @@
 
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ===== GLOBAL ===== */
@@ -19,7 +21,7 @@
         body {
             height: 100%;
             overflow: hidden;
-            font-family: ui-sans-serif, system-ui;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -434,7 +436,7 @@
                                 <!-- Temperature -->
                                 <div
                                     class="bg-blue-500/20 text-blue-300 px-3 py-2 rounded mb-3 text-xs md:text-sm flex justify-between">
-                                    <span>Temp Ruangan</span>
+                                    <span>Room Temperature</span>
                                     <span id="temp-{{ $room->id }}" class="font-semibold">
                                         {{ $room->temperature ?? '--' }} °C
                                     </span>
