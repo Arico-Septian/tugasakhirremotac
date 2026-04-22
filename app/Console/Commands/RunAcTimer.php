@@ -17,11 +17,14 @@ class RunAcTimer extends Command
     const WINDOW_BEFORE = -30;
     const WINDOW_AFTER = 60;
     const EXECUTION_BUFFER = 60;
+    const COOLDOWN_SECONDS = 5;
 
     public function handle()
     {
         $now   = Carbon::now('Asia/Jakarta');
         $today = Carbon::today('Asia/Jakarta');
+
+        $this->info("🕐 Checking AC timers at " . $now->toDateTimeString());
 
         $mqtt = new MqttService();
 
@@ -34,15 +37,26 @@ class RunAcTimer extends Command
             })
             ->get();
 
+        if ($acs->isEmpty()) {
+            $this->line("No active timers found.");
+        }
+
         foreach ($acs as $ac) {
 
+            // Cek cooldown untuk mencegah spam
+            $cooldownKey = "ac_cooldown_{$ac->id}";
+            if (Cache::has($cooldownKey)) {
+                continue; // Skip jika masih dalam cooldown
+            }
+
             $version = Cache::get("timer_version_{$ac->id}", 1);
-            $topic   = "room/{$ac->room->name}/ac/{$ac->ac_number}/control";
+            $roomName = strtolower(trim($ac->room->name));
+            $topic   = "room/{$roomName}/ac/{$ac->ac_number}/control";
 
             foreach (['on', 'off'] as $type) {
 
                 $timerField     = "timer_{$type}";
-                $expectedStatus = strtoupper($type);
+                $expectedStatus = strtoupper($type); // "ON" atau "OFF"
 
                 if (!$ac->$timerField) continue;
 
@@ -63,40 +77,51 @@ class RunAcTimer extends Command
                     $lock = Cache::lock("lock:{$key}", 10);
 
                     if (!$lock->get()) {
+                        $this->warn("Lock not acquired for AC {$ac->ac_number} {$type}");
                         continue;
                     }
 
                     try {
-
-                        // double check (extra safety)
+                        // Double check (extra safety)
                         if (Cache::has($key)) {
+                            $this->line("Already executed: AC {$ac->ac_number} {$type}");
                             continue;
                         }
 
+                        $this->info("⏰ Executing timer: AC {$ac->ac_number} → {$expectedStatus}");
+
+                        // Kirim perintah ke MQTT
                         $mqtt->publish($topic, json_encode([
                             "power" => $expectedStatus
-                        ]));
+                        ]), 1, false);
 
+                        // Update database
                         $ac->update([
                             'power_status' => $expectedStatus
                         ]);
 
+                        // Tandai sudah dieksekusi
                         Cache::put($key, true, 300);
 
+                        // Set cooldown
+                        Cache::put($cooldownKey, true, self::COOLDOWN_SECONDS);
+
                         Log::info("TIMER {$expectedStatus} SUCCESS", [
-                            'ac'   => $ac->ac_number,
-                            'time' => $now->toDateTimeString()
+                            'ac_id'    => $ac->ac_number,
+                            'room'     => $roomName,
+                            'time'     => $now->toDateTimeString(),
+                            'timer_at' => $timer->toDateTimeString()
                         ]);
 
-                        $this->info("TIMER {$expectedStatus} → AC {$ac->ac_number}");
+                        $this->info("✅ TIMER {$expectedStatus} → AC {$ac->ac_number}");
 
                     } catch (\Exception $e) {
-
                         Log::error("MQTT {$expectedStatus} ERROR", [
-                            'ac'    => $ac->ac_number,
-                            'error' => $e->getMessage()
+                            'ac_id'  => $ac->ac_number,
+                            'error'  => $e->getMessage(),
+                            'topic'  => $topic
                         ]);
-
+                        $this->error("❌ Failed: AC {$ac->ac_number} - " . $e->getMessage());
                     } finally {
                         optional($lock)->release();
                     }
@@ -104,6 +129,7 @@ class RunAcTimer extends Command
             }
         }
 
+        $this->info("✅ Timer check completed");
         return Command::SUCCESS;
     }
 }

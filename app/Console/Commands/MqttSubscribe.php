@@ -67,8 +67,8 @@ class MqttSubscribe extends Command
 
                     $this->error("ESP OFFLINE: {$deviceId}");
 
-                    Cache::forget("device_{$deviceId}_last_seen");
-                    Cache::forever("device_status_{$deviceId}", 'offline');
+                    Cache::put("device_{$deviceId}_last_seen", null, 60);
+                    Cache::put("device_status_{$deviceId}", 'offline', 300);
                     Cache::forget("device_unknown_{$deviceId}");
 
                     AcStatus::whereHas('acUnit', function ($q) use ($deviceId) {
@@ -78,6 +78,8 @@ class MqttSubscribe extends Command
                     ]);
 
                     event(new DeviceStatusUpdated($deviceId, 'offline'));
+
+                    Log::info("Device marked OFFLINE via LWT", ['device' => $deviceId]);
                 } elseif ($message === 'online') {
 
                     $this->info("STATUS ONLINE: {$deviceId}");
@@ -255,8 +257,8 @@ class MqttSubscribe extends Command
     {
         $deviceId = $this->normalize($deviceId);
 
-        Cache::forever("device_{$deviceId}_last_seen", now());
-        Cache::forever("device_status_{$deviceId}", 'online');
+        Cache::put("device_{$deviceId}_last_seen", now(), 60);
+        Cache::put("device_status_{$deviceId}", 'online', 60);
         Cache::forget("device_unknown_{$deviceId}");
     }
 

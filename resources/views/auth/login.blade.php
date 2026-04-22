@@ -7,7 +7,8 @@
     <title>Login | SmartAC Control System</title>
 
     <link href="/css/app.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -19,21 +20,32 @@
 
         body {
             font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 200% 200%;
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.7), rgba(10, 20, 80, 0.9)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
+            background-size: cover;
             animation: gradientShift 8s ease infinite;
             position: relative;
             overflow-x: hidden;
         }
 
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Animated Background Blobs */
@@ -49,12 +61,19 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.1); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
         }
 
         .blob-1 {
-            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0));
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
             top: -100px;
             right: -100px;
             width: 400px;
@@ -91,17 +110,28 @@
             z-index: 0;
         }
 
+        .text-white\/70 {
+            color: #94a3b8 !important;
+        }
+
+        .input-label {
+            color: #cbd5f5;
+            /* lebih soft */
+        }
         @keyframes particleFloat {
             0% {
                 transform: translateY(100vh) rotate(0deg);
                 opacity: 0;
             }
+
             10% {
                 opacity: 0.5;
             }
+
             90% {
                 opacity: 0.5;
             }
+
             100% {
                 transform: translateY(-100vh) rotate(360deg);
                 opacity: 0;
@@ -110,10 +140,10 @@
 
         /* Glass Card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(20px);
             border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             transition: all 0.3s ease;
             position: relative;
@@ -146,8 +176,8 @@
         .input-field {
             width: 100%;
             padding: 14px 16px 14px 48px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 16px;
             font-size: 15px;
             color: white;
@@ -188,9 +218,10 @@
         .login-btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #2563eb, #1e3a8a);
             border: none;
             border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(37,99,235,0.3);
             font-size: 16px;
             font-weight: 700;
             color: white;
@@ -243,9 +274,19 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         .error-alert i {
@@ -265,8 +306,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
         }
 
         /* Footer Links */
@@ -328,7 +378,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Floating Shapes */
@@ -358,7 +410,7 @@
 
             <!-- Logo & Title -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-4 logo-icon">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-700/50 mb-4 logo-icon">
                     <i class="fa-solid fa-snowflake text-4xl text-white"></i>
                 </div>
                 <h2 class="text-3xl font-bold text-white mb-2">
@@ -396,14 +448,8 @@
                     </label>
                     <div class="relative">
                         <i class="fa-regular fa-envelope input-icon"></i>
-                        <input type="text"
-                               name="name"
-                               required
-                               autofocus
-                               autocomplete="username"
-                               placeholder="Enter your username"
-                               class="input-field"
-                               value="{{ old('name') }}">
+                        <input type="text" name="name" required autofocus autocomplete="username"
+                            placeholder="Enter your username" class="input-field" value="{{ old('name') }}">
                     </div>
                 </div>
 
@@ -414,16 +460,10 @@
                     </label>
                     <div class="relative">
                         <i class="fa-solid fa-key input-icon"></i>
-                        <input type="password"
-                               name="password"
-                               required
-                               autocomplete="current-password"
-                               placeholder="Enter your password"
-                               class="input-field"
-                               id="password">
-                        <button type="button"
-                                onclick="togglePassword()"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition">
+                        <input type="password" name="password" required autocomplete="current-password"
+                            placeholder="Enter your password" class="input-field" id="password">
+                        <button type="button" onclick="togglePassword()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition">
                             <i class="fa-regular fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>

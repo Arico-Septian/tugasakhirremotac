@@ -16,7 +16,7 @@ class MqttListener extends Command
 
     public function handle()
     {
-        $server = '192.168.79.28';
+        $server = 'broker.hivemq.com';
         $port = 1883;
 
         while (true) {
@@ -28,8 +28,8 @@ class MqttListener extends Command
                 $mqtt = new MqttClient($server, $port, 'laravel-listener');
 
                 $settings = (new ConnectionSettings)
-                    ->setUsername('mqtt_user')
-                    ->setPassword('Raspberry3')
+                    ->setUsername(null)
+                    ->setPassword(null)
                     ->setKeepAliveInterval(60);
 
                 $mqtt->connect($settings, true);

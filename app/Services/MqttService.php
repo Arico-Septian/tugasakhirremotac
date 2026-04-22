@@ -11,13 +11,13 @@ class MqttService
 
     public function __construct()
     {
-        $server = '192.168.79.28';
+        $server = 'broker.hivemq.com';
         $port = 1883;
         $clientId = 'laravel_' . uniqid();
 
         $connectionSettings = (new ConnectionSettings)
-            ->setUsername('mqtt_user')
-            ->setPassword('Raspberry3');
+            ->setUsername(null)
+            ->setPassword(null);
 
         $this->mqtt = new MqttClient($server, $port, $clientId);
         $this->mqtt->connect($connectionSettings, true);

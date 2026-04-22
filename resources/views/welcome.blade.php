@@ -7,8 +7,10 @@
     <title>Smart AC Control System | Premium IoT Climate Control</title>
 
     <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
@@ -32,11 +34,19 @@
 
         /* Premium Gradient Background */
         .premium-bg {
-            background: radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.4) 0%, rgba(37, 99, 235, 0.3) 50%, transparent 80%),
-                        linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background:
+                linear-gradient(rgba(10, 20, 80, 0.7), rgba(10, 20, 80, 0.9)),
+                url('/images/wallpaper.jpeg') no-repeat center center fixed;
             position: relative;
         }
-
+        .premium-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(30, 64, 175, 0.2), transparent 50%);
+            z-index: 0;
+        }
         /* Animated Gradient Border */
         .gradient-border {
             position: relative;
@@ -63,31 +73,44 @@
         /* Glass Morphism Premium */
         .glass-premium {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-
-        /* Animated Gradient Text */
+      /* Animated Gradient Text */
         .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             animation: gradientShift 3s ease infinite;
         }
-
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Floating Animation */
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         .float {
@@ -194,20 +217,25 @@
     </style>
 </head>
 
-<body class="premium-bg text-white">
+<body class="premium-bg text-white relative">
 
     <!-- Custom Cursor -->
     <div class="custom-cursor hidden md:block"></div>
     <div class="custom-cursor-dot hidden md:block"></div>
+
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm -z-10"></div>
 
     <!-- Particles Background -->
     <div id="tsparticles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
 
     <!-- Animated Background Blobs -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-5">
-        <div class="absolute top-20 left-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div class="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div class="absolute top-20 left-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div
+            class="absolute bottom-20 right-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000">
+        </div>
+        <div class="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-800/10 rounded-full blur-3xl animate-pulse delay-2000">
+        </div>
     </div>
 
     <!-- ==================== NAVBAR ==================== -->
@@ -223,7 +251,8 @@
                 <a href="#about" class="hover:text-blue-400 transition">About</a>
                 <a href="#contact" class="hover:text-blue-400 transition">Contact</a>
             </div>
-            <a href="/login" class="bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-2 rounded-full text-sm font-semibold hover:scale-105 transition">
+            <a href="/login"
+                class="bg-gradient-to-r from-blue-600 to-blue-900 px-5 py-2 rounded-full text-sm font-semibold hover:scale-105 transition">
                 Get Started
             </a>
         </div>
@@ -248,22 +277,26 @@
                 <span class="gradient-text block">Climate Control</span>
             </h1>
 
-            <p data-aos="fade-up" data-aos-delay="200" class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
+            <p data-aos="fade-up" data-aos-delay="200"
+                class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
                 Experience the future of air conditioning management with real-time monitoring,
                 smart automation, and energy-efficient technology.
             </p>
 
             <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/login" class="btn-premium bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition inline-flex items-center justify-center gap-2">
+                <a href="/login"
+                    class="btn-premium bg-gradient-to-r from-blue-600 to-blue-900 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition inline-flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rocket"></i> Launch Dashboard
                 </a>
-                <a href="#features" class="glass-premium px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition inline-flex items-center justify-center gap-2">
+                <a href="#features"
+                    class="glass-premium px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition inline-flex items-center justify-center gap-2">
                     <i class="fa-solid fa-play"></i> Watch Demo
                 </a>
             </div>
 
             <!-- Stats -->
-            <div data-aos="fade-up" data-aos-delay="600" class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-10 border-t border-white/10">
+            <div data-aos="fade-up" data-aos-delay="600"
+                class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-10 border-t border-white/10">
                 <div>
                     <div class="stat-number">500+</div>
                     <div class="text-sm text-gray-400">Active Devices</div>
@@ -300,8 +333,10 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div data-aos="fade-up" data-aos-delay="300" class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div data-aos="fade-up" data-aos-delay="300"
+                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
+                    <div
+                        class="w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <i class="fa-solid fa-bolt text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Real-Time Intelligence</h3>
@@ -310,8 +345,10 @@
                     </p>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="400" class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div class="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div data-aos="fade-up" data-aos-delay="400"
+                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
+                    <div
+                        class="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Seamless Remote Access</h3>
@@ -320,8 +357,10 @@
                     </p>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="500" class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div class="w-20 h-20 bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div data-aos="fade-up" data-aos-delay="500"
+                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
+                    <div
+                        class="w-20 h-20 bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <i class="fa-solid fa-chart-line text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Energy Efficiency</h3>
@@ -347,19 +386,25 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div data-aos="fade-up" data-aos-delay="200" class="text-center">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">1</div>
+                    <div
+                        class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
+                        1</div>
                     <h3 class="text-xl font-bold mb-3">Install Device</h3>
                     <p class="text-gray-400">Connect your ESP32 device to power and network</p>
                 </div>
 
                 <div data-aos="fade-up" data-aos-delay="300" class="text-center">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">2</div>
+                    <div
+                        class="w-24 h-24 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
+                        2</div>
                     <h3 class="text-xl font-bold mb-3">Configure System</h3>
                     <p class="text-gray-400">Set your preferences and automation rules</p>
                 </div>
 
                 <div data-aos="fade-up" data-aos-delay="400" class="text-center">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">3</div>
+                    <div
+                        class="w-24 h-24 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
+                        3</div>
                     <h3 class="text-xl font-bold mb-3">Enjoy Control</h3>
                     <p class="text-gray-400">Monitor and manage your AC from anywhere</p>
                 </div>
@@ -401,10 +446,11 @@
                 </div>
                 <div data-aos="fade-left" class="flex-1">
                     <div class="relative">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-3xl opacity-30"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-900 rounded-full blur-3xl opacity-30">
+                        </div>
                         <img src="https://cdn-icons-png.flaticon.com/512/1048/1048943.png"
-                             class="relative w-full max-w-md mx-auto float"
-                             alt="Smart AC Illustration">
+                            class="relative w-full max-w-md mx-auto float" alt="Smart AC Illustration">
                     </div>
                 </div>
             </div>
@@ -427,10 +473,12 @@
                 <div data-aos="fade-up" data-aos-delay="200" class="glass-premium rounded-2xl p-8">
                     <i class="fa-solid fa-quote-left text-4xl text-blue-500 mb-4"></i>
                     <p class="text-gray-300 leading-relaxed mb-6">
-                        "The best investment we've made for our office. Energy bills reduced by 25% and employees are more comfortable."
+                        "The best investment we've made for our office. Energy bills reduced by 25% and employees are
+                        more comfortable."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 flex items-center justify-center">
                             <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <div>
@@ -446,7 +494,8 @@
                         "Finally, an AC control system that actually works. The real-time monitoring is a game changer."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
                             <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <div>
@@ -462,7 +511,8 @@
                         "Amazing support team and incredible technology. Highly recommended for any smart building."
                     </p>
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center">
                             <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <div>
@@ -479,14 +529,17 @@
     <section class="py-24 px-6">
         <div class="container mx-auto max-w-5xl">
             <div data-aos="zoom-in" class="glass-premium rounded-3xl p-12 text-center relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-3xl opacity-20"></div>
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-r from-blue-600 to-blue-900 rounded-full blur-3xl opacity-20">
+                </div>
                 <h2 class="text-3xl md:text-5xl font-bold mb-4">
                     Ready to Get Started?
                 </h2>
                 <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
                     Join thousands of satisfied users and transform your climate control experience today
                 </p>
-                <a href="/login" class="btn-premium bg-gradient-to-r from-blue-600 to-purple-600 px-10 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-2 hover:shadow-2xl transition">
+                <a href="/login"
+                    class="btn-premium bg-gradient-to-r from-blue-600 to-blue-900 px-10 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-2 hover:shadow-2xl transition">
                     <i class="fa-solid fa-arrow-right"></i> Start Free Trial
                 </a>
                 <p class="text-sm text-gray-400 mt-6">No credit card required · Free 14-day trial</p>
@@ -526,13 +579,16 @@
                 <div>
                     <h4 class="font-semibold mb-4">Connect</h4>
                     <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
                             <i class="fa-brands fa-twitter"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
                             <i class="fa-brands fa-linkedin-in"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
                             <i class="fa-brands fa-github"></i>
                         </a>
                     </div>
@@ -564,17 +620,50 @@
         if (window.innerWidth > 768) {
             tsParticles.load('tsparticles', {
                 particles: {
-                    number: { value: 80, density: { enable: true, area: 800 } },
-                    color: { value: ["#667eea", "#764ba2", "#f093fb", "#4facfe"] },
-                    shape: { type: "circle" },
-                    opacity: { value: 0.3, random: true },
-                    size: { value: 2, random: true },
-                    move: { enable: true, speed: 1, direction: "none", random: true, straight: false },
-                    links: { enable: true, color: "#ffffff", opacity: 0.1, distance: 150 },
+                    number: {
+                        value: 80,
+                        density: {
+                            enable: true,
+                            area: 800
+                        }
+                    },
+                    color: {
+                        value: ["#667eea", "#764ba2", "#f093fb", "#4facfe"]
+                    },
+                    shape: {
+                        type: "circle"
+                    },
+                    opacity: {
+                        value: 0.3,
+                        random: true
+                    },
+                    size: {
+                        value: 2,
+                        random: true
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1,
+                        direction: "none",
+                        random: true,
+                        straight: false
+                    },
+                    links: {
+                        enable: true,
+                        color: "#ffffff",
+                        opacity: 0.1,
+                        distance: 150
+                    },
                     interactivity: {
                         events: {
-                            onHover: { enable: true, mode: "grab" },
-                            onClick: { enable: true, mode: "push" }
+                            onHover: {
+                                enable: true,
+                                mode: "grab"
+                            },
+                            onClick: {
+                                enable: true,
+                                mode: "push"
+                            }
                         }
                     }
                 }
@@ -613,7 +702,10 @@
         }
 
         // Scroll Reveal
-        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -627,13 +719,16 @@
 
         // Smooth Scroll for Nav Links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+            anchor.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 if (href !== "#" && href !== "#home") {
                     e.preventDefault();
                     const target = document.querySelector(href);
                     if (target) {
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
                     }
                 }
             });
