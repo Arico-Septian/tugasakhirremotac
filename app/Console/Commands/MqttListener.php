@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use PhpMqtt\Client\MqttClient;
 use PhpMqtt\Client\ConnectionSettings;
+use App\Models\Room;
 use App\Models\RoomTemperature;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -54,25 +55,35 @@ class MqttListener extends Command
                         return;
                     }
 
-                    $room = strtolower(trim($data['room']));
-                    $temperature = (float) $data['temperature'];
+                    $roomKey = RoomTemperature::normalizeRoomName($data['room']);
+                    if ($roomKey === '') {
+                        echo "Data room kosong\n";
+                        return;
+                    }
 
-                    if (!is_numeric($temperature)) {
+                    $roomModel = Room::whereRaw('LOWER(name) = ?', [$roomKey])->first();
+                    $room = $roomModel ? $roomModel->name : $roomKey;
+
+                    if (!is_numeric($data['temperature'])) {
                         echo "⚠️ Temperature bukan angka\n";
                         return;
                     }
+
+                    $temperature = (float) $data['temperature'];
 
                     if ($temperature < 10 || $temperature > 60) {
                         echo "⚠️ Suhu tidak wajar: $temperature\n";
                         return;
                     }
 
-                    $dupKey = 'dup_' . md5($room . $temperature);
+                    $normalizedRoom = RoomTemperature::normalizeRoomName($room);
+
+                    $dupKey = 'dup_' . md5($normalizedRoom . $temperature);
                     if (Cache::has($dupKey)) return;
                     Cache::put($dupKey, true, 5);
 
                     $now  = now();
-                    $key  = "last_temp_{$room}";
+                    $key  = "last_temp_{$normalizedRoom}";
                     $last = Cache::get($key);
 
                     if (!$last || $now->diffInSeconds($last) >= 5) {

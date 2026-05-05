@@ -114,7 +114,7 @@ class CheckDeviceStatus extends Command
             Cache::forget($unknownKey);
 
             // Optional: Update database
-            $this->updateDeviceInDatabase($deviceId, 'offline');
+            $this->updateDeviceInDatabase($deviceId, 'offline', $lastSeen);
         }
         // ONLINE
         elseif (!$isOffline && $currentStatus !== self::STATUS_ONLINE) {
@@ -130,7 +130,7 @@ class CheckDeviceStatus extends Command
             Cache::forget($unknownKey);
 
             // Optional: Update database
-            $this->updateDeviceInDatabase($deviceId, 'online');
+            $this->updateDeviceInDatabase($deviceId, 'online', $lastSeen);
         }
     }
 
@@ -149,20 +149,19 @@ class CheckDeviceStatus extends Command
         }
     }
 
-    private function updateDeviceInDatabase($deviceId, $status)
+    private function updateDeviceInDatabase($deviceId, $status, $lastSeen = null)
     {
         try {
             $room = Room::where('device_id', $deviceId)->first();
 
             if ($room) {
-                // If you have a 'status' column in rooms table
-                // $room->update(['status' => $status, 'last_seen' => now()]);
+                $data = ['device_status' => $status];
 
-                // Or update a separate device_statuses table
-                // DeviceStatus::updateOrCreate(
-                //     ['device_id' => $deviceId],
-                //     ['status' => $status, 'last_seen' => now()]
-                // );
+                if ($lastSeen) {
+                    $data['last_seen'] = $lastSeen;
+                }
+
+                $room->update($data);
             }
         } catch (\Exception $e) {
             Log::warning("Failed to update device status in DB: " . $e->getMessage());

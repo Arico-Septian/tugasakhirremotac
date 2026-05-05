@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\MqttService;
 use Illuminate\Support\Facades\Cache;
+use App\Models\AcUnit;
 use App\Models\AcStatus;
 use App\Events\DeviceStatusUpdated;
 use App\Models\Room;
@@ -67,14 +68,17 @@ class MqttSubscribe extends Command
 
                     $this->error("ESP OFFLINE: {$deviceId}");
 
-                    Cache::put("device_{$deviceId}_last_seen", null, 60);
+                    Cache::forget("device_{$deviceId}_last_seen");
                     Cache::put("device_status_{$deviceId}", 'offline', 300);
                     Cache::forget("device_unknown_{$deviceId}");
 
-                    AcStatus::whereHas('acUnit', function ($q) use ($deviceId) {
+                    AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
                         $q->where('device_id', $deviceId);
                     })->update([
                         'power' => 'OFF'
+                    ]);
+                    Room::where('device_id', $deviceId)->update([
+                        'device_status' => 'offline',
                     ]);
 
                     event(new DeviceStatusUpdated($deviceId, 'offline'));
@@ -108,7 +112,7 @@ class MqttSubscribe extends Command
                 $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
                 if (!$room) return;
 
-                $ac = \App\Models\AcUnit::where('room_id', $room->id)
+                $ac = AcUnit::where('room_id', $room->id)
                     ->where('ac_number', $acId)
                     ->first();
 
@@ -117,9 +121,9 @@ class MqttSubscribe extends Command
                 AcStatus::updateOrCreate(
                     ['ac_unit_id' => $ac->id],
                     [
-                        'power' => $data['power'] ?? 'OFF',
-                        'mode'  => $data['mode'] ?? 'COOL',
-                        'set_temperature' => (int)($data['temp'] ?? 24),
+                        'power' => $this->normalizePower($data['power'] ?? 'OFF'),
+                        'mode'  => $this->normalizeMode($data['mode'] ?? 'COOL'),
+                        'set_temperature' => $this->normalizeTemperature($data['temp'] ?? 24),
                     ]
                 );
 
@@ -157,7 +161,7 @@ class MqttSubscribe extends Command
                         return;
                     }
 
-                    $room = \App\Models\Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+                    $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
 
                     if (!$room) {
                         Log::warning("ROOM TIDAK DITEMUKAN", [
@@ -166,7 +170,7 @@ class MqttSubscribe extends Command
                         return;
                     }
 
-                    $ac = \App\Models\AcUnit::where('room_id', $room->id)
+                    $ac = AcUnit::where('room_id', $room->id)
                         ->where('ac_number', $acNumber)
                         ->first();
 
@@ -175,13 +179,14 @@ class MqttSubscribe extends Command
                             'room' => $roomName,
                             'ac_number' => $acNumber
                         ]);
+                        return;
                     }
 
-                    $power = strtoupper($data['power'] ?? 'OFF');
-                    $mode  = strtoupper($data['mode'] ?? 'COOL');
-                    $temp  = (int) ($data['ac_temp'] ?? 24);
+                    $power = $this->normalizePower($data['power'] ?? 'OFF');
+                    $mode  = $this->normalizeMode($data['mode'] ?? 'COOL');
+                    $temp  = $this->normalizeTemperature($data['ac_temp'] ?? $data['temp'] ?? 24);
 
-                    \App\Models\AcStatus::updateOrCreate(
+                    AcStatus::updateOrCreate(
                         ['ac_unit_id' => $ac->id],
                         [
                             'power' => $power,
@@ -233,16 +238,30 @@ class MqttSubscribe extends Command
                 $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
                 if (!$room || !$room->device_id) return;
 
-                $deviceId = $this->normalize($room->device_id);
+                $acNumber = (int) $data['id'];
 
-                \App\Models\AcUnit::firstOrCreate(
-                    [
-                        'device_id' => $deviceId,
-                        'ac_id' => $data['id']
-                    ],
+                if ($acNumber < 1 || $acNumber > 15) {
+                    $this->warn("Nomor AC tidak valid: {$acNumber}");
+                    return;
+                }
+
+                $ac = AcUnit::firstOrCreate(
                     [
                         'room_id' => $room->id,
-                        'brand' => $data['brand'] ?? 'Unknown'
+                        'ac_number' => $acNumber,
+                    ],
+                    [
+                        'name' => "AC {$acNumber}",
+                        'brand' => $data['brand'] ?? 'Unknown',
+                    ]
+                );
+
+                AcStatus::firstOrCreate(
+                    ['ac_unit_id' => $ac->id],
+                    [
+                        'power' => 'OFF',
+                        'mode' => 'COOL',
+                        'set_temperature' => 24,
                     ]
                 );
 
@@ -256,10 +275,16 @@ class MqttSubscribe extends Command
     private function setOnline($deviceId)
     {
         $deviceId = $this->normalize($deviceId);
+        $now = now();
 
-        Cache::put("device_{$deviceId}_last_seen", now(), 60);
+        Cache::put("device_{$deviceId}_last_seen", $now, 60);
         Cache::put("device_status_{$deviceId}", 'online', 60);
         Cache::forget("device_unknown_{$deviceId}");
+
+        Room::where('device_id', $deviceId)->update([
+            'device_status' => 'online',
+            'last_seen' => $now,
+        ]);
     }
 
     /* === HELPER: EXTRACT DEVICE ID === */
@@ -276,5 +301,26 @@ class MqttSubscribe extends Command
     private function normalize($value)
     {
         return strtolower(trim($value));
+    }
+
+    private function normalizePower($value)
+    {
+        $power = strtoupper(trim((string) $value));
+
+        return in_array($power, ['ON', 'OFF'], true) ? $power : 'OFF';
+    }
+
+    private function normalizeMode($value)
+    {
+        $mode = strtoupper(trim((string) $value));
+
+        return in_array($mode, ['COOL', 'HEAT', 'FAN', 'AUTO'], true) ? $mode : 'COOL';
+    }
+
+    private function normalizeTemperature($value)
+    {
+        $temperature = (int) $value;
+
+        return min(30, max(16, $temperature ?: 24));
     }
 }

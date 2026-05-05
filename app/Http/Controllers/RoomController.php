@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcUnit;
 use App\Models\Room;
+use App\Models\RoomTemperature;
 use App\Models\UserLog;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
@@ -16,25 +17,30 @@ class RoomController extends Controller
 {
     public function index(Request $request)
     {
-        $rooms = Room::with(['acUnits.status', 'temperatureData'])
+        $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%');
             })
             ->orderBy('name')
             ->get();
+        $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
         foreach ($rooms as $room) {
-            $deviceId = strtolower((string) $room->device_id);
+            $deviceId = strtolower(trim((string) $room->device_id));
 
-            $status = Cache::get("device_status_{$deviceId}", 'offline');
-            $lastSeen = Cache::get("device_{$deviceId}_last_seen");
+            $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
 
-            if ($lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
+            if ($status !== 'offline' && $lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
                 $status = 'online';
+            } elseif ($status === 'online' && $lastSeen && now()->diffInSeconds($lastSeen) > 30) {
+                $status = 'offline';
             }
 
             $room->device_status = $status;
-            $room->temperature = optional($room->temperatureData)->temperature;
+            $room->temperature = optional(
+                $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
+            )->temperature;
         }
 
         return view('rooms.index', compact('rooms'));
@@ -118,7 +124,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
-        $deviceId = strtolower((string) $room->device_id);
+        $deviceId = strtolower(trim((string) $room->device_id));
 
         $mqttPublished = true;
 

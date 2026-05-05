@@ -63,18 +63,19 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::get('/device-status', function () {
         return Room::whereNotNull('device_id')
-            ->orderBy('id')
+            ->orderBy('name')
             ->get()
             ->map(function ($room) {
                 $deviceId = strtolower(trim($room->device_id));
-                $lastSeen = Cache::get("device_{$deviceId}_last_seen");
+                $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
+                $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
 
                 $lastSeenAt = null;
                 $isOnline = false;
 
                 if ($lastSeen) {
                     $lastSeenAt = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-                    $isOnline = now()->diffInSeconds($lastSeenAt) <= 15;
+                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt) <= 15;
                 }
 
                 return [
@@ -115,15 +116,14 @@ Route::middleware(['auth', 'active'])->group(function () {
     });
 
     $temperatureEndpoint = function () {
-        $latestTemperatures = RoomTemperature::latest()
-            ->get()
-            ->unique('room')
-            ->keyBy('room');
+        $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
-        return Room::orderBy('id')
+        return Room::orderBy('name')
             ->get()
             ->map(function ($room) use ($latestTemperatures) {
-                $temperature = optional($latestTemperatures->get($room->name))->temperature;
+                $temperature = optional(
+                    $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
+                )->temperature;
 
                 return [
                     'id' => $room->id,
