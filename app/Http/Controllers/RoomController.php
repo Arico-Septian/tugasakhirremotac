@@ -2,32 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Room;
 use App\Models\AcUnit;
-use App\Services\MqttService;
+use App\Models\Room;
 use App\Models\UserLog;
+use App\Services\MqttService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\RoomTemperature;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class RoomController extends Controller
 {
     public function index(Request $request)
     {
-        $rooms = Room::with(['acUnits.status'])
+        $rooms = Room::with(['acUnits.status', 'temperatureData'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%');
             })
+            ->orderBy('name')
             ->get();
 
-        $temps = RoomTemperature::latest()
-            ->get()
-            ->groupBy('room');
-
         foreach ($rooms as $room) {
-
-            $deviceId = strtolower($room->device_id);
+            $deviceId = strtolower((string) $room->device_id);
 
             $status = Cache::get("device_status_{$deviceId}", 'offline');
             $lastSeen = Cache::get("device_{$deviceId}_last_seen");
@@ -37,9 +34,7 @@ class RoomController extends Controller
             }
 
             $room->device_status = $status;
-
-            $latestTemp = $temps[$room->name][0] ?? null;
-            $room->temperature = $latestTemp ? $latestTemp->temperature : null;
+            $room->temperature = optional($room->temperatureData)->temperature;
         }
 
         return view('rooms.index', compact('rooms'));
@@ -48,28 +43,59 @@ class RoomController extends Controller
     /*=== CREATE ROOM ===*/
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'device_id' => 'required|unique:rooms,device_id'
+        $request->merge([
+            'name' => trim((string) $request->name),
+            'device_id' => strtolower(trim((string) $request->device_id)),
         ]);
 
-        $deviceId = strtolower($request->device_id);
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('rooms', 'name'),
+            ],
+            'device_id' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-z0-9_-]+$/',
+                Rule::unique('rooms', 'device_id'),
+            ],
+        ], [
+            'device_id.regex' => 'ESP ID hanya boleh berisi huruf kecil, angka, underscore, dan strip.',
+        ]);
+
+        $deviceId = $request->device_id;
 
         $room = Room::create([
             'name' => $request->name,
             'device_id' => $deviceId
         ]);
 
-        $mqtt = new MqttService();
+        $mqttPublished = true;
 
-        $topic = "device/{$deviceId}/config";
+        try {
+            $mqtt = new MqttService();
+            $topic = "device/{$deviceId}/config";
 
-        $mqtt->publish(
-            $topic,
-            json_encode([
-                "room" => $room->name
-            ])
-        );
+            $mqtt->publish(
+                $topic,
+                json_encode([
+                    "room" => $room->name
+                ]),
+                1,
+                true
+            );
+        } catch (\Throwable $e) {
+            $mqttPublished = false;
+
+            Log::warning('Failed to publish room config to MQTT', [
+                'room_id' => $room->id,
+                'device_id' => $deviceId,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         Cache::put("device_status_{$deviceId}", 'offline');
 
@@ -80,7 +106,11 @@ class RoomController extends Controller
             'activity' => 'add_room'
         ]);
 
-        return redirect('/rooms');
+        $message = $mqttPublished
+            ? 'Room berhasil ditambahkan'
+            : 'Room berhasil ditambahkan, tetapi konfigurasi MQTT gagal dikirim';
+
+        return redirect('/rooms')->with('success', $message);
     }
 
     /*=== DELETE ROOM ===*/
@@ -88,14 +118,28 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
-        $deviceId = strtolower($room->device_id);
+        $deviceId = strtolower((string) $room->device_id);
 
-        $mqtt = new MqttService();
+        $mqttPublished = true;
 
-        $mqtt->publish(
-            "device/{$deviceId}/clear",
-            json_encode(new \stdClass())
-        );
+        try {
+            $mqtt = new MqttService();
+
+            $mqtt->publish(
+                "device/{$deviceId}/clear",
+                json_encode(new \stdClass()),
+                1,
+                true
+            );
+        } catch (\Throwable $e) {
+            $mqttPublished = false;
+
+            Log::warning('Failed to publish room clear command to MQTT', [
+                'room_id' => $room->id,
+                'device_id' => $deviceId,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         Cache::forget("device_status_{$deviceId}");
         Cache::forget("device_{$deviceId}_last_seen");
@@ -109,7 +153,11 @@ class RoomController extends Controller
 
         $room->delete();
 
-        return redirect('/rooms');
+        $message = $mqttPublished
+            ? 'Room berhasil dihapus'
+            : 'Room berhasil dihapus, tetapi perintah clear ke MQTT gagal dikirim';
+
+        return redirect('/rooms')->with('success', $message);
     }
 
     /*=== DETAIL STATUS AC ===*/

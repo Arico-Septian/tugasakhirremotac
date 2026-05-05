@@ -326,8 +326,8 @@
                     <div class="flex items-center gap-2 md:gap-6">
                         <div id="systemStatus"
                             class="flex items-center gap-2 bg-gray-500/10 text-gray-400 px-3 py-1 rounded-full text-sm font-medium">
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
-                            Checking
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            Offline
                         </div>
                     </div>
                 @endauth
@@ -705,57 +705,25 @@
             if (!document.hidden) resetTimer();
         });
 
-        // ---- Device Status ----
-        function setSystemStatus(label, state = 'offline') {
+        // ---- Network Status ----
+        function setSystemStatus(isOnline) {
             const el = document.getElementById('systemStatus');
             if (!el) return;
 
-            const styles = {
-                online: ['bg-green-500/10 text-green-400', 'bg-green-500 animate-pulse'],
-                partial: ['bg-yellow-500/10 text-yellow-300', 'bg-yellow-400 animate-pulse'],
-                offline: ['bg-gray-500/10 text-gray-400', 'bg-gray-400'],
-            };
+            const wrapperClass = isOnline ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400';
+            const dotClass = isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400';
+            const label = isOnline ? 'Online' : 'Offline';
 
-            const [wrapperClass, dotClass] = styles[state] || styles.offline;
             el.className = `flex items-center gap-2 ${wrapperClass} px-3 py-1 rounded-full text-sm font-medium`;
             el.innerHTML = `<span class="w-2 h-2 ${dotClass} rounded-full"></span> ${label}`;
         }
 
         function updateSystemStatus() {
-            if (!navigator.onLine) {
-                setSystemStatus('Browser Offline');
-                return;
-            }
-
-            fetch('/device-status', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Device status unavailable');
-                    return res.json();
-                })
-                .then(devices => {
-                    const total = devices.length;
-                    const online = devices.filter(device => device.is_online).length;
-
-                    if (total === 0) {
-                        setSystemStatus('No Device');
-                    } else if (online === total) {
-                        setSystemStatus('Devices Online', 'online');
-                    } else if (online > 0) {
-                        setSystemStatus(`${online}/${total} Online`, 'partial');
-                    } else {
-                        setSystemStatus('Devices Offline');
-                    }
-                })
-                .catch(() => setSystemStatus('Status Unknown'));
+            setSystemStatus(navigator.onLine);
         }
 
         window.addEventListener('online', updateSystemStatus);
         window.addEventListener('offline', updateSystemStatus);
-        setInterval(updateSystemStatus, 15000);
 
         // ---- Init on DOM Ready ----
         document.addEventListener('DOMContentLoaded', () => {

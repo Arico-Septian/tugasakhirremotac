@@ -86,7 +86,7 @@
             width: calc(100% - 80px);
         }
 
-        /* ===== HEADER — diam di atas ===== */
+        /* ===== HEADER - diam di atas ===== */
         .main-header {
             flex-shrink: 0;
             height: 72px;
@@ -102,7 +102,7 @@
             z-index: 30;
         }
 
-        /* ===== PAGE BODY — area yang scroll ===== */
+        /* ===== PAGE BODY - area yang scroll ===== */
         .page-body {
             flex: 1;
             overflow-y: auto;
@@ -341,8 +341,7 @@
 
         <!-- ==================== MAIN CONTENT ==================== -->
         <div class="main-content">
-
-            <!-- HEADER — tidak ikut scroll -->
+            <!-- HEADER - tidak ikut scroll -->
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button class="lg:hidden text-gray-300 text-lg" onclick="toggleSidebar()">
@@ -360,7 +359,7 @@
             </header>
             <!-- END HEADER -->
 
-            <!-- PAGE BODY — hanya bagian ini yang scroll -->
+            <!-- PAGE BODY - hanya bagian ini yang scroll -->
             <div class="page-body">
 
                 <!-- SEARCH & ADD -->
@@ -438,7 +437,7 @@
                                     class="bg-blue-500/20 text-blue-300 px-3 py-2 rounded mb-3 text-xs md:text-sm flex justify-between">
                                     <span>Room Temperature</span>
                                     <span id="temp-{{ $room->id }}" class="font-semibold">
-                                        {{ $room->temperature ?? '--' }} °C
+                                        {{ $room->temperature ?? '--' }} &deg;C
                                     </span>
                                 </div>
 
@@ -511,7 +510,7 @@
 
                     <button onclick="closeModal()"
                         class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl z-50">
-                        ✕
+                        &times;
                     </button>
 
                     <h2 class="text-xl font-bold mb-5">Add New Room</h2>
@@ -646,7 +645,7 @@
                                     const tempValue = typeof room.temp === 'number' ? room.temp :
                                         parseFloat(room.temp);
                                     if (!isNaN(tempValue)) {
-                                        el.innerText = tempValue + ' °C';
+                                        el.innerHTML = tempValue + ' &deg;C';
                                     }
                                 }
                             });
