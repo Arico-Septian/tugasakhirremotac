@@ -88,7 +88,7 @@
             width: calc(100% - 80px);
         }
 
-        /* ===== HEADER — diam di atas ===== */
+        /* ===== HEADER - diam di atas ===== */
         .main-header {
             flex-shrink: 0;
             height: 72px;
@@ -104,7 +104,7 @@
             z-index: 30;
         }
 
-        /* ===== PAGE BODY — area yang scroll ===== */
+        /* ===== PAGE BODY - area yang scroll ===== */
         .page-body {
             flex: 1;
             overflow-y: auto;
@@ -325,9 +325,9 @@
 
                     <div class="flex items-center gap-2 md:gap-6">
                         <div id="systemStatus"
-                            class="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            Online
+                            class="flex items-center gap-2 bg-gray-500/10 text-gray-400 px-3 py-1 rounded-full text-sm font-medium">
+                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
+                            Checking
                         </div>
                     </div>
                 @endauth
@@ -433,10 +433,10 @@
 
                                 <div
                                     class="p-2.5 md:p-3 rounded mb-3 text-sm flex justify-between
-                                    {{ $temp > 30 ? 'bg-red-500/20 text-red-300' : ($temp > 25 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-blue-500/20 text-blue-300') }}">
+                                    {{ is_null($temp) ? 'bg-white/10 text-gray-300' : ($temp > 30 ? 'bg-red-500/20 text-red-300' : ($temp > 25 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-blue-500/20 text-blue-300')) }}">
                                     <span>Room Temperature</span>
                                     <span id="temp-{{ $room->id }}" class="font-semibold">
-                                        {{ $temp ?? '--' }} °C
+                                        {{ $temp ?? '--' }} &deg;C
                                     </span>
                                 </div>
 
@@ -452,7 +452,7 @@
                                     class="bg-white/10 text-gray-300 p-3 rounded-lg mb-4 flex justify-between text-sm">
                                     <span>Inactive Units</span>
                                     <span class="font-semibold">
-                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'OFF')->count() }}
+                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power !== 'ON')->count() }}
                                     </span>
                                 </div>
 
@@ -481,8 +481,16 @@
     <script>
         // ---- Chart ----
         const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
-        const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => $t ?? 0));
+        const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => is_null($t) ? null : (float) $t)->values());
         const ctx = document.getElementById('tempChart');
+
+        function tempColor(temp) {
+            if (temp === null || Number.isNaN(Number(temp))) return '#64748b';
+            if (temp > 30) return '#ef4444';
+            if (temp > 25) return '#facc15';
+
+            return '#3b82f6';
+        }
 
         const valueLabelPlugin = {
             id: 'valueLabel',
@@ -497,12 +505,12 @@
                     const meta = chart.getDatasetMeta(i);
                     meta.data.forEach((bar, index) => {
                         const value = dataset.data[index];
-                        if (value > 0) {
+                        if (Number.isFinite(value) && value > 0) {
                             ctx.save();
                             ctx.fillStyle = '#ffffff';
                             ctx.font = isMobile ? 'bold 10px "Inter"' : 'bold 12px "Inter"';
                             ctx.textAlign = 'center';
-                            ctx.fillText(value + '°C', bar.x, bar.y - 6);
+                            ctx.fillText(value + '\u00B0C', bar.x, bar.y - 6);
                             ctx.restore();
                         }
                     });
@@ -521,11 +529,9 @@
                     labels: roomNames,
                     datasets: [{
                             type: 'bar',
-                            label: 'Temperature (°C)',
+                            label: 'Temperature (\u00B0C)',
                             data: roomTemps,
-                            backgroundColor: roomTemps.map(t =>
-                                t > 30 ? '#ef4444' : t > 25 ? '#facc15' : '#3b82f6'
-                            ),
+                            backgroundColor: roomTemps.map(tempColor),
                             borderRadius: 6,
                             barPercentage: 0.75,
                             categoryPercentage: 0.85
@@ -613,20 +619,29 @@
             if (!tempChart) return;
 
             fetch('/temperature')
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json();
+                })
                 .then(data => {
                     if (!tempChart) return;
 
-                    const safeData = data.map(t => {
-                        const temp = parseFloat(t);
-                        return isNaN(temp) ? 0 : temp;
+                    const safeData = data.map(room => {
+                        const temp = parseFloat(room.temp);
+                        return isNaN(temp) ? null : temp;
+                    });
+
+                    data.forEach(room => {
+                        const el = document.getElementById(`temp-${room.id}`);
+                        if (!el) return;
+
+                        const temp = parseFloat(room.temp);
+                        el.innerText = isNaN(temp) ? '-- \u00B0C' : `${temp} \u00B0C`;
                     });
 
                     tempChart.data.datasets[0].data = safeData;
                     tempChart.data.datasets[1].data = safeData;
-                    tempChart.data.datasets[0].backgroundColor = safeData.map(t =>
-                        t > 30 ? '#ef4444' : t > 25 ? '#facc15' : '#3b82f6'
-                    );
+                    tempChart.data.datasets[0].backgroundColor = safeData.map(tempColor);
                     tempChart.update();
                 })
                 .catch(err => console.error('Error fetching temperature:', err));
@@ -690,27 +705,62 @@
             if (!document.hidden) resetTimer();
         });
 
-        // ---- Online / Offline Status ----
-        function updateStatus() {
+        // ---- Device Status ----
+        function setSystemStatus(label, state = 'offline') {
             const el = document.getElementById('systemStatus');
-            if (navigator.onLine) {
-                el.innerHTML = `<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online`;
-                el.className =
-                    'flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-medium';
-            } else {
-                el.innerHTML = `<span class="w-2 h-2 bg-gray-400 rounded-full"></span> Offline`;
-                el.className =
-                    'flex items-center gap-2 bg-gray-500/10 text-gray-400 px-3 py-1 rounded-full text-sm font-medium';
-            }
+            if (!el) return;
+
+            const styles = {
+                online: ['bg-green-500/10 text-green-400', 'bg-green-500 animate-pulse'],
+                partial: ['bg-yellow-500/10 text-yellow-300', 'bg-yellow-400 animate-pulse'],
+                offline: ['bg-gray-500/10 text-gray-400', 'bg-gray-400'],
+            };
+
+            const [wrapperClass, dotClass] = styles[state] || styles.offline;
+            el.className = `flex items-center gap-2 ${wrapperClass} px-3 py-1 rounded-full text-sm font-medium`;
+            el.innerHTML = `<span class="w-2 h-2 ${dotClass} rounded-full"></span> ${label}`;
         }
 
-        window.addEventListener('online', updateStatus);
-        window.addEventListener('offline', updateStatus);
+        function updateSystemStatus() {
+            if (!navigator.onLine) {
+                setSystemStatus('Browser Offline');
+                return;
+            }
+
+            fetch('/device-status', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Device status unavailable');
+                    return res.json();
+                })
+                .then(devices => {
+                    const total = devices.length;
+                    const online = devices.filter(device => device.is_online).length;
+
+                    if (total === 0) {
+                        setSystemStatus('No Device');
+                    } else if (online === total) {
+                        setSystemStatus('Devices Online', 'online');
+                    } else if (online > 0) {
+                        setSystemStatus(`${online}/${total} Online`, 'partial');
+                    } else {
+                        setSystemStatus('Devices Offline');
+                    }
+                })
+                .catch(() => setSystemStatus('Status Unknown'));
+        }
+
+        window.addEventListener('online', updateSystemStatus);
+        window.addEventListener('offline', updateSystemStatus);
+        setInterval(updateSystemStatus, 15000);
 
         // ---- Init on DOM Ready ----
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
-            updateStatus();
+            updateSystemStatus();
             resetTimer();
         });
     </script>
@@ -739,3 +789,4 @@
 </body>
 
 </html>
+

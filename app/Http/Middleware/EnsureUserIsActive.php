@@ -6,17 +6,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RoleMiddleware
+class EnsureUserIsActive
 {
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
         $user = Auth::user();
 
-        if (!$user->is_active) {
+        if ($user && !$user->is_active) {
+            $user->is_online = false;
+            $user->last_activity = null;
+            $user->save();
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -24,10 +24,6 @@ class RoleMiddleware
             return redirect()
                 ->route('login')
                 ->with('error', 'User tidak aktif');
-        }
-
-        if (!in_array($user->role, $roles, true)) {
-            abort(403, 'Akses ditolak');
         }
 
         return $next($request);

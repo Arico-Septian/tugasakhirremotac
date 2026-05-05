@@ -4,21 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\AcUnit;
-use App\Models\User;
-use App\Models\RoomTemperature;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $rooms = Room::with('acUnits.status')->get();
+        $rooms = Room::with(['acUnits.status', 'temperatureData'])
+            ->orderBy('id')
+            ->get();
 
         foreach ($rooms as $room) {
-            $latestTemp = RoomTemperature::where('room', $room->name)
-                ->latest()
-                ->first();
-
-            $room->temperature = $latestTemp ? $latestTemp->temperature : null;
+            $room->temperature = optional($room->temperatureData)->temperature;
         }
 
         $totalRooms = $rooms->count();

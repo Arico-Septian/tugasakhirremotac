@@ -16,9 +16,9 @@ class CheckDeviceStatus extends Command
     const STATUS_ONLINE  = 'online';
     const STATUS_OFFLINE = 'offline';
 
-    const OFFLINE_THRESHOLD = 10;  // 15 detik tanpa kabar = offline
-    const STATUS_TTL = 300;        // 5 menit
-    const UNKNOWN_TTL = 60;        // 1 menit
+    const OFFLINE_THRESHOLD = 10;
+    const STATUS_TTL = 300;
+    const UNKNOWN_TTL = 60;
 
     public function handle()
     {
@@ -30,7 +30,7 @@ class CheckDeviceStatus extends Command
         }
 
         try {
-            $this->info('🔄 Starting device status checker...');
+            $this->info('Starting device status checker...');
 
             for ($i = 0; $i < 12; $i++) {  // Run for ~1 minute (12 * 5 seconds)
 
@@ -53,7 +53,7 @@ class CheckDeviceStatus extends Command
                 sleep(5);
             }
 
-            $this->info('✅ Device status check completed');
+            $this->info('Device status check completed');
 
         } catch (\Throwable $e) {
             Log::error('Device status check error: ' . $e->getMessage());
@@ -75,7 +75,7 @@ class CheckDeviceStatus extends Command
         if (!$lastSeen) {
             if (!Cache::get($unknownKey)) {
                 Log::info("Device UNKNOWN", ['device' => $deviceId]);
-                $this->warn("❓ UNKNOWN → {$deviceId}");
+                $this->warn("UNKNOWN -> {$deviceId}");
 
                 Cache::put($unknownKey, true, self::UNKNOWN_TTL);
             }
@@ -108,7 +108,7 @@ class CheckDeviceStatus extends Command
                 'diff_seconds' => $diff
             ]);
 
-            $this->error("🔴 OFFLINE → {$deviceId} ({$diff}s ago)");
+            $this->error("OFFLINE -> {$deviceId} ({$diff}s ago)");
 
             Cache::put($statusKey, self::STATUS_OFFLINE, self::STATUS_TTL);
             Cache::forget($unknownKey);
@@ -124,7 +124,7 @@ class CheckDeviceStatus extends Command
                 'diff_seconds' => $diff
             ]);
 
-            $this->info("🟢 ONLINE → {$deviceId} ({$diff}s ago)");
+            $this->info("ONLINE -> {$deviceId} ({$diff}s ago)");
 
             Cache::put($statusKey, self::STATUS_ONLINE, self::STATUS_TTL);
             Cache::forget($unknownKey);
@@ -144,7 +144,7 @@ class CheckDeviceStatus extends Command
             $roomExists = Room::where('device_id', $deviceId)->exists();
 
             if (!$roomExists) {
-                $this->line("👻 Orphan device found in cache: {$deviceId}");
+                $this->line("Orphan device found in cache: {$deviceId}");
             }
         }
     }

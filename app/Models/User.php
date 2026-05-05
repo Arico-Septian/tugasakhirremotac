@@ -11,6 +11,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'is_online',
         'last_activity',
         'last_login_at',
         'last_logout_at'
@@ -26,6 +27,7 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'last_logout_at' => 'datetime',
         'is_active' => 'boolean',
+        'is_online' => 'boolean',
     ];
 
     protected $appends = ['isOnline', 'status_text'];
