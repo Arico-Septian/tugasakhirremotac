@@ -9,13 +9,14 @@ use App\Models\UserLog;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class RoomController extends Controller
 {
-public function index(Request $request)
+    public function index(Request $request)
     {
         $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -31,23 +32,16 @@ public function index(Request $request)
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
 
-            if ($status !== 'offline' && $lastSeen && now()->diffInSeconds($lastSeen) <= 30) {
-                $status = 'online';
-            } elseif ($status === 'online' && $lastSeen && now()->diffInSeconds($lastSeen) > 30) {
-                $status = 'offline';
+            if ($lastSeen) {
+                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
             }
 
-            $room->device_status = $status;
+            $isOnline = ($status === 'online' || $status === 'available') && $lastSeen && now()->diffInSeconds($lastSeen) <= 30;
+            $room->device_status = $isOnline ? 'online' : 'offline';
+
             $room->temperature = optional(
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
-        }
-
-        // Filter room by device status (ESP Online/Offline)
-        $statusFilter = $request->query('status');
-        if (in_array($statusFilter, ['active', 'inactive'], true)) {
-            $wanted = $statusFilter === 'active' ? 'online' : 'offline';
-            $rooms = $rooms->filter(fn($room) => ($room->device_status ?? 'offline') === $wanted)->values();
         }
 
         return view('rooms.index', compact('rooms'));
@@ -177,6 +171,12 @@ public function index(Request $request)
     public function status($id)
     {
         $room = Room::findOrFail($id);
+
+        // Tambahkan suhu terbaru agar bisa ditampilkan di halaman detail status
+        $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
+        $room->temperature = optional(
+            $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
+        )->temperature;
 
         $acs = AcUnit::with('status')
             ->where('room_id', $id)

@@ -22,15 +22,12 @@ class DashboardController extends Controller
         }
 
         $totalRooms = $rooms->count();
-        $totalAc = AcUnit::count();
 
-        $activeAc = AcUnit::whereHas('status', function ($q) {
-            $q->where('power', 'ON');
-        })->count();
-
-        $inactiveAc = AcUnit::whereDoesntHave('status', function ($q) {
-            $q->where('power', 'ON');
-        })->count();
+        // Mengambil semua unit AC dari koleksi rooms untuk efisiensi query
+        $allAcUnits = $rooms->flatMap->acUnits;
+        $totalAc = $allAcUnits->count();
+        $activeAc = $allAcUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
+        $inactiveAc = $totalAc - $activeAc;
 
         return view('dashboard.dashboard', compact(
             'rooms',

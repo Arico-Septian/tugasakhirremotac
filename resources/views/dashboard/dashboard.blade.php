@@ -400,36 +400,6 @@
                     </div>
                     <!-- END STATISTICS -->
 
-                    <!-- ROOM STATUS CONTROLS -->
-                    <div class="grid grid-cols-2 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-8">
-                        <a href="/rooms?status=active" class="room-card w-full flex items-center justify-between p-4 md:p-5 hover:scale-[1.01] transition border border-green-500/30">
-                            <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                    <img src="/images/kontrol.png" alt="kontrol" class="w-6 h-6" style="filter: hue-rotate(90deg);" />
-                                </div>
-                                <div>
-                                    <p class="text-xs md:text-sm text-green-200 font-bold">Room aktif</p>
-                                    <h3 class="text-base md:text-lg font-semibold">ESP Online</h3>
-                                </div>
-                            </div>
-                            <div class="text-green-300 text-2xl">→</div>
-                        </a>
-
-                        <a href="/rooms?status=inactive" class="room-card w-full flex items-center justify-between p-4 md:p-5 hover:scale-[1.01] transition border border-red-500/30">
-                            <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-xl bg-red-500/20 flex items-center justify-center">
-                                    <img src="/images/kontrol.png" alt="kontrol" class="w-6 h-6" style="filter: hue-rotate(-80deg);" />
-                                </div>
-                                <div>
-                                    <p class="text-xs md:text-sm text-red-200 font-bold">Room tidak aktif</p>
-                                    <h3 class="text-base md:text-lg font-semibold">ESP Offline</h3>
-                                </div>
-                            </div>
-                            <div class="text-red-300 text-2xl">→</div>
-                        </a>
-                    </div>
-                    <!-- END ROOM STATUS CONTROLS -->
-
                     <!-- TEMPERATURE CHART -->
                     <div class="bg-slate-900/70 rounded-xl p-3 md:p-4 max-w-3xl mx-auto">
                         <h2 class="text-lg font-semibold text-white mb-4">Room Temperature Overview</h2>
