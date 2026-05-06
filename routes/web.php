@@ -154,6 +154,8 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
         Route::post('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
         Route::post('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
+        Route::post('/ac/{id}/fan-speed/{speed}', [AcControlController::class, 'setFanSpeed']);
+        Route::post('/ac/{id}/swing/{swing}', [AcControlController::class, 'setSwing']);
         Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
         Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
 
@@ -171,6 +173,8 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                         'power' => 'OFF',
                         'mode' => 'COOL',
                         'set_temperature' => 24,
+                        'fan_speed' => 'AUTO',
+                        'swing' => 'OFF',
                     ]
                 )
                 : null;
@@ -178,6 +182,8 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             $power = strtoupper(trim((string) ($changes['power'] ?? $status?->power ?? 'OFF')));
             $mode = strtoupper(trim((string) ($changes['mode'] ?? $status?->mode ?? 'COOL')));
             $temp = min(30, max(16, (int) ($changes['temp'] ?? $status?->set_temperature ?? 24) ?: 24));
+            $fanSpeed = strtoupper(trim((string) ($changes['fan_speed'] ?? $status?->fan_speed ?? 'AUTO')));
+            $swing = strtoupper(trim((string) ($changes['swing'] ?? $status?->swing ?? 'OFF')));
 
             if (!in_array($power, ['ON', 'OFF'], true)) {
                 $power = 'OFF';
@@ -187,10 +193,20 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                 $mode = 'COOL';
             }
 
+            if (!in_array($fanSpeed, ['AUTO', 'LOW', 'MEDIUM', 'HIGH'], true)) {
+                $fanSpeed = 'AUTO';
+            }
+
+            if (!in_array($swing, ['OFF', 'FULL', 'HALF', 'DOWN'], true)) {
+                $swing = 'OFF';
+            }
+
             $payload = [
                 'power' => $power,
                 'mode' => $mode,
                 'temp' => $temp,
+                'fan_speed' => $fanSpeed,
+                'swing' => $swing,
             ];
 
             (new MqttService())->publish(
@@ -205,6 +221,8 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                     'power' => $power,
                     'mode' => $mode,
                     'set_temperature' => $temp,
+                    'fan_speed' => $fanSpeed,
+                    'swing' => $swing,
                 ]);
             }
         };
@@ -271,6 +289,18 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             $publishAcControl($room, $id, ['temp' => $temp]);
 
             return 'Temperatur diubah';
+        });
+
+        Route::get('/ac-fan-speed/{room}/{id}/{speed}', function ($room, $id, $speed) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['fan_speed' => $speed]);
+
+            return 'Fan speed AC diubah';
+        });
+
+        Route::get('/ac-swing/{room}/{id}/{swing}', function ($room, $id, $swing) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['swing' => $swing]);
+
+            return 'Swing AC diubah';
         });
     });
 

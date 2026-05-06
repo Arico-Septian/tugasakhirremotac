@@ -68,7 +68,9 @@ class MqttService
                 json_encode([
                     "power" => $status->power,
                     "mode"  => $status->mode,
-                    "temp"  => (int)($status->set_temperature ?? 24)
+                    "temp"  => (int)($status->set_temperature ?? 24),
+                    "fan_speed" => $status->fan_speed ?? 'AUTO',
+                    "swing" => $status->swing ?? 'OFF',
                 ]),
                 1,
                 true

@@ -418,6 +418,30 @@
                                             </span>
                                         </div>
 
+                                        <!-- Fan Speed -->
+                                        <div
+                                            class="bg-cyan-500/20 text-cyan-300 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-wind"></i> Fan Speed
+                                            </span>
+                                            <span id="fan-{{ $ac->id }}"
+                                                class="font-semibold transition-all duration-300">
+                                                {{ strtoupper($ac->status?->fan_speed ?? 'AUTO') }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Swing -->
+                                        <div
+                                            class="bg-indigo-500/20 text-indigo-300 p-3 rounded-lg mb-3 flex justify-between text-sm">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-arrows-up-down"></i> Swing
+                                            </span>
+                                            <span id="swing-{{ $ac->id }}"
+                                                class="font-semibold transition-all duration-300">
+                                                {{ strtoupper($ac->status?->swing ?? 'OFF') }}
+                                            </span>
+                                        </div>
+
                                         <!-- Timer -->
                                         <div
                                             class="bg-yellow-500/20 text-yellow-300 p-3 rounded-lg flex justify-between text-sm">
@@ -590,6 +614,14 @@
                         // Update mode
                         const mode = (item.mode || ac.mode || 'AUTO').toUpperCase();
                         updateElement('mode-' + id, mode);
+
+                        // Update fan speed
+                        const fanSpeed = (item.fan_speed || ac.fan_speed || 'AUTO').toUpperCase();
+                        updateElement('fan-' + id, fanSpeed);
+
+                        // Update swing
+                        const swing = (item.swing || ac.swing || 'OFF').toUpperCase();
+                        updateElement('swing-' + id, swing);
 
                         // Update timer
                         const timerEl = document.getElementById('timer-' + id);

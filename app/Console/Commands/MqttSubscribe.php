@@ -18,11 +18,13 @@ class MqttSubscribe extends Command
 
     public function handle()
     {
-        $mqtt = new MqttService();
+        while (true) {
+            try {
+                $mqtt = new MqttService();
 
-        $this->info("MQTT LISTENER STARTED");
+                $this->info("MQTT LISTENER STARTED");
 
-        $mqtt->subscribeMultiple([
+                $mqtt->subscribeMultiple([
 
             /* === DEVICE ONLINE === */
             'device/+/online' => function ($topic, $message) use ($mqtt) {
@@ -130,6 +132,12 @@ class MqttSubscribe extends Command
                     'set_temperature' => $this->normalizeTemperature(
                         $data['temp'] ?? $data['ac_temp'] ?? $status->set_temperature ?? 24
                     ),
+                    'fan_speed' => $this->normalizeFanSpeed(
+                        $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
+                    ),
+                    'swing' => $this->normalizeSwing(
+                        $data['swing'] ?? $status->swing ?? 'OFF'
+                    ),
                 ])->save();
 
                 $this->info("AC {$acId} di {$roomName} diupdate");
@@ -198,11 +206,19 @@ class MqttSubscribe extends Command
                     $temp = $this->normalizeTemperature(
                         $data['ac_temp'] ?? $data['temp'] ?? $status->set_temperature ?? 24
                     );
+                    $fanSpeed = $this->normalizeFanSpeed(
+                        $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
+                    );
+                    $swing = $this->normalizeSwing(
+                        $data['swing'] ?? $status->swing ?? 'OFF'
+                    );
 
                     $status->fill([
                         'power' => $power,
                         'mode' => $mode,
                         'set_temperature' => $temp,
+                        'fan_speed' => $fanSpeed,
+                        'swing' => $swing,
                     ])->save();
 
                     Log::info("MQTT STATUS UPDATED", [
@@ -210,7 +226,9 @@ class MqttSubscribe extends Command
                         'ac' => $acNumber,
                         'power' => $power,
                         'mode' => $mode,
-                        'temp' => $temp
+                        'temp' => $temp,
+                        'fan_speed' => $fanSpeed,
+                        'swing' => $swing,
                     ]);
                 } catch (\Throwable $e) {
 
@@ -272,13 +290,26 @@ class MqttSubscribe extends Command
                         'power' => 'OFF',
                         'mode' => 'COOL',
                         'set_temperature' => 24,
+                        'fan_speed' => 'AUTO',
+                        'swing' => 'OFF',
                     ]
                 );
 
                 $this->info("AC ditambahkan ke {$roomName}");
             },
 
-        ]);
+                ]);
+            } catch (\Throwable $e) {
+                Log::error("MQTT SUBSCRIBER ERROR", [
+                    'error' => $e->getMessage(),
+                ]);
+
+                $this->error("MQTT subscriber error: " . $e->getMessage());
+                $this->line("Retrying in 5 seconds...");
+
+                sleep(5);
+            }
+        }
     }
 
     /* === HELPER: SET ONLINE === */
@@ -332,5 +363,19 @@ class MqttSubscribe extends Command
         $temperature = (int) $value;
 
         return min(30, max(16, $temperature ?: 24));
+    }
+
+    private function normalizeFanSpeed($value)
+    {
+        $fanSpeed = strtoupper(trim((string) $value));
+
+        return in_array($fanSpeed, ['AUTO', 'LOW', 'MEDIUM', 'HIGH'], true) ? $fanSpeed : 'AUTO';
+    }
+
+    private function normalizeSwing($value)
+    {
+        $swing = strtoupper(trim((string) $value));
+
+        return in_array($swing, ['OFF', 'FULL', 'HALF', 'DOWN'], true) ? $swing : 'OFF';
     }
 }

@@ -24,7 +24,7 @@ class MqttListener extends Command
 
             try {
 
-                $this->info("🔄 Connecting MQTT...");
+                $this->info("Connecting MQTT...");
 
                 $mqtt = new MqttClient($server, $port, 'laravel-listener');
 
@@ -35,7 +35,7 @@ class MqttListener extends Command
 
                 $mqtt->connect($settings, true);
 
-                $this->info("✅ Connected to MQTT");
+                $this->info("Connected to MQTT");
 
                 $mqtt->subscribe('room/+/temperature', function ($topic, $message, $retained) {
 
@@ -46,12 +46,12 @@ class MqttListener extends Command
                     $data = json_decode($message, true);
 
                     if (!is_array($data)) {
-                        echo "❌ JSON tidak valid: $message\n";
+                        echo "JSON tidak valid: $message\n";
                         return;
                     }
 
                     if (!isset($data['temperature'], $data['room'])) {
-                        echo "⚠️ Data tidak lengkap\n";
+                        echo "Data tidak lengkap\n";
                         return;
                     }
 
@@ -65,14 +65,14 @@ class MqttListener extends Command
                     $room = $roomModel ? $roomModel->name : $roomKey;
 
                     if (!is_numeric($data['temperature'])) {
-                        echo "⚠️ Temperature bukan angka\n";
+                        echo "Temperature bukan angka\n";
                         return;
                     }
 
                     $temperature = (float) $data['temperature'];
 
                     if ($temperature < 10 || $temperature > 60) {
-                        echo "⚠️ Suhu tidak wajar: $temperature\n";
+                        echo "Suhu tidak wajar: $temperature\n";
                         return;
                     }
 
@@ -98,7 +98,7 @@ class MqttListener extends Command
                         Log::info('Temperature received', compact('room', 'temperature'));
 
                         if (app()->environment('local')) {
-                            echo "🌡 [$room] $temperature °C\n";
+                            echo "[{$room}] {$temperature} C\n";
                         }
                     }
 
@@ -108,7 +108,7 @@ class MqttListener extends Command
 
             } catch (\Throwable $e) {
 
-                $this->error("❌ MQTT ERROR: " . $e->getMessage());
+                $this->error("MQTT ERROR: " . $e->getMessage());
 
                 if (isset($mqtt)) {
                     try {

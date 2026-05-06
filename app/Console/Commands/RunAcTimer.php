@@ -25,11 +25,21 @@ class RunAcTimer extends Command
         $now   = Carbon::now('Asia/Jakarta');
         $today = Carbon::today('Asia/Jakarta');
 
-        $this->info("🕐 Checking AC timers at " . $now->toDateTimeString());
+        $this->info("Checking AC timers at " . $now->toDateTimeString());
 
-        $mqtt = new MqttService();
+        try {
+            $mqtt = new MqttService();
+        } catch (\Throwable $e) {
+            Log::error("MQTT TIMER CONNECTION ERROR", [
+                'error' => $e->getMessage(),
+            ]);
 
-        $acs = AcUnit::with(['room:id,name', 'status:id,ac_unit_id,power,mode,set_temperature'])
+            $this->error("MQTT connection failed: " . $e->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        $acs = AcUnit::with(['room:id,name', 'status:id,ac_unit_id,power,mode,set_temperature,fan_speed,swing'])
             ->select('id', 'room_id', 'ac_number', 'timer_on', 'timer_off')
             ->whereHas('room')
             ->where(function ($q) {
@@ -59,6 +69,8 @@ class RunAcTimer extends Command
                     'power' => 'OFF',
                     'mode' => 'COOL',
                     'set_temperature' => 24,
+                    'fan_speed' => 'AUTO',
+                    'swing' => 'OFF',
                 ]
             );
 
@@ -97,13 +109,15 @@ class RunAcTimer extends Command
                             continue;
                         }
 
-                        $this->info("⏰ Executing timer: AC {$ac->ac_number} → {$expectedStatus}");
+                        $this->info("Executing timer: AC {$ac->ac_number} -> {$expectedStatus}");
 
                         // Kirim perintah ke MQTT
                         $mqtt->publish($topic, json_encode([
                             "power" => $expectedStatus,
                             "mode"  => $status->mode ?? 'COOL',
                             "temp"  => (int)($status->set_temperature ?? 24),
+                            "fan_speed" => $status->fan_speed ?? 'AUTO',
+                            "swing" => $status->swing ?? 'OFF',
                         ]), 1, true);
 
                         // Update database
@@ -124,7 +138,7 @@ class RunAcTimer extends Command
                             'timer_at' => $timer->toDateTimeString()
                         ]);
 
-                        $this->info("✅ TIMER {$expectedStatus} → AC {$ac->ac_number}");
+                        $this->info("TIMER {$expectedStatus} -> AC {$ac->ac_number}");
 
                     } catch (\Exception $e) {
                         Log::error("MQTT {$expectedStatus} ERROR", [
@@ -132,7 +146,7 @@ class RunAcTimer extends Command
                             'error'  => $e->getMessage(),
                             'topic'  => $topic
                         ]);
-                        $this->error("❌ Failed: AC {$ac->ac_number} - " . $e->getMessage());
+                        $this->error("Failed: AC {$ac->ac_number} - " . $e->getMessage());
                     } finally {
                         optional($lock)->release();
                     }
@@ -140,7 +154,7 @@ class RunAcTimer extends Command
             }
         }
 
-        $this->info("✅ Timer check completed");
+        $this->info("Timer check completed");
         return Command::SUCCESS;
     }
 }

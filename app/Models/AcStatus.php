@@ -10,7 +10,9 @@ class AcStatus extends Model
         'ac_unit_id',
         'power',
         'set_temperature',
-        'mode'
+        'mode',
+        'fan_speed',
+        'swing',
     ];
 
     public function acUnit()

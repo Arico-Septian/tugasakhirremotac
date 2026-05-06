@@ -23,6 +23,10 @@ return new class extends Migration
 
             $table->enum('mode', ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'])->default('AUTO');
 
+            $table->enum('fan_speed', ['AUTO', 'LOW', 'MEDIUM', 'HIGH'])->default('AUTO');
+
+            $table->enum('swing', ['OFF', 'FULL', 'HALF', 'DOWN'])->default('OFF');
+
             $table->timestamps();
         });
     }

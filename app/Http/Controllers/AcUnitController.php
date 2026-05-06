@@ -52,6 +52,8 @@ class AcUnitController extends Controller
             'power' => 'OFF',
             'mode' => 'COOL',
             'set_temperature' => 24,
+            'fan_speed' => 'AUTO',
+            'swing' => 'OFF',
             'room_temperature' => 24,
         ]);
 

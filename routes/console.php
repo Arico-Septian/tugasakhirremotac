@@ -19,13 +19,3 @@ Schedule::command('device:check-status')
 Schedule::command('ac:run-timer')
     ->everyMinute()
     ->withoutOverlapping();
-
-Schedule::command('mqtt:subscribe')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground();
-
-Schedule::command('app:mqtt-listener')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground();

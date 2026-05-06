@@ -540,23 +540,35 @@
                                 <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[350px_1fr] gap-4">
 
                                     <!-- STATUS MOBILE ONLY (di atas) -->
-                                    <div class="flex gap-2 mb-4 md:hidden">
-                                        <div class="ac-card flex-1 text-center py-2">
+                                    <div class="grid grid-cols-2 gap-2 mb-4 md:hidden">
+                                        <div class="ac-card text-center py-2">
                                             <p class="text-xs text-gray-400">POWER</p>
                                             <p class="text-sm font-semibold text-green-400">
                                                 {{ $ac->status?->power ?? 'OFF' }}
                                             </p>
                                         </div>
-                                        <div class="ac-card flex-1 text-center py-2">
+                                        <div class="ac-card text-center py-2">
                                             <p class="text-xs text-gray-400">TEMP</p>
                                             <p class="text-sm font-semibold text-yellow-300">
                                                 {{ $ac->status?->set_temperature ?? 24 }}°C
                                             </p>
                                         </div>
-                                        <div class="ac-card flex-1 text-center py-2">
+                                        <div class="ac-card text-center py-2">
                                             <p class="text-xs text-gray-400">MODE</p>
                                             <p class="text-sm font-semibold text-blue-400">
                                                 {{ strtoupper($ac->status?->mode ?? 'cool') }}
+                                            </p>
+                                        </div>
+                                        <div class="ac-card text-center py-2">
+                                            <p class="text-xs text-gray-400">FAN</p>
+                                            <p class="text-sm font-semibold text-cyan-300">
+                                                {{ strtoupper($ac->status?->fan_speed ?? 'AUTO') }}
+                                            </p>
+                                        </div>
+                                        <div class="ac-card text-center py-2 col-span-2">
+                                            <p class="text-xs text-gray-400">SWING</p>
+                                            <p class="text-sm font-semibold text-purple-300">
+                                                {{ strtoupper($ac->status?->swing ?? 'OFF') }}
                                             </p>
                                         </div>
                                     </div>
@@ -603,7 +615,7 @@
                                     <!-- RIGHT: Info + Mode + Timer -->
                                     <div class="flex flex-col gap-4">
                                         <!-- STATUS DESKTOP ONLY (sembunyikan di mobile) -->
-                                        <div class="desktop-status grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                        <div class="desktop-status grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                                             <div class="ac-card text-center py-3">
                                                 <p class="text-xs text-gray-400">POWER</p>
                                                 <p class="text-lg font-semibold text-green-400">
@@ -622,6 +634,18 @@
                                                     {{ strtoupper($ac->status?->mode ?? 'cool') }}
                                                 </p>
                                             </div>
+                                            <div class="ac-card text-center py-3">
+                                                <p class="text-xs text-gray-400">FAN SPEED</p>
+                                                <p class="text-lg font-semibold text-cyan-300">
+                                                    {{ strtoupper($ac->status?->fan_speed ?? 'AUTO') }}
+                                                </p>
+                                            </div>
+                                            <div class="ac-card text-center py-3">
+                                                <p class="text-xs text-gray-400">SWING</p>
+                                                <p class="text-lg font-semibold text-purple-300">
+                                                    {{ strtoupper($ac->status?->swing ?? 'OFF') }}
+                                                </p>
+                                            </div>
                                         </div>
 
                                         <!-- Mode Selection -->
@@ -636,10 +660,56 @@
         'auto' => ['fa-rotate', 'Auto'],
     ] as $mode => [$icon, $label])
                                                     <form action="/ac/{{ $ac->id }}/mode/{{ $mode }}"
-                                                        method="POST" class="mode-form">
+                                                        method="POST" class="control-form">
                                                         @csrf
                                                         <button type="submit"
                                                             class="mode-btn {{ strtoupper($ac->status?->mode ?? 'cool') == strtoupper($mode) ? 'active' : '' }}">
+                                                            <i class="fa-solid {{ $icon }}"></i>
+                                                            {{ $label }}
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- Fan Speed Selection -->
+                                        <div class="ac-card">
+                                            <p class="text-gray-400 mb-4 text-sm">FAN SPEED</p>
+                                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                @foreach ([
+        'auto' => ['fa-fan', 'Auto'],
+        'low' => ['fa-wind', 'Low'],
+        'medium' => ['fa-gauge-simple', 'Medium'],
+        'high' => ['fa-gauge-high', 'High'],
+    ] as $speed => [$icon, $label])
+                                                    <form action="/ac/{{ $ac->id }}/fan-speed/{{ $speed }}"
+                                                        method="POST" class="control-form">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="mode-btn {{ strtoupper($ac->status?->fan_speed ?? 'AUTO') == strtoupper($speed) ? 'active' : '' }}">
+                                                            <i class="fa-solid {{ $icon }}"></i>
+                                                            {{ $label }}
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- Swing Selection -->
+                                        <div class="ac-card">
+                                            <p class="text-gray-400 mb-4 text-sm">SWING</p>
+                                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                @foreach ([
+        'off' => ['fa-ban', 'Diam'],
+        'full' => ['fa-arrows-up-down', 'Full'],
+        'half' => ['fa-compress', 'Setengah'],
+        'down' => ['fa-arrow-down', 'Ke Bawah'],
+    ] as $swing => [$icon, $label])
+                                                    <form action="/ac/{{ $ac->id }}/swing/{{ $swing }}"
+                                                        method="POST" class="control-form">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="mode-btn {{ strtoupper($ac->status?->swing ?? 'OFF') == strtoupper($swing) ? 'active' : '' }}">
                                                             <i class="fa-solid {{ $icon }}"></i>
                                                             {{ $label }}
                                                         </button>
@@ -975,8 +1045,8 @@
             });
         });
 
-        // ==================== MODE BUTTON HANDLER ====================
-        document.querySelectorAll('.mode-form').forEach(form => {
+        // ==================== AC CONTROL BUTTON HANDLER ====================
+        document.querySelectorAll('.control-form').forEach(form => {
             form.addEventListener('submit', function() {
                 const btn = this.querySelector('.mode-btn');
 
