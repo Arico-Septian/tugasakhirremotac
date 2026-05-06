@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
 
 class RoomController extends Controller
 {
-    public function index(Request $request)
+public function index(Request $request)
     {
         $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -41,6 +41,13 @@ class RoomController extends Controller
             $room->temperature = optional(
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
+        }
+
+        // Filter room by device status (ESP Online/Offline)
+        $statusFilter = $request->query('status');
+        if (in_array($statusFilter, ['active', 'inactive'], true)) {
+            $wanted = $statusFilter === 'active' ? 'online' : 'offline';
+            $rooms = $rooms->filter(fn($room) => ($room->device_status ?? 'offline') === $wanted)->values();
         }
 
         return view('rooms.index', compact('rooms'));
