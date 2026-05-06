@@ -599,6 +599,7 @@
                                             : 'Offline');
                                     $statusColor = $isOnline ? 'text-green-400' : 'text-gray-500';
                                     $statusDotColor = $isOnline ? 'bg-green-500' : 'bg-gray-500';
+                                    $isActive = $user->is_active ?? true;
                                     $avatarClass =
                                         $user->role == 'admin'
                                             ? 'admin'
@@ -679,8 +680,25 @@
                                                 class="text-xs {{ $statusColor }} font-medium">{{ $statusText }}</span>
                                         </div>
 
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold {{ $isActive ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20' }}">
+                                            <i class="fa-solid {{ $isActive ? 'fa-user-check' : 'fa-user-slash' }} text-[10px]"></i>
+                                            {{ $isActive ? 'Active' : 'Inactive' }}
+                                        </span>
+
                                         <!-- Action Buttons with Tooltips -->
                                         @if ($user->id !== Auth::user()->id)
+                                            <form action="/users/status/{{ $user->id }}" method="POST"
+                                                class="inline-flex"
+                                                onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="action-btn tooltip w-9 h-9 flex items-center justify-center {{ $isActive ? 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/20' : 'text-green-400 hover:text-green-300 hover:bg-green-500/20' }} rounded-xl transition-all duration-200"
+                                                    data-tooltip="{{ $isActive ? 'Deactivate User' : 'Activate User' }}">
+                                                    <i class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-sm"></i>
+                                                </button>
+                                            </form>
+
                                             <button onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
                                                 class="action-btn tooltip w-9 h-9 flex items-center justify-center text-blue-400 hover:text-blue-300 rounded-xl hover:bg-blue-500/20 transition-all duration-200"
                                                 data-tooltip="Edit Role">

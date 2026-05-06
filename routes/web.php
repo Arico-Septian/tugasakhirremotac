@@ -46,11 +46,12 @@ Route::get('/system-check', function () {
     return response()->json(['status' => 'online']);
 });
 
-Route::middleware(['auth', 'active'])->group(function () {
+Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/rooms/{id}/status', [RoomController::class, 'status']);
 
     Route::get('/api/ac-status', function () {
@@ -248,7 +249,9 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/users-online', function () {
             return response()->json([
-                'count' => User::where('last_activity', '>=', now()->subMinutes(5))->count(),
+                'count' => User::where('is_active', true)
+                    ->where('last_activity', '>=', now()->subMinutes(5))
+                    ->count(),
             ]);
         });
     });

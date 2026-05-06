@@ -33,7 +33,7 @@
                     </h2>
 
                     <p class="text-gray-500">
-                        {{ $user->email }}
+                        {{ '@' . strtolower(str_replace(' ', '', $user->name)) }}
                     </p>
 
                     <span class="text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
@@ -65,11 +65,11 @@
                 <div>
 
                     <label class="text-gray-500 text-sm">
-                        Email
+                        Username
                     </label>
 
                     <p class="font-semibold">
-                        {{ $user->email }}
+                        {{ $user->name }}
                     </p>
 
                 </div>
@@ -84,6 +84,8 @@
             <form method="POST" action="/change-password">
                 @csrf
                 <input type="password" name="password" placeholder="New Password"
+                    class="border p-3 rounded-lg w-full mb-4">
+                <input type="password" name="password_confirmation" placeholder="Confirm New Password"
                     class="border p-3 rounded-lg w-full mb-4">
 
                 <button class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">

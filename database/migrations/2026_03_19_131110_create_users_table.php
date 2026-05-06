@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('password');
 
-            $table->string('role')->default('viewer');
+            $table->string('role')->default('user');
 
             $table->boolean('is_active')->default(true);
             $table->boolean('is_online')->default(false);

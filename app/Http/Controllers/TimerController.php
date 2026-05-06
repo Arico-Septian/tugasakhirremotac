@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AcUnit;
+use App\Models\UserLog;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class TimerController extends Controller
 {
@@ -15,7 +17,7 @@ class TimerController extends Controller
             'timer_off' => 'nullable|date_format:H:i',
         ]);
 
-        $ac = AcUnit::findOrFail($id);
+        $ac = AcUnit::with('room')->findOrFail($id);
 
         // VALIDASI LOGIKA
         if ($request->timer_on && $request->timer_off) {
@@ -44,6 +46,13 @@ class TimerController extends Controller
             $ac->update([
                 'timer_on'  => $newTimerOn,
                 'timer_off' => $newTimerOff,
+            ]);
+
+            UserLog::create([
+                'user_id' => Auth::id(),
+                'room' => optional($ac->room)->name,
+                'ac' => 'AC ' . $ac->ac_number,
+                'activity' => 'set_timer'
             ]);
         }
 

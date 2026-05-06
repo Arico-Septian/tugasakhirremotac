@@ -293,15 +293,31 @@
                     @php
                         function activityBadge($activity)
                         {
+                            if (str_starts_with($activity, 'set_temp_')) {
+                                return ['SET TEMP ' . str_replace('set_temp_', '', $activity), 'bg-yellow-500/20 text-yellow-300'];
+                            }
+
+                            if (str_starts_with($activity, 'mode_')) {
+                                return ['MODE ' . str_replace('mode_', '', $activity), 'bg-cyan-500/20 text-cyan-300'];
+                            }
+
                             return match ($activity) {
+                                'login' => ['LOGIN', 'bg-green-500/20 text-green-300'],
+                                'logout' => ['LOGOUT', 'bg-gray-500/20 text-gray-300'],
                                 'add_room' => ['ADD ROOM', 'bg-emerald-500/20 text-emerald-300'],
                                 'delete_room' => ['DELETE ROOM', 'bg-red-500/20 text-red-300'],
                                 'add_ac' => ['ADD AC', 'bg-blue-500/20 text-blue-300'],
                                 'delete_ac' => ['DELETE AC', 'bg-orange-500/20 text-orange-300'],
+                                'add_user' => ['ADD USER', 'bg-blue-500/20 text-blue-300'],
+                                'delete_user' => ['DELETE USER', 'bg-red-500/20 text-red-300'],
+                                'update_role' => ['UPDATE ROLE', 'bg-indigo-500/20 text-indigo-300'],
+                                'activate_user' => ['ACTIVATE USER', 'bg-green-500/20 text-green-300'],
+                                'deactivate_user' => ['DEACTIVATE USER', 'bg-red-500/20 text-red-300'],
+                                'change_password' => ['CHANGE PASSWORD', 'bg-amber-500/20 text-amber-300'],
                                 'on' => ['ON', 'bg-green-500/20 text-green-300'],
                                 'off' => ['OFF', 'bg-gray-500/20 text-gray-300'],
-                                'mode' => ['MODE', 'bg-cyan-500/20 text-cyan-300'],
                                 'set_timer' => ['SET TIMER', 'bg-yellow-500/20 text-yellow-300'],
+                                'control_ac' => ['CONTROL AC', 'bg-purple-500/20 text-purple-300'],
                                 default => [strtoupper($activity), 'bg-purple-500/20 text-purple-300'],
                             };
                         }
@@ -339,7 +355,7 @@
                                         {{ $log->user->name ?? '-' }}
                                     </div>
                                     <div class="text-xs text-gray-300">
-                                        Room: {{ $log->room }} | AC: {{ $log->ac }}
+                                        Target: {{ $log->room ?? '-' }} | Detail: {{ $log->ac ?? '-' }}
                                     </div>
                                     <div>
                                         @php [$label, $class] = activityBadge($log->activity); @endphp
@@ -360,8 +376,8 @@
                                 <thead class="border-b border-white/10 bg-white/5">
                                     <tr class="text-left text-gray-300">
                                         <th class="p-3">User</th>
-                                        <th class="p-3">Room</th>
-                                        <th class="p-3">AC</th>
+                                        <th class="p-3">Target</th>
+                                        <th class="p-3">Detail</th>
                                         <th class="p-3">Activity</th>
                                         <th class="p-3">Time</th>
                                     </tr>
@@ -369,9 +385,9 @@
                                 <tbody>
                                     @foreach ($logs as $log)
                                         <tr class="border-b hover:bg-white/5 transition">
-                                            <td class="p-3">{{ $log->user->name ?? '-' }}</td>
-                                            <td class="p-3">{{ $log->room }}</td>
-                                            <td class="p-3">{{ $log->ac }}</td>
+                                            <td class="p-3">{{ $log->user->name }}</td>
+                                            <td class="p-3">{{ $log->room ?? '-' }}</td>
+                                            <td class="p-3">{{ $log->ac ?? '-' }}</td>
                                             <td class="p-3">
                                                 @php [$label, $class] = activityBadge($log->activity); @endphp
                                                 <span
