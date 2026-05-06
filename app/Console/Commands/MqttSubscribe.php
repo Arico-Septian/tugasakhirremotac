@@ -98,7 +98,7 @@ class MqttSubscribe extends Command
 
                 $data = json_decode($message, true);
 
-                if (!$data) {
+                if (!is_array($data)) {
                     $this->warn("CONTROL tidak valid");
                     return;
                 }
@@ -118,14 +118,19 @@ class MqttSubscribe extends Command
 
                 if (!$ac) return;
 
-                AcStatus::updateOrCreate(
-                    ['ac_unit_id' => $ac->id],
-                    [
-                        'power' => $this->normalizePower($data['power'] ?? 'OFF'),
-                        'mode'  => $this->normalizeMode($data['mode'] ?? 'COOL'),
-                        'set_temperature' => $this->normalizeTemperature($data['temp'] ?? 24),
-                    ]
-                );
+                $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
+
+                $status->fill([
+                    'power' => array_key_exists('power', $data)
+                        ? $this->normalizePower($data['power'])
+                        : $this->normalizePower($status->power ?? 'OFF'),
+                    'mode' => array_key_exists('mode', $data)
+                        ? $this->normalizeMode($data['mode'])
+                        : $this->normalizeMode($status->mode ?? 'COOL'),
+                    'set_temperature' => $this->normalizeTemperature(
+                        $data['temp'] ?? $data['ac_temp'] ?? $status->set_temperature ?? 24
+                    ),
+                ])->save();
 
                 $this->info("AC {$acId} di {$roomName} diupdate");
             },
@@ -182,18 +187,23 @@ class MqttSubscribe extends Command
                         return;
                     }
 
-                    $power = $this->normalizePower($data['power'] ?? 'OFF');
-                    $mode  = $this->normalizeMode($data['mode'] ?? 'COOL');
-                    $temp  = $this->normalizeTemperature($data['ac_temp'] ?? $data['temp'] ?? 24);
+                    $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
 
-                    AcStatus::updateOrCreate(
-                        ['ac_unit_id' => $ac->id],
-                        [
-                            'power' => $power,
-                            'mode' => $mode,
-                            'set_temperature' => $temp,
-                        ]
+                    $power = array_key_exists('power', $data)
+                        ? $this->normalizePower($data['power'])
+                        : $this->normalizePower($status->power ?? 'OFF');
+                    $mode = array_key_exists('mode', $data)
+                        ? $this->normalizeMode($data['mode'])
+                        : $this->normalizeMode($status->mode ?? 'COOL');
+                    $temp = $this->normalizeTemperature(
+                        $data['ac_temp'] ?? $data['temp'] ?? $status->set_temperature ?? 24
                     );
+
+                    $status->fill([
+                        'power' => $power,
+                        'mode' => $mode,
+                        'set_temperature' => $temp,
+                    ])->save();
 
                     Log::info("MQTT STATUS UPDATED", [
                         'room' => $roomName,
@@ -314,7 +324,7 @@ class MqttSubscribe extends Command
     {
         $mode = strtoupper(trim((string) $value));
 
-        return in_array($mode, ['COOL', 'HEAT', 'FAN', 'AUTO'], true) ? $mode : 'COOL';
+        return in_array($mode, ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'], true) ? $mode : 'COOL';
     }
 
     private function normalizeTemperature($value)

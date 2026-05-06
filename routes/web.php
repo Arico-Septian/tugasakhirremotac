@@ -8,6 +8,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TimerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
+use App\Models\AcUnit;
 use App\Models\AcStatus;
 use App\Models\Room;
 use App\Models\RoomTemperature;
@@ -151,10 +152,62 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
         Route::get('/ac/{id}/on', [AcControlController::class, 'powerOn']);
         Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
-        Route::get('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
-        Route::get('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
+        Route::post('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
+        Route::post('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
         Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
         Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
+
+        $publishAcControl = function ($room, $id, array $changes) {
+            $roomName = strtolower(trim((string) $room));
+            $acNumber = (int) $id;
+            $roomModel = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+            $ac = $roomModel
+                ? AcUnit::where('room_id', $roomModel->id)->where('ac_number', $acNumber)->first()
+                : null;
+            $status = $ac
+                ? AcStatus::firstOrCreate(
+                    ['ac_unit_id' => $ac->id],
+                    [
+                        'power' => 'OFF',
+                        'mode' => 'COOL',
+                        'set_temperature' => 24,
+                    ]
+                )
+                : null;
+
+            $power = strtoupper(trim((string) ($changes['power'] ?? $status?->power ?? 'OFF')));
+            $mode = strtoupper(trim((string) ($changes['mode'] ?? $status?->mode ?? 'COOL')));
+            $temp = min(30, max(16, (int) ($changes['temp'] ?? $status?->set_temperature ?? 24) ?: 24));
+
+            if (!in_array($power, ['ON', 'OFF'], true)) {
+                $power = 'OFF';
+            }
+
+            if (!in_array($mode, ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'], true)) {
+                $mode = 'COOL';
+            }
+
+            $payload = [
+                'power' => $power,
+                'mode' => $mode,
+                'temp' => $temp,
+            ];
+
+            (new MqttService())->publish(
+                "room/{$roomName}/ac/{$acNumber}/control",
+                json_encode($payload),
+                1,
+                true
+            );
+
+            if ($status) {
+                $status->update([
+                    'power' => $power,
+                    'mode' => $mode,
+                    'set_temperature' => $temp,
+                ]);
+            }
+        };
 
         Route::get('/set-room/{room}', function ($room) {
             $mqtt = new MqttService();
@@ -186,51 +239,36 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             return 'AC dihapus';
         });
 
-        Route::get('/ac-control/{room}/{id}/{mode}/{temp}', function ($room, $id, $mode, $temp) {
-            $mqtt = new MqttService();
-            $topic = "room/{$room}/ac/{$id}/control";
-
-            $mqtt->publish($topic, json_encode([
+        Route::get('/ac-control/{room}/{id}/{mode}/{temp}', function ($room, $id, $mode, $temp) use ($publishAcControl) {
+            $publishAcControl($room, $id, [
                 'power' => 'ON',
                 'mode' => $mode,
                 'temp' => $temp,
-            ]));
+            ]);
 
             return 'AC berhasil dikontrol';
         });
 
-        Route::get('/ac-on/{room}/{id}', function ($room, $id) {
-            $mqtt = new MqttService();
-            $topic = "room/{$room}/ac/{$id}/control";
-
-            $mqtt->publish($topic, json_encode(['power' => 'ON']));
+        Route::get('/ac-on/{room}/{id}', function ($room, $id) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['power' => 'ON']);
 
             return 'AC dinyalakan';
         });
 
-        Route::get('/ac-off/{room}/{id}', function ($room, $id) {
-            $mqtt = new MqttService();
-            $topic = "room/{$room}/ac/{$id}/control";
-
-            $mqtt->publish($topic, json_encode(['power' => 'OFF']));
+        Route::get('/ac-off/{room}/{id}', function ($room, $id) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['power' => 'OFF']);
 
             return 'AC dimatikan';
         });
 
-        Route::get('/ac-mode/{room}/{id}/{mode}', function ($room, $id, $mode) {
-            $mqtt = new MqttService();
-            $topic = "room/{$room}/ac/{$id}/control";
-
-            $mqtt->publish($topic, json_encode(['mode' => $mode]));
+        Route::get('/ac-mode/{room}/{id}/{mode}', function ($room, $id, $mode) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['mode' => $mode]);
 
             return 'Mode AC diubah';
         });
 
-        Route::get('/ac-temp/{room}/{id}/{temp}', function ($room, $id, $temp) {
-            $mqtt = new MqttService();
-            $topic = "room/{$room}/ac/{$id}/control";
-
-            $mqtt->publish($topic, json_encode(['temp' => $temp]));
+        Route::get('/ac-temp/{room}/{id}/{temp}', function ($room, $id, $temp) use ($publishAcControl) {
+            $publishAcControl($room, $id, ['temp' => $temp]);
 
             return 'Temperatur diubah';
         });

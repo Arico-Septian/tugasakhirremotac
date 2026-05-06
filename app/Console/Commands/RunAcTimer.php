@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Services\MqttService;
 use Illuminate\Support\Facades\Cache;
@@ -28,8 +29,8 @@ class RunAcTimer extends Command
 
         $mqtt = new MqttService();
 
-        $acs = AcUnit::with('room:id,name')
-            ->select('id', 'room_id', 'ac_number', 'timer_on', 'timer_off', 'power_status')
+        $acs = AcUnit::with(['room:id,name', 'status:id,ac_unit_id,power,mode,set_temperature'])
+            ->select('id', 'room_id', 'ac_number', 'timer_on', 'timer_off')
             ->whereHas('room')
             ->where(function ($q) {
                 $q->whereNotNull('timer_on')
@@ -52,6 +53,14 @@ class RunAcTimer extends Command
             $version = Cache::get("timer_version_{$ac->id}", 1);
             $roomName = strtolower(trim($ac->room->name));
             $topic   = "room/{$roomName}/ac/{$ac->ac_number}/control";
+            $status = $ac->status ?: AcStatus::firstOrCreate(
+                ['ac_unit_id' => $ac->id],
+                [
+                    'power' => 'OFF',
+                    'mode' => 'COOL',
+                    'set_temperature' => 24,
+                ]
+            );
 
             foreach (['on', 'off'] as $type) {
 
@@ -71,7 +80,7 @@ class RunAcTimer extends Command
                     $diff >= self::WINDOW_BEFORE &&
                     $diff <= self::WINDOW_AFTER &&
                     !$alreadyExecuted &&
-                    $ac->power_status !== $expectedStatus
+                    $status->power !== $expectedStatus
                 ) {
 
                     $lock = Cache::lock("lock:{$key}", 10);
@@ -92,12 +101,14 @@ class RunAcTimer extends Command
 
                         // Kirim perintah ke MQTT
                         $mqtt->publish($topic, json_encode([
-                            "power" => $expectedStatus
-                        ]), 1, false);
+                            "power" => $expectedStatus,
+                            "mode"  => $status->mode ?? 'COOL',
+                            "temp"  => (int)($status->set_temperature ?? 24),
+                        ]), 1, true);
 
                         // Update database
-                        $ac->update([
-                            'power_status' => $expectedStatus
+                        $status->update([
+                            'power' => $expectedStatus
                         ]);
 
                         // Tandai sudah dieksekusi

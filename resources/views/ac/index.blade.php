@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AC Units - Management Control</title>
 
     <link href="/css/app.css" rel="stylesheet">
@@ -147,6 +148,7 @@
         /* ===== MODE BUTTON ===== */
         .mode-btn {
             display: flex;
+            width: 100%;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -160,6 +162,7 @@
             color: white;
             cursor: pointer;
             text-decoration: none;
+            font-family: inherit;
         }
 
         .mode-btn:hover {
@@ -583,11 +586,13 @@
 
                                         <div class="flex gap-3 md:gap-6 mt-6">
                                             <button
+                                                type="button"
                                                 onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) - 1 }})"
                                                 class="temp-btn w-10 h-10 md:w-12 md:h-12 bg-slate-700 text-white rounded-full text-xl hover:bg-slate-600 transition">
                                                 −
                                             </button>
                                             <button
+                                                type="button"
                                                 onclick="setTemp({{ $ac->id }}, {{ ($ac->status?->set_temperature ?? 24) + 1 }})"
                                                 class="temp-btn w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-full text-xl hover:bg-blue-700 transition">
                                                 +
@@ -630,11 +635,15 @@
         'fan' => ['fa-fan', 'Fan'],
         'auto' => ['fa-rotate', 'Auto'],
     ] as $mode => [$icon, $label])
-                                                    <a href="/ac/{{ $ac->id }}/mode/{{ $mode }}"
-                                                        class="mode-btn {{ strtoupper($ac->status?->mode ?? 'cool') == strtoupper($mode) ? 'active' : '' }}">
-                                                        <i class="fa-solid {{ $icon }}"></i>
-                                                        {{ $label }}
-                                                    </a>
+                                                    <form action="/ac/{{ $ac->id }}/mode/{{ $mode }}"
+                                                        method="POST" class="mode-form">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="mode-btn {{ strtoupper($ac->status?->mode ?? 'cool') == strtoupper($mode) ? 'active' : '' }}">
+                                                            <i class="fa-solid {{ $icon }}"></i>
+                                                            {{ $label }}
+                                                        </button>
+                                                    </form>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -819,7 +828,22 @@
                 btn.style.opacity = '0.5';
             });
 
-            window.location.href = '/ac/' + id + '/temp/' + temp;
+            const form = document.createElement('form');
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            form.method = 'POST';
+            form.action = '/ac/' + id + '/temp/' + temp;
+
+            if (token) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '_token';
+                input.value = token;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
         }
 
         // ==================== TIMER FUNCTIONS ====================
@@ -952,15 +976,15 @@
         });
 
         // ==================== MODE BUTTON HANDLER ====================
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                if (!this.hasAttribute('href')) return;
+        document.querySelectorAll('.mode-form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('.mode-btn');
 
-                // Show loading on clicked mode button
-                const originalHtml = this.innerHTML;
-                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
-                this.style.opacity = '0.7';
-                this.style.pointerEvents = 'none';
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+                    btn.style.opacity = '0.7';
+                    btn.style.pointerEvents = 'none';
+                }
             });
         });
 

@@ -7,25 +7,62 @@ use App\Models\AcUnit;
 use App\Models\Room;
 use App\Models\UserLog;
 use App\Services\MqttService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AcControlController extends Controller
 {
+    private const MODES = ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'];
+
     private $mqtt;
 
     public function __construct()
     {
         $this->mqtt = new MqttService();
     }
-    private function sendFullState($ac, $room, $status)
+    private function statusFor(AcUnit $ac): AcStatus
+    {
+        return AcStatus::firstOrCreate(
+            ['ac_unit_id' => $ac->id],
+            [
+                'power' => 'OFF',
+                'mode' => 'COOL',
+                'set_temperature' => 24,
+            ]
+        );
+    }
+
+    private function normalizeTemperature($value): int
+    {
+        return min(30, max(16, (int) $value ?: 24));
+    }
+
+    private function normalizeMode($mode): string
+    {
+        $mode = strtoupper(trim((string) $mode));
+
+        abort_unless(in_array($mode, self::MODES, true), 422, 'Mode AC tidak valid');
+
+        return $mode;
+    }
+
+    private function normalizePower($power): string
+    {
+        $power = strtoupper(trim((string) $power));
+
+        abort_unless(in_array($power, ['ON', 'OFF'], true), 422, 'Power AC tidak valid');
+
+        return $power;
+    }
+
+    private function sendFullState(AcUnit $ac, Room $room, AcStatus $status)
     {
         $this->mqtt->publish(
-            "room/" . strtolower($room->name) . "/ac/{$ac->ac_number}/control",
+            "room/" . strtolower(trim($room->name)) . "/ac/{$ac->ac_number}/control",
             json_encode([
                 "power" => $status->power ?? 'OFF',
                 "mode"  => $status->mode ?? 'COOL',
-                "temp"  => (int)($status->set_temperature ?? 24)
+                "temp"  => $this->normalizeTemperature($status->set_temperature ?? 24)
             ]),
             1,
             true
@@ -37,9 +74,7 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $status = AcStatus::firstOrCreate([
-            'ac_unit_id' => $id
-        ]);
+        $status = $this->statusFor($ac);
 
         $status->power = 'ON';
         $status->save();
@@ -61,9 +96,7 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $status = AcStatus::firstOrCreate([
-            'ac_unit_id' => $id
-        ]);
+        $status = $this->statusFor($ac);
 
         $status->power = 'OFF';
         $status->save();
@@ -85,9 +118,8 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $status = AcStatus::firstOrCreate([
-            'ac_unit_id' => $id
-        ]);
+        $value = $this->normalizeTemperature($value);
+        $status = $this->statusFor($ac);
 
         $status->set_temperature = $value;
         $status->save();
@@ -109,11 +141,10 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $status = AcStatus::firstOrCreate([
-            'ac_unit_id' => $id
-        ]);
+        $mode = $this->normalizeMode($mode);
+        $status = $this->statusFor($ac);
 
-        $status->mode = strtoupper($mode);
+        $status->mode = $mode;
         $status->save();
 
         $this->sendFullState($ac, $room, $status);
@@ -122,7 +153,7 @@ class AcControlController extends Controller
             'user_id' => Auth::id(),
             'room' => $room->name,
             'ac' => $ac->ac_number,
-            'activity' => 'mode_' . strtoupper($mode)
+            'activity' => 'mode_' . $mode
         ]);
 
         return back();
@@ -133,9 +164,7 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $status = AcStatus::firstOrCreate([
-            'ac_unit_id' => $ac->id
-        ]);
+        $status = $this->statusFor($ac);
 
         $status->power = ($status->power == 'ON') ? 'OFF' : 'ON';
         $status->save();
@@ -157,24 +186,19 @@ class AcControlController extends Controller
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
 
-        $topic = "room/" . strtolower($room->name) . "/ac/{$ac->ac_number}/control";
+        $status = $this->statusFor($ac);
 
-        $payload = [
-            "power" => $request->power,
-            "mode"  => $request->mode,
-            "temp"  => (int)$request->temp
-        ];
+        $power = $this->normalizePower($request->input('power', $status->power));
+        $mode = $this->normalizeMode($request->input('mode', $status->mode));
+        $temp = $this->normalizeTemperature($request->input('temp', $status->set_temperature));
 
-        $this->mqtt->publish($topic, json_encode($payload), 1, true);
+        $status->update([
+            'power' => $power,
+            'mode' => $mode,
+            'set_temperature' => $temp,
+        ]);
 
-        AcStatus::updateOrCreate(
-            ['ac_unit_id' => $ac->id],
-            [
-                'power' => $request->power,
-                'mode'  => $request->mode,
-                'set_temperature' => (int)$request->temp
-            ]
-        );
+        $this->sendFullState($ac, $room, $status);
 
         UserLog::create([
             'user_id' => Auth::id(),

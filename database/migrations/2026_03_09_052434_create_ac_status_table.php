@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->integer('set_temperature')->default(24);
 
-            $table->enum('mode', ['COOL', 'HEAT', 'FAN', 'AUTO'])->default('AUTO');
+            $table->enum('mode', ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'])->default('AUTO');
 
             $table->timestamps();
         });
