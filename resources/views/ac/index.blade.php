@@ -650,7 +650,7 @@
 
                                         <!-- Mode Selection -->
                                         <div class="ac-card">
-                                            <p class="text-gray-400 mb-4 text-sm">OPERATING MODE</p>
+                                            <p class="text-gray-400 mb-4 text-sm">MODE</p>
                                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                                 @foreach ([
         'cool' => ['fa-snowflake', 'Cool'],
