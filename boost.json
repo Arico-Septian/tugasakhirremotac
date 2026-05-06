@@ -2,11 +2,8 @@
     "agents": [
         "copilot"
     ],
-    "guidelines": true,
-    "herd_mcp": false,
+    "cloud": true,
     "mcp": true,
-    "sail": false,
-    "skills": [
-        "tailwindcss-development"
-    ]
+    "nightwatch": false,
+    "sail": false
 }
