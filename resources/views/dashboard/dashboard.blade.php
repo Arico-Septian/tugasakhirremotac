@@ -1,760 +1,411 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centralized AC Dashboard</title>
-
+    <title>Dashboard — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="/js/chart.umd.js"></script>
-
+    @include('components.sidebar-styles')
     <style>
-        /* ===== GLOBAL ===== */
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ===== BACKGROUND ===== */
-        .custom-bg {
-            background:
-                linear-gradient(rgba(10, 20, 80, 0.6), rgba(10, 20, 80, 0.7)),
-                url('/images/wallpaper.jpeg') no-repeat center center;
-            background-size: cover;
-        }
-
-        /* ===== LAYOUT ===== */
-        .layout {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 256px;
-            flex-shrink: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            z-index: 50;
-            overflow: hidden;
-            transition: width 0.25s ease;
-        }
-
-        .sidebar.close {
-            width: 80px;
-        }
-
-        .sidebar.close .menu-text,
-        .sidebar.close h2 span,
-        .sidebar.close .profile-full {
-            display: none;
-        }
-
-        .sidebar.close .profile-collapse {
-            display: block;
-        }
-
-        .sidebar.close ul li a {
-            justify-content: center;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 256px;
-            width: calc(100% - 256px);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left 0.3s ease, width 0.3s ease;
-            overflow: hidden;
-        }
-
-        .sidebar.close~.main-content {
-            margin-left: 80px;
-            width: calc(100% - 80px);
-        }
-
-        /* ===== HEADER - diam di atas ===== */
-        .main-header {
-            flex-shrink: 0;
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            color: white;
-            z-index: 30;
-        }
-
-        /* ===== PAGE BODY - area yang scroll ===== */
-        .page-body {
-            flex: 1;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 100px;
-        }
-
-        @media (min-width: 1024px) {
-            .page-body {
-                padding-bottom: 0;
-            }
-        }
-
-        /* ===== CARD ===== */
-        .room-card,
+        /* ===== STAT CARDS ===== */
         .stat-card {
-            background: rgba(15, 23, 42, 0.7);
-            color: white;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
             border-radius: 16px;
-            padding: 14px;
+            padding: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
-
-        .room-card:hover,
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--accent, #3b82f6);
+            opacity: 0.6;
+        }
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-
-        /* ===== ICON BOX ===== */
-        .icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+        .stat-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        /* ===== CHART CARD ===== */
+        .chart-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        /* ===== NODE CARD ===== */
+        .node-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 20px 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
+            gap: 16px;
         }
-
-        /* ===== OVERLAY ===== */
-        #overlay {
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .node-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(59,130,246,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-
-        #overlay.active {
-            opacity: 1;
+        /* ===== ALERT BANNER ===== */
+        .alert-banner {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
-
-        /* ===== MOBILE ===== */
-        @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                width: 256px !important;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
-        /* ===== SMALL SCREEN ===== */
-        @media (max-width: 768px) {
-            .stat-card {
-                padding: 10px;
-            }
-
-            .stat-card h2 {
-                font-size: 18px;
-            }
-
-            .stat-card p {
-                font-size: 13px;
-            }
-
-            h1,
-            h2,
-            h3 {
-                line-height: 1.2;
-            }
-        }
-
-        /* ===== REMOVE TAP ZOOM ===== */
-        a:active,
-        button:active {
-            transform: none !important;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .stat-card { padding: 14px 16px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 15px; }
         }
     </style>
 </head>
+<body>
+<div class="custom-bg"></div>
 
-<body class="custom-bg">
+<div id="overlay" class="fixed inset-0 bg-black/50 z-40"></div>
 
-    <!-- ==================== LAYOUT WRAPPER ==================== -->
-    <div class="layout">
+<div class="layout">
+    @include('components.sidebar')
 
-        <!-- OVERLAY (mobile) -->
-        <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40"></div>
-
-        <!-- ==================== SIDEBAR ==================== -->
-        <div id="sidebar" class="sidebar bg-slate-900 text-white shadow-lg p-6 border-r border-white/10">
-
-            <!-- Logo -->
-            <div class="flex justify-between items-center pb-5 mb-8 border-b border-white/10">
-                <h2 class="text-xl font-bold text-blue-500 flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <span class="menu-text">AC System</span>
-                </h2>
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-300">
-                    <i class="fa-solid fa-bars"></i>
+    <div class="main-content">
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()"
+                    class="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-300 transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div>
+                    <h1 class="text-base font-bold text-white leading-tight">Centralized AC</h1>
+                    <p class="text-xs text-blue-300 font-medium hidden sm:block">Server Room Cooling Control</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div id="systemStatus"
+                    class="flex items-center gap-1.5 bg-gray-500/10 text-gray-400 px-3 py-1.5 rounded-full text-xs font-medium transition-all">
+                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
+                    <span>Offline</span>
+                </div>
+                <button id="notifBtn" onclick="toggleNotifications()" title="Notifikasi Suhu Kritis"
+                    class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-500 transition">
+                    <i class="fa-regular fa-bell text-sm"></i>
                 </button>
             </div>
+        </header>
 
-            <!-- Menu -->
-            <ul class="space-y-4">
-                <li>
-                    <a href="/dashboard"
-                        class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
-                        {{ request()->is('dashboard') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
-                        <i class="fa-solid fa-chart-pie"></i>
-                        <span class="menu-text">Dashboard</span>
-                    </a>
-                </li>
+        <!-- PAGE BODY -->
+        <div class="page-body">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 py-5 space-y-6">
 
-                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                    <li>
-                        <a href="/rooms"
-                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
-                            {{ request()->is('rooms*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
-                            <i class="fa-solid fa-server"></i>
-                            <span class="menu-text">Manage Rooms & Ac Unit</span>
-                        </a>
-                    </li>
-                @endif
+                <!-- CRITICAL TEMPERATURE ALERT -->
+                <div id="tempAlertBanner" class="alert-banner" style="display:none;">
+                    <i class="fa-solid fa-triangle-exclamation text-red-400 text-base mt-0.5 flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-red-300 font-semibold text-sm">Peringatan Suhu Kritis!</p>
+                        <p id="tempAlertRooms" class="text-red-200 text-xs mt-0.5 leading-relaxed"></p>
+                    </div>
+                    <button onclick="document.getElementById('tempAlertBanner').style.display='none'"
+                        class="text-red-400 hover:text-red-200 flex-shrink-0">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
 
-                @if (Auth::user()->role == 'admin')
-                    <li>
-                        <a href="/users"
-                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
-                            {{ request()->is('users*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
-                            <i class="fa-solid fa-users"></i>
-                            <span class="menu-text">User Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/logs"
-                            class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl transition
-                            {{ request()->is('logs*') ? 'bg-white/10 text-white font-bold' : 'hover:bg-white/10 text-gray-300' }}">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span class="menu-text">Activity Log</span>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-
-            <!-- Profile -->
-            <div class="absolute bottom-6 left-6 right-6">
-                <div class="profile-full">
-                    <div class="w-full flex items-center gap-3 px-3 py-2">
-                        <div
-                            class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                <!-- STAT CARDS -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    <div class="stat-card" style="--accent:#3b82f6">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs text-gray-400 font-medium mb-1">Ruangan</p>
+                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $rooms->count() }}</h2>
+                            </div>
+                            <div class="stat-icon bg-blue-500/15 text-blue-400">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
                         </div>
-                        <div class="text-left menu-text">
-                            <p class="text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-400">{{ Auth::user()->role }}</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#818cf8">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs text-gray-400 font-medium mb-1">Unit AC</p>
+                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $totalAc }}</h2>
+                            </div>
+                            <div class="stat-icon bg-indigo-500/15 text-indigo-400">
+                                <i class="fa-solid fa-snowflake"></i>
+                            </div>
                         </div>
-                        <!-- PERBAIKAN: Form logout dengan POST -->
-                        <form action="/logout" method="POST" class="ml-auto">
-                            @csrf
-                            <button type="submit" class="text-red-500 hover:text-red-600 text-lg">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </button>
-                        </form>
+                    </div>
+                    <div class="stat-card" style="--accent:#22c55e">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs text-gray-400 font-medium mb-1">AC Aktif</p>
+                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $activeAc }}</h2>
+                            </div>
+                            <div class="stat-icon bg-green-500/15 text-green-400">
+                                <i class="fa-solid fa-power-off"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="--accent:#64748b">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs text-gray-400 font-medium mb-1">AC Nonaktif</p>
+                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $inactiveAc }}</h2>
+                            </div>
+                            <div class="stat-icon bg-slate-500/15 text-slate-400">
+                                <i class="fa-solid fa-plug-circle-xmark"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="profile-collapse hidden text-center">
-                    <form action="/logout" method="POST">
-                        @csrf
-                        <button class="text-red-500 text-xl">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
 
-        </div>
-        <!-- ==================== END SIDEBAR ==================== -->
-
-        <!-- ==================== MAIN CONTENT ==================== -->
-        <div class="main-content">
-
-            <!-- HEADER -->
-            <header class="main-header">
-                @auth
-                    <div class="flex items-center gap-3">
-                        <button class="lg:hidden text-gray-300 text-lg p-1 rounded-lg hover:bg-white/10 transition"
-                            onclick="toggleSidebar()">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
+                <!-- TEMPERATURE CHART -->
+                <div class="chart-card">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
-                            <h1 class="text-base md:text-xl font-bold text-white leading-tight">
-                                Centralized AC Management
-                            </h1>
-                            <p class="text-sm text-blue-200 font-medium">
-                                Server Room Cooling Control System
-                            </p>
+                            <h2 class="text-sm font-semibold text-white">Suhu Ruangan</h2>
+                            <p class="text-xs text-gray-500 mt-0.5">Real-time monitoring</p>
                         </div>
+                        <span id="chartLastUpdated" class="text-xs text-gray-500 font-medium">--</span>
                     </div>
-
-                    <div class="flex items-center gap-2 md:gap-6">
-                        <div id="systemStatus"
-                            class="flex items-center gap-2 bg-gray-500/10 text-gray-400 px-3 py-1 rounded-full text-sm font-medium">
-                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            Offline
-                        </div>
+                    <div style="height: 260px;">
+                        <canvas id="tempChart"></canvas>
                     </div>
-                @endauth
-            </header>
-            <!-- END HEADER -->
-
-            <!-- PAGE BODY -->
-            <div class="page-body">
-                <div class="w-full max-w-7xl mx-auto px-4 md:px-6 py-6">
-
-                    <!-- STATISTICS -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 md:mb-12">
-
-                        <div class="stat-card">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs md:text-sm text-gray-300 font-bold">Rooms</p>
-                                    <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
-                                        {{ $rooms->count() }}
-                                    </h2>
-                                </div>
-                                <div class="icon-box text-blue-500">
-                                    <i class="fa-solid fa-server"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs md:text-sm text-gray-300 font-bold">AC Units</p>
-                                    <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
-                                        {{ $totalAc }}
-                                    </h2>
-                                </div>
-                                <div class="icon-box text-indigo-500">
-                                    <i class="fa-solid fa-snowflake"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs md:text-sm text-gray-300 font-bold">AC Active</p>
-                                    <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
-                                        {{ $activeAc }}
-                                    </h2>
-                                </div>
-                                <div class="icon-box text-green-500">
-                                    <i class="fa-solid fa-power-off"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs md:text-sm text-gray-300 font-bold">AC Nonactive</p>
-                                    <h2 class="text-lg md:text-2xl font-bold text-white leading-tight">
-                                        {{ $inactiveAc }}
-                                    </h2>
-                                </div>
-                                <div class="icon-box text-gray-400">
-                                    <i class="fa-solid fa-plug-circle-xmark"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- END STATISTICS -->
-
-                    <!-- TEMPERATURE CHART -->
-                    <div class="bg-slate-900/70 rounded-xl p-3 md:p-4 max-w-3xl mx-auto">
-                        <h2 class="text-lg font-semibold text-white mb-4">Room Temperature Overview</h2>
-                        <div style="height: 300px;">
-                            <canvas id="tempChart"></canvas>
-                        </div>
-                    </div>
-                    <!-- END TEMPERATURE CHART -->
-
-                    <!-- SERVER ROOMS -->
-                    <h2 class="text-xl md:text-2xl font-bold text-white text-center mt-8 mb-6">
-                        Server Rooms
-                    </h2>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                        @foreach ($rooms as $room)
-                            <div class="room-card w-full">
-
-                                <div class="flex justify-between mb-3">
-                                    <h3 class="font-semibold text-sm md:text-lg text-white leading-tight">
-                                        {{ ucfirst($room->name) }}
-                                    </h3>
-                                    <i class="fa-solid fa-server text-gray-400"></i>
-                                </div>
-
-                                <p class="text-gray-400 -mt-1 text-sm">
-                                    Total : {{ $room->acUnits->count() }} units
-                                </p>
-
-                                @php $temp = $room->temperature; @endphp
-
-                                <div
-                                    class="p-2.5 md:p-3 rounded mb-3 text-sm flex justify-between
-                                    {{ is_null($temp) ? 'bg-white/10 text-gray-300' : ($temp > 30 ? 'bg-red-500/20 text-red-300' : ($temp > 25 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-blue-500/20 text-blue-300')) }}">
-                                    <span>Room Temperature</span>
-                                    <span id="temp-{{ $room->id }}" class="font-semibold">
-                                        {{ $temp ?? '--' }} &deg;C
-                                    </span>
-                                </div>
-
-                                <div
-                                    class="bg-green-500/20 text-green-300 p-3 rounded-lg mb-2 flex justify-between text-sm">
-                                    <span>Active Units</span>
-                                    <span class="font-semibold">
-                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count() }}
-                                    </span>
-                                </div>
-
-                                <div
-                                    class="bg-white/10 text-gray-300 p-3 rounded-lg mb-4 flex justify-between text-sm">
-                                    <span>Inactive Units</span>
-                                    <span class="font-semibold">
-                                        {{ $room->acUnits->filter(fn($ac) => optional($ac->status)->power !== 'ON')->count() }}
-                                    </span>
-                                </div>
-
-                                <a href="/rooms/{{ $room->id }}/status">
-                                    <button
-                                        class="w-full py-3 md:py-2 text-sm md:text-base rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
-                                        View Details
-                                    </button>
-                                </a>
-
-                            </div>
-                        @endforeach
-                    </div>
-                    <!-- END SERVER ROOMS -->
-
                 </div>
+
+                <!-- SERVER ROOMS NODE CARD -->
+                <a href="{{ route('rooms.overview') }}" class="node-card group">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl
+                                bg-gradient-to-br from-violet-600 to-indigo-600
+                                flex items-center justify-center shadow-lg shadow-violet-900/30">
+                        <i class="fa-solid fa-server text-white text-base"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-bold tracking-widest text-teal-400 mb-0.5">/// NODES</p>
+                        <h2 class="text-base font-bold text-white group-hover:text-blue-200 transition leading-tight">
+                            Server Rooms
+                        </h2>
+                        <p class="text-xs text-gray-500 truncate">{{ $totalRooms }} ruangan terdaftar</p>
+                    </div>
+                    <div class="flex-shrink-0 flex items-center gap-4 md:gap-6 pr-2">
+                        <div class="text-center hidden sm:block">
+                            <p class="text-lg font-bold text-white leading-none">{{ $totalRooms }}</p>
+                            <p class="text-[10px] text-gray-500 font-semibold tracking-wide mt-1">TOTAL</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-green-400 leading-none">{{ $onlineRooms }}</p>
+                            <p class="text-[10px] text-green-600 font-semibold tracking-wide mt-1">ONLINE</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-red-400 leading-none">{{ $offlineRooms }}</p>
+                            <p class="text-[10px] text-red-600 font-semibold tracking-wide mt-1">OFFLINE</p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 w-8 h-8 rounded-xl bg-white/6 group-hover:bg-blue-600
+                                transition-all flex items-center justify-center ml-1">
+                        <i class="fa-solid fa-arrow-right text-white text-xs"></i>
+                    </div>
+                </a>
+
             </div>
-            <!-- END PAGE BODY -->
-
         </div>
-        <!-- ==================== END MAIN CONTENT ==================== -->
-
     </div>
-    <!-- ==================== END LAYOUT WRAPPER ==================== -->
+</div>
 
-    <script>
-        // ---- Chart ----
-        const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
-        const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => is_null($t) ? null : (float) $t)->values());
-        const ctx = document.getElementById('tempChart');
+@include('components.bottom-nav')
 
-        function tempColor(temp) {
-            if (temp === null || Number.isNaN(Number(temp))) return '#64748b';
-            if (temp > 30) return '#ef4444';
-            if (temp > 25) return '#facc15';
+<script>
+const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
+const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => is_null($t) ? null : (float)$t)->values());
+const ctx = document.getElementById('tempChart');
 
-            return '#3b82f6';
-        }
+function tempColor(t) {
+    if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.6)';
+    if (t > 30) return 'rgba(239,68,68,0.8)';
+    if (t > 25) return 'rgba(250,204,21,0.8)';
+    return 'rgba(59,130,246,0.8)';
+}
 
-        const valueLabelPlugin = {
-            id: 'valueLabel',
-            afterDatasetsDraw(chart) {
-                const {
-                    ctx
-                } = chart;
-                const isMobile = window.innerWidth < 768;
-
-                chart.data.datasets.forEach((dataset, i) => {
-                    if (dataset.type !== 'bar') return;
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        if (Number.isFinite(value) && value > 0) {
-                            ctx.save();
-                            ctx.fillStyle = '#ffffff';
-                            ctx.font = isMobile ? 'bold 10px "Inter"' : 'bold 12px "Inter"';
-                            ctx.textAlign = 'center';
-                            ctx.fillText(value + '\u00B0C', bar.x, bar.y - 6);
-                            ctx.restore();
-                        }
-                    });
-                });
-            }
-        };
-
-        let tempChart;
-
-        function initChart() {
-            if (!ctx) return;
-
-            tempChart = new Chart(ctx, {
-                plugins: [valueLabelPlugin],
-                data: {
-                    labels: roomNames,
-                    datasets: [{
-                            type: 'bar',
-                            label: 'Temperature (\u00B0C)',
-                            data: roomTemps,
-                            backgroundColor: roomTemps.map(tempColor),
-                            borderRadius: 6,
-                            barPercentage: 0.75,
-                            categoryPercentage: 0.85
-                        },
-                        {
-                            type: 'line',
-                            label: 'Trend',
-                            data: roomTemps,
-                            borderColor: 'rgba(255,255,255,0.6)',
-                            backgroundColor: 'transparent',
-                            tension: 0.4,
-                            pointBackgroundColor: '#ffffff',
-                            pointRadius: 2,
-                            borderWidth: 2
-                        }
-                    ]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#94a3b8',
-                                font: {
-                                    family: 'Inter',
-                                    size: 11,
-                                    weight: '500'
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#94a3b8',
-                            borderColor: '#3b82f6',
-                            borderWidth: 1,
-                            padding: 8,
-                            cornerRadius: 8,
-                            bodyFont: {
-                                family: 'Inter',
-                                size: 12
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: '#94a3b8',
-                                maxRotation: 0,
-                                minRotation: 0,
-                                autoSkip: true,
-                                maxTicksLimit: 5,
-                                font: {
-                                    family: 'Inter',
-                                    size: 10,
-                                    weight: '500'
-                                }
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            suggestedMin: 20,
-                            suggestedMax: 40,
-                            ticks: {
-                                color: '#94a3b8',
-                                font: {
-                                    family: 'Inter',
-                                    size: 10
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(255,255,255,0.1)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // PERBAIKAN: Temperature Auto-Refresh dengan pengecekan chart
-        setInterval(() => {
-            if (!tempChart) return;
-
-            fetch('/temperature')
-                .then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    return res.json();
-                })
-                .then(data => {
-                    if (!tempChart) return;
-
-                    const safeData = data.map(room => {
-                        const temp = parseFloat(room.temp);
-                        return isNaN(temp) ? null : temp;
-                    });
-
-                    data.forEach(room => {
-                        const el = document.getElementById(`temp-${room.id}`);
-                        if (!el) return;
-
-                        const temp = parseFloat(room.temp);
-                        el.innerText = isNaN(temp) ? '-- \u00B0C' : `${temp} \u00B0C`;
-                    });
-
-                    tempChart.data.datasets[0].data = safeData;
-                    tempChart.data.datasets[1].data = safeData;
-                    tempChart.data.datasets[0].backgroundColor = safeData.map(tempColor);
-                    tempChart.update();
-                })
-                .catch(err => console.error('Error fetching temperature:', err));
-        }, 5000);
-    </script>
-
-    <script>
-        // ---- Sidebar Toggle ----
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-
-            if (window.innerWidth <= 1024) {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('hidden');
-            } else {
-                sidebar.classList.toggle('close');
-            }
-        }
-
-        document.getElementById('overlay').onclick = function() {
-            document.getElementById('sidebar').classList.remove('open');
-            this.classList.add('hidden');
-        };
-
-        // PERBAIKAN: Idle Timeout dengan POST request
-        const role = "{{ Auth::check() ? Auth::user()->role : '' }}";
-
-        const idleTime = role === 'admin' ? 10 * 60 * 1000 :
-            role === 'operator' ? 5 * 60 * 1000 :
-            2 * 60 * 1000;
-
-        let timeout;
-
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                // Buat form untuk logout via POST
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/logout';
-                form.style.display = 'none';
-
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = '{{ csrf_token() }}';
-                form.appendChild(csrf);
-
-                document.body.appendChild(form);
-                form.submit();
-            }, idleTime);
-        }
-
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
-
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) resetTimer();
-        });
-
-        // ---- Network Status ----
-        function setSystemStatus(isOnline) {
-            const el = document.getElementById('systemStatus');
-            if (!el) return;
-
-            const wrapperClass = isOnline ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400';
-            const dotClass = isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400';
-            const label = isOnline ? 'Online' : 'Offline';
-
-            el.className = `flex items-center gap-2 ${wrapperClass} px-3 py-1 rounded-full text-sm font-medium`;
-            el.innerHTML = `<span class="w-2 h-2 ${dotClass} rounded-full"></span> ${label}`;
-        }
-
-        function updateSystemStatus() {
-            setSystemStatus(navigator.onLine);
-        }
-
-        window.addEventListener('online', updateSystemStatus);
-        window.addEventListener('offline', updateSystemStatus);
-
-        // ---- Init on DOM Ready ----
-        document.addEventListener('DOMContentLoaded', () => {
-            initChart();
-            updateSystemStatus();
-            resetTimer();
-        });
-    </script>
-
-    <script>
-        document.querySelectorAll('.menu-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-
-                if (window.innerWidth <= 1024) {
-                    e.preventDefault();
-
-                    const sidebar = document.getElementById('sidebar');
-                    const overlay = document.getElementById('overlay');
-
-                    sidebar.classList.remove('open');
-                    overlay.classList.add('hidden');
-
-                    setTimeout(() => {
-                        window.location.href = this.href;
-                    }, 250);
+const valueLabelPlugin = {
+    id: 'valueLabel',
+    afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, i) => {
+            if (ds.type !== 'bar') return;
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((bar, idx) => {
+                const v = ds.data[idx];
+                if (Number.isFinite(v) && v > 0) {
+                    ctx.save();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = `bold ${window.innerWidth < 768 ? 9 : 11}px Inter`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(v + '°C', bar.x, bar.y - 5);
+                    ctx.restore();
                 }
             });
         });
-    </script>
+    }
+};
 
+/* ===== NOTIFICATIONS ===== */
+let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
+const notifCooldown = {};
+
+function updateNotifButton() {
+    const btn = document.getElementById('notifBtn');
+    if (!btn) return;
+    if (notifEnabled && Notification.permission === 'granted') {
+        btn.classList.replace('text-gray-500', 'text-amber-400');
+        btn.querySelector('i').className = 'fa-solid fa-bell text-sm';
+        btn.title = 'Notifikasi aktif — klik untuk nonaktifkan';
+    } else {
+        btn.classList.replace('text-amber-400', 'text-gray-500');
+        btn.querySelector('i').className = 'fa-regular fa-bell text-sm';
+        btn.title = 'Aktifkan notifikasi suhu kritis';
+    }
+}
+
+function toggleNotifications() {
+    if (!('Notification' in window)) { alert('Browser tidak mendukung notifikasi.'); return; }
+    if (notifEnabled) {
+        notifEnabled = false;
+        localStorage.setItem('notifEnabled', 'false');
+        updateNotifButton();
+        return;
+    }
+    Notification.requestPermission().then(perm => {
+        notifEnabled = perm === 'granted';
+        localStorage.setItem('notifEnabled', notifEnabled ? 'true' : 'false');
+        updateNotifButton();
+        if (perm === 'denied') alert('Izin notifikasi ditolak. Aktifkan di pengaturan browser.');
+    });
+}
+
+function sendTempNotification(roomName, temp) {
+    if (!notifEnabled || Notification.permission !== 'granted') return;
+    const now = Date.now();
+    if (notifCooldown[roomName] && now - notifCooldown[roomName] < 5 * 60 * 1000) return;
+    notifCooldown[roomName] = now;
+    new Notification('⚠️ Suhu Kritis!', {
+        body: `${roomName}: ${temp}°C — segera periksa ruangan`,
+        icon: '/images/wallpaper.jpeg',
+        tag:  'temp-' + roomName,
+    });
+}
+
+let tempChart;
+function initChart() {
+    if (!ctx) return;
+    tempChart = new Chart(ctx, {
+        plugins: [valueLabelPlugin],
+        data: {
+            labels: roomNames,
+            datasets: [
+                { type: 'bar', label: 'Suhu (°C)', data: roomTemps,
+                  backgroundColor: roomTemps.map(tempColor), borderRadius: 8,
+                  barPercentage: 0.7, categoryPercentage: 0.8 },
+                { type: 'line', label: 'Tren', data: roomTemps,
+                  borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'transparent',
+                  tension: 0.4, pointBackgroundColor: '#fff', pointRadius: 3, borderWidth: 1.5 }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false, responsive: true,
+            plugins: {
+                legend: { labels: { color: '#64748b', font: { family: 'Inter', size: 11 } } },
+                tooltip: {
+                    backgroundColor: 'rgba(12,22,40,0.95)',
+                    titleColor: '#fff', bodyColor: '#94a3b8',
+                    borderColor: 'rgba(59,130,246,0.4)', borderWidth: 1,
+                    padding: 10, cornerRadius: 10,
+                    callbacks: { label: c => ` ${c.parsed.y}°C` }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#64748b', maxRotation: 0, font: { size: 10 } }, grid: { display: false } },
+                y: { suggestedMin: 20, suggestedMax: 40,
+                     ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
+                     grid: { color: 'rgba(255,255,255,0.05)' } }
+            }
+        }
+    });
+}
+
+function refreshTemperature() {
+    if (!tempChart) return;
+    fetch('/temperature')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data || !tempChart) return;
+            const safe = data.map(r => { const t = parseFloat(r.temp); return isNaN(t) ? null : t; });
+            tempChart.data.datasets[0].data = safe;
+            tempChart.data.datasets[1].data = safe;
+            tempChart.data.datasets[0].backgroundColor = safe.map(tempColor);
+            tempChart.update();
+
+            const tsEl = document.getElementById('chartLastUpdated');
+            if (tsEl) tsEl.textContent = 'Diperbarui ' + new Date().toLocaleTimeString('id-ID');
+
+            const critical = data.filter(r => { const t = parseFloat(r.temp); return !isNaN(t) && t > 30; });
+            const banner   = document.getElementById('tempAlertBanner');
+            const alertMsg = document.getElementById('tempAlertRooms');
+            if (banner && alertMsg) {
+                if (critical.length > 0) {
+                    alertMsg.textContent = 'Suhu kritis: ' + critical.map(r => `${r.name} (${parseFloat(r.temp).toFixed(1)}°C)`).join(', ');
+                    banner.style.display = 'flex';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+            critical.forEach(r => sendTempNotification(r.name, parseFloat(r.temp).toFixed(1)));
+        })
+        .catch(() => {});
+}
+
+setInterval(refreshTemperature, 5000);
+
+function setSystemStatus(online) {
+    const el = document.getElementById('systemStatus');
+    if (!el) return;
+    el.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${online ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'}`;
+    el.innerHTML = `<span class="w-1.5 h-1.5 ${online ? 'bg-green-400 animate-pulse' : 'bg-gray-400'} rounded-full"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+}
+window.addEventListener('online',  () => setSystemStatus(true));
+window.addEventListener('offline', () => setSystemStatus(false));
+
+document.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    setSystemStatus(navigator.onLine);
+    updateNotifButton();
+    setTimeout(refreshTemperature, 400);
+});
+</script>
+@include('components.sidebar-scripts')
 </body>
-
 </html>
-

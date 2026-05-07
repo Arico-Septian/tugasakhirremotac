@@ -48,10 +48,15 @@ class TimerController extends Controller
                 'timer_off' => $newTimerOff,
             ]);
 
+            $detail = [];
+            if ($newTimerOn)  $detail[] = 'ON ' . $newTimerOn;
+            if ($newTimerOff) $detail[] = 'OFF ' . $newTimerOff;
+            if (!$newTimerOn && !$newTimerOff) $detail[] = 'dihapus';
+
             UserLog::create([
                 'user_id' => Auth::id(),
                 'room' => optional($ac->room)->name,
-                'ac' => 'AC ' . $ac->ac_number,
+                'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : '') . ' [' . implode(', ', $detail) . ']',
                 'activity' => 'set_timer'
             ]);
         }

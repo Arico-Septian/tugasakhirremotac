@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
-use App\Models\AcUnit;
 use App\Models\RoomTemperature;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -15,18 +16,34 @@ class DashboardController extends Controller
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
+        $onlineRooms  = 0;
+        $offlineRooms = 0;
+
         foreach ($rooms as $room) {
             $room->temperature = optional(
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
+
+            $deviceId = strtolower(trim((string) $room->device_id));
+            $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
+
+            if ($lastSeen) {
+                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
+            }
+
+            $isOnline = ($status === 'online' || $status === 'available')
+                && $lastSeen
+                && now()->diffInSeconds($lastSeen) <= 30;
+
+            $isOnline ? $onlineRooms++ : $offlineRooms++;
         }
 
         $totalRooms = $rooms->count();
 
-        // Mengambil semua unit AC dari koleksi rooms untuk efisiensi query
         $allAcUnits = $rooms->flatMap->acUnits;
-        $totalAc = $allAcUnits->count();
-        $activeAc = $allAcUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
+        $totalAc    = $allAcUnits->count();
+        $activeAc   = $allAcUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
         $inactiveAc = $totalAc - $activeAc;
 
         return view('dashboard.dashboard', compact(
@@ -34,7 +51,9 @@ class DashboardController extends Controller
             'totalRooms',
             'totalAc',
             'activeAc',
-            'inactiveAc'
+            'inactiveAc',
+            'onlineRooms',
+            'offlineRooms'
         ));
     }
 }

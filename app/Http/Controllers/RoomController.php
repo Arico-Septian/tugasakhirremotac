@@ -167,16 +167,60 @@ class RoomController extends Controller
         return redirect('/rooms')->with('success', $message);
     }
 
+    /*=== OVERVIEW ALL ROOMS ===*/
+    public function overview()
+    {
+        $rooms = Room::with(['acUnits.status'])
+            ->orderBy('name')
+            ->get();
+        $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
+
+        foreach ($rooms as $room) {
+            $room->temperature = optional(
+                $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
+            )->temperature;
+
+            $deviceId = strtolower(trim((string) $room->device_id));
+            $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
+
+            if ($lastSeen) {
+                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
+            }
+
+            $isOnline = ($status === 'online' || $status === 'available')
+                && $lastSeen
+                && now()->diffInSeconds($lastSeen) <= 30;
+
+            $room->device_status = $isOnline ? 'online' : 'offline';
+        }
+
+        return view('rooms.overview', compact('rooms'));
+    }
+
     /*=== DETAIL STATUS AC ===*/
     public function status($id)
     {
         $room = Room::findOrFail($id);
 
-        // Tambahkan suhu terbaru agar bisa ditampilkan di halaman detail status
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
         $room->temperature = optional(
             $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
         )->temperature;
+
+        $deviceId = strtolower(trim((string) $room->device_id));
+        $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+        $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
+
+        if ($lastSeen) {
+            $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
+        }
+
+        $isOnline = ($status === 'online' || $status === 'available')
+            && $lastSeen
+            && now()->diffInSeconds($lastSeen) <= 30;
+
+        $room->device_status = $isOnline ? 'online' : 'offline';
 
         $acs = AcUnit::with('status')
             ->where('room_id', $id)

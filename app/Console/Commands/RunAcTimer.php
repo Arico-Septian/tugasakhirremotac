@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
+use App\Models\UserLog;
 use App\Services\MqttService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -123,6 +124,13 @@ class RunAcTimer extends Command
                         // Update database
                         $status->update([
                             'power' => $expectedStatus
+                        ]);
+
+                        UserLog::create([
+                            'user_id' => null,
+                            'room'    => $roomName,
+                            'ac'      => 'AC ' . $ac->ac_number,
+                            'activity' => 'timer_' . strtolower($type),
                         ]);
 
                         // Tandai sudah dieksekusi

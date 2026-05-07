@@ -53,6 +53,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
+    Route::get('/rooms/overview', [RoomController::class, 'overview'])->name('rooms.overview');
     Route::get('/rooms/{id}/status', [RoomController::class, 'status']);
 
     Route::get('/api/ac-status', function () {
@@ -140,6 +141,24 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::get('/temperature', $temperatureEndpoint);
     Route::get('/temperatures', $temperatureEndpoint);
 
+    Route::get('/temperature/history/{id}', function ($id) {
+        $room       = Room::findOrFail($id);
+        $normalized = RoomTemperature::normalizeRoomName($room->name);
+
+        $rows = RoomTemperature::where('room', $normalized)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->orderBy('created_at')
+            ->get();
+
+        $grouped = $rows
+            ->groupBy(fn($t) => $t->created_at->format('H:00'))
+            ->map(fn($g) => round($g->avg('temperature'), 1));
+
+        return response()->json(
+            $grouped->map(fn($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
+        );
+    });
+
     Route::middleware(['role:admin,operator'])->group(function () {
         Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
         Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
@@ -149,6 +168,9 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::get('/rooms/{id}/ac', [AcUnitController::class, 'index']);
         Route::post('/rooms/{id}/ac', [AcUnitController::class, 'store']);
         Route::delete('/ac/{id}', [AcUnitController::class, 'destroy']);
+        Route::put('/ac/{id}', [AcUnitController::class, 'update']);
+
+        Route::post('/rooms/{id}/ac/bulk-power', [AcControlController::class, 'bulkPower']);
 
         Route::get('/ac/{id}/on', [AcControlController::class, 'powerOn']);
         Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
@@ -313,6 +335,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
 
         Route::get('/logs', [UserLogController::class, 'index']);
+        Route::get('/logs/export', [UserLogController::class, 'export']);
         Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
         Route::get('/users-online', function () {

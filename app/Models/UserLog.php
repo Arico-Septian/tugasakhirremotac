@@ -15,8 +15,8 @@ class UserLog extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class)->withDefault([
-            'name' => 'Deleted User',
-        ]);
+        return $this->belongsTo(\App\Models\User::class)->withDefault(function ($user, $log) {
+            $user->name = $log->user_id === null ? 'System' : 'Deleted User';
+        });
     }
 }

@@ -69,6 +69,38 @@ class AcUnitController extends Controller
         return back()->with('new_ac_id', $ac->id);
     }
 
+    public function update(Request $request, $id)
+    {
+        $ac   = AcUnit::findOrFail($id);
+        $room = Room::findOrFail($ac->room_id);
+
+        $request->validate([
+            'name'      => 'required|string|max:50',
+            'brand'     => 'required|string|max:50',
+            'ac_number' => [
+                'required', 'integer', 'min:1', 'max:15',
+                Rule::unique('ac_units')
+                    ->where(fn($q) => $q->where('room_id', $ac->room_id))
+                    ->ignore($ac->id),
+            ],
+        ]);
+
+        $ac->update([
+            'name'      => $request->name,
+            'brand'     => $request->brand,
+            'ac_number' => $request->ac_number,
+        ]);
+
+        UserLog::create([
+            'user_id'  => Auth::id(),
+            'room'     => $room->name,
+            'ac'       => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
+            'activity' => 'edit_ac',
+        ]);
+
+        return back()->with('success', 'AC unit berhasil diperbarui');
+    }
+
     public function destroy($id)
     {
         $ac = AcUnit::findOrFail($id);

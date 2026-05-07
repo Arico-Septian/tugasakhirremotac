@@ -119,7 +119,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'on'
         ]);
 
@@ -141,7 +141,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'off'
         ]);
 
@@ -164,7 +164,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'set_temp_' . $value
         ]);
 
@@ -187,7 +187,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'mode_' . $mode
         ]);
 
@@ -210,7 +210,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'fan_speed_' . $speed
         ]);
 
@@ -233,7 +233,7 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'swing_' . $swing
         ]);
 
@@ -255,11 +255,35 @@ class AcControlController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => $ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => strtolower($status->power)
         ]);
 
         return back();
+    }
+
+    public function bulkPower(Request $request, $roomId)
+    {
+        $power = $this->normalizePower($request->input('power'));
+        $room  = Room::findOrFail($roomId);
+        $acs   = AcUnit::where('room_id', $roomId)->get();
+
+        foreach ($acs as $ac) {
+            $status = $this->statusFor($ac);
+            $status->power = $power;
+            $status->save();
+            $this->sendFullState($ac, $room, $status);
+        }
+
+        UserLog::create([
+            'user_id' => Auth::id(),
+            'room'    => $room->name,
+            'ac'      => 'Semua AC (' . $acs->count() . ' unit)',
+            'activity' => $power === 'ON' ? 'bulk_on' : 'bulk_off',
+        ]);
+
+        $action = $power === 'ON' ? 'dinyalakan' : 'dimatikan';
+        return back()->with('success', "Semua AC di {$room->name} berhasil {$action}");
     }
 
     public function control(Request $request, $id)
