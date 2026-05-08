@@ -31,6 +31,12 @@
         </a>
     @endif
 
+    <a href="{{ route('monitoring') }}"
+       class="bnav-item {{ request()->routeIs('monitoring') ? 'active' : '' }}">
+        <i class="fa-brands fa-raspberry-pi"></i>
+        <span>Raspi</span>
+    </a>
+
     <a href="/profile"
        class="bnav-item {{ request()->is('profile*') ? 'active' : '' }}">
         <i class="fa-regular fa-circle-user"></i>

@@ -382,10 +382,13 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         return response()->json([
             'suhu'  => $temp !== null ? $temp . ' °C' : null,
             'value' => $temp,
-        ]);
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     });
 
-    Route::get('/monitoring', function () {
-        return view('suhu');
-    });
+    Route::get('/raspi-monitor', function () {
+        return response()->view('server.monitoring')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    })->name('monitoring');
 });

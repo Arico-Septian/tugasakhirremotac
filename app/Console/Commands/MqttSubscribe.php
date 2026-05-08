@@ -243,7 +243,7 @@ class MqttSubscribe extends Command
             'raspi/temperature' => function ($topic, $message) {
                 $temp = (float) trim($message);
                 if ($temp > 0) {
-                    Cache::put('raspi_temperature', $temp, 120);
+                    Cache::put('raspi_temperature', $temp, 300);
                     $this->line("RASPI TEMP: {$temp}°C");
                 }
             },
