@@ -34,7 +34,7 @@
             <a href="{{ route('rooms.overview') }}"
                class="nav-link menu-link {{ request()->routeIs('rooms.overview') || request()->is('rooms/*/status') ? 'active' : '' }}">
                 <i class="fa-solid fa-grip"></i>
-                <span class="menu-text">Room & Ac Overview</span>
+                <span class="menu-text">List Room & Ac</span>
             </a>
         </div>
 
@@ -44,7 +44,7 @@
                 <a href="/rooms"
                    class="nav-link menu-link {{ request()->is('rooms*') && !request()->routeIs('rooms.overview') && !request()->is('rooms/*/status') ? 'active' : '' }}">
                     <i class="fa-solid fa-server"></i>
-                    <span class="menu-text">Rooms &amp; AC</span>
+                    <span class="menu-text">Control Rooms &amp; AC</span>
                 </a>
                 <a href="/energy"
                    class="nav-link menu-link {{ request()->is('energy*') ? 'active' : '' }}">
