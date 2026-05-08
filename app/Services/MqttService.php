@@ -11,13 +11,15 @@ class MqttService
 
     public function __construct()
     {
-        $server = 'broker.hivemq.com';
-        $port = 1883;
+        $server   = env('MQTT_HOST', 'broker.hivemq.com');
+        $port     = (int) env('MQTT_PORT', 1883);
         $clientId = 'laravel_' . uniqid();
 
         $connectionSettings = (new ConnectionSettings)
-            ->setUsername(null)
-            ->setPassword(null);
+            ->setUsername(env('MQTT_USERNAME'))
+            ->setPassword(env('MQTT_PASSWORD'))
+            ->setUseTls(env('MQTT_PORT', 1883) == 8883)
+            ->setTlsSelfSignedAllowed(false);
 
         $this->mqtt = new MqttClient($server, $port, $clientId);
         $this->mqtt->connect($connectionSettings, true);
