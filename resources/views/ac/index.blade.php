@@ -429,8 +429,6 @@
                                     $isPowerOn = ($ac->status?->power ?? 'OFF') === 'ON';
                                 @endphp
                                 <div class="panel" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px 20px;">
-                                    <p class="eyebrow" style="width:100%;text-align:center;margin:0;"><i class="fa-solid fa-temperature-three-quarters"></i> Set Temperature</p>
-
                                     <div class="temp-ring">
                                         <div class="temp-ring-inner">
                                             <p class="ring-label">Target</p>
@@ -466,29 +464,6 @@
 
                                 {{-- RIGHT --}}
                                 <div class="flex flex-col gap-3">
-                                    {{-- Status strip --}}
-                                    <div class="grid grid-cols-5 gap-2">
-                                        <div class="stat-mini">
-                                            <p class="lbl">Power</p>
-                                            <p class="val" style="color:var(--mint);">{{ $ac->status?->power ?? 'OFF' }}</p>
-                                        </div>
-                                        <div class="stat-mini">
-                                            <p class="lbl">Temp</p>
-                                            <p class="val" style="color:var(--cyan);">{{ ($ac->status?->set_temperature ?? 24) }}°</p>
-                                        </div>
-                                        <div class="stat-mini">
-                                            <p class="lbl">Mode</p>
-                                            <p class="val" style="color:var(--lavender);">{{ strtoupper($ac->status?->mode ?? 'COOL') }}</p>
-                                        </div>
-                                        <div class="stat-mini">
-                                            <p class="lbl">Fan</p>
-                                            <p class="val" style="color:var(--cyan);">{{ strtoupper($ac->status?->fan_speed ?? 'AUTO') }}</p>
-                                        </div>
-                                        <div class="stat-mini">
-                                            <p class="lbl">Swing</p>
-                                            <p class="val" style="color:var(--lavender);">{{ strtoupper($ac->status?->swing ?? 'OFF') }}</p>
-                                        </div>
-                                    </div>
 
                                     {{-- Mode --}}
                                     <div class="panel">
