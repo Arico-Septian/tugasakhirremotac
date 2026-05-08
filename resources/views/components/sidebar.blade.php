@@ -1,97 +1,116 @@
 {{-- Shared Sidebar Component --}}
-<div id="sidebar" class="sidebar bg-[#0c1628] text-white flex flex-col border-r border-white/5">
+@php
+    $role = Auth::user()->role;
+    $isAdminOp = in_array($role, ['admin', 'operator']);
+@endphp
 
-    {{-- HEADER --}}
-    <div class="flex items-center justify-between px-4 h-16 border-b border-white/5 flex-shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-900/40">
-                <i class="fa-solid fa-snowflake text-white text-sm"></i>
+<aside id="sidebar" class="app-sidebar">
+    {{-- BRAND --}}
+    <div class="brand">
+        <div class="brand-mark">
+            <div class="brand-logo">
+                <i class="fa-solid fa-snowflake"></i>
             </div>
-            <div class="menu-text leading-tight">
-                <p class="text-sm font-bold text-white">SmartAC</p>
-                <p class="text-[10px] text-gray-500 font-medium">Control System</p>
+            <div class="brand-text menu-text">
+                <span class="name">SmartAC</span>
+                <span class="sub">Control Suite</span>
             </div>
         </div>
-        <button onclick="toggleSidebar()"
-            class="sidebar-toggle hidden lg:flex w-7 h-7 items-center justify-center rounded-lg hover:bg-white/8 transition-colors text-gray-500 hover:text-gray-300">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
+        <button onclick="toggleSidebar()" type="button"
+                class="sidebar-toggle desktop-only" title="Toggle sidebar">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
         </button>
     </div>
 
-    {{-- NAV MENU --}}
-    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+    {{-- NAV --}}
+    <nav class="nav-scroll">
+        <p class="nav-section-label">Overview</p>
+        <div class="nav-list">
+            <a href="{{ route('dashboard') }}"
+               class="nav-link menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+            <a href="{{ route('rooms.overview') }}"
+               class="nav-link menu-link {{ request()->routeIs('rooms.overview') || request()->is('rooms/*/status') ? 'active' : '' }}">
+                <i class="fa-solid fa-grip"></i>
+                <span class="menu-text">Room & Ac Overview</span>
+            </a>
+        </div>
 
-        <a href="{{ route('dashboard') }}"
-            class="sidebar-nav-item menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="fa-solid fa-chart-pie sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Dashboard</span>
-        </a>
-
-        @if (Auth::user()->role === 'user')
-        <a href="{{ route('rooms.overview') }}"
-            class="sidebar-nav-item menu-link {{ request()->routeIs('rooms.overview') ? 'active' : '' }}">
-            <i class="fa-solid fa-server sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Room Status</span>
-        </a>
+        @if ($isAdminOp)
+            <p class="nav-section-label">Manage</p>
+            <div class="nav-list">
+                <a href="/rooms"
+                   class="nav-link menu-link {{ request()->is('rooms*') && !request()->routeIs('rooms.overview') && !request()->is('rooms/*/status') ? 'active' : '' }}">
+                    <i class="fa-solid fa-server"></i>
+                    <span class="menu-text">Rooms &amp; AC</span>
+                </a>
+                <a href="/energy"
+                   class="nav-link menu-link {{ request()->is('energy*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span class="menu-text">Energy Analytics</span>
+                </a>
+            </div>
         @endif
 
-        @if (in_array(Auth::user()->role, ['admin', 'operator']))
-        <a href="/rooms"
-            class="sidebar-nav-item menu-link {{ request()->is('rooms*') && !request()->routeIs('rooms.overview') ? 'active' : '' }}">
-            <i class="fa-solid fa-server sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Kelola Ruangan</span>
-        </a>
+        @if ($role === 'admin')
+            <p class="nav-section-label">Admin</p>
+            <div class="nav-list">
+                <a href="/users"
+                   class="nav-link menu-link {{ request()->is('users*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span class="menu-text">Users</span>
+                </a>
+                <a href="/logs"
+                   class="nav-link menu-link {{ request()->is('logs*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="menu-text">Activity Log</span>
+                </a>
+            </div>
         @endif
 
-        @if (Auth::user()->role === 'admin')
-        <a href="/users"
-            class="sidebar-nav-item menu-link {{ request()->is('users*') ? 'active' : '' }}">
-            <i class="fa-solid fa-users sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Manajemen User</span>
-        </a>
-        <a href="/logs"
-            class="sidebar-nav-item menu-link {{ request()->is('logs*') ? 'active' : '' }}">
-            <i class="fa-solid fa-clock-rotate-left sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Activity Log</span>
-        </a>
-        @endif
-
-        <a href="/profile"
-            class="sidebar-nav-item menu-link {{ request()->is('profile*') ? 'active' : '' }}">
-            <i class="fa-solid fa-circle-user sidebar-icon"></i>
-            <span class="menu-text sidebar-label">Profile</span>
-        </a>
-
+        <p class="nav-section-label">Account</p>
+        <div class="nav-list">
+            <a href="/notifications"
+               class="nav-link menu-link {{ request()->is('notifications*') ? 'active' : '' }}"
+               style="position:relative;">
+                <i class="fa-regular fa-bell"></i>
+                <span class="menu-text">Notifikasi</span>
+                <span id="sidebarNotifBadge" class="notif-badge" style="display:none;position:absolute;top:8px;right:14px;min-width:18px;height:18px;border-radius:999px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg-1);font-family:'JetBrains Mono',monospace;"></span>
+            </a>
+            <a href="/profile"
+               class="nav-link menu-link {{ request()->is('profile*') ? 'active' : '' }}">
+                <i class="fa-regular fa-circle-user"></i>
+                <span class="menu-text">Profile</span>
+            </a>
+        </div>
     </nav>
 
     {{-- FOOTER --}}
-    <div class="px-3 pb-4 pt-3 border-t border-white/5 flex-shrink-0">
-        <div class="profile-full flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-white/5 transition-colors">
-            <a href="/profile" class="flex-shrink-0">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
+    <div class="sidebar-footer">
+        <div class="profile-full">
+            <a href="/profile" class="avatar" title="View profile">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </a>
-            <a href="/profile" class="menu-text flex-1 min-w-0 hover:text-blue-300 transition-colors">
-                <p class="text-xs font-semibold text-white truncate">{{ Auth::user()->name }}</p>
-                <p class="text-[10px] text-gray-500 capitalize">{{ Auth::user()->role }}</p>
+            <a href="/profile" class="profile-info menu-text" style="text-decoration:none;">
+                <p class="name">{{ Auth::user()->name }}</p>
+                <p class="role">{{ ucfirst(Auth::user()->role) }}</p>
             </a>
-            <form action="/logout" method="POST" class="menu-text ml-auto">
+            <form action="/logout" method="POST" class="menu-text" style="margin:0;">
                 @csrf
-                <button type="submit"
-                    class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <button type="submit" class="icon-btn danger" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
                 </button>
             </form>
         </div>
-        <div class="profile-collapse hidden text-center pt-1">
-            <form action="/logout" method="POST">
+        <div class="profile-mini">
+            <form action="/logout" method="POST" style="margin:0;">
                 @csrf
-                <button class="w-8 h-8 rounded-xl flex items-center justify-center mx-auto text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <button type="submit" class="icon-btn danger" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
                 </button>
             </form>
         </div>
     </div>
-
-</div>
+</aside>

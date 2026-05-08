@@ -10,9 +10,44 @@ function toggleSidebar() {
         overlay?.classList.toggle('active', isOpen);
         document.body.style.overflow = isOpen ? 'hidden' : '';
     } else {
-        sidebar.classList.toggle('close');
+        // collapse on desktop
+        sidebar.classList.toggle('collapsed');
+        try {
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+        } catch (e) {}
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && window.innerWidth > 1024) {
+        try {
+            if (localStorage.getItem('sidebarCollapsed') === '1') sidebar.classList.add('collapsed');
+        } catch (e) {}
+    }
+});
+
+/* ===== SIDEBAR NOTIF BADGE (synced with bell poll) ===== */
+function syncSidebarNotifBadge(count) {
+    const b = document.getElementById('sidebarNotifBadge');
+    if (!b) return;
+    if (count > 0) {
+        b.textContent = count > 99 ? '99+' : String(count);
+        b.style.display = 'inline-flex';
+    } else {
+        b.style.display = 'none';
+    }
+}
+function pollSidebarNotifBadge() {
+    fetch('/notifications/unread-count', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(d => syncSidebarNotifBadge(d.count))
+        .catch(() => {});
+}
+document.addEventListener('DOMContentLoaded', () => {
+    pollSidebarNotifBadge();
+    setInterval(() => { if (!document.hidden) pollSidebarNotifBadge(); }, 30000);
+});
 
 document.getElementById('overlay')?.addEventListener('click', function () {
     document.getElementById('sidebar')?.classList.remove('open');
@@ -20,7 +55,7 @@ document.getElementById('overlay')?.addEventListener('click', function () {
     document.body.style.overflow = '';
 });
 
-/* ===== MENU LINK: close sidebar on mobile nav ===== */
+/* Close mobile sidebar after nav (with brief delay for visual close) */
 document.querySelectorAll('.menu-link').forEach(link => {
     link.addEventListener('click', function (e) {
         if (window.innerWidth <= 1024) {
@@ -31,7 +66,7 @@ document.querySelectorAll('.menu-link').forEach(link => {
                 sidebar.classList.remove('open');
                 overlay?.classList.remove('active');
                 document.body.style.overflow = '';
-                setTimeout(() => { window.location.href = this.href; }, 220);
+                setTimeout(() => { window.location.href = this.href; }, 200);
             }
         }
     });
@@ -39,7 +74,7 @@ document.querySelectorAll('.menu-link').forEach(link => {
 
 /* ===== IDLE TIMEOUT ===== */
 (function () {
-    const role = "{{ Auth::check() ? Auth::user()->role : '' }}";
+    const role  = "{{ Auth::check() ? Auth::user()->role : '' }}";
     const idleMs = role === 'admin' ? 600000 : role === 'operator' ? 300000 : 120000;
     let timer;
 
@@ -55,11 +90,21 @@ document.querySelectorAll('.menu-link').forEach(link => {
             form.submit();
         }, idleMs);
     }
-
     ['mousemove','keypress','click','scroll','touchstart'].forEach(ev => {
         document.addEventListener(ev, resetTimer, { passive: true });
     });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) resetTimer(); });
     resetTimer();
 })();
+
+/* ===== TOAST helper (used across pages) ===== */
+window.smToast = function (msg, type = 'info') {
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+    const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info', warn: 'fa-triangle-exclamation' };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span class="icon"><i class="fa-solid ${icons[type] || icons.info}"></i></span><span>${msg}</span>`;
+    document.body.appendChild(t);
+    setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 240); }, 2800);
+};
 </script>

@@ -3,261 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Overview — SmartAC</title>
+    <title>Server Rooms — SmartAC</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="/js/chart.umd.js"></script>
     @include('components.sidebar-styles')
     <style>
-        /* ===== SEARCH BAR ===== */
-        .search-wrap {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            display: flex; align-items: center;
-            gap: 10px; padding: 0 14px;
-            transition: border-color 0.2s;
-        }
-        .search-wrap:focus-within {
-            border-color: rgba(59,130,246,0.5);
-            background: rgba(255,255,255,0.07);
-        }
-        .search-wrap input {
-            background: transparent; border: none;
-            outline: none; color: white;
-            font-size: 14px; font-family: 'Inter', sans-serif;
-            padding: 10px 0; flex: 1;
-        }
-        .search-wrap input::placeholder { color: #64748b; }
-
-        /* ===== FILTER PILLS ===== */
-        .filter-pill {
-            padding: 7px 16px; border-radius: 999px;
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.04);
-            color: #64748b; transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .filter-pill.active, .filter-pill:hover {
-            background: rgba(59,130,246,0.15);
-            border-color: rgba(59,130,246,0.4);
-            color: #93c5fd;
-        }
-
-        /* ===== ROOM CARD ===== */
         .room-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px; padding: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s ease;
+            position: relative;
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            border-radius: var(--r-xl);
+            padding: 14px;
             display: flex; flex-direction: column; gap: 10px;
+            transition: var(--t-base);
+            box-shadow: var(--inset-hi);
+            overflow: hidden;
+        }
+        .room-card::before {
+            content: ''; position: absolute; left: 0; right: 0; top: 0;
+            height: 2px;
+            background: var(--card-accent, var(--ink-3));
+            opacity: 0.7;
         }
         .room-card:hover {
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(255,255,255,0.12);
+            background: var(--panel-2);
+            border-color: var(--line);
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            box-shadow: var(--shadow);
         }
-        .room-card[data-status="online"] { border-top: 2px solid rgba(34,197,94,0.5); }
-        .room-card[data-status="offline"] { border-top: 2px solid rgba(239,68,68,0.3); }
-
-        /* ===== MODAL ===== */
-        .modal-backdrop {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
-            z-index: 100; display: flex; align-items: center;
-            justify-content: center; padding: 16px;
+        .room-card[data-status="online"]  { --card-accent: var(--mint); }
+        .room-card[data-status="offline"] { --card-accent: var(--coral); }
+        .room-card .ac-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .room-card .ac-mini > div {
+            text-align: center; padding: 8px 6px;
+            border-radius: var(--r-md);
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
         }
-        .modal-box {
-            background: #0c1628;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px; padding: 24px;
-            width: 100%; max-width: 640px;
-            max-height: 90vh; overflow-y: auto;
+        .room-card .ac-mini .num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px; font-weight: 700; line-height: 1;
         }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center; padding: 64px 16px; color: #475569;
+        .room-card .ac-mini .lbl {
+            font-size: 9.5px; color: var(--ink-3);
+            letter-spacing: 0.06em; text-transform: uppercase;
+            margin-top: 4px; font-weight: 600;
         }
-
-        @media (max-width: 640px) {
-            .room-card { padding: 14px; }
+        .floor-section { margin-bottom: 4px; }
+        .floor-section-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 12px;
+        }
+        .floor-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--ink-3);
+            white-space: nowrap;
+        }
+        .floor-divider {
+            flex: 1; height: 1px;
+            background: var(--line-soft);
+        }
+        .floor-count {
+            font-size: 10px; color: var(--ink-4);
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 <div class="custom-bg"></div>
-<div id="overlay" class="fixed inset-0 bg-black/50 z-40"></div>
+<div id="overlay"></div>
 
 <div class="layout">
     @include('components.sidebar')
 
     <div class="main-content">
-        <!-- HEADER -->
         <header class="main-header">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()"
-                    class="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-300 transition">
-                    <i class="fa-solid fa-bars text-base"></i>
+                <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
+                    <i class="fa-solid fa-bars text-xs"></i>
                 </button>
-                <a href="{{ route('dashboard') }}"
-                    class="hidden lg:flex w-8 h-8 items-center justify-center rounded-xl hover:bg-white/8 text-gray-400 hover:text-white transition">
-                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                <a href="{{ route('dashboard') }}" class="hidden lg:inline-flex btn-icon" title="Back">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
                 </a>
-                <div>
-                    <h1 class="text-base font-bold text-white leading-tight">Server Rooms</h1>
-                    <p class="text-xs text-blue-300 font-medium hidden sm:block">
-                        {{ $rooms->count() }} ruangan — AC monitoring
-                    </p>
+                <div class="app-header-title">
+                    <h1>Server Rooms</h1>
+                    <p>{{ $rooms->count() }} ruangan · live AC monitoring</p>
                 </div>
+            </div>
+            <div class="flex items-center gap-2">
+                @include('components.notification-bell')
             </div>
         </header>
 
-        <!-- PAGE BODY -->
         <div class="page-body">
-            <div class="max-w-7xl mx-auto px-4 md:px-6 py-5">
+            <div class="app-content">
+                <div class="app-content-inner space-y-4">
 
-                <!-- SEARCH & FILTER -->
-                <div class="flex flex-col sm:flex-row gap-3 mb-5">
-                    <div class="search-wrap flex-1">
-                        <i class="fa-solid fa-magnifying-glass text-gray-500 text-sm"></i>
-                        <input id="searchInput" type="text" placeholder="Cari nama ruangan..."
-                            autocomplete="off">
-                    </div>
-                    <div class="flex gap-2 flex-shrink-0">
-                        <button class="filter-pill active" data-filter="all">Semua</button>
-                        <button class="filter-pill" data-filter="online">
-                            <i class="fa-solid fa-circle text-green-400 text-[9px] mr-1"></i>Online
-                        </button>
-                        <button class="filter-pill" data-filter="offline">
-                            <i class="fa-solid fa-circle text-red-400 text-[9px] mr-1"></i>Offline
-                        </button>
-                    </div>
-                </div>
-
-                <!-- COUNT -->
-                <p id="roomCount" class="text-xs text-gray-500 mb-4"></p>
-
-                @if ($rooms->count() > 0)
-                <div id="roomGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                    @foreach ($rooms as $room)
-                    @php
-                        $activeCount   = $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
-                        $inactiveCount = $room->acUnits->filter(fn($ac) => optional($ac->status)->power !== 'ON')->count();
-                        $temp          = $room->temperature;
-                        $status        = $room->device_status ?? 'offline';
-                        $tempClass     = $temp === null ? 'text-gray-400' : ($temp > 30 ? 'text-red-400' : ($temp > 25 ? 'text-yellow-400' : 'text-blue-400'));
-                        $tempBg        = $temp === null ? 'bg-white/5' : ($temp > 30 ? 'bg-red-500/10' : ($temp > 25 ? 'bg-yellow-500/10' : 'bg-blue-500/10'));
-                    @endphp
-                    <div class="room-card"
-                         data-name="{{ strtolower($room->name) }}"
-                         data-status="{{ $status }}">
-
-                        <!-- Header -->
-                        <div class="flex items-start justify-between gap-2">
-                            <h3 class="font-semibold text-sm text-white leading-tight">
-                                {{ ucfirst($room->name) }}
-                            </h3>
-                            @if ($status === 'online')
-                            <span class="flex items-center gap-1 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                <span class="text-[10px] text-green-400 font-semibold hidden sm:inline">Online</span>
-                            </span>
-                            @else
-                            <span class="flex items-center gap-1 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>
-                                <span class="text-[10px] text-red-400 font-semibold hidden sm:inline">Offline</span>
-                            </span>
+                    {{-- Toolbar --}}
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <label class="search-input flex-1">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input id="searchInput" type="text" placeholder="Cari nama ruangan…" autocomplete="off">
+                        </label>
+                        <div class="flex gap-2 flex-shrink-0 flex-wrap">
+                            <button class="filter-pill active" data-filter="all">All</button>
+                            <button class="filter-pill" data-filter="online">
+                                <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
+                            </button>
+                            <button class="filter-pill" data-filter="offline">
+                                <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
+                            </button>
+                            {{-- Floor tabs --}}
+                            @if ($roomsByFloor->count() > 1)
+                                <div style="width:1px;background:var(--line-soft);margin:0 2px;"></div>
+                                @foreach ($roomsByFloor->keys() as $floorKey)
+                                    <button class="filter-pill" data-floor="{{ $floorKey }}">
+                                        <i class="fa-solid fa-layer-group" style="font-size:9px;"></i>
+                                        {{ $floorKey }}
+                                    </button>
+                                @endforeach
                             @endif
                         </div>
-
-                        <!-- Temperature -->
-                        <div class="{{ $tempBg }} {{ $tempClass }} rounded-lg px-3 py-2 flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Suhu</span>
-                            <span id="temp-{{ $room->id }}" class="font-bold">
-                                {{ $temp !== null ? $temp.'°C' : '--' }}
-                            </span>
-                        </div>
-
-                        <!-- AC Count -->
-                        <div class="grid grid-cols-2 gap-1.5 text-xs">
-                            <div class="bg-green-500/10 text-green-400 rounded-lg px-2 py-1.5 text-center">
-                                <p class="text-[10px] text-gray-500">Aktif</p>
-                                <p class="font-bold">{{ $activeCount }}</p>
-                            </div>
-                            <div class="bg-white/5 text-gray-400 rounded-lg px-2 py-1.5 text-center">
-                                <p class="text-[10px] text-gray-500">Mati</p>
-                                <p class="font-bold">{{ $inactiveCount }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex gap-1.5 mt-auto pt-1">
-                            <a href="/rooms/{{ $room->id }}/status" class="flex-1">
-                                <button class="w-full py-2 text-xs font-semibold rounded-lg
-                                    bg-blue-600 hover:bg-blue-500 text-white transition">
-                                    Detail
-                                </button>
-                            </a>
-                            <button onclick="openHistory({{ $room->id }}, '{{ ucfirst($room->name) }}')"
-                                class="w-8 h-8 flex items-center justify-center rounded-lg
-                                       bg-white/5 hover:bg-indigo-600 text-gray-400 hover:text-white transition"
-                                title="Histori suhu 24 jam">
-                                <i class="fa-solid fa-chart-line text-xs"></i>
-                            </button>
-                        </div>
-
                     </div>
-                    @endforeach
-                </div>
 
-                <!-- EMPTY STATE (filtered) -->
-                <div id="emptyState" class="hidden empty-state">
-                    <i class="fa-solid fa-magnifying-glass text-4xl mb-3 opacity-20"></i>
-                    <p class="text-base font-medium text-white">Tidak ditemukan</p>
-                    <p class="text-sm mt-1">Coba kata kunci atau filter lain</p>
-                </div>
-                @else
-                <div class="empty-state">
-                    <i class="fa-solid fa-server text-5xl mb-4 opacity-20"></i>
-                    <p class="text-lg font-medium text-white">Belum ada ruangan</p>
-                </div>
-                @endif
+                    <p id="roomCount" class="text-mono text-xs" style="color:var(--ink-3);"></p>
 
+                    @if ($rooms->count() > 0)
+                        <div id="allSections">
+                            @foreach ($roomsByFloor as $floorName => $floorRooms)
+                                <div class="floor-section" data-section-floor="{{ $floorName }}">
+                                    @if ($roomsByFloor->count() > 1)
+                                        <div class="floor-section-header">
+                                            <i class="fa-solid fa-layer-group text-[10px]" style="color:var(--lavender);"></i>
+                                            <span class="floor-label">{{ $floorName }}</span>
+                                            <div class="floor-divider"></div>
+                                            <span class="floor-count">{{ $floorRooms->count() }} ruangan</span>
+                                        </div>
+                                    @endif
+                                    <div class="floor-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 mb-6">
+                                        @foreach ($floorRooms as $room)
+                                            @php
+                                                $activeCount   = $room->acUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
+                                                $inactiveCount = $room->acUnits->filter(fn($ac) => optional($ac->status)->power !== 'ON')->count();
+                                                $temp          = $room->temperature;
+                                                $status        = $room->device_status ?? 'offline';
+                                                $tempClass     = $temp === null ? 'idle' : ($temp > 30 ? 'hot' : ($temp > 25 ? 'warm' : 'cool'));
+                                            @endphp
+                                            <div class="room-card"
+                                                 data-name="{{ strtolower($room->name) }}"
+                                                 data-status="{{ $status }}"
+                                                 data-floor="{{ $floorName }}">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <h3 class="text-sm font-semibold text-tight" style="color:var(--ink-0);line-height:1.25;">
+                                                        {{ ucfirst($room->name) }}
+                                                    </h3>
+                                                    <span class="pill {{ $status === 'online' ? 'pill-online' : 'pill-offline' }}" style="padding:3px 8px;font-size:10px;">
+                                                        <span class="dot"></span><span class="hidden sm:inline">{{ $status === 'online' ? 'Online' : 'Offline' }}</span>
+                                                    </span>
+                                                </div>
+
+                                                <div class="temp-chip {{ $tempClass }}" style="justify-content:space-between;width:100%;">
+                                                    <span style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
+                                                        <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
+                                                    </span>
+                                                    <span id="temp-{{ $room->id }}" class="text-mono">
+                                                        {{ $temp !== null ? $temp.'°C' : '—' }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="ac-mini">
+                                                    <div>
+                                                        <p class="num" style="color:var(--mint);">{{ $activeCount }}</p>
+                                                        <p class="lbl">Active</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="num" style="color:var(--ink-2);">{{ $inactiveCount }}</p>
+                                                        <p class="lbl">Idle</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex gap-1.5 mt-auto pt-1">
+                                                    <a href="/rooms/{{ $room->id }}/status" class="btn btn-primary btn-sm flex-1">
+                                                        Detail
+                                                    </a>
+                                                    <button type="button"
+                                                            onclick="openHistory({{ $room->id }}, '{{ ucfirst($room->name) }}')"
+                                                            class="btn-icon lavender" title="Histori suhu 24 jam">
+                                                        <i class="fa-solid fa-chart-line text-[10px]"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div id="emptyState" class="empty-state" hidden>
+                            <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <p class="empty-title">Tidak ditemukan</p>
+                            <p class="empty-sub">Coba kata kunci atau filter lain</p>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
+                            <p class="empty-title">Belum ada ruangan</p>
+                            <p class="empty-sub">Hubungi administrator untuk menambahkan ruangan</p>
+                        </div>
+                    @endif
+
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- HISTORY MODAL -->
-<div id="historyModal" class="modal-backdrop" style="display:none;">
-    <div class="modal-box">
-        <div class="flex justify-between items-start mb-5">
+{{-- HISTORY MODAL --}}
+<div id="historyModal" class="modal-backdrop">
+    <div class="modal modal-lg">
+        <div class="modal-header">
             <div>
-                <p class="text-[10px] text-teal-400 font-bold tracking-widest mb-1">HISTORI SUHU</p>
-                <h2 id="historyTitle" class="text-lg font-bold text-white">Ruangan</h2>
-                <p class="text-xs text-gray-500">24 jam terakhir</p>
+                <p class="eyebrow" style="color:var(--lavender);"><i class="fa-solid fa-chart-line"></i> Histori Suhu</p>
+                <h2 id="historyTitle">Ruangan</h2>
+                <p class="sub">24 jam terakhir · rata-rata per jam</p>
             </div>
-            <button onclick="closeHistory()"
-                class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/6
-                       hover:bg-red-500/20 text-gray-400 hover:text-red-300 transition">
-                <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
+            <button type="button" class="modal-close" onclick="closeHistory()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="historyLoading" class="text-center py-12 text-gray-500">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-            <p class="text-sm">Memuat data...</p>
-        </div>
-        <div id="historyEmpty" class="hidden text-center py-12 text-gray-500">
-            <i class="fa-solid fa-temperature-empty text-3xl mb-2 opacity-30"></i>
-            <p class="text-sm">Tidak ada data suhu dalam 24 jam terakhir</p>
-        </div>
-        <div id="historyChartWrap" class="hidden" style="height:260px;">
-            <canvas id="historyChart"></canvas>
+        <div class="modal-body">
+            <div id="historyLoading" class="empty-state" style="padding:36px 0;">
+                <div class="empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                <p class="empty-sub">Memuat data…</p>
+            </div>
+            <div id="historyEmpty" class="empty-state" style="padding:36px 0;" hidden>
+                <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
+                <p class="empty-sub">Tidak ada data suhu dalam 24 jam terakhir</p>
+            </div>
+            <div id="historyChartWrap" hidden style="height:280px;">
+                <canvas id="historyChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -265,63 +250,89 @@
 @include('components.bottom-nav')
 
 <script>
-// ===== SEARCH & FILTER =====
-const cards       = Array.from(document.querySelectorAll('#roomGrid .room-card'));
+/* ===== SEARCH, STATUS & FLOOR FILTER ===== */
+const cards       = Array.from(document.querySelectorAll('.room-card'));
+const sections    = Array.from(document.querySelectorAll('.floor-section'));
 const emptyState  = document.getElementById('emptyState');
 const countEl     = document.getElementById('roomCount');
-const grid        = document.getElementById('roomGrid');
-let   activeFilter = 'all';
+let activeStatus  = 'all';
+let activeFloor   = 'all';
 
 function applyFilter() {
     const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
     let visible = 0;
+
     cards.forEach(card => {
-        const match = (!q || card.dataset.name.includes(q)) &&
-                      (activeFilter === 'all' || card.dataset.status === activeFilter);
-        card.style.display = match ? '' : 'none';
-        if (match) visible++;
+        const matchSearch = !q || card.dataset.name.includes(q);
+        const matchStatus = activeStatus === 'all' || card.dataset.status === activeStatus;
+        const matchFloor  = activeFloor === 'all' || card.dataset.floor === activeFloor;
+        const show = matchSearch && matchStatus && matchFloor;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
     });
+
+    // Show/hide section headers based on whether they have visible cards
+    sections.forEach(sec => {
+        const sFloor = sec.dataset.sectionFloor;
+        const hasVisible = cards.some(c => c.dataset.floor === sFloor && c.style.display !== 'none');
+        sec.style.display = hasVisible ? '' : 'none';
+    });
+
     countEl.textContent = visible === cards.length
-        ? `Menampilkan ${cards.length} ruangan`
-        : `${visible} dari ${cards.length} ruangan`;
-    if (emptyState) emptyState.classList.toggle('hidden', visible > 0);
-    if (grid)       grid.classList.toggle('hidden', visible === 0);
+        ? `Showing ${cards.length} room${cards.length !== 1 ? 's' : ''}`
+        : `${visible} of ${cards.length} room${cards.length !== 1 ? 's' : ''}`;
+
+    if (emptyState) emptyState.hidden = visible > 0;
 }
+
 document.getElementById('searchInput')?.addEventListener('input', applyFilter);
-document.querySelectorAll('.filter-pill').forEach(btn => {
+
+document.querySelectorAll('.filter-pill[data-filter]').forEach(btn => {
     btn.addEventListener('click', function () {
-        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-pill[data-filter]').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-        activeFilter = this.dataset.filter;
+        activeStatus = this.dataset.filter;
         applyFilter();
     });
 });
+
+document.querySelectorAll('.filter-pill[data-floor]').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const isActive = this.classList.contains('active');
+        document.querySelectorAll('.filter-pill[data-floor]').forEach(b => b.classList.remove('active'));
+        if (isActive) {
+            activeFloor = 'all';
+        } else {
+            this.classList.add('active');
+            activeFloor = this.dataset.floor;
+        }
+        applyFilter();
+    });
+});
+
 document.addEventListener('DOMContentLoaded', applyFilter);
 
-// ===== HISTORY MODAL =====
+/* ===== HISTORY MODAL ===== */
 let historyChartInstance = null;
 
 function openHistory(roomId, roomName) {
     document.getElementById('historyTitle').textContent = roomName;
-    document.getElementById('historyModal').style.display = 'flex';
-    document.getElementById('historyLoading').classList.remove('hidden');
-    document.getElementById('historyEmpty').classList.add('hidden');
-    document.getElementById('historyChartWrap').classList.add('hidden');
+    document.getElementById('historyModal').classList.add('is-open');
+    document.getElementById('historyLoading').hidden = false;
+    document.getElementById('historyEmpty').hidden = true;
+    document.getElementById('historyChartWrap').hidden = true;
 
     if (historyChartInstance) { historyChartInstance.destroy(); historyChartInstance = null; }
 
     fetch(`/temperature/history/${roomId}`)
         .then(r => r.ok ? r.json() : [])
         .then(data => {
-            document.getElementById('historyLoading').classList.add('hidden');
-            if (!data || data.length === 0) {
-                document.getElementById('historyEmpty').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('historyChartWrap').classList.remove('hidden');
+            document.getElementById('historyLoading').hidden = true;
+            if (!data || data.length === 0) { document.getElementById('historyEmpty').hidden = false; return; }
+            document.getElementById('historyChartWrap').hidden = false;
             const labels = data.map(d => d.time);
             const temps  = data.map(d => d.temp);
-            const pointColor = t => t > 30 ? '#ef4444' : t > 25 ? '#facc15' : '#3b82f6';
+            const pointColor = t => t > 30 ? '#fb7185' : t > 25 ? '#fbbf24' : '#4dd4ff';
             const ctx = document.getElementById('historyChart').getContext('2d');
             historyChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -329,8 +340,8 @@ function openHistory(roomId, roomName) {
                     labels,
                     datasets: [{
                         label: 'Suhu (°C)', data: temps,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.08)',
+                        borderColor: '#4dd4ff',
+                        backgroundColor: 'rgba(77,212,255,0.10)',
                         pointBackgroundColor: temps.map(pointColor),
                         pointRadius: 4, pointHoverRadius: 6,
                         tension: 0.4, fill: true, borderWidth: 2
@@ -341,10 +352,10 @@ function openHistory(roomId, roomName) {
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(12,22,40,0.95)',
-                            titleColor: '#fff', bodyColor: '#94a3b8',
-                            borderColor: 'rgba(59,130,246,0.4)', borderWidth: 1,
-                            padding: 10, cornerRadius: 10,
+                            backgroundColor: 'rgba(7,16,31,0.96)',
+                            titleColor: '#f5f7fb', bodyColor: '#cbd5e1',
+                            borderColor: 'rgba(77,212,255,0.40)', borderWidth: 1,
+                            padding: 10, cornerRadius: 10, displayColors: false,
                             callbacks: { label: c => ` ${c.parsed.y}°C` }
                         }
                     },
@@ -358,31 +369,30 @@ function openHistory(roomId, roomName) {
             });
         })
         .catch(() => {
-            document.getElementById('historyLoading').classList.add('hidden');
-            document.getElementById('historyEmpty').classList.remove('hidden');
+            document.getElementById('historyLoading').hidden = true;
+            document.getElementById('historyEmpty').hidden = false;
         });
 }
 function closeHistory() {
-    document.getElementById('historyModal').style.display = 'none';
+    document.getElementById('historyModal').classList.remove('is-open');
     if (historyChartInstance) { historyChartInstance.destroy(); historyChartInstance = null; }
 }
 document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeHistory(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHistory(); });
 
-// ===== LIVE TEMP =====
-setInterval(() => {
-    fetch('/temperature')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!data) return;
-            data.forEach(room => {
-                const el = document.getElementById(`temp-${room.id}`);
-                if (!el) return;
-                const t = parseFloat(room.temp);
-                el.textContent = isNaN(t) ? '--' : `${t}°C`;
-            });
-        })
-        .catch(() => {});
-}, 5000);
+/* ===== LIVE TEMP ===== */
+function refreshTemps() {
+    fetch('/temperature').then(r => r.ok ? r.json() : null).then(data => {
+        if (!data) return;
+        data.forEach(room => {
+            const el = document.getElementById(`temp-${room.id}`);
+            if (!el) return;
+            const t = parseFloat(room.temp);
+            el.textContent = isNaN(t) ? '—' : `${t}°C`;
+        });
+    }).catch(() => {});
+}
+setInterval(refreshTemps, 5000);
 </script>
 @include('components.sidebar-scripts')
 </body>

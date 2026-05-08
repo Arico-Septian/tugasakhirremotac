@@ -4,12 +4,15 @@ use App\Http\Controllers\AcControlController;
 use App\Http\Controllers\AcUnitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EnergyController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TimerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
 use App\Models\AcUnit;
 use App\Models\AcStatus;
+use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomTemperature;
 use App\Models\User;
@@ -81,6 +84,11 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                     $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt) <= 15;
                 }
 
+                // Auto-notify when device is offline > 2 minutes (deduped 15min via cache key inside Notification::deviceOffline)
+                if (!$isOnline && $lastSeenAt && now()->diffInMinutes($lastSeenAt) >= 2) {
+                    Notification::deviceOffline($room->name, $deviceId);
+                }
+
                 return [
                     'room_id' => $room->id,
                     'room_name' => $room->name,
@@ -92,6 +100,17 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             })
             ->values();
     });
+
+    // ==================== ENERGY ANALYTICS ====================
+    Route::get('/energy', [EnergyController::class, 'index'])->name('energy.index');
+
+    // ==================== NOTIFICATIONS ====================
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/recent', [NotificationController::class, 'recent']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 
     Route::post('/update-activity', function () {
         /** @var User|null $user */

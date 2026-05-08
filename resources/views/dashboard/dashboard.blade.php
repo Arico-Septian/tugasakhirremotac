@@ -4,234 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — SmartAC</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="/js/chart.umd.js"></script>
     @include('components.sidebar-styles')
-    <style>
-        /* ===== STAT CARDS ===== */
-        .stat-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            transition: all 0.25s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: var(--accent, #3b82f6);
-            opacity: 0.6;
-        }
-        .stat-card:hover {
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        .stat-icon {
-            width: 42px; height: 42px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-        }
-        /* ===== CHART CARD ===== */
-        .chart-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-        /* ===== NODE CARD ===== */
-        .node-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 20px 24px;
-            backdrop-filter: blur(10px);
-            transition: all 0.25s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .node-card:hover {
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(59,130,246,0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        /* ===== ALERT BANNER ===== */
-        .alert-banner {
-            background: rgba(239,68,68,0.1);
-            border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 640px) {
-            .stat-card { padding: 14px 16px; }
-            .stat-icon { width: 36px; height: 36px; font-size: 15px; }
-        }
-    </style>
 </head>
 <body>
 <div class="custom-bg"></div>
-
-<div id="overlay" class="fixed inset-0 bg-black/50 z-40"></div>
+<div id="overlay"></div>
 
 <div class="layout">
     @include('components.sidebar')
 
     <div class="main-content">
-        <!-- HEADER -->
+        {{-- HEADER --}}
         <header class="main-header">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()"
-                    class="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-300 transition">
-                    <i class="fa-solid fa-bars text-base"></i>
+                <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
+                    <i class="fa-solid fa-bars text-xs"></i>
                 </button>
-                <div>
-                    <h1 class="text-base font-bold text-white leading-tight">Centralized AC</h1>
-                    <p class="text-xs text-blue-300 font-medium hidden sm:block">Server Room Cooling Control</p>
+                <div class="app-header-title">
+                    <h1>Dashboard</h1>
+                    <p>Overview &amp; live monitoring</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <div id="systemStatus"
-                    class="flex items-center gap-1.5 bg-gray-500/10 text-gray-400 px-3 py-1.5 rounded-full text-xs font-medium transition-all">
-                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
-                    <span>Offline</span>
-                </div>
-                <button id="notifBtn" onclick="toggleNotifications()" title="Notifikasi Suhu Kritis"
-                    class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-500 transition">
-                    <i class="fa-regular fa-bell text-sm"></i>
-                </button>
+                <span id="systemStatus" class="pill pill-offline">
+                    <span class="dot"></span><span>Offline</span>
+                </span>
+                @include('components.notification-bell')
             </div>
         </header>
 
-        <!-- PAGE BODY -->
+        {{-- BODY --}}
         <div class="page-body">
-            <div class="max-w-7xl mx-auto px-4 md:px-6 py-5 space-y-6">
+            <div class="app-content">
+                <div class="app-content-inner space-y-5">
 
-                <!-- CRITICAL TEMPERATURE ALERT -->
-                <div id="tempAlertBanner" class="alert-banner" style="display:none;">
-                    <i class="fa-solid fa-triangle-exclamation text-red-400 text-base mt-0.5 flex-shrink-0"></i>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-red-300 font-semibold text-sm">Peringatan Suhu Kritis!</p>
-                        <p id="tempAlertRooms" class="text-red-200 text-xs mt-0.5 leading-relaxed"></p>
+                    {{-- Critical alert banner --}}
+                    <div id="tempAlertBanner" class="alert alert-error" hidden>
+                        <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="alert-title">Critical Temperature Detected</p>
+                            <p id="tempAlertRooms" class="alert-body text-xs leading-relaxed"></p>
+                        </div>
+                        <button type="button" onclick="document.getElementById('tempAlertBanner').hidden = true"
+                                class="btn-icon" style="border:0;background:transparent;color:var(--coral);">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
                     </div>
-                    <button onclick="document.getElementById('tempAlertBanner').style.display='none'"
-                        class="text-red-400 hover:text-red-200 flex-shrink-0">
-                        <i class="fa-solid fa-xmark text-sm"></i>
-                    </button>
+
+                    {{-- Stat cards --}}
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div class="stat-card acc-cyan">
+                            <span class="accent-bar"></span>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="stat-label">Rooms</p>
+                                    <p class="stat-value">{{ $rooms->count() }}</p>
+                                    <p class="stat-meta">Total registered</p>
+                                </div>
+                                <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
+                            </div>
+                        </div>
+                        <div class="stat-card acc-lavender">
+                            <span class="accent-bar"></span>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="stat-label">AC Units</p>
+                                    <p class="stat-value">{{ $totalAc }}</p>
+                                    <p class="stat-meta">Across all rooms</p>
+                                </div>
+                                <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
+                            </div>
+                        </div>
+                        <div class="stat-card acc-mint">
+                            <span class="accent-bar"></span>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="stat-label">Active</p>
+                                    <p class="stat-value">{{ $activeAc }}</p>
+                                    <p class="stat-meta">Currently powered on</p>
+                                </div>
+                                <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+                            </div>
+                        </div>
+                        <div class="stat-card acc-slate">
+                            <span class="accent-bar"></span>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="stat-label">Idle</p>
+                                    <p class="stat-value">{{ $inactiveAc }}</p>
+                                    <p class="stat-meta">Powered off</p>
+                                </div>
+                                <div class="stat-icon"><i class="fa-regular fa-circle"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Temperature chart --}}
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow"><i class="fa-solid fa-temperature-half"></i> Live</p>
+                                <h2 class="panel-title">Room Temperatures</h2>
+                            </div>
+                            <span id="chartLastUpdated" class="panel-meta">—</span>
+                        </div>
+                        <div style="height:280px;">
+                            <canvas id="tempChart"></canvas>
+                        </div>
+                    </div>
+
+                    {{-- Server rooms node card --}}
+                    <a href="{{ route('rooms.overview') }}" class="surface surface-hover panel"
+                       style="display:flex;align-items:center;gap:18px;text-decoration:none;">
+                        <div class="stat-icon" style="--icon-bg:var(--lavender-soft);--icon-color:var(--lavender);width:48px;height:48px;font-size:18px;border-radius:14px;">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="eyebrow" style="color:var(--lavender);"><i class="fa-solid fa-grip-lines"></i> Nodes</p>
+                            <h2 class="panel-title" style="margin-top:2px;">Server Rooms</h2>
+                            <p class="panel-subtitle">{{ $totalRooms }} ruangan terdaftar</p>
+                        </div>
+                        <div class="hidden sm:flex items-center gap-5 mr-2">
+                            <div class="text-center">
+                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--ink-0);">{{ $totalRooms }}</p>
+                                <p class="label-tag mt-1">Total</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--mint);">{{ $onlineRooms }}</p>
+                                <p class="label-tag mt-1" style="color:var(--mint);">Online</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--coral);">{{ $offlineRooms }}</p>
+                                <p class="label-tag mt-1" style="color:var(--coral);">Offline</p>
+                            </div>
+                        </div>
+                        <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </div>
+                    </a>
+
                 </div>
-
-                <!-- STAT CARDS -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                    <div class="stat-card" style="--accent:#3b82f6">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-xs text-gray-400 font-medium mb-1">Ruangan</p>
-                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $rooms->count() }}</h2>
-                            </div>
-                            <div class="stat-icon bg-blue-500/15 text-blue-400">
-                                <i class="fa-solid fa-server"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="--accent:#818cf8">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-xs text-gray-400 font-medium mb-1">Unit AC</p>
-                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $totalAc }}</h2>
-                            </div>
-                            <div class="stat-icon bg-indigo-500/15 text-indigo-400">
-                                <i class="fa-solid fa-snowflake"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="--accent:#22c55e">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-xs text-gray-400 font-medium mb-1">AC Aktif</p>
-                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $activeAc }}</h2>
-                            </div>
-                            <div class="stat-icon bg-green-500/15 text-green-400">
-                                <i class="fa-solid fa-power-off"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="--accent:#64748b">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-xs text-gray-400 font-medium mb-1">AC Nonaktif</p>
-                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ $inactiveAc }}</h2>
-                            </div>
-                            <div class="stat-icon bg-slate-500/15 text-slate-400">
-                                <i class="fa-solid fa-plug-circle-xmark"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEMPERATURE CHART -->
-                <div class="chart-card">
-                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                        <div>
-                            <h2 class="text-sm font-semibold text-white">Suhu Ruangan</h2>
-                            <p class="text-xs text-gray-500 mt-0.5">Real-time monitoring</p>
-                        </div>
-                        <span id="chartLastUpdated" class="text-xs text-gray-500 font-medium">--</span>
-                    </div>
-                    <div style="height: 260px;">
-                        <canvas id="tempChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- SERVER ROOMS NODE CARD -->
-                <a href="{{ route('rooms.overview') }}" class="node-card group">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl
-                                bg-gradient-to-br from-violet-600 to-indigo-600
-                                flex items-center justify-center shadow-lg shadow-violet-900/30">
-                        <i class="fa-solid fa-server text-white text-base"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[10px] font-bold tracking-widest text-teal-400 mb-0.5">/// NODES</p>
-                        <h2 class="text-base font-bold text-white group-hover:text-blue-200 transition leading-tight">
-                            Server Rooms
-                        </h2>
-                        <p class="text-xs text-gray-500 truncate">{{ $totalRooms }} ruangan terdaftar</p>
-                    </div>
-                    <div class="flex-shrink-0 flex items-center gap-4 md:gap-6 pr-2">
-                        <div class="text-center hidden sm:block">
-                            <p class="text-lg font-bold text-white leading-none">{{ $totalRooms }}</p>
-                            <p class="text-[10px] text-gray-500 font-semibold tracking-wide mt-1">TOTAL</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-lg font-bold text-green-400 leading-none">{{ $onlineRooms }}</p>
-                            <p class="text-[10px] text-green-600 font-semibold tracking-wide mt-1">ONLINE</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-lg font-bold text-red-400 leading-none">{{ $offlineRooms }}</p>
-                            <p class="text-[10px] text-red-600 font-semibold tracking-wide mt-1">OFFLINE</p>
-                        </div>
-                    </div>
-                    <div class="flex-shrink-0 w-8 h-8 rounded-xl bg-white/6 group-hover:bg-blue-600
-                                transition-all flex items-center justify-center ml-1">
-                        <i class="fa-solid fa-arrow-right text-white text-xs"></i>
-                    </div>
-                </a>
-
             </div>
         </div>
     </div>
@@ -242,13 +158,12 @@
 <script>
 const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
 const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => is_null($t) ? null : (float)$t)->values());
-const ctx = document.getElementById('tempChart');
 
 function tempColor(t) {
-    if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.6)';
-    if (t > 30) return 'rgba(239,68,68,0.8)';
-    if (t > 25) return 'rgba(250,204,21,0.8)';
-    return 'rgba(59,130,246,0.8)';
+    if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.55)';
+    if (t > 30) return 'rgba(251,113,133,0.85)';   // coral
+    if (t > 25) return 'rgba(251,191,36,0.85)';    // amber
+    return 'rgba(77,212,255,0.85)';                // cyan
 }
 
 const valueLabelPlugin = {
@@ -262,10 +177,10 @@ const valueLabelPlugin = {
                 const v = ds.data[idx];
                 if (Number.isFinite(v) && v > 0) {
                     ctx.save();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = `bold ${window.innerWidth < 768 ? 9 : 11}px Inter`;
+                    ctx.fillStyle = '#f5f7fb';
+                    ctx.font = `600 ${window.innerWidth < 768 ? 9 : 10.5}px Inter`;
                     ctx.textAlign = 'center';
-                    ctx.fillText(v + '°C', bar.x, bar.y - 5);
+                    ctx.fillText(v + '°C', bar.x, bar.y - 6);
                     ctx.restore();
                 }
             });
@@ -280,19 +195,24 @@ const notifCooldown = {};
 function updateNotifButton() {
     const btn = document.getElementById('notifBtn');
     if (!btn) return;
+    const i = btn.querySelector('i');
     if (notifEnabled && Notification.permission === 'granted') {
-        btn.classList.replace('text-gray-500', 'text-amber-400');
-        btn.querySelector('i').className = 'fa-solid fa-bell text-sm';
-        btn.title = 'Notifikasi aktif — klik untuk nonaktifkan';
+        btn.style.color = 'var(--amber)';
+        btn.style.background = 'var(--amber-soft)';
+        btn.style.borderColor = 'var(--amber-soft-2)';
+        i.className = 'fa-solid fa-bell text-xs';
+        btn.title = 'Notifications enabled — click to disable';
     } else {
-        btn.classList.replace('text-amber-400', 'text-gray-500');
-        btn.querySelector('i').className = 'fa-regular fa-bell text-sm';
-        btn.title = 'Aktifkan notifikasi suhu kritis';
+        btn.style.color = '';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        i.className = 'fa-regular fa-bell text-xs';
+        btn.title = 'Enable critical temperature notifications';
     }
 }
 
 function toggleNotifications() {
-    if (!('Notification' in window)) { alert('Browser tidak mendukung notifikasi.'); return; }
+    if (!('Notification' in window)) { window.smToast('Browser tidak mendukung notifikasi', 'error'); return; }
     if (notifEnabled) {
         notifEnabled = false;
         localStorage.setItem('notifEnabled', 'false');
@@ -303,7 +223,7 @@ function toggleNotifications() {
         notifEnabled = perm === 'granted';
         localStorage.setItem('notifEnabled', notifEnabled ? 'true' : 'false');
         updateNotifButton();
-        if (perm === 'denied') alert('Izin notifikasi ditolak. Aktifkan di pengaturan browser.');
+        if (perm === 'denied') window.smToast('Izin notifikasi ditolak', 'error');
     });
 }
 
@@ -312,38 +232,38 @@ function sendTempNotification(roomName, temp) {
     const now = Date.now();
     if (notifCooldown[roomName] && now - notifCooldown[roomName] < 5 * 60 * 1000) return;
     notifCooldown[roomName] = now;
-    new Notification('⚠️ Suhu Kritis!', {
+    new Notification('⚠️ Suhu Kritis', {
         body: `${roomName}: ${temp}°C — segera periksa ruangan`,
-        icon: '/images/wallpaper.jpeg',
-        tag:  'temp-' + roomName,
+        tag: 'temp-' + roomName,
     });
 }
 
 let tempChart;
 function initChart() {
+    const ctx = document.getElementById('tempChart');
     if (!ctx) return;
     tempChart = new Chart(ctx, {
         plugins: [valueLabelPlugin],
         data: {
             labels: roomNames,
             datasets: [
-                { type: 'bar', label: 'Suhu (°C)', data: roomTemps,
-                  backgroundColor: roomTemps.map(tempColor), borderRadius: 8,
-                  barPercentage: 0.7, categoryPercentage: 0.8 },
-                { type: 'line', label: 'Tren', data: roomTemps,
-                  borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'transparent',
-                  tension: 0.4, pointBackgroundColor: '#fff', pointRadius: 3, borderWidth: 1.5 }
+                { type: 'bar', label: 'Temperature (°C)', data: roomTemps,
+                  backgroundColor: roomTemps.map(tempColor), borderRadius: 6,
+                  barPercentage: 0.7, categoryPercentage: 0.78 },
+                { type: 'line', label: 'Trend', data: roomTemps,
+                  borderColor: 'rgba(245,247,251,0.32)', backgroundColor: 'transparent',
+                  tension: 0.4, pointBackgroundColor: '#f5f7fb', pointRadius: 3, borderWidth: 1.5 }
             ]
         },
         options: {
             maintainAspectRatio: false, responsive: true,
             plugins: {
-                legend: { labels: { color: '#64748b', font: { family: 'Inter', size: 11 } } },
+                legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, boxWidth: 10, boxHeight: 10 } },
                 tooltip: {
-                    backgroundColor: 'rgba(12,22,40,0.95)',
-                    titleColor: '#fff', bodyColor: '#94a3b8',
-                    borderColor: 'rgba(59,130,246,0.4)', borderWidth: 1,
-                    padding: 10, cornerRadius: 10,
+                    backgroundColor: 'rgba(7,16,31,0.96)',
+                    titleColor: '#f5f7fb', bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(77,212,255,0.35)', borderWidth: 1,
+                    padding: 10, cornerRadius: 10, displayColors: false,
                     callbacks: { label: c => ` ${c.parsed.y}°C` }
                 }
             },
@@ -351,7 +271,7 @@ function initChart() {
                 x: { ticks: { color: '#64748b', maxRotation: 0, font: { size: 10 } }, grid: { display: false } },
                 y: { suggestedMin: 20, suggestedMax: 40,
                      ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
-                     grid: { color: 'rgba(255,255,255,0.05)' } }
+                     grid: { color: 'rgba(255,255,255,0.04)' } }
             }
         }
     });
@@ -370,17 +290,17 @@ function refreshTemperature() {
             tempChart.update();
 
             const tsEl = document.getElementById('chartLastUpdated');
-            if (tsEl) tsEl.textContent = 'Diperbarui ' + new Date().toLocaleTimeString('id-ID');
+            if (tsEl) tsEl.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
 
             const critical = data.filter(r => { const t = parseFloat(r.temp); return !isNaN(t) && t > 30; });
-            const banner   = document.getElementById('tempAlertBanner');
+            const banner = document.getElementById('tempAlertBanner');
             const alertMsg = document.getElementById('tempAlertRooms');
             if (banner && alertMsg) {
                 if (critical.length > 0) {
-                    alertMsg.textContent = 'Suhu kritis: ' + critical.map(r => `${r.name} (${parseFloat(r.temp).toFixed(1)}°C)`).join(', ');
-                    banner.style.display = 'flex';
+                    alertMsg.textContent = critical.map(r => `${r.name} (${parseFloat(r.temp).toFixed(1)}°C)`).join(' · ');
+                    banner.hidden = false;
                 } else {
-                    banner.style.display = 'none';
+                    banner.hidden = true;
                 }
             }
             critical.forEach(r => sendTempNotification(r.name, parseFloat(r.temp).toFixed(1)));
@@ -393,8 +313,8 @@ setInterval(refreshTemperature, 5000);
 function setSystemStatus(online) {
     const el = document.getElementById('systemStatus');
     if (!el) return;
-    el.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${online ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'}`;
-    el.innerHTML = `<span class="w-1.5 h-1.5 ${online ? 'bg-green-400 animate-pulse' : 'bg-gray-400'} rounded-full"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+    el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+    el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
 }
 window.addEventListener('online',  () => setSystemStatus(true));
 window.addEventListener('offline', () => setSystemStatus(false));

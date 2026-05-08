@@ -9,6 +9,7 @@ class Room extends Model
     protected $fillable = [
         'name',
         'device_id',
+        'floor',
         'device_status',
         'last_seen',
     ];

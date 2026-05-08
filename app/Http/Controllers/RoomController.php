@@ -76,8 +76,9 @@ class RoomController extends Controller
         $deviceId = $request->device_id;
 
         $room = Room::create([
-            'name' => $request->name,
-            'device_id' => $deviceId
+            'name'      => $request->name,
+            'device_id' => $deviceId,
+            'floor'     => $request->filled('floor') ? trim($request->floor) : null,
         ]);
 
         $mqttPublished = true;
@@ -171,6 +172,7 @@ class RoomController extends Controller
     public function overview()
     {
         $rooms = Room::with(['acUnits.status'])
+            ->orderBy('floor')
             ->orderBy('name')
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
@@ -195,7 +197,9 @@ class RoomController extends Controller
             $room->device_status = $isOnline ? 'online' : 'offline';
         }
 
-        return view('rooms.overview', compact('rooms'));
+        $roomsByFloor = $rooms->groupBy(fn($r) => $r->floor ?: 'Lainnya');
+
+        return view('rooms.overview', compact('rooms', 'roomsByFloor'));
     }
 
     /*=== DETAIL STATUS AC ===*/
