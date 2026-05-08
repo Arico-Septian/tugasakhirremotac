@@ -51,7 +51,7 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'name' => trim((string) $request->name),
+            'name' => strtolower(trim((string) $request->name)),
             'device_id' => strtolower(trim((string) $request->device_id)),
         ]);
 

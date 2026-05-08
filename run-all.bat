@@ -15,8 +15,8 @@ for /f "delims=" %%P in ('where php 2^>nul') do (
     goto :php_found
 )
 
-if exist "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" (
-    set "PHP=C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe"
+if exist "C:\laragon\bin\php\php-8.4.21-Win32-vs17-x64\php.exe" (
+    set "PHP=C:\laragon\bin\php\php-8.4.21-Win32-vs17-x64\php.exe"
     goto :php_found
 )
 
@@ -44,7 +44,7 @@ if not exist artisan (
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-echo [1/5] Menjalankan migration...
+echo [1/4] Menjalankan migration...
 "%PHP%" artisan migrate --force 2>>"%LOG_DIR%\launcher-error.log"
 if errorlevel 1 (
     echo.
@@ -55,41 +55,36 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/5] Menjalankan MQTT subscriber untuk kontrol AC
+echo [2/4] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
 start /min "SmartAC MQTT Subscriber" cmd /c ""%PHP%" "%ARTISAN%" mqtt:subscribe >> "%LOG_DIR%\mqtt-subscriber.log" 2>&1"
 
 timeout /t 1 /nobreak >nul
 
-echo [3/5] Menjalankan MQTT listener untuk suhu ruangan
+echo [3/4] Menjalankan MQTT listener (suhu ruangan)...
 start /min "SmartAC Temperature Listener" cmd /c ""%PHP%" "%ARTISAN%" app:mqtt-listener >> "%LOG_DIR%\temperature-listener.log" 2>&1"
 
 timeout /t 1 /nobreak >nul
 
-echo [4/5] Menjalankan scheduler untuk device status dan timer AC
+echo [4/4] Menjalankan queue worker dan scheduler...
+start /min "SmartAC Queue Worker" cmd /c ""%PHP%" "%ARTISAN%" queue:work --sleep=3 --tries=3 >> "%LOG_DIR%\queue.log" 2>&1"
 start /min "SmartAC Scheduler" cmd /c ""%PHP%" "%ARTISAN%" schedule:work >> "%LOG_DIR%\scheduler.log" 2>&1"
 
-timeout /t 1 /nobreak >nul
-
 echo.
 echo ========================================
-echo   SERVICES STARTED
+echo   SEMUA SERVICE BERJALAN
 echo ========================================
 echo Buka: http://127.0.0.1:8000
+echo Log service :
+echo   - storage\logs\mqtt-subscriber.log
+echo   - storage\logs\temperature-listener.log
+echo   - storage\logs\queue.log
+echo   - storage\logs\scheduler.log
 echo.
-echo Biarkan window ini tetap terbuka untuk Laravel server.
-echo Service MQTT dan scheduler berjalan di background.
-echo Log service ada di:
-echo - storage\logs\mqtt-subscriber.log
-echo - storage\logs\temperature-listener.log
-echo - storage\logs\scheduler.log
-echo.
-echo [5/5] Menjalankan Laravel server di http://127.0.0.1:8000
-echo Jika server berhasil, akan muncul tulisan:
-echo INFO  Server running on [http://127.0.0.1:8000].
-echo.
-"%PHP%" artisan serve --host=127.0.0.1 --port=8000 2>>"%LOG_DIR%\server-error.log"
 
+timeout /t 2 /nobreak >nul
+start http://127.0.0.1:8000
+
+echo [5/4] Menjalankan Laravel web server di http://127.0.0.1:8000
+echo Biarkan window ini tetap terbuka.
 echo.
-echo Laravel server berhenti atau gagal berjalan.
-echo Kirim screenshot isi window ini kalau masih gagal.
-pause
+"%PHP%" artisan serve --host=127.0.0.1 --port=8000

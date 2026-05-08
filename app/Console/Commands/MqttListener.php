@@ -17,8 +17,8 @@ class MqttListener extends Command
 
     public function handle()
     {
-        $server = 'broker.hivemq.com';
-        $port = 1883;
+        $server = env('MQTT_HOST', 'broker.hivemq.com');
+        $port   = (int) env('MQTT_PORT', 1883);
 
         while (true) {
 
@@ -26,11 +26,13 @@ class MqttListener extends Command
 
                 $this->info("Connecting MQTT...");
 
-                $mqtt = new MqttClient($server, $port, 'laravel-listener');
+                $mqtt = new MqttClient($server, $port, 'laravel-listener-' . uniqid());
 
                 $settings = (new ConnectionSettings)
-                    ->setUsername(null)
-                    ->setPassword(null)
+                    ->setUsername(env('MQTT_USERNAME'))
+                    ->setPassword(env('MQTT_PASSWORD'))
+                    ->setUseTls($port === 8883)
+                    ->setTlsSelfSignedAllowed(false)
                     ->setKeepAliveInterval(60);
 
                 $mqtt->connect($settings, true);

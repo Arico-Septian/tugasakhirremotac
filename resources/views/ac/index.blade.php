@@ -866,6 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
     @endif
     @if (session('success') && !session('new_ac_id')) window.smToast("{{ session('success') }}", 'success'); @endif
     @if (session('error')) window.smToast("{{ session('error') }}", 'error'); @endif
+    @if (session('warning')) window.smToast("{{ session('warning') }}", 'warn'); @endif
     @if ($errors->any()) window.smToast("{{ $errors->first() }}", 'error'); @endif
 });
 

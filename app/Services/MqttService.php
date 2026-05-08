@@ -25,6 +25,11 @@ class MqttService
         $this->mqtt->connect($connectionSettings, true);
     }
 
+    public static function roomToTopic(string $roomName): string
+    {
+        return str_replace(' ', '_', strtolower(trim($roomName)));
+    }
+
     public function publish($topic, $message, $qos = 1, $retain = false)
     {
         $this->mqtt->publish($topic, $message, $qos, $retain);

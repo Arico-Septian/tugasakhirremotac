@@ -111,7 +111,7 @@ class MqttSubscribe extends Command
 
                 if (!$roomName || !$acId) return;
 
-                $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+                $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
                 if (!$room) return;
 
                 $ac = AcUnit::where('room_id', $room->id)
@@ -174,7 +174,7 @@ class MqttSubscribe extends Command
                         return;
                     }
 
-                    $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+                    $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
 
                     if (!$room) {
                         Log::warning("ROOM TIDAK DITEMUKAN", [
@@ -239,6 +239,15 @@ class MqttSubscribe extends Command
                 }
             },
 
+            /* === RASPI TEMPERATURE === */
+            'raspi/temperature' => function ($topic, $message) {
+                $temp = (float) trim($message);
+                if ($temp > 0) {
+                    Cache::put('raspi_temperature', $temp, 120);
+                    $this->line("RASPI TEMP: {$temp}°C");
+                }
+            },
+
             /* === HEARTBEAT === */
             'device/+/heartbeat' => function ($topic) {
 
@@ -263,7 +272,7 @@ class MqttSubscribe extends Command
 
                 if (!$roomName) return;
 
-                $room = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+                $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
                 if (!$room || !$room->device_id) return;
 
                 $acNumber = (int) $data['id'];

@@ -377,12 +377,12 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     });
 
     Route::get('/suhu-raspi', function () {
-        $data = file_get_contents('http://192.168.79.28:8000/suhu.php');
-        preg_match('/([0-9.]+)/', $data, $matches);
+        $temp = Cache::get('raspi_temperature');
 
-        return [
-            'suhu' => ($matches[1] ?? null) ? $matches[1] . ' C' : null,
-        ];
+        return response()->json([
+            'suhu'  => $temp !== null ? $temp . ' °C' : null,
+            'value' => $temp,
+        ]);
     });
 
     Route::get('/monitoring', function () {
