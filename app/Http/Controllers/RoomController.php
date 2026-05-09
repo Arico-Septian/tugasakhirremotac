@@ -33,7 +33,7 @@ class RoomController extends Controller
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
 
-            $isOnline = ($status === 'online' || $status === 'available') && $lastSeen && now()->diffInSeconds($lastSeen) <= 30;
+            $isOnline = ($status === 'online' || $status === 'available') && $lastSeen && now()->diffInSeconds($lastSeen, true) <= 30;
             $room->device_status = $isOnline ? 'online' : 'offline';
 
             $room->temperature = optional(
@@ -186,7 +186,7 @@ class RoomController extends Controller
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 30;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
         }
@@ -213,7 +213,7 @@ class RoomController extends Controller
 
         $isOnline = ($status === 'online' || $status === 'available')
             && $lastSeen
-            && now()->diffInSeconds($lastSeen) <= 30;
+            && now()->diffInSeconds($lastSeen, true) <= 30;
 
         $room->device_status = $isOnline ? 'online' : 'offline';
 

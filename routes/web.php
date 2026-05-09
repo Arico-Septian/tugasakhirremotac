@@ -10,8 +10,8 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TimerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
-use App\Models\AcUnit;
 use App\Models\AcStatus;
+use App\Models\AcUnit;
 use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomTemperature;
@@ -81,11 +81,11 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
                 if ($lastSeen) {
                     $lastSeenAt = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt) <= 15;
+                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 15;
                 }
 
                 // Auto-notify when device is offline > 2 minutes (deduped 15min via cache key inside Notification::deviceOffline)
-                if (!$isOnline && $lastSeenAt && now()->diffInMinutes($lastSeenAt) >= 2) {
+                if (! $isOnline && $lastSeenAt && now()->diffInMinutes($lastSeenAt, true) >= 2) {
                     Notification::deviceOffline($room->name, $deviceId);
                 }
 
@@ -128,12 +128,12 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user || !$user->last_activity) {
+        if (! $user || ! $user->last_activity) {
             return response()->json(['status' => 'offline']);
         }
 
         return response()->json([
-            'status' => now()->diffInSeconds($user->last_activity) < 60 ? 'online' : 'offline',
+            'status' => now()->diffInSeconds($user->last_activity, true) < 60 ? 'online' : 'offline',
         ]);
     });
 
@@ -161,7 +161,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::get('/temperatures', $temperatureEndpoint);
 
     Route::get('/temperature/history/{id}', function ($id) {
-        $room       = Room::findOrFail($id);
+        $room = Room::findOrFail($id);
         $normalized = RoomTemperature::normalizeRoomName($room->name);
 
         $rows = RoomTemperature::where('room', $normalized)
@@ -170,11 +170,11 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->get();
 
         $grouped = $rows
-            ->groupBy(fn($t) => $t->created_at->format('H:00'))
-            ->map(fn($g) => round($g->avg('temperature'), 1));
+            ->groupBy(fn ($t) => $t->created_at->format('H:00'))
+            ->map(fn ($g) => round($g->avg('temperature'), 1));
 
         return response()->json(
-            $grouped->map(fn($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
+            $grouped->map(fn ($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
         );
     });
 
@@ -226,19 +226,19 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             $fanSpeed = strtoupper(trim((string) ($changes['fan_speed'] ?? $status?->fan_speed ?? 'AUTO')));
             $swing = strtoupper(trim((string) ($changes['swing'] ?? $status?->swing ?? 'OFF')));
 
-            if (!in_array($power, ['ON', 'OFF'], true)) {
+            if (! in_array($power, ['ON', 'OFF'], true)) {
                 $power = 'OFF';
             }
 
-            if (!in_array($mode, ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'], true)) {
+            if (! in_array($mode, ['COOL', 'HEAT', 'DRY', 'FAN', 'AUTO'], true)) {
                 $mode = 'COOL';
             }
 
-            if (!in_array($fanSpeed, ['AUTO', 'LOW', 'MEDIUM', 'HIGH'], true)) {
+            if (! in_array($fanSpeed, ['AUTO', 'LOW', 'MEDIUM', 'HIGH'], true)) {
                 $fanSpeed = 'AUTO';
             }
 
-            if (!in_array($swing, ['OFF', 'FULL', 'HALF', 'DOWN'], true)) {
+            if (! in_array($swing, ['OFF', 'FULL', 'HALF', 'DOWN'], true)) {
                 $swing = 'OFF';
             }
 
@@ -250,7 +250,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                 'swing' => $swing,
             ];
 
-            (new MqttService())->publish(
+            (new MqttService)->publish(
                 "room/{$roomName}/ac/{$acNumber}/control",
                 json_encode($payload),
                 1,
@@ -269,7 +269,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         };
 
         Route::get('/set-room/{room}', function ($room) {
-            $mqtt = new MqttService();
+            $mqtt = new MqttService;
             $topic = 'device/esp32_01/config';
 
             $mqtt->publish($topic, json_encode(['room' => $room]));
@@ -278,7 +278,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         });
 
         Route::get('/add-ac/{room}/{id}/{brand}', function ($room, $id, $brand) {
-            $mqtt = new MqttService();
+            $mqtt = new MqttService;
             $topic = "room/{$room}/ac/add";
 
             $mqtt->publish($topic, json_encode([
@@ -290,7 +290,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         });
 
         Route::get('/remove-ac/{room}/{id}', function ($room, $id) {
-            $mqtt = new MqttService();
+            $mqtt = new MqttService;
             $topic = "room/{$room}/ac/remove";
 
             $mqtt->publish($topic, json_encode(['id' => $id]));
@@ -380,7 +380,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         $temp = Cache::get('raspi_temperature');
 
         return response()->json([
-            'suhu'  => $temp !== null ? $temp . ' °C' : null,
+            'suhu' => $temp !== null ? $temp.' °C' : null,
             'value' => $temp,
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     });

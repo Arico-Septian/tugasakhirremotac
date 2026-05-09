@@ -81,13 +81,15 @@
                                 $activeAcs = $room->acUnits->filter(fn($ac) => $ac->status && $ac->status->power == 'ON')->count();
                                 $idleAcs   = $room->acUnits->filter(fn($ac) => !$ac->status || $ac->status->power !== 'ON')->count();
                             @endphp
-                            <div class="room-card" data-status="{{ $online ? 'online' : 'offline' }}">
+                            <div class="room-card"
+                                 data-room-id="{{ $room->id }}"
+                                 data-status="{{ $online ? 'online' : 'offline' }}">
                                 <div class="flex items-start justify-between gap-2">
                                     <div class="min-w-0 flex-1">
                                         <h2 class="text-sm font-semibold text-tight truncate" style="color:var(--ink-0);">{{ $room->name }}</h2>
                                         <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                                            <span class="pill {{ $online ? 'pill-online' : 'pill-offline' }}" style="padding:3px 9px;font-size:10px;">
-                                                <span class="dot"></span><span>{{ $online ? 'Online' : 'Offline' }}</span>
+                                            <span class="pill room-status-pill {{ $online ? 'pill-online' : 'pill-offline' }}" style="padding:3px 9px;font-size:10px;">
+                                                <span class="dot"></span><span class="room-status-text">{{ $online ? 'Online' : 'Offline' }}</span>
                                             </span>
                                             @if ($room->floor)
                                                 <span class="label-tag" style="background:var(--lavender-soft);color:var(--lavender);border-color:var(--lavender-soft-2);font-size:9px;">
@@ -218,7 +220,39 @@ setInterval(() => {
         }).catch(() => {});
 }, 5000);
 
+function setRoomStatus(card, online) {
+    card.dataset.status = online ? 'online' : 'offline';
+
+    const pill = card.querySelector('.room-status-pill');
+    const text = card.querySelector('.room-status-text');
+    if (!pill || !text) return;
+
+    pill.classList.toggle('pill-online', online);
+    pill.classList.toggle('pill-offline', !online);
+    text.textContent = online ? 'Online' : 'Offline';
+}
+
+function refreshRoomStatuses() {
+    fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!Array.isArray(data)) return;
+
+            data.forEach(device => {
+                const card = document.querySelector(`.room-card[data-room-id="${device.room_id}"]`);
+                if (!card) return;
+
+                setRoomStatus(card, device.is_online === true || device.status === 'online');
+            });
+        })
+        .catch(() => {});
+}
+
+setInterval(refreshRoomStatuses, 5000);
+
 document.addEventListener('DOMContentLoaded', () => {
+    refreshRoomStatuses();
+
     @if (session('success')) window.smToast("{{ session('success') }}", 'success'); @endif
     @if (session('error'))   window.smToast("{{ session('error') }}", 'error'); @endif
     @if ($errors->any())     window.smToast("{{ $errors->first() }}", 'error'); @endif

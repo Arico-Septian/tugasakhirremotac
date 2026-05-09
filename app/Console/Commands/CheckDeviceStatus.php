@@ -90,7 +90,7 @@ class CheckDeviceStatus extends Command
         }
 
         // Check if offline
-        $diff = max(0, $now->diffInSeconds($lastSeen));
+        $diff = $now->diffInSeconds($lastSeen, true);
         $isOffline = $diff > self::OFFLINE_THRESHOLD;
         $currentStatus = Cache::get($statusKey);
 

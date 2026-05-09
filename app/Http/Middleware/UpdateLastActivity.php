@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 
 class UpdateLastActivity
 {
@@ -13,10 +13,10 @@ class UpdateLastActivity
     {
         if (Auth::check()) {
 
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = Auth::user();
 
-            if (!$user->last_activity || now()->diffInSeconds($user->last_activity) > 10) {
+            if (! $user->last_activity || now()->diffInSeconds($user->last_activity, true) > 10) {
                 $user->last_activity = now();
                 $user->save();
             }

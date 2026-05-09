@@ -152,6 +152,7 @@
                                                 $tempClass     = $temp === null ? 'idle' : ($temp > 30 ? 'hot' : ($temp > 25 ? 'warm' : 'cool'));
                                             @endphp
                                             <div class="room-card"
+                                                 data-room-id="{{ $room->id }}"
                                                  data-name="{{ strtolower($room->name) }}"
                                                  data-status="{{ $status }}"
                                                  data-floor="{{ $floorName }}">
@@ -159,8 +160,8 @@
                                                     <h3 class="text-sm font-semibold text-tight" style="color:var(--ink-0);line-height:1.25;">
                                                         {{ ucfirst($room->name) }}
                                                     </h3>
-                                                    <span class="pill {{ $status === 'online' ? 'pill-online' : 'pill-offline' }}" style="padding:3px 8px;font-size:10px;">
-                                                        <span class="dot"></span><span class="hidden sm:inline">{{ $status === 'online' ? 'Online' : 'Offline' }}</span>
+                                                    <span class="pill room-status-pill {{ $status === 'online' ? 'pill-online' : 'pill-offline' }}" style="padding:3px 8px;font-size:10px;">
+                                                        <span class="dot"></span><span class="room-status-text hidden sm:inline">{{ $status === 'online' ? 'Online' : 'Offline' }}</span>
                                                     </span>
                                                 </div>
 
@@ -311,6 +312,39 @@ document.querySelectorAll('.filter-pill[data-floor]').forEach(btn => {
 });
 
 document.addEventListener('DOMContentLoaded', applyFilter);
+
+function setRoomStatus(card, online) {
+    card.dataset.status = online ? 'online' : 'offline';
+
+    const pill = card.querySelector('.room-status-pill');
+    const text = card.querySelector('.room-status-text');
+    if (!pill || !text) return;
+
+    pill.classList.toggle('pill-online', online);
+    pill.classList.toggle('pill-offline', !online);
+    text.textContent = online ? 'Online' : 'Offline';
+}
+
+function refreshRoomStatuses() {
+    fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!Array.isArray(data)) return;
+
+            data.forEach(device => {
+                const card = document.querySelector(`.room-card[data-room-id="${device.room_id}"]`);
+                if (!card) return;
+
+                setRoomStatus(card, device.is_online === true || device.status === 'online');
+            });
+
+            applyFilter();
+        })
+        .catch(() => {});
+}
+
+setInterval(refreshRoomStatuses, 5000);
+document.addEventListener('DOMContentLoaded', refreshRoomStatuses);
 
 /* ===== HISTORY MODAL ===== */
 let historyChartInstance = null;

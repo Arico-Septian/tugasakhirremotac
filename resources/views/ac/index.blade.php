@@ -335,9 +335,11 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span class="pill {{ ($room->device_status ?? 'offline') === 'online' ? 'pill-online' : 'pill-error' }}">
+                <span id="espStatusPill"
+                      data-room-id="{{ $room->id }}"
+                      class="pill {{ ($room->device_status ?? 'offline') === 'online' ? 'pill-online' : 'pill-error' }}">
                     <span class="dot"></span>
-                    <span>ESP {{ ($room->device_status ?? 'offline') === 'online' ? 'Online' : 'Offline' }}</span>
+                    <span id="espStatusText">ESP {{ ($room->device_status ?? 'offline') === 'online' ? 'Online' : 'Offline' }}</span>
                 </span>
             </div>
         </header>
@@ -847,7 +849,33 @@ document.querySelectorAll('.control-form').forEach(form => {
     });
 });
 
+function updateEspStatus() {
+    const pill = document.getElementById('espStatusPill');
+    const text = document.getElementById('espStatusText');
+    if (!pill || !text) return;
+
+    const roomId = Number(pill.dataset.roomId);
+    fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(devices => {
+            const current = Array.isArray(devices)
+                ? devices.find(device => Number(device.room_id) === roomId)
+                : null;
+
+            if (!current) return;
+
+            const online = current.is_online === true || current.status === 'online';
+            pill.classList.toggle('pill-online', online);
+            pill.classList.toggle('pill-error', !online);
+            text.textContent = `ESP ${online ? 'Online' : 'Offline'}`;
+        })
+        .catch(() => {});
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    updateEspStatus();
+    setInterval(updateEspStatus, 5000);
+
     @if (session('new_ac_id'))
         const id = "{{ session('new_ac_id') }}";
         localStorage.setItem('selectedAC', id);
