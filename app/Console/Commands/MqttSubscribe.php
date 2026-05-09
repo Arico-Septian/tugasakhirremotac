@@ -2,319 +2,345 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\MqttService;
-use Illuminate\Support\Facades\Cache;
-use App\Models\AcUnit;
-use App\Models\AcStatus;
 use App\Events\DeviceStatusUpdated;
+use App\Models\AcStatus;
+use App\Models\AcUnit;
 use App\Models\Room;
+use App\Services\MqttService;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class MqttSubscribe extends Command
 {
     protected $signature = 'mqtt:subscribe';
+
     protected $description = 'MQTT Listener (Realtime IoT)';
 
     public function handle()
     {
         while (true) {
             try {
-                $mqtt = new MqttService();
+                $mqtt = new MqttService;
 
-                $this->info("MQTT LISTENER STARTED");
+                $this->info('MQTT LISTENER STARTED');
 
                 $mqtt->subscribeMultiple([
 
-            /* === DEVICE ONLINE === */
-            'device/+/online' => function ($topic, $message) use ($mqtt) {
+                    /* === DEVICE ONLINE === */
+                    'device/+/online' => function ($topic, $message) use ($mqtt) {
 
-                $data = json_decode($message, true);
+                        $data = json_decode($message, true);
 
-                if (!$data || empty($data['device_id'])) {
-                    $this->warn("JSON ONLINE tidak valid");
-                    return;
-                }
+                        if (! $data || empty($data['device_id'])) {
+                            $this->warn('JSON ONLINE tidak valid');
 
-                $deviceId = $this->normalize($data['device_id']);
+                            return;
+                        }
 
-                $this->info("ESP ONLINE: {$deviceId}");
+                        $deviceId = $this->normalize($data['device_id']);
 
-                $this->setOnline($deviceId);
+                        $this->info("ESP ONLINE: {$deviceId}");
 
-                $mqtt->resendConfig($deviceId);
+                        $this->setOnline($deviceId);
 
-                event(new DeviceStatusUpdated($deviceId, 'online'));
-            },
+                        $mqtt->resendConfig($deviceId);
 
-            /* === PING === */
-            'device/+/ping' => function ($topic) {
+                        event(new DeviceStatusUpdated($deviceId, 'online'));
+                    },
 
-                $deviceId = $this->extractDeviceId($topic, 'ping');
-                if (!$deviceId) return;
+                    /* === PING === */
+                    'device/+/ping' => function ($topic) {
 
-                $this->setOnline($deviceId);
+                        $deviceId = $this->extractDeviceId($topic, 'ping');
+                        if (! $deviceId) {
+                            return;
+                        }
 
-                $this->line("PING: {$deviceId}");
+                        $this->setOnline($deviceId);
 
-                event(new DeviceStatusUpdated($deviceId, 'online'));
-            },
+                        $this->line("PING: {$deviceId}");
 
-            /* === STATUS (LWT) === */
-            'device/+/status' => function ($topic, $message) {
+                        event(new DeviceStatusUpdated($deviceId, 'online'));
+                    },
 
-                $deviceId = $this->extractDeviceId($topic, 'status');
-                if (!$deviceId) return;
+                    /* === STATUS (LWT) === */
+                    'device/+/status' => function ($topic, $message) {
 
-                if ($message === 'offline') {
+                        $deviceId = $this->extractDeviceId($topic, 'status');
+                        if (! $deviceId) {
+                            return;
+                        }
 
-                    $this->error("ESP OFFLINE: {$deviceId}");
+                        if ($message === 'offline') {
 
-                    Cache::forget("device_{$deviceId}_last_seen");
-                    Cache::put("device_status_{$deviceId}", 'offline', 300);
-                    Cache::forget("device_unknown_{$deviceId}");
+                            $this->error("ESP OFFLINE: {$deviceId}");
 
-                    AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
-                        $q->where('device_id', $deviceId);
-                    })->update([
-                        'power' => 'OFF'
-                    ]);
-                    Room::where('device_id', $deviceId)->update([
-                        'device_status' => 'offline',
-                    ]);
+                            Cache::forget("device_{$deviceId}_last_seen");
+                            Cache::put("device_status_{$deviceId}", 'offline', 300);
+                            Cache::forget("device_unknown_{$deviceId}");
 
-                    event(new DeviceStatusUpdated($deviceId, 'offline'));
+                            AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
+                                $q->where('device_id', $deviceId);
+                            })->update([
+                                'power' => 'OFF',
+                            ]);
+                            Room::where('device_id', $deviceId)->update([
+                                'device_status' => 'offline',
+                            ]);
 
-                    Log::info("Device marked OFFLINE via LWT", ['device' => $deviceId]);
-                } elseif ($message === 'online') {
+                            event(new DeviceStatusUpdated($deviceId, 'offline'));
 
-                    $this->info("STATUS ONLINE: {$deviceId}");
+                            Log::info('Device marked OFFLINE via LWT', ['device' => $deviceId]);
+                        } elseif ($message === 'online') {
 
-                    $this->setOnline($deviceId);
+                            $this->info("STATUS ONLINE: {$deviceId}");
 
-                    event(new DeviceStatusUpdated($deviceId, 'online'));
-                }
-            },
+                            $this->setOnline($deviceId);
 
-            'room/+/ac/+/control' => function ($topic, $message) {
+                            event(new DeviceStatusUpdated($deviceId, 'online'));
+                        }
+                    },
 
-                $data = json_decode($message, true);
+                    'room/+/ac/+/control' => function ($topic, $message) {
 
-                if (!is_array($data)) {
-                    $this->warn("CONTROL tidak valid");
-                    return;
-                }
+                        $data = json_decode($message, true);
 
-                $parts = explode('/', $topic);
-                $roomName = strtolower($parts[1] ?? '');
-                $acId = $parts[3] ?? null;
+                        if (! is_array($data)) {
+                            $this->warn('CONTROL tidak valid');
 
-                if (!$roomName || !$acId) return;
+                            return;
+                        }
 
-                $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
-                if (!$room) return;
+                        $parts = explode('/', $topic);
+                        $roomName = strtolower($parts[1] ?? '');
+                        $acId = $parts[3] ?? null;
 
-                $ac = AcUnit::where('room_id', $room->id)
-                    ->where('ac_number', $acId)
-                    ->first();
+                        if (! $roomName || ! $acId) {
+                            return;
+                        }
 
-                if (!$ac) return;
+                        $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
+                        if (! $room) {
+                            return;
+                        }
 
-                $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
-
-                $status->fill([
-                    'power' => array_key_exists('power', $data)
-                        ? $this->normalizePower($data['power'])
-                        : $this->normalizePower($status->power ?? 'OFF'),
-                    'mode' => array_key_exists('mode', $data)
-                        ? $this->normalizeMode($data['mode'])
-                        : $this->normalizeMode($status->mode ?? 'COOL'),
-                    'set_temperature' => $this->normalizeTemperature(
-                        $data['temp'] ?? $data['ac_temp'] ?? $status->set_temperature ?? 24
-                    ),
-                    'fan_speed' => $this->normalizeFanSpeed(
-                        $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
-                    ),
-                    'swing' => $this->normalizeSwing(
-                        $data['swing'] ?? $status->swing ?? 'OFF'
-                    ),
-                ])->save();
-
-                $this->info("AC {$acId} di {$roomName} diupdate");
-            },
-
-            'room/+/ac/+/status' => function ($topic, $message) {
-
-                try {
-
-                    $data = json_decode($message, true);
-
-                    if (!is_array($data)) {
-                        Log::warning("MQTT STATUS INVALID JSON", [
-                            'topic' => $topic,
-                            'message' => $message
-                        ]);
-                        return;
-                    }
-
-                    $parts = explode('/', $topic);
-
-                    if (count($parts) < 5) {
-                        Log::warning("MQTT TOPIC INVALID", [
-                            'topic' => $topic
-                        ]);
-                        return;
-                    }
-
-                    $roomName = strtolower(trim($parts[1]));
-                    $acNumber = (int) $parts[3];
-
-                    if (!$roomName || !$acNumber) {
-                        Log::warning("MQTT DATA TIDAK LENGKAP", compact('topic'));
-                        return;
-                    }
-
-                    $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
-
-                    if (!$room) {
-                        Log::warning("ROOM TIDAK DITEMUKAN", [
-                            'room' => $roomName
-                        ]);
-                        return;
-                    }
-
-                    $ac = AcUnit::where('room_id', $room->id)
-                        ->where('ac_number', $acNumber)
-                        ->first();
-
-                    if (!$ac) {
-                        Log::warning("AC TIDAK TERDAFTAR (DIABAIKAN)", [
-                            'room' => $roomName,
-                            'ac_number' => $acNumber
-                        ]);
-                        return;
-                    }
-
-                    $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
-
-                    $power = array_key_exists('power', $data)
-                        ? $this->normalizePower($data['power'])
-                        : $this->normalizePower($status->power ?? 'OFF');
-                    $mode = array_key_exists('mode', $data)
-                        ? $this->normalizeMode($data['mode'])
-                        : $this->normalizeMode($status->mode ?? 'COOL');
-                    $temp = $this->normalizeTemperature(
-                        $data['ac_temp'] ?? $data['temp'] ?? $status->set_temperature ?? 24
-                    );
-                    $fanSpeed = $this->normalizeFanSpeed(
-                        $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
-                    );
-                    $swing = $this->normalizeSwing(
-                        $data['swing'] ?? $status->swing ?? 'OFF'
-                    );
-
-                    $status->fill([
-                        'power' => $power,
-                        'mode' => $mode,
-                        'set_temperature' => $temp,
-                        'fan_speed' => $fanSpeed,
-                        'swing' => $swing,
-                    ])->save();
-
-                    Log::info("MQTT STATUS UPDATED", [
-                        'room' => $roomName,
-                        'ac' => $acNumber,
-                        'power' => $power,
-                        'mode' => $mode,
-                        'temp' => $temp,
-                        'fan_speed' => $fanSpeed,
-                        'swing' => $swing,
-                    ]);
-                } catch (\Throwable $e) {
-
-                    Log::error("MQTT STATUS ERROR", [
-                        'topic' => $topic,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            },
-
-            /* === RASPI TEMPERATURE === */
-            'raspi/temperature' => function ($topic, $message) {
-                $temp = (float) trim($message);
-                if ($temp > 0) {
-                    Cache::put('raspi_temperature', $temp, 300);
-                    $this->line("RASPI TEMP: {$temp}°C");
-                }
-            },
-
-            /* === HEARTBEAT === */
-            'device/+/heartbeat' => function ($topic) {
-
-                $deviceId = $this->extractDeviceId($topic, 'heartbeat');
-                if (!$deviceId) return;
-
-                $this->setOnline($deviceId);
-            },
-
-            /* === ADD AC === */
-            'room/+/ac/add' => function ($topic, $message) {
-
-                $data = json_decode($message, true);
-
-                if (!$data || empty($data['id'])) {
-                    $this->warn("AC ADD tidak valid");
-                    return;
-                }
-
-                $parts = explode('/', $topic);
-                $roomName = strtolower(trim($parts[1] ?? ''));
-
-                if (!$roomName) return;
-
-                $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
-                if (!$room || !$room->device_id) return;
-
-                $acNumber = (int) $data['id'];
-
-                if ($acNumber < 1 || $acNumber > 15) {
-                    $this->warn("Nomor AC tidak valid: {$acNumber}");
-                    return;
-                }
-
-                $ac = AcUnit::firstOrCreate(
-                    [
-                        'room_id' => $room->id,
-                        'ac_number' => $acNumber,
-                    ],
-                    [
-                        'name' => "AC {$acNumber}",
-                        'brand' => $data['brand'] ?? 'Unknown',
-                    ]
-                );
-
-                AcStatus::firstOrCreate(
-                    ['ac_unit_id' => $ac->id],
-                    [
-                        'power' => 'OFF',
-                        'mode' => 'COOL',
-                        'set_temperature' => 24,
-                        'fan_speed' => 'AUTO',
-                        'swing' => 'OFF',
-                    ]
-                );
-
-                $this->info("AC ditambahkan ke {$roomName}");
-            },
+                        $ac = AcUnit::where('room_id', $room->id)
+                            ->where('ac_number', $acId)
+                            ->first();
+
+                        if (! $ac) {
+                            return;
+                        }
+
+                        $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
+
+                        $status->fill([
+                            'power' => array_key_exists('power', $data)
+                                ? $this->normalizePower($data['power'])
+                                : $this->normalizePower($status->power ?? 'OFF'),
+                            'mode' => array_key_exists('mode', $data)
+                                ? $this->normalizeMode($data['mode'])
+                                : $this->normalizeMode($status->mode ?? 'COOL'),
+                            'set_temperature' => $this->normalizeTemperature(
+                                $data['temp'] ?? $data['ac_temp'] ?? $status->set_temperature ?? 24
+                            ),
+                            'fan_speed' => $this->normalizeFanSpeed(
+                                $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
+                            ),
+                            'swing' => $this->normalizeSwing(
+                                $data['swing'] ?? $status->swing ?? 'OFF'
+                            ),
+                        ])->save();
+
+                        $this->info("AC {$acId} di {$roomName} diupdate");
+                    },
+
+                    'room/+/ac/+/status' => function ($topic, $message) {
+
+                        try {
+
+                            $data = json_decode($message, true);
+
+                            if (! is_array($data)) {
+                                Log::warning('MQTT STATUS INVALID JSON', [
+                                    'topic' => $topic,
+                                    'message' => $message,
+                                ]);
+
+                                return;
+                            }
+
+                            $parts = explode('/', $topic);
+
+                            if (count($parts) < 5) {
+                                Log::warning('MQTT TOPIC INVALID', [
+                                    'topic' => $topic,
+                                ]);
+
+                                return;
+                            }
+
+                            $roomName = strtolower(trim($parts[1]));
+                            $acNumber = (int) $parts[3];
+
+                            if (! $roomName || ! $acNumber) {
+                                Log::warning('MQTT DATA TIDAK LENGKAP', compact('topic'));
+
+                                return;
+                            }
+
+                            $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
+
+                            if (! $room) {
+                                Log::warning('ROOM TIDAK DITEMUKAN', [
+                                    'room' => $roomName,
+                                ]);
+
+                                return;
+                            }
+
+                            $ac = AcUnit::where('room_id', $room->id)
+                                ->where('ac_number', $acNumber)
+                                ->first();
+
+                            if (! $ac) {
+                                Log::warning('AC TIDAK TERDAFTAR (DIABAIKAN)', [
+                                    'room' => $roomName,
+                                    'ac_number' => $acNumber,
+                                ]);
+
+                                return;
+                            }
+
+                            $status = AcStatus::firstOrNew(['ac_unit_id' => $ac->id]);
+
+                            $power = array_key_exists('power', $data)
+                                ? $this->normalizePower($data['power'])
+                                : $this->normalizePower($status->power ?? 'OFF');
+                            $mode = array_key_exists('mode', $data)
+                                ? $this->normalizeMode($data['mode'])
+                                : $this->normalizeMode($status->mode ?? 'COOL');
+                            $temp = $this->normalizeTemperature(
+                                $data['ac_temp'] ?? $data['temp'] ?? $status->set_temperature ?? 24
+                            );
+                            $fanSpeed = $this->normalizeFanSpeed(
+                                $data['fan_speed'] ?? $status->fan_speed ?? 'AUTO'
+                            );
+                            $swing = $this->normalizeSwing(
+                                $data['swing'] ?? $status->swing ?? 'OFF'
+                            );
+
+                            $status->fill([
+                                'power' => $power,
+                                'mode' => $mode,
+                                'set_temperature' => $temp,
+                                'fan_speed' => $fanSpeed,
+                                'swing' => $swing,
+                            ])->save();
+
+                            Log::info('MQTT STATUS UPDATED', [
+                                'room' => $roomName,
+                                'ac' => $acNumber,
+                                'power' => $power,
+                                'mode' => $mode,
+                                'temp' => $temp,
+                                'fan_speed' => $fanSpeed,
+                                'swing' => $swing,
+                            ]);
+                        } catch (\Throwable $e) {
+
+                            Log::error('MQTT STATUS ERROR', [
+                                'topic' => $topic,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    },
+
+                    /* === RASPI TEMPERATURE === */
+                    'raspi/temperature' => function ($topic, $message) {
+                        $temp = (float) trim($message);
+                        if ($temp > 0) {
+                            Cache::put('raspi_temperature', $temp, 300);
+                            $this->line("RASPI TEMP: {$temp}°C");
+                        }
+                    },
+
+                    /* === HEARTBEAT === */
+                    'device/+/heartbeat' => function ($topic) {
+
+                        $deviceId = $this->extractDeviceId($topic, 'heartbeat');
+                        if (! $deviceId) {
+                            return;
+                        }
+
+                        $this->setOnline($deviceId);
+                    },
+
+                    /* === ADD AC === */
+                    'room/+/ac/add' => function ($topic, $message) {
+
+                        $data = json_decode($message, true);
+
+                        if (! $data || empty($data['id'])) {
+                            $this->warn('AC ADD tidak valid');
+
+                            return;
+                        }
+
+                        $parts = explode('/', $topic);
+                        $roomName = strtolower(trim($parts[1] ?? ''));
+
+                        if (! $roomName) {
+                            return;
+                        }
+
+                        $room = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
+                        if (! $room || ! $room->device_id) {
+                            return;
+                        }
+
+                        $acNumber = (int) $data['id'];
+
+                        if ($acNumber < 1 || $acNumber > 15) {
+                            $this->warn("Nomor AC tidak valid: {$acNumber}");
+
+                            return;
+                        }
+
+                        $ac = AcUnit::firstOrCreate(
+                            [
+                                'room_id' => $room->id,
+                                'ac_number' => $acNumber,
+                            ],
+                            [
+                                'name' => "AC {$acNumber}",
+                                'brand' => $data['brand'] ?? 'Unknown',
+                            ]
+                        );
+
+                        AcStatus::firstOrCreate(
+                            ['ac_unit_id' => $ac->id],
+                            [
+                                'power' => 'OFF',
+                                'mode' => 'COOL',
+                                'set_temperature' => 24,
+                                'fan_speed' => 'AUTO',
+                                'swing' => 'OFF',
+                            ]
+                        );
+
+                        $this->info("AC ditambahkan ke {$roomName}");
+                    },
 
                 ]);
             } catch (\Throwable $e) {
-                Log::error("MQTT SUBSCRIBER ERROR", [
+                Log::error('MQTT SUBSCRIBER ERROR', [
                     'error' => $e->getMessage(),
                 ]);
 
-                $this->error("MQTT subscriber error: " . $e->getMessage());
-                $this->line("Retrying in 5 seconds...");
+                $this->error('MQTT subscriber error: '.$e->getMessage());
+                $this->line('Retrying in 5 seconds...');
 
                 sleep(5);
             }
@@ -327,7 +353,7 @@ class MqttSubscribe extends Command
         $deviceId = $this->normalize($deviceId);
         $now = now();
 
-        Cache::put("device_{$deviceId}_last_seen", $now, 60);
+        Cache::put("device_{$deviceId}_last_seen", $now->toDateTimeString(), 60);
         Cache::put("device_status_{$deviceId}", 'online', 60);
         Cache::forget("device_unknown_{$deviceId}");
 
@@ -340,7 +366,7 @@ class MqttSubscribe extends Command
     /* === HELPER: EXTRACT DEVICE ID === */
     private function extractDeviceId($topic, $type)
     {
-        if (!preg_match("/device\/(.+)\/{$type}/", $topic, $matches)) {
+        if (! preg_match("/device\/(.+)\/{$type}/", $topic, $matches)) {
             return null;
         }
 

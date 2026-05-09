@@ -16,7 +16,7 @@ class DashboardController extends Controller
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
-        $onlineRooms  = 0;
+        $onlineRooms = 0;
         $offlineRooms = 0;
 
         foreach ($rooms as $room) {
@@ -25,12 +25,9 @@ class DashboardController extends Controller
             )->temperature;
 
             $deviceId = strtolower(trim((string) $room->device_id));
-            $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
-            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
-
-            if ($lastSeen) {
-                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-            }
+            $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+                ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
@@ -42,8 +39,8 @@ class DashboardController extends Controller
         $totalRooms = $rooms->count();
 
         $allAcUnits = $rooms->flatMap->acUnits;
-        $totalAc    = $allAcUnits->count();
-        $activeAc   = $allAcUnits->filter(fn($ac) => optional($ac->status)->power === 'ON')->count();
+        $totalAc = $allAcUnits->count();
+        $activeAc = $allAcUnits->filter(fn ($ac) => optional($ac->status)->power === 'ON')->count();
         $inactiveAc = $totalAc - $activeAc;
 
         return view('dashboard.dashboard', compact(
@@ -55,5 +52,22 @@ class DashboardController extends Controller
             'onlineRooms',
             'offlineRooms'
         ));
+    }
+
+    private function lastSeenFrom(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if (! is_string($value) && ! is_int($value)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

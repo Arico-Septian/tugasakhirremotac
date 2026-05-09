@@ -8,8 +8,8 @@ use App\Models\RoomTemperature;
 use App\Models\UserLog;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -20,7 +20,7 @@ class RoomController extends Controller
     {
         $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%');
             })
             ->orderBy('name')
             ->get();
@@ -30,11 +30,8 @@ class RoomController extends Controller
             $deviceId = strtolower(trim((string) $room->device_id));
 
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
-            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
-
-            if ($lastSeen) {
-                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-            }
+            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+                ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available') && $lastSeen && now()->diffInSeconds($lastSeen) <= 30;
             $room->device_status = $isOnline ? 'online' : 'offline';
@@ -47,7 +44,7 @@ class RoomController extends Controller
         return view('rooms.index', compact('rooms'));
     }
 
-    /*=== CREATE ROOM ===*/
+    /* === CREATE ROOM === */
     public function store(Request $request)
     {
         $request->merge([
@@ -76,21 +73,21 @@ class RoomController extends Controller
         $deviceId = $request->device_id;
 
         $room = Room::create([
-            'name'      => $request->name,
+            'name' => $request->name,
             'device_id' => $deviceId,
-            'floor'     => $request->filled('floor') ? trim($request->floor) : null,
+            'floor' => $request->filled('floor') ? trim($request->floor) : null,
         ]);
 
         $mqttPublished = true;
 
         try {
-            $mqtt = new MqttService();
+            $mqtt = new MqttService;
             $topic = "device/{$deviceId}/config";
 
             $mqtt->publish(
                 $topic,
                 json_encode([
-                    "room" => $room->name
+                    'room' => $room->name,
                 ]),
                 1,
                 true
@@ -111,7 +108,7 @@ class RoomController extends Controller
             'user_id' => Auth::id(),
             'room' => $room->name,
             'ac' => '-',
-            'activity' => 'add_room'
+            'activity' => 'add_room',
         ]);
 
         $message = $mqttPublished
@@ -121,7 +118,7 @@ class RoomController extends Controller
         return redirect('/rooms')->with('success', $message);
     }
 
-    /*=== DELETE ROOM ===*/
+    /* === DELETE ROOM === */
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
@@ -131,11 +128,11 @@ class RoomController extends Controller
         $mqttPublished = true;
 
         try {
-            $mqtt = new MqttService();
+            $mqtt = new MqttService;
 
             $mqtt->publish(
                 "device/{$deviceId}/clear",
-                json_encode(new \stdClass()),
+                json_encode(new \stdClass),
                 1,
                 true
             );
@@ -156,7 +153,7 @@ class RoomController extends Controller
             'user_id' => Auth::id(),
             'room' => $room->name,
             'ac' => '-',
-            'activity' => 'delete_room'
+            'activity' => 'delete_room',
         ]);
 
         $room->delete();
@@ -168,7 +165,7 @@ class RoomController extends Controller
         return redirect('/rooms')->with('success', $message);
     }
 
-    /*=== OVERVIEW ALL ROOMS ===*/
+    /* === OVERVIEW ALL ROOMS === */
     public function overview()
     {
         $rooms = Room::with(['acUnits.status'])
@@ -183,12 +180,9 @@ class RoomController extends Controller
             )->temperature;
 
             $deviceId = strtolower(trim((string) $room->device_id));
-            $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
-            $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
-
-            if ($lastSeen) {
-                $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-            }
+            $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+                ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
@@ -197,12 +191,12 @@ class RoomController extends Controller
             $room->device_status = $isOnline ? 'online' : 'offline';
         }
 
-        $roomsByFloor = $rooms->groupBy(fn($r) => $r->floor ?: 'Lainnya');
+        $roomsByFloor = $rooms->groupBy(fn ($r) => $r->floor ?: 'Lainnya');
 
         return view('rooms.overview', compact('rooms', 'roomsByFloor'));
     }
 
-    /*=== DETAIL STATUS AC ===*/
+    /* === DETAIL STATUS AC === */
     public function status($id)
     {
         $room = Room::findOrFail($id);
@@ -213,12 +207,9 @@ class RoomController extends Controller
         )->temperature;
 
         $deviceId = strtolower(trim((string) $room->device_id));
-        $status   = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
-        $lastSeen = Cache::get("device_{$deviceId}_last_seen") ?: $room->last_seen;
-
-        if ($lastSeen) {
-            $lastSeen = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-        }
+        $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+        $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+            ?? $this->lastSeenFrom($room->last_seen);
 
         $isOnline = ($status === 'online' || $status === 'available')
             && $lastSeen
@@ -231,5 +222,22 @@ class RoomController extends Controller
             ->get();
 
         return view('rooms.status', compact('room', 'acs'));
+    }
+
+    private function lastSeenFrom(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if (! is_string($value) && ! is_int($value)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
