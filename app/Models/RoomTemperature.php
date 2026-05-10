@@ -10,14 +10,22 @@ class RoomTemperature extends Model
 
     public static function normalizeRoomName($room): string
     {
-        return strtolower(trim((string) $room));
+        $room = strtolower(trim((string) $room));
+        // rapihin spasi dobel jadi satu
+        return preg_replace('/\s+/', ' ', $room) ?? $room;
     }
 
     public static function latestByNormalizedRoom()
     {
-        return static::latest()
+        // ambil id terakhir per room langsung dari database
+        $latestIds = static::query()
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('room')
+            ->pluck('id');
+
+        return static::query()
+            ->whereIn('id', $latestIds)
             ->get()
-            ->unique(fn($temperature) => static::normalizeRoomName($temperature->room))
-            ->keyBy(fn($temperature) => static::normalizeRoomName($temperature->room));
+            ->keyBy(fn ($t) => static::normalizeRoomName($t->room));
     }
 }

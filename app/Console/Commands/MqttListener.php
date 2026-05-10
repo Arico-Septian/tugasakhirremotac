@@ -40,13 +40,9 @@ class MqttListener extends Command
 
                 $this->info('Connected to MQTT');
 
-                $mqtt->subscribe('room/+/temperature', function ($topic, $message, $retained) {
+                $mqtt->subscribe('room/+/sensor', function ($topic, $message, $retained) {
 
-                    if ($retained) {
-                        return;
-                    }
-
-                    if (! preg_match('#^room/[^/]+/temperature$#', $topic)) {
+                    if (! preg_match('#^room/[^/]+/sensor$#', $topic)) {
                         return;
                     }
 
@@ -58,7 +54,7 @@ class MqttListener extends Command
                         return;
                     }
 
-                    if (! isset($data['temperature'], $data['room'])) {
+                    if (! isset($data['suhu'], $data['room'])) {
                         echo "Data tidak lengkap\n";
 
                         return;
@@ -74,13 +70,13 @@ class MqttListener extends Command
                     $roomModel = Room::whereRaw('LOWER(name) = ?', [$roomKey])->first();
                     $room = $roomModel ? $roomModel->name : $roomKey;
 
-                    if (! is_numeric($data['temperature'])) {
-                        echo "Temperature bukan angka\n";
+                    if (! is_numeric($data['suhu'])) {
+                        echo "Suhu bukan angka\n";
 
                         return;
                     }
 
-                    $temperature = (float) $data['temperature'];
+                    $temperature = (float) $data['suhu'];
 
                     if ($temperature < 10 || $temperature > 60) {
                         echo "Suhu tidak wajar: $temperature\n";
@@ -104,7 +100,7 @@ class MqttListener extends Command
 
                         RoomTemperature::create([
                             'room' => $room,
-                            'temperature' => $temperature,
+                            'temperature' => (float) $data['suhu'],
                         ]);
 
                         Cache::put($key, $now, 60);
