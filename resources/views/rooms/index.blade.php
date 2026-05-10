@@ -28,6 +28,24 @@
         .room-card[data-status="online"]  { --card-accent: var(--mint); }
         .room-card[data-status="offline"] { --card-accent: var(--coral); }
         .room-card:hover { background: var(--panel-2); border-color: var(--line); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .floor-section { margin-bottom: 4px; }
+        .floor-section-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 12px;
+        }
+        .floor-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--ink-3);
+            white-space: nowrap;
+        }
+        .floor-divider {
+            flex: 1; height: 1px;
+            background: var(--line-soft);
+        }
+        .floor-count {
+            font-size: 10px; color: var(--ink-4);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -48,32 +66,56 @@
                     <p>Manage server rooms</p>
                 </div>
             </div>
-            @auth
-                @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                    <button onclick="openModal()" class="btn btn-primary btn-sm" type="button">
-                        <i class="fa-solid fa-plus text-[10px]"></i>
-                        <span class="hidden sm:inline">Add Room</span>
-                    </button>
-                @endif
-            @endauth
         </header>
 
         <div class="page-body">
             <div class="app-content">
                 <div class="app-content-inner space-y-4">
 
-                    <form method="GET" action="/rooms" class="max-w-sm">
-                        <label class="search-input">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <form method="GET" action="{{ route('rooms.index') }}" class="flex-1 min-w-0">
+                            <label class="search-input">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input name="search" value="{{ request('search') }}" type="text" placeholder="Cari ruangan…" autocomplete="off">
                             @if (request('search'))
-                                <a href="/rooms" class="clear" title="Clear"><i class="fa-solid fa-xmark text-[10px]"></i></a>
+                                <a href="{{ route('rooms.index') }}" class="clear" title="Clear"><i class="fa-solid fa-xmark text-[10px]"></i></a>
                             @endif
-                        </label>
-                    </form>
+                            </label>
+                        </form>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                        @forelse ($rooms as $room)
+                        <div class="flex gap-2 flex-shrink-0 flex-wrap">
+                            @auth
+                                @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                                    <button onclick="openModal()" class="btn btn-primary btn-sm" type="button">
+                                        <i class="fa-solid fa-plus text-[10px]"></i>
+                                        <span>Add Room</span>
+                                    </button>
+                                @endif
+                            @endauth
+                            <div style="width:1px;background:var(--line-soft);margin:0 2px;"></div>
+                            <button class="filter-pill active" data-room-filter="all" type="button">All</button>
+                            <button class="filter-pill" data-room-filter="online" type="button">
+                                <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
+                            </button>
+                            <button class="filter-pill" data-room-filter="offline" type="button">
+                                <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
+                            </button>
+                        </div>
+                    </div>
+
+                    @if ($rooms->count() > 0)
+                        <div class="space-y-2">
+                            @foreach ($roomsByFloor as $floorName => $floorRooms)
+                                <section class="floor-section">
+                                    <div class="floor-section-header">
+                                        <i class="fa-solid fa-layer-group text-[10px]" style="color:var(--lavender);"></i>
+                                        <span class="floor-label">{{ $floorName }}</span>
+                                        <div class="floor-divider"></div>
+                                        <span class="floor-count">{{ $floorRooms->count() }} ruangan</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-6">
+                                        @foreach ($floorRooms as $room)
                             @php
                                 $online = ($room->device_status ?? 'offline') === 'online';
                                 $temp = $room->temperature ?? null;
@@ -137,14 +179,23 @@
                                     @endauth
                                 </div>
                             </div>
-                        @empty
-                            <div class="col-span-full empty-state">
-                                <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
-                                <p class="empty-title">Belum ada ruangan</p>
-                                <p class="empty-sub">Tambahkan ruangan untuk memulai</p>
-                            </div>
-                        @endforelse
-                    </div>
+                                        @endforeach
+                                    </div>
+                                </section>
+                            @endforeach
+                        </div>
+                        <div id="roomFilterEmpty" class="empty-state" hidden>
+                            <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <p class="empty-title">Tidak ditemukan</p>
+                            <p class="empty-sub">Coba filter status lain</p>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
+                            <p class="empty-title">Belum ada ruangan</p>
+                            <p class="empty-sub">Tambahkan ruangan untuk memulai</p>
+                        </div>
+                    @endif
 
                 </div>
             </div>
@@ -207,6 +258,41 @@ function confirmDelete(e) {
     return false;
 }
 
+const roomCards = Array.from(document.querySelectorAll('.room-card'));
+const floorSections = Array.from(document.querySelectorAll('.floor-section'));
+const roomFilterEmpty = document.getElementById('roomFilterEmpty');
+let activeRoomFilter = 'all';
+
+function applyRoomFilter() {
+    let visible = 0;
+
+    roomCards.forEach(card => {
+        const show = activeRoomFilter === 'all' || card.dataset.status === activeRoomFilter;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    floorSections.forEach(section => {
+        const hasVisible = Array.from(section.querySelectorAll('.room-card'))
+            .some(card => card.style.display !== 'none');
+
+        section.style.display = hasVisible ? '' : 'none';
+    });
+
+    if (roomFilterEmpty) {
+        roomFilterEmpty.hidden = visible > 0;
+    }
+}
+
+document.querySelectorAll('[data-room-filter]').forEach(button => {
+    button.addEventListener('click', function () {
+        document.querySelectorAll('[data-room-filter]').forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        activeRoomFilter = this.dataset.roomFilter;
+        applyRoomFilter();
+    });
+});
+
 setInterval(() => {
     fetch('/temperature', { headers: { 'Accept':'application/json' } })
         .then(r => r.ok ? r.json() : null)
@@ -244,6 +330,8 @@ function refreshRoomStatuses() {
 
                 setRoomStatus(card, device.is_online === true || device.status === 'online');
             });
+
+            applyRoomFilter();
         })
         .catch(() => {});
 }
@@ -251,6 +339,7 @@ function refreshRoomStatuses() {
 setInterval(refreshRoomStatuses, 5000);
 
 document.addEventListener('DOMContentLoaded', () => {
+    applyRoomFilter();
     refreshRoomStatuses();
 
     @if (session('success')) window.smToast("{{ session('success') }}", 'success'); @endif

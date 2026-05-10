@@ -22,6 +22,7 @@ class RoomController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%');
             })
+            ->orderBy('floor')
             ->orderBy('name')
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
@@ -41,7 +42,9 @@ class RoomController extends Controller
             )->temperature;
         }
 
-        return view('rooms.index', compact('rooms'));
+        $roomsByFloor = $rooms->groupBy(fn ($room) => $room->floor ?: 'Lainnya');
+
+        return view('rooms.index', compact('rooms', 'roomsByFloor'));
     }
 
     /* === CREATE ROOM === */
