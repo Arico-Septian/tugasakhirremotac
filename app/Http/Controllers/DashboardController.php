@@ -33,6 +33,8 @@ class DashboardController extends Controller
                 && $lastSeen
                 && now()->diffInSeconds($lastSeen, true) <= 30;
 
+            $room->device_status = $isOnline ? 'online' : 'offline';
+
             $isOnline ? $onlineRooms++ : $offlineRooms++;
         }
 

@@ -9,6 +9,193 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <style>
+        .dashboard-rooms-panel {
+            padding: 24px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .dashboard-rooms-panel .panel-header {
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-rooms-title {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--ink-0);
+        }
+
+        .dashboard-rooms-subtitle {
+            margin-top: 4px;
+            font-size: 16px;
+            line-height: 1.25;
+            color: var(--ink-2);
+        }
+
+        .dashboard-rooms-action {
+            min-width: 108px;
+            min-height: 60px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line-soft);
+            color: var(--ink-0);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+            line-height: 1.05;
+            transition: var(--t-base);
+        }
+
+        .dashboard-rooms-action:hover {
+            background: var(--panel-2);
+            border-color: var(--line);
+            color: var(--ink-0);
+            transform: translateY(-1px);
+        }
+
+        .dashboard-room-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .dashboard-room-row {
+            min-height: 72px;
+            padding: 14px 16px 14px 18px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line-soft);
+            color: inherit;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 18px;
+            position: relative;
+            transition: var(--t-base);
+        }
+
+        .dashboard-room-row::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            bottom: 15px;
+            width: 5px;
+            border-radius: 999px;
+            background: #fca5a5;
+        }
+
+        .dashboard-room-row:hover {
+            background: var(--panel-2);
+            border-color: var(--line);
+            transform: translateY(-1px);
+        }
+
+        .dashboard-room-main {
+            min-width: 0;
+            padding-left: 24px;
+        }
+
+        .dashboard-room-name {
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--ink-0);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-room-meta {
+            margin-top: 3px;
+            color: var(--ink-2);
+            font-size: 14px;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-room-temp {
+            min-width: 76px;
+            text-align: right;
+            color: var(--ink-3);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .dashboard-room-status {
+            min-width: 82px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .dashboard-room-status.online {
+            background: var(--mint-soft);
+            color: var(--mint);
+        }
+
+        .dashboard-room-status.offline {
+            background: rgba(251, 113, 133, 0.14);
+            color: #fca5a5;
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-rooms-panel {
+                padding: 18px;
+            }
+
+            .dashboard-rooms-panel .panel-header {
+                flex-wrap: nowrap;
+            }
+
+            .dashboard-rooms-action {
+                min-width: 84px;
+                min-height: 50px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .dashboard-room-row {
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                padding-right: 12px;
+            }
+
+            .dashboard-room-temp {
+                grid-column: 2;
+                grid-row: 1;
+                min-width: 62px;
+                font-size: 13px;
+            }
+
+            .dashboard-room-status {
+                grid-column: 2;
+                grid-row: 2;
+                min-width: 74px;
+                font-size: 10px;
+                padding: 5px 9px;
+            }
+
+            .dashboard-room-name {
+                font-size: 15px;
+            }
+
+            .dashboard-room-meta {
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="custom-bg"></div>
@@ -118,34 +305,61 @@
                     </div>
 
                     
-                    <a href="<?php echo e(route('rooms.overview')); ?>" class="surface surface-hover panel"
-                       style="display:flex;align-items:center;gap:18px;text-decoration:none;">
-                        <div class="stat-icon" style="--icon-bg:var(--lavender-soft);--icon-color:var(--lavender);width:48px;height:48px;font-size:18px;border-radius:14px;">
-                            <i class="fa-solid fa-server"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="eyebrow" style="color:var(--lavender);"><i class="fa-solid fa-grip-lines"></i> Nodes</p>
-                            <h2 class="panel-title" style="margin-top:2px;">Server Rooms</h2>
-                            <p class="panel-subtitle"><?php echo e($totalRooms); ?> ruangan terdaftar</p>
-                        </div>
-                        <div class="hidden sm:flex items-center gap-5 mr-2">
-                            <div class="text-center">
-                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--ink-0);"><?php echo e($totalRooms); ?></p>
-                                <p class="label-tag mt-1">Total</p>
+                    <section class="panel dashboard-rooms-panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="dashboard-rooms-title">Server Rooms</h2>
+                                <p class="dashboard-rooms-subtitle"><?php echo e($totalRooms); ?> ruangan terdaftar</p>
                             </div>
-                            <div class="text-center">
-                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--mint);"><?php echo e($onlineRooms); ?></p>
-                                <p class="label-tag mt-1" style="color:var(--mint);">Online</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-mono text-base font-semibold text-tight" style="color:var(--coral);"><?php echo e($offlineRooms); ?></p>
-                                <p class="label-tag mt-1" style="color:var(--coral);">Offline</p>
-                            </div>
+                            <a href="<?php echo e(route('rooms.overview')); ?>" class="dashboard-rooms-action" aria-label="Lihat semua server rooms">
+                                <span>Lihat<br>semua</span>
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </a>
                         </div>
-                        <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);">
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </div>
-                    </a>
+
+                        <?php
+                            $previewRooms = $rooms->take(4);
+                        ?>
+
+                        <?php if($previewRooms->isNotEmpty()): ?>
+                            <div class="dashboard-room-list">
+                                <?php $__currentLoopData = $previewRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
+                                        $temperature = $room->temperature;
+                                        $status = $room->device_status === 'online' ? 'online' : 'offline';
+                                    ?>
+                                    <a href="<?php echo e(route('rooms.overview')); ?>"
+                                       class="dashboard-room-row"
+                                       data-dashboard-room-id="<?php echo e($room->id); ?>">
+                                        <div class="dashboard-room-main">
+                                            <h3 class="dashboard-room-name"><?php echo e(ucfirst($room->name)); ?></h3>
+                                            <p class="dashboard-room-meta">
+                                                <?php echo e($room->acUnits->count()); ?> unit &middot; <?php echo e($room->device_id ?: '-'); ?>
+
+                                            </p>
+                                        </div>
+                                        <div id="dashboard-room-temp-<?php echo e($room->id); ?>" class="dashboard-room-temp">
+                                            <?php if($temperature !== null): ?>
+                                                <?php echo e(number_format((float) $temperature, 1)); ?>&deg;C
+                                            <?php else: ?>
+                                                -- &deg;C
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="dashboard-room-status <?php echo e($status); ?>">
+                                            <?php echo e(strtoupper($status)); ?>
+
+                                        </div>
+                                    </a>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="empty-state" style="padding:28px 12px;">
+                                <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
+                                <p class="empty-title">Belum ada ruangan</p>
+                                <p class="empty-sub">Tambahkan ruangan untuk mulai monitoring</p>
+                            </div>
+                        <?php endif; ?>
+                    </section>
 
                 </div>
             </div>
@@ -289,6 +503,14 @@ function refreshTemperature() {
             tempChart.data.datasets[0].backgroundColor = safe.map(tempColor);
             tempChart.update();
 
+            data.forEach(room => {
+                const tempEl = document.getElementById(`dashboard-room-temp-${room.id}`);
+                if (!tempEl) return;
+
+                const temp = parseFloat(room.temp);
+                tempEl.textContent = isNaN(temp) ? '-- \u00b0C' : `${temp.toFixed(1)}\u00b0C`;
+            });
+
             const tsEl = document.getElementById('chartLastUpdated');
             if (tsEl) tsEl.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
 
@@ -310,6 +532,28 @@ function refreshTemperature() {
 
 setInterval(refreshTemperature, 5000);
 
+function refreshDashboardRoomStatuses() {
+    fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!Array.isArray(data)) return;
+
+            data.forEach(device => {
+                const row = document.querySelector(`[data-dashboard-room-id="${device.room_id}"]`);
+                const statusEl = row?.querySelector('.dashboard-room-status');
+                if (!statusEl) return;
+
+                const isOnline = device.is_online === true || device.status === 'online';
+                statusEl.classList.toggle('online', isOnline);
+                statusEl.classList.toggle('offline', !isOnline);
+                statusEl.textContent = isOnline ? 'ONLINE' : 'OFFLINE';
+            });
+        })
+        .catch(() => {});
+}
+
+setInterval(refreshDashboardRoomStatuses, 5000);
+
 function setSystemStatus(online) {
     const el = document.getElementById('systemStatus');
     if (!el) return;
@@ -324,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setSystemStatus(navigator.onLine);
     updateNotifButton();
     setTimeout(refreshTemperature, 400);
+    setTimeout(refreshDashboardRoomStatuses, 600);
 });
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
