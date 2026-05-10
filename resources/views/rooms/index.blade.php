@@ -142,6 +142,8 @@
                             </div>
                         </div>
 
+                        <p id="roomCount" class="text-mono text-xs" style="color:var(--ink-3);"></p>
+
                         @if ($rooms->count() > 0)
                             <div class="space-y-2">
                                 @foreach ($roomsByFloor as $floorName => $floorRooms)
@@ -188,14 +190,6 @@
                                                                     <span class="dot"></span><span
                                                                         class="room-status-text">{{ $online ? 'Online' : 'Offline' }}</span>
                                                                 </span>
-                                                                @if ($room->floor)
-                                                                    <span class="label-tag"
-                                                                        style="background:var(--lavender-soft);color:var(--lavender);border-color:var(--lavender-soft-2);font-size:9px;">
-                                                                        <i class="fa-solid fa-layer-group"
-                                                                            style="font-size:8px;"></i>
-                                                                        {{ $room->floor }}
-                                                                    </span>
-                                                                @endif
                                                             </div>
                                                         </div>
                                                         <i class="fa-solid fa-server text-[11px]"
@@ -350,6 +344,7 @@
         const roomCards = Array.from(document.querySelectorAll('.room-card'));
         const floorSections = Array.from(document.querySelectorAll('.floor-section'));
         const roomFilterEmpty = document.getElementById('roomFilterEmpty');
+        const roomCount = document.getElementById('roomCount');
         let activeRoomFilter = 'all';
 
         function applyRoomFilter() {
@@ -367,6 +362,13 @@
 
                 section.style.display = hasVisible ? '' : 'none';
             });
+
+            if (roomCount) {
+                roomCount.textContent =
+                    visible === roomCards.length ?
+                    `Showing ${roomCards.length} rooms` :
+                    `${visible} of ${roomCards.length} rooms`;
+            }
 
             if (roomFilterEmpty) {
                 roomFilterEmpty.hidden = visible > 0;
