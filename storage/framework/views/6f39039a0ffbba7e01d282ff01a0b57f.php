@@ -115,17 +115,7 @@
                             <button class="filter-pill" data-filter="offline">
                                 <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
                             </button>
-                            
-                            <?php if($roomsByFloor->count() > 1): ?>
-                                <div style="width:1px;background:var(--line-soft);margin:0 2px;"></div>
-                                <?php $__currentLoopData = $roomsByFloor->keys(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $floorKey): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <button class="filter-pill" data-floor="<?php echo e($floorKey); ?>">
-                                        <i class="fa-solid fa-layer-group" style="font-size:9px;"></i>
-                                        <?php echo e($floorKey); ?>
 
-                                    </button>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            <?php endif; ?>
                         </div>
                     </div>
 
