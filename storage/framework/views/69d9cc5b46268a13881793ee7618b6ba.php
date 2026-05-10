@@ -217,10 +217,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                 <span id="systemStatus" class="pill pill-offline">
                     <span class="dot"></span><span>Offline</span>
                 </span>
-                <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             </div>
         </header>
 
@@ -270,7 +270,7 @@
                             <span class="accent-bar"></span>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="stat-label">Active</p>
+                                    <p class="stat-label">Ac Active</p>
                                     <p class="stat-value"><?php echo e($activeAc); ?></p>
                                     <p class="stat-meta">Currently powered on</p>
                                 </div>
@@ -281,7 +281,7 @@
                             <span class="accent-bar"></span>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="stat-label">Idle</p>
+                                    <p class="stat-label">Ac Idle</p>
                                     <p class="stat-value"><?php echo e($inactiveAc); ?></p>
                                     <p class="stat-meta">Powered off</p>
                                 </div>
