@@ -101,6 +101,13 @@
                         <p>Manage server rooms</p>
                     </div>
                 </div>
+                <div class="flex items-center gap-2">
+                    @include('components.notification-bell')
+                    <span id="systemStatus" class="pill pill-online">
+                        <span class="dot"></span>
+                        <span>Online</span>
+                    </span>
+                </div>
             </header>
 
             <div class="page-body">
@@ -453,6 +460,15 @@
                 window.smToast("{{ $errors->first() }}", 'error');
             @endif
         });
+
+        function setSystemStatus(online) {
+            const el = document.getElementById('systemStatus');
+            if (!el) return;
+            el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+            el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+        }
+        window.addEventListener('online', () => setSystemStatus(true));
+        window.addEventListener('offline', () => setSystemStatus(false));
     </script>
     @include('components.sidebar-scripts')
 </body>
