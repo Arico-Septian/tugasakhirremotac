@@ -138,6 +138,10 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <span id="systemStatus" class="pill pill-online">
+                        <span class="dot"></span>
+                        <span>Online</span>
+                    </span>
                 </div>
             </header>
 
@@ -543,6 +547,15 @@
             }).catch(() => {});
         }
         setInterval(refreshTemps, 5000);
+
+        function setSystemStatus(online) {
+            const el = document.getElementById('systemStatus');
+            if (!el) return;
+            el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+            el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+        }
+        window.addEventListener('online', () => setSystemStatus(true));
+        window.addEventListener('offline', () => setSystemStatus(false));
     </script>
     <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
