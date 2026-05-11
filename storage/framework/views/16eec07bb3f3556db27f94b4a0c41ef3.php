@@ -203,16 +203,101 @@
                                                             style="color:var(--ink-4);margin-top:3px;"></i>
                                                     </div>
 
+                                                    
                                                     <div class="temp-chip <?php echo e($tcls); ?>"
                                                         style="justify-content:space-between;width:100%;">
                                                         <span
                                                             style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
-                                                        <span id="temp-<?php echo e($room->id); ?>"
-                                                            class="text-mono"><?php echo e($temp ?? '—'); ?>°C</span>
+
+                                                        <span id="temp-<?php echo e($room->id); ?>" class="text-mono">
+                                                            <?php echo e($temp ?? '—'); ?>°C
+                                                        </span>
                                                     </div>
 
+                                                    
+                                                    <?php if(!is_null($room->temperature)): ?>
+                                                        <div class="mt-2"
+                                                            style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:8px 10px;">
+                                                            <div class="flex items-center justify-between"
+                                                                style="font-size:12px;color:var(--ink-3);">
+                                                                <span>ΔT</span>
+                                                                <span
+                                                                    class="text-mono"><?php echo e($room->delta_t ?? 0); ?></span>
+                                                            </div>
+
+                                                            <?php if(!empty($room->fuzzy)): ?>
+                                                                <div class="flex items-center justify-between mt-1"
+                                                                    style="font-size:12px;">
+                                                                    <span
+                                                                        style="color:var(--ink-3);">Pendinginan</span>
+                                                                    <span class="text-mono"
+                                                                        style="font-weight:700;color:var(--mint);">
+                                                                        <?php echo e($room->fuzzy['status_pendinginan'] ?? '-'); ?>
+
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="flex items-center justify-between mt-1"
+                                                                    style="font-size:11px;color:var(--ink-4);">
+                                                                    <span>Crisp</span>
+                                                                    <span
+                                                                        class="text-mono"><?php echo e($room->fuzzy['crisp_output'] ?? '-'); ?></span>
+                                                                </div>
+
+                                                                
+                                                                <?php if(!empty($room->decision)): ?>
+                                                                    <div class="mt-2"
+                                                                        style="font-size:11px;color:var(--ink-3);">
+
+                                                                        <div class="flex items-center justify-between">
+                                                                            <span>Keputusan</span>
+
+                                                                            <span class="text-mono"
+                                                                                style="font-weight:700;color:#facc15;">
+                                                                                <?php echo e($room->decision['action'] ?? 'DIAM'); ?>
+
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="flex items-center justify-between mt-1"
+                                                                            style="font-size:11px;color:var(--ink-4);">
+
+                                                                            <span>Setpoint</span>
+
+                                                                            <span class="text-mono">
+                                                                                <?php echo e($room->decision['setpoint_before'] ?? '-'); ?>
+
+                                                                                →
+                                                                                <?php echo e($room->decision['setpoint_after'] ?? '-'); ?>
+
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                <?php endif; ?>
+
+                                                                
+                                                                <div class="mt-2"
+                                                                    style="font-size:10.5px;color:var(--ink-4);line-height:1.4;">
+                                                                    <div class="text-mono">
+                                                                        μSuhu:
+                                                                        D=<?php echo e($room->fuzzy['membership_suhu']['dingin'] ?? 0); ?>,
+                                                                        N=<?php echo e($room->fuzzy['membership_suhu']['normal'] ?? 0); ?>,
+                                                                        P=<?php echo e($room->fuzzy['membership_suhu']['panas'] ?? 0); ?>
+
+                                                                    </div>
+                                                                    <div class="text-mono">
+                                                                        μΔT:
+                                                                        T=<?php echo e($room->fuzzy['membership_delta_t']['turun'] ?? 0); ?>,
+                                                                        S=<?php echo e($room->fuzzy['membership_delta_t']['stabil'] ?? 0); ?>,
+                                                                        N=<?php echo e($room->fuzzy['membership_delta_t']['naik'] ?? 0); ?>
+
+                                                                    </div>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    <?php endif; ?>
                                                     <div class="grid grid-cols-2 gap-1.5">
                                                         <div
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">

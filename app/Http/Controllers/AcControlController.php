@@ -175,6 +175,25 @@ class AcControlController extends Controller
         return $sent ? back() : back()->with('warning', 'AC diperbarui, tetapi perintah gagal terkirim ke perangkat.');
     }
 
+    public function fuzzySetTemp(AcUnit $ac, int $targetTemp): bool
+    {
+        $room = Room::findOrFail($ac->room_id);
+
+        $status = $this->statusFor($ac);
+
+        $targetTemp = $this->normalizeTemperature($targetTemp);
+
+        // skip kalau sama
+        if ((int)$status->set_temperature === $targetTemp) {
+            return true;
+        }
+
+        $status->set_temperature = $targetTemp;
+        $status->save();
+
+        return $this->sendFullState($ac, $room, $status);
+    }
+
     public function setMode($id, $mode)
     {
         $ac = AcUnit::findOrFail($id);

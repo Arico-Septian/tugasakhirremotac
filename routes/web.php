@@ -166,11 +166,11 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->get();
 
         $grouped = $rows
-            ->groupBy(fn ($t) => $t->created_at->format('H:00'))
-            ->map(fn ($g) => round($g->avg('temperature'), 1));
+            ->groupBy(fn($t) => $t->created_at->format('H:00'))
+            ->map(fn($g) => round($g->avg('temperature'), 1));
 
         return response()->json(
-            $grouped->map(fn ($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
+            $grouped->map(fn($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
         );
     });
 
@@ -375,7 +375,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         $temp = Cache::get('raspi_temperature');
 
         return response()->json([
-            'suhu' => $temp !== null ? $temp.' °C' : null,
+            'suhu' => $temp !== null ? $temp . ' °C' : null,
             'value' => $temp,
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     });
@@ -387,4 +387,9 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->header('Expires', '0');
     })->name('monitoring');
     Route::get('/temperature', [\App\Http\Controllers\TemperatureController::class, 'index']);
+
+    Route::post(
+        '/rooms/{id}/ac/fuzzy/apply',
+        [AcUnitController::class, 'applyFuzzy']
+    )->name('ac.fuzzy.apply');
 });

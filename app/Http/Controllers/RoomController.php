@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use App\Services\FuzzyMamdaniService;
 
 class RoomController extends Controller
 {
@@ -20,29 +21,113 @@ class RoomController extends Controller
     {
         $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%');
             })
             ->orderBy('floor')
             ->orderBy('name')
             ->get();
+
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
+        // =========================
+        // FUZZY SERVICE
+        // =========================
+        $fuzzyService = new FuzzyMamdaniService();
+
         foreach ($rooms as $room) {
+
             $deviceId = strtolower(trim((string) $room->device_id));
 
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
-            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
-                ?? $this->lastSeenFrom($room->last_seen);
 
-            $isOnline = ($status === 'online' || $status === 'available') && $lastSeen && now()->diffInSeconds($lastSeen, true) <= 30;
+            $lastSeen = $this->lastSeenFrom(
+                Cache::get("device_{$deviceId}_last_seen")
+            ) ?? $this->lastSeenFrom($room->last_seen);
+
+            $isOnline =
+                ($status === 'online' || $status === 'available')
+                && $lastSeen
+                && now()->diffInSeconds($lastSeen, true) <= 30;
+
             $room->device_status = $isOnline ? 'online' : 'offline';
 
+            // =========================
+            // SUHU TERBARU
+            // =========================
+
             $room->temperature = optional(
-                $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
+                $latestTemperatures->get(
+                    RoomTemperature::normalizeRoomName($room->name)
+                )
             )->temperature;
+
+            // =========================
+            // AMBIL 2 DATA TERBARU
+            // =========================
+
+            $tempHistory = RoomTemperature::where(
+                'room',
+                RoomTemperature::normalizeRoomName($room->name)
+            )
+                ->latest()
+                ->take(2)
+                ->get();
+
+            $currentTemp = $tempHistory->first()?->temperature;
+
+            $previousTemp = $tempHistory->count() > 1
+                ? $tempHistory[1]->temperature
+                : $currentTemp;
+
+            // =========================
+            // HITUNG DELTA T
+            // =========================
+
+            $deltaT = ($currentTemp !== null && $previousTemp !== null)
+                ? ($currentTemp - $previousTemp)
+                : 0;
+
+            // =========================
+            // FUZZY CALCULATION
+            // =========================
+
+            if ($currentTemp !== null) {
+
+                $fuzzyResult = $fuzzyService->calculate(
+                    $currentTemp,
+                    $deltaT
+                );
+
+                $room->temperature = round($currentTemp, 1);
+
+                $room->delta_t = round($deltaT, 2);
+
+                $room->fuzzy = $fuzzyResult;
+
+                // =========================
+                // FUZZY DECISION
+                // =========================
+
+                // sementara setpoint default dulu
+                $currentSetpoint = 24;
+
+                $decision = $fuzzyService->decideAction(
+                    $fuzzyResult,
+                    $currentSetpoint
+                );
+
+                $room->decision = $decision;
+            } else {
+
+                $room->delta_t = 0;
+                $room->fuzzy = null;
+                $room->decision = null;
+            }
         }
 
-        $roomsByFloor = $rooms->groupBy(fn ($room) => $room->floor ?: 'Lainnya');
+        $roomsByFloor = $rooms->groupBy(
+            fn($room) => $room->floor ?: 'Lainnya'
+        );
 
         return view('rooms.index', compact('rooms', 'roomsByFloor'));
     }
@@ -194,7 +279,7 @@ class RoomController extends Controller
             $room->device_status = $isOnline ? 'online' : 'offline';
         }
 
-        $roomsByFloor = $rooms->groupBy(fn ($r) => $r->floor ?: 'Lainnya');
+        $roomsByFloor = $rooms->groupBy(fn($r) => $r->floor ?: 'Lainnya');
 
         return view('rooms.overview', compact('rooms', 'roomsByFloor'));
     }

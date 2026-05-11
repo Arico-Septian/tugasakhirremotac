@@ -27,7 +27,7 @@ class MqttListener extends Command
 
                 $this->info('Connecting MQTT...');
 
-                $mqtt = new MqttClient($server, $port, 'laravel-listener-'.uniqid());
+                $mqtt = new MqttClient($server, $port, 'laravel-listener-' . uniqid());
 
                 $settings = (new ConnectionSettings)
                     ->setUsername(env('MQTT_USERNAME'))
@@ -67,8 +67,14 @@ class MqttListener extends Command
                         return;
                     }
 
-                    $roomModel = Room::whereRaw('LOWER(name) = ?', [$roomKey])->first();
-                    $room = $roomModel ? $roomModel->name : $roomKey;
+                    $roomModel = Room::whereRaw(
+                        'LOWER(TRIM(name)) = ?',
+                        [$roomKey]
+                    )->first();
+
+                    $normalizedRoom = $roomModel
+                        ? RoomTemperature::normalizeRoomName($roomModel->name)
+                        : $roomKey;
 
                     if (! is_numeric($data['suhu'])) {
                         echo "Suhu bukan angka\n";
@@ -84,9 +90,9 @@ class MqttListener extends Command
                         return;
                     }
 
-                    $normalizedRoom = RoomTemperature::normalizeRoomName($room);
+                    // room sudah normalized dari atas
 
-                    $dupKey = 'dup_'.md5($normalizedRoom.$temperature);
+                    $dupKey = 'dup_' . md5($normalizedRoom . $temperature);
                     if (Cache::has($dupKey)) {
                         return;
                     }
@@ -99,26 +105,27 @@ class MqttListener extends Command
                     if (! $last || $now->diffInSeconds($last, true) >= 5) {
 
                         RoomTemperature::create([
-                            'room' => $room,
-                            'temperature' => (float) $data['suhu'],
+                            'room' => $normalizedRoom,
+                            'temperature' => $temperature,
                         ]);
 
                         Cache::put($key, $now, 60);
 
-                        Log::info('Temperature received', compact('room', 'temperature'));
+                        Log::info('Temperature received', [
+                            'room' => $normalizedRoom,
+                            'temperature' => $temperature,
+                        ]);
 
                         if (app()->environment('local')) {
-                            echo "[{$room}] {$temperature} C\n";
+                            echo "[{$normalizedRoom}] {$temperature} C\n";
                         }
                     }
-
                 }, 1);
 
                 $mqtt->loop(true);
-
             } catch (\Throwable $e) {
 
-                $this->error('MQTT ERROR: '.$e->getMessage());
+                $this->error('MQTT ERROR: ' . $e->getMessage());
 
                 if (isset($mqtt)) {
                     try {

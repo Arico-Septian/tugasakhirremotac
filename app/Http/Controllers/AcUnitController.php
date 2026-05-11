@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Models\Room;
+use App\Models\RoomTemperature;
+use App\Services\FuzzyMamdaniService;
 use App\Models\UserLog;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
@@ -17,13 +19,66 @@ class AcUnitController extends Controller
 {
     public function index($id)
     {
-        $room = Room::findOrFail($id);
+        $room = Room::with(['acUnits.status'])->findOrFail($id);
 
         $this->setCurrentDeviceStatus($room);
 
         $acs = AcUnit::with('status')
             ->where('room_id', $id)
             ->get();
+
+        // =========================
+        // FUZZY LOGIC
+        // =========================
+
+        $fuzzyService = new FuzzyMamdaniService();
+
+        $normalized = RoomTemperature::normalizeRoomName($room->name);
+
+        $tempHistory = RoomTemperature::where('room', $normalized)
+            ->latest()
+            ->take(2)
+            ->get();
+
+        $currentTemp = $tempHistory->first()?->temperature;
+
+        $previousTemp = $tempHistory->count() > 1
+            ? $tempHistory[1]->temperature
+            : $currentTemp;
+
+        $deltaT = ($currentTemp !== null && $previousTemp !== null)
+            ? ($currentTemp - $previousTemp)
+            : 0;
+
+        if ($currentTemp !== null) {
+
+            $room->temperature = round($currentTemp, 1);
+
+            $room->delta_t = round($deltaT, 2);
+
+            $fuzzyResult = $fuzzyService->calculate(
+                $currentTemp,
+                $deltaT
+            );
+
+            $room->fuzzy = $fuzzyResult;
+
+            // ambil setpoint dari AC pertama
+            $currentSetpoint = (int) (
+                $room->acUnits->first()?->status?->set_temperature ?? 24
+            );
+
+            $room->decision = $fuzzyService->decideAction(
+                $fuzzyResult,
+                $currentSetpoint
+            );
+        } else {
+
+            $room->temperature = null;
+            $room->delta_t = 0;
+            $room->fuzzy = null;
+            $room->decision = null;
+        }
 
         return view('ac.index', compact('room', 'acs'));
     }
@@ -44,7 +99,7 @@ class AcUnitController extends Controller
                 'integer',
                 'min:1',
                 'max:15',
-                Rule::unique('ac_units')->where(fn ($q) => $q->where('room_id', $roomId)),
+                Rule::unique('ac_units')->where(fn($q) => $q->where('room_id', $roomId)),
             ],
         ]);
 
@@ -70,7 +125,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC '.$ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number,
             'activity' => 'add_ac',
         ]);
 
@@ -86,9 +141,12 @@ class AcUnitController extends Controller
             'name' => 'required|string|max:50',
             'brand' => 'required|string|max:50',
             'ac_number' => [
-                'required', 'integer', 'min:1', 'max:15',
+                'required',
+                'integer',
+                'min:1',
+                'max:15',
                 Rule::unique('ac_units')
-                    ->where(fn ($q) => $q->where('room_id', $ac->room_id))
+                    ->where(fn($q) => $q->where('room_id', $ac->room_id))
                     ->ignore($ac->id),
             ],
         ]);
@@ -102,7 +160,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC '.$ac->ac_number.($ac->name ? ' '.$ac->name : ''),
+            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
             'activity' => 'edit_ac',
         ]);
 
@@ -118,7 +176,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC '.$ac->ac_number,
+            'ac' => 'AC ' . $ac->ac_number,
             'activity' => 'delete_ac',
         ]);
 
@@ -130,7 +188,87 @@ class AcUnitController extends Controller
 
         $mqtt->resendConfig($room->device_id);
 
-        return redirect('/rooms/'.$room_id.'/ac');
+        return redirect('/rooms/' . $room_id . '/ac');
+    }
+
+    public function applyFuzzy($id)
+    {
+        $room = Room::with(['acUnits.status'])->findOrFail($id);
+
+        $fuzzyService = new FuzzyMamdaniService();
+
+        $normalized = RoomTemperature::normalizeRoomName($room->name);
+
+        $tempHistory = RoomTemperature::where('room', $normalized)
+            ->latest()
+            ->take(2)
+            ->get();
+
+        $currentTemp = $tempHistory->first()?->temperature;
+
+        $previousTemp = $tempHistory->count() > 1
+            ? $tempHistory[1]->temperature
+            : $currentTemp;
+
+        $deltaT = ($currentTemp !== null && $previousTemp !== null)
+            ? ($currentTemp - $previousTemp)
+            : 0;
+
+        if ($currentTemp === null) {
+            return back()->with('error', 'Data suhu belum tersedia');
+        }
+
+        $fuzzyResult = $fuzzyService->calculate(
+            $currentTemp,
+            $deltaT
+        );
+
+        $currentSetpoint = (int) (
+            $room->acUnits->first()?->status?->set_temperature ?? 24
+        );
+
+        $decision = $fuzzyService->decideAction(
+            $fuzzyResult,
+            $currentSetpoint
+        );
+
+        $targetSetpoint = (int) (
+            $decision['setpoint_after'] ?? $currentSetpoint
+        );
+
+        // =========================
+        // COOLDOWN
+        // =========================
+
+        $cooldownKey = 'fuzzy_room_' . $room->id;
+
+        if (Cache::has($cooldownKey)) {
+            return back()->with(
+                'warning',
+                'Cooldown fuzzy masih aktif'
+            );
+        }
+
+        Cache::put($cooldownKey, true, 30);
+
+        // =========================
+        // APPLY KE SEMUA AC
+        // =========================
+
+        $acController = new AcControlController();
+
+        foreach ($room->acUnits as $ac) {
+
+            $acController->fuzzySetTemp(
+                $ac,
+                $targetSetpoint
+            );
+        }
+
+        return back()->with(
+            'success',
+            'Fuzzy berhasil diterapkan ke semua AC'
+        );
     }
 
     private function setCurrentDeviceStatus(Room $room): void

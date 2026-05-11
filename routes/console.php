@@ -19,3 +19,7 @@ Schedule::command('device:check-status')
 Schedule::command('ac:run-timer')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('fuzzy:run')
+    ->everyMinute()
+    ->withoutOverlapping();

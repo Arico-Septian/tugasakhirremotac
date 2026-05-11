@@ -203,16 +203,95 @@
                                                             style="color:var(--ink-4);margin-top:3px;"></i>
                                                     </div>
 
+                                                    {{-- BAR SUHU (tetap ada span suhu untuk realtime JS) --}}
                                                     <div class="temp-chip {{ $tcls }}"
                                                         style="justify-content:space-between;width:100%;">
                                                         <span
                                                             style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
-                                                        <span id="temp-{{ $room->id }}"
-                                                            class="text-mono">{{ $temp ?? '—' }}°C</span>
+
+                                                        <span id="temp-{{ $room->id }}" class="text-mono">
+                                                            {{ $temp ?? '—' }}°C
+                                                        </span>
                                                     </div>
 
+                                                    {{-- FUZZY OUTPUT (taruh DI BAWAH BAR SUHU) --}}
+                                                    @if (!is_null($room->temperature))
+                                                        <div class="mt-2"
+                                                            style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:8px 10px;">
+                                                            <div class="flex items-center justify-between"
+                                                                style="font-size:12px;color:var(--ink-3);">
+                                                                <span>ΔT</span>
+                                                                <span
+                                                                    class="text-mono">{{ $room->delta_t ?? 0 }}</span>
+                                                            </div>
+
+                                                            @if (!empty($room->fuzzy))
+                                                                <div class="flex items-center justify-between mt-1"
+                                                                    style="font-size:12px;">
+                                                                    <span
+                                                                        style="color:var(--ink-3);">Pendinginan</span>
+                                                                    <span class="text-mono"
+                                                                        style="font-weight:700;color:var(--mint);">
+                                                                        {{ $room->fuzzy['status_pendinginan'] ?? '-' }}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="flex items-center justify-between mt-1"
+                                                                    style="font-size:11px;color:var(--ink-4);">
+                                                                    <span>Crisp</span>
+                                                                    <span
+                                                                        class="text-mono">{{ $room->fuzzy['crisp_output'] ?? '-' }}</span>
+                                                                </div>
+
+                                                                {{-- KEPUTUSAN FUZZY --}}
+                                                                @if (!empty($room->decision))
+                                                                    <div class="mt-2"
+                                                                        style="font-size:11px;color:var(--ink-3);">
+
+                                                                        <div class="flex items-center justify-between">
+                                                                            <span>Keputusan</span>
+
+                                                                            <span class="text-mono"
+                                                                                style="font-weight:700;color:#facc15;">
+                                                                                {{ $room->decision['action'] ?? 'DIAM' }}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="flex items-center justify-between mt-1"
+                                                                            style="font-size:11px;color:var(--ink-4);">
+
+                                                                            <span>Setpoint</span>
+
+                                                                            <span class="text-mono">
+                                                                                {{ $room->decision['setpoint_before'] ?? '-' }}
+                                                                                →
+                                                                                {{ $room->decision['setpoint_after'] ?? '-' }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+
+                                                                {{-- OPSIONAL --}}
+                                                                <div class="mt-2"
+                                                                    style="font-size:10.5px;color:var(--ink-4);line-height:1.4;">
+                                                                    <div class="text-mono">
+                                                                        μSuhu:
+                                                                        D={{ $room->fuzzy['membership_suhu']['dingin'] ?? 0 }},
+                                                                        N={{ $room->fuzzy['membership_suhu']['normal'] ?? 0 }},
+                                                                        P={{ $room->fuzzy['membership_suhu']['panas'] ?? 0 }}
+                                                                    </div>
+                                                                    <div class="text-mono">
+                                                                        μΔT:
+                                                                        T={{ $room->fuzzy['membership_delta_t']['turun'] ?? 0 }},
+                                                                        S={{ $room->fuzzy['membership_delta_t']['stabil'] ?? 0 }},
+                                                                        N={{ $room->fuzzy['membership_delta_t']['naik'] ?? 0 }}
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                     <div class="grid grid-cols-2 gap-1.5">
                                                         <div
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">
