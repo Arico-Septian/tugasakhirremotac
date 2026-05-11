@@ -230,19 +230,6 @@
                 <div class="app-content-inner space-y-5">
 
                     
-                    <div id="tempAlertBanner" class="alert alert-error" hidden>
-                        <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
-                        <div class="flex-1 min-w-0">
-                            <p class="alert-title">Critical Temperature Detected</p>
-                            <p id="tempAlertRooms" class="alert-body text-xs leading-relaxed"></p>
-                        </div>
-                        <button type="button" onclick="document.getElementById('tempAlertBanner').hidden = true"
-                                class="btn-icon" style="border:0;background:transparent;color:var(--coral);">
-                            <i class="fa-solid fa-xmark text-xs"></i>
-                        </button>
-                    </div>
-
-                    
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                         <div class="stat-card acc-cyan">
                             <span class="accent-bar"></span>
@@ -441,17 +428,6 @@ function toggleNotifications() {
     });
 }
 
-function sendTempNotification(roomName, temp) {
-    if (!notifEnabled || Notification.permission !== 'granted') return;
-    const now = Date.now();
-    if (notifCooldown[roomName] && now - notifCooldown[roomName] < 5 * 60 * 1000) return;
-    notifCooldown[roomName] = now;
-    new Notification('⚠️ Suhu Kritis', {
-        body: `${roomName}: ${temp}°C — segera periksa ruangan`,
-        tag: 'temp-' + roomName,
-    });
-}
-
 let tempChart;
 function initChart() {
     const ctx = document.getElementById('tempChart');
@@ -513,19 +489,6 @@ function refreshTemperature() {
 
             const tsEl = document.getElementById('chartLastUpdated');
             if (tsEl) tsEl.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
-
-            const critical = data.filter(r => { const t = parseFloat(r.temp); return !isNaN(t) && t > 30; });
-            const banner = document.getElementById('tempAlertBanner');
-            const alertMsg = document.getElementById('tempAlertRooms');
-            if (banner && alertMsg) {
-                if (critical.length > 0) {
-                    alertMsg.textContent = critical.map(r => `${r.name} (${parseFloat(r.temp).toFixed(1)}°C)`).join(' · ');
-                    banner.hidden = false;
-                } else {
-                    banner.hidden = true;
-                }
-            }
-            critical.forEach(r => sendTempNotification(r.name, parseFloat(r.temp).toFixed(1)));
         })
         .catch(() => {});
 }

@@ -217,7 +217,7 @@
                                                             class="pill room-status-pill {{ $status === 'online' ? 'pill-online' : 'pill-offline' }}"
                                                             style="padding:3px 8px;font-size:10px;">
                                                             <span class="dot"></span><span
-                                                                class="room-status-text hidden sm:inline">{{ $status === 'online' ? 'Online' : 'Offline' }}</span>
+                                                                class="room-status-text">{{ $status === 'online' ? 'Online' : 'Offline' }}</span>
                                                         </span>
                                                     </div>
 
