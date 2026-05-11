@@ -4,7 +4,6 @@ use App\Http\Controllers\AcControlController;
 use App\Http\Controllers\AcUnitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EnergyController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TimerController;
@@ -100,9 +99,6 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             })
             ->values();
     });
-
-    // ==================== ENERGY ANALYTICS ====================
-    Route::get('/energy', [EnergyController::class, 'index'])->name('energy.index');
 
     // ==================== NOTIFICATIONS ====================
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

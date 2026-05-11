@@ -33,7 +33,7 @@ php artisan ac:run-timer           # fires scheduled AC on/off timers
 php artisan logs:clean             # deletes old user logs
 ```
 
-The scheduler (`php artisan schedule:run`) fires `device:check-status` and `ac:run-timer` every minute, and `logs:clean` daily at 07:00.
+The scheduler is defined in `routes/console.php` (Laravel 13 pattern). It automatically fires `device:check-status` and `ac:run-timer` every minute, and `logs:clean` daily at 07:00. Run `php artisan schedule:run` manually to execute the schedule once (used by cron jobs on production servers).
 
 ## Architecture
 
@@ -56,7 +56,9 @@ The scheduler (`php artisan schedule:run`) fires `device:check-status` and `ac:r
 | Server → Device | `device/{id}/config` | Sends room + AC list on reconnect |
 | Server → Device | `room/{room}/ac/{n}/control` | AC control command (retained QoS 1) |
 
-Room names in topics are always `strtolower(trim())`. A device is considered **online** when `last_seen` is within 15–30 seconds depending on context.
+Room names in topics are always `strtolower(trim())`. A device is considered **online** in two contexts:
+- **Dashboard view** (DashboardController): `last_seen` within 30 seconds
+- **API endpoint** (`/device-status`): `last_seen` within 15 seconds
 
 ### Role System
 
@@ -84,10 +86,30 @@ Auth middleware stack on protected routes: `auth` → `active` (blocks deactivat
 
 `RunAcTimer` (`ac:run-timer`) runs every minute. It fires if `now` is within a ±30 s / +60 s window of `timer_on`/`timer_off`, guarded by Cache locks (`lock:timer_{type}_{id}_v{version}_{date_time}`) and a 60 s cooldown (`ac_cooldown_{id}`) to prevent double-execution.
 
-### Energy Analytics
-
-`config/smartac.php` holds `energy.power_kw`, `energy.tariff_per_kwh`, and `energy.default_session_hours`, all overridable via `.env` (`SMARTAC_POWER_KW`, etc.). `EnergyController` uses these for cost estimates.
-
 ### Frontend
 
 Blade templates in `resources/views/`. Sidebar and bottom-nav are Blade components (`components/sidebar`, `components/bottom-nav`). No separate SPA — Alpine.js / vanilla JS handles live updates by polling JSON API endpoints.
+
+## Key Endpoints
+
+Read-only endpoints (authenticated, available to all roles):
+- `GET /device-status` — room device online/offline status (15 s online threshold)
+- `GET /temperature` or `/temperatures` — latest room temperatures
+- `GET /temperature/history/{id}` — 24-hour temperature data grouped by hour
+- `GET /notifications/recent` — recent notifications
+- `GET /api/ac-status` — AC unit status with room relationships
+
+AC control endpoints (`role:admin,operator`):
+- `GET /ac/{id}/on`, `/ac/{id}/off`, `POST /ac/{id}/toggle` — power control
+- `POST /ac/{id}/temp/{value}`, `/ac/{id}/mode/{mode}`, `/ac/{id}/fan-speed/{speed}`, `/ac/{id}/swing/{swing}` — settings
+- `POST /ac/{id}/schedule` — set timer (`timer_on`/`timer_off`)
+
+All endpoints return JSON for API calls, Blade views for page requests. All control actions are logged to `UserLog`.
+
+## Queue System
+
+`composer run dev` includes `queue:listen` which processes queued jobs. Jobs run synchronously in development (see `config/queue.php`). In production, the SMTP driver might queue mail jobs — ensure `queue:work` is running as a service.
+
+## Testing
+
+Tests live in `tests/` (Feature and Unit). Use `composer run test` to run all tests, or `php artisan test --filter=ClassName` for a specific class. The CI environment clears config cache before tests to ensure fresh state.

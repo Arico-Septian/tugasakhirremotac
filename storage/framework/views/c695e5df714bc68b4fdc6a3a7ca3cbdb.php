@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>Activity Log — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -16,7 +17,7 @@
         }
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 10px;
         }
         .filter-grid .field { margin: 0; }
@@ -74,24 +75,6 @@
                     <p>System &amp; user activity</p>
                 </div>
             </div>
-            <?php if(Auth::user()->role == 'admin'): ?>
-                <div class="flex items-center gap-2">
-                    <a href="<?php echo e('/logs/export?' . http_build_query(request()->only(['user_id','room','activity','date_from','date_to','search']))); ?>"
-                       class="btn btn-mint btn-sm">
-                        <i class="fa-solid fa-file-pdf text-[10px]"></i>
-                        <span class="hidden sm:inline">Export PDF</span>
-                    </a>
-                    <form action="/logs/delete-all" method="POST"
-                          onsubmit="return confirm('Hapus SEMUA log? Tindakan ini tidak dapat dibatalkan.')">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('DELETE'); ?>
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fa-solid fa-trash text-[10px]"></i>
-                            <span class="hidden sm:inline">Clear</span>
-                        </button>
-                    </form>
-                </div>
-            <?php endif; ?>
         </header>
 
         <div class="page-body">
@@ -238,6 +221,12 @@
                                         <i class="fa-solid fa-xmark text-[10px]"></i>
                                         Reset
                                     </a>
+                                <?php endif; ?>
+                                <?php if(Auth::user()->role == 'admin'): ?>
+                                    <button type="button" onclick="deleteAllLogs()" class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-trash text-[10px]"></i>
+                                        <span class="hidden sm:inline">Hapus Semua</span>
+                                    </button>
                                 <?php endif; ?>
                                 <span class="text-xs" style="color:var(--ink-4);margin-left:4px;">
                                     <?php echo e($logs->total()); ?> hasil ditemukan
@@ -449,6 +438,30 @@ function removeFilter(key) {
     url.searchParams.delete(key);
     url.searchParams.delete('page');
     window.location.href = url.toString();
+}
+
+function deleteAllLogs() {
+    if (!confirm('Hapus SEMUA log? Tindakan ini tidak dapat dibatalkan.')) return;
+
+    fetch('/logs/delete-all', {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('Delete failed');
+        return r.json();
+    })
+    .then(() => {
+        window.smToast ? window.smToast('Semua log berhasil dihapus', 'success') : alert('Semua log berhasil dihapus');
+        setTimeout(() => location.reload(), 800);
+    })
+    .catch(err => {
+        window.smToast ? window.smToast('Gagal menghapus log', 'error') : alert('Gagal menghapus log');
+        console.error('Delete error:', err);
+    });
 }
 </script>
 </body>

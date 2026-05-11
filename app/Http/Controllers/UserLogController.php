@@ -110,7 +110,7 @@ class UserLogController extends Controller
         return $pdf->download('activity_log_' . now()->format('Y-m-d_His') . '.pdf');
     }
 
-    public function destroyAll()
+    public function destroyAll(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -120,6 +120,10 @@ class UserLogController extends Controller
         }
 
         UserLog::truncate();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Semua log berhasil dihapus']);
+        }
 
         return back()->with('success', 'Semua log berhasil dihapus');
     }

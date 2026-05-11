@@ -51,11 +51,6 @@
                     <i class="fa-solid fa-server"></i>
                     <span class="menu-text">Control Rooms &amp; AC</span>
                 </a>
-                <a href="/energy"
-                   class="nav-link menu-link <?php echo e(request()->is('energy*') ? 'active' : ''); ?>">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span class="menu-text">Energy Analytics</span>
-                </a>
             </div>
         <?php endif; ?>
 
