@@ -523,6 +523,9 @@
         }
         window.addEventListener('online', () => setSystemStatus(true));
         window.addEventListener('offline', () => setSystemStatus(false));
+        document.addEventListener('DOMContentLoaded', () => {
+            setSystemStatus(navigator.onLine);
+        });
     </script>
 </body>
 

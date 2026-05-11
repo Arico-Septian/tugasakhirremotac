@@ -415,6 +415,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             startActivityPing();
+            setSystemStatus(navigator.onLine);
             @if (session('success'))
                 window.smToast("{{ session('success') }}", 'success');
             @endif
