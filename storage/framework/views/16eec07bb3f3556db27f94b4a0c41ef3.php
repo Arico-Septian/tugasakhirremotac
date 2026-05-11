@@ -469,6 +469,9 @@
         }
         window.addEventListener('online', () => setSystemStatus(true));
         window.addEventListener('offline', () => setSystemStatus(false));
+        document.addEventListener('DOMContentLoaded', () => {
+            setSystemStatus(navigator.onLine);
+        });
     </script>
     <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>

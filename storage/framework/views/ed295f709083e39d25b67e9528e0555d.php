@@ -417,6 +417,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             startActivityPing();
+            setSystemStatus(navigator.onLine);
             <?php if(session('success')): ?>
                 window.smToast("<?php echo e(session('success')); ?>", 'success');
             <?php endif; ?>

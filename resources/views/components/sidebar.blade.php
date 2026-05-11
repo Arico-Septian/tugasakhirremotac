@@ -70,21 +70,6 @@
             </div>
         @endif
 
-        <p class="nav-section-label">Account</p>
-        <div class="nav-list">
-            <a href="/notifications"
-               class="nav-link menu-link {{ request()->is('notifications*') ? 'active' : '' }}"
-               style="position:relative;">
-                <i class="fa-regular fa-bell"></i>
-                <span class="menu-text">Notifikasi</span>
-                <span id="sidebarNotifBadge" class="notif-badge" style="display:none;position:absolute;top:8px;right:14px;min-width:18px;height:18px;border-radius:999px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg-1);font-family:'JetBrains Mono',monospace;"></span>
-            </a>
-            <a href="/profile"
-               class="nav-link menu-link {{ request()->is('profile*') ? 'active' : '' }}">
-                <i class="fa-regular fa-circle-user"></i>
-                <span class="menu-text">Profile</span>
-            </a>
-        </div>
     </nav>
 
     {{-- FOOTER --}}
