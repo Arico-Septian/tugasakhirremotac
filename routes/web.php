@@ -350,7 +350,6 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
 
         Route::get('/logs', [UserLogController::class, 'index']);
-        Route::get('/logs/export', [UserLogController::class, 'export']);
         Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
         Route::get('/users-online', function () {
