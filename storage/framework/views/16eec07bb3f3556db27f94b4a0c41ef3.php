@@ -80,6 +80,18 @@
             color: var(--ink-4);
             white-space: nowrap;
         }
+
+        .temp-offline-badge {
+            display: inline-block;
+            margin-left: 4px;
+            padding: 2px 6px;
+            background-color: var(--coral);
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 
@@ -211,8 +223,11 @@
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
 
-                                                        <span id="temp-<?php echo e($room->id); ?>" class="text-mono">
+                                                        <span id="temp-<?php echo e($room->id); ?>" class="text-mono" data-offline="<?php echo e($room->temperature_is_offline ? 'true' : 'false'); ?>">
                                                             <?php echo e($temp ?? '—'); ?>°C
+                                                            <?php if($room->temperature_is_offline): ?>
+                                                                <span class="temp-offline-badge">OFFLINE</span>
+                                                            <?php endif; ?>
                                                         </span>
                                                     </div>
 
@@ -463,7 +478,11 @@
                     data.forEach(r => {
                         const el = document.getElementById(`temp-${r.id}`);
                         const t = parseFloat(r.temp);
-                        if (el && !isNaN(t)) el.textContent = t + '°C';
+                        if (el && !isNaN(t)) {
+                            const badge = el.querySelector('.temp-offline-badge');
+                            el.textContent = t + '°C';
+                            if (badge) el.appendChild(badge);
+                        }
                     });
                 }).catch(() => {});
         }, 5000);

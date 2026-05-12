@@ -55,11 +55,20 @@ class RoomController extends Controller
             // SUHU TERBARU
             // =========================
 
-            $room->temperature = optional(
-                $latestTemperatures->get(
-                    RoomTemperature::normalizeRoomName($room->name)
-                )
-            )->temperature;
+            $lastTempRecord = $latestTemperatures->get(
+                RoomTemperature::normalizeRoomName($room->name)
+            );
+
+            $room->temperature = optional($lastTempRecord)->temperature;
+
+            // Check if temperature data is stale (offline)
+            $room->temperature_is_offline = false;
+            if ($lastTempRecord && $lastTempRecord->created_at) {
+                $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
+                $room->temperature_is_offline = $secondsSinceLastTemp > 120; // 2 minutes
+            } elseif (!$lastTempRecord) {
+                $room->temperature_is_offline = true;
+            }
 
             // =========================
             // AMBIL 2 DATA TERBARU
@@ -263,9 +272,16 @@ class RoomController extends Controller
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
         foreach ($rooms as $room) {
-            $room->temperature = optional(
-                $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
-            )->temperature;
+            $lastTempRecord = $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name));
+            $room->temperature = optional($lastTempRecord)->temperature;
+
+            $room->temperature_is_offline = false;
+            if ($lastTempRecord && $lastTempRecord->created_at) {
+                $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
+                $room->temperature_is_offline = $secondsSinceLastTemp > 120;
+            } elseif (!$lastTempRecord) {
+                $room->temperature_is_offline = true;
+            }
 
             $deviceId = strtolower(trim((string) $room->device_id));
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
@@ -274,7 +290,7 @@ class RoomController extends Controller
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen, true) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 60;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
         }
@@ -290,9 +306,16 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
-        $room->temperature = optional(
-            $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
-        )->temperature;
+        $lastTempRecord = $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name));
+        $room->temperature = optional($lastTempRecord)->temperature;
+
+        $room->temperature_is_offline = false;
+        if ($lastTempRecord && $lastTempRecord->created_at) {
+            $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
+            $room->temperature_is_offline = $secondsSinceLastTemp > 120;
+        } elseif (!$lastTempRecord) {
+            $room->temperature_is_offline = true;
+        }
 
         $deviceId = strtolower(trim((string) $room->device_id));
         $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
@@ -301,7 +324,7 @@ class RoomController extends Controller
 
         $isOnline = ($status === 'online' || $status === 'available')
             && $lastSeen
-            && now()->diffInSeconds($lastSeen, true) <= 30;
+            && now()->diffInSeconds($lastSeen, true) <= 60;
 
         $room->device_status = $isOnline ? 'online' : 'offline';
 

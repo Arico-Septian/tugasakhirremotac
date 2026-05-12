@@ -112,6 +112,18 @@
             color: var(--ink-4);
             white-space: nowrap;
         }
+
+        .temp-offline-badge {
+            display: inline-block;
+            margin-left: 4px;
+            padding: 2px 6px;
+            background-color: var(--coral);
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 
@@ -227,8 +239,11 @@
                                                             style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
-                                                        <span id="temp-{{ $room->id }}" class="text-mono">
-                                                            {{ $temp !== null ? $temp . '°C' : '—' }}
+                                                        <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
+                                                            {{ $temp ?? '—' }}°C
+                                                            @if ($room->temperature_is_offline)
+                                                                <span class="temp-offline-badge">OFFLINE</span>
+                                                            @endif
                                                         </span>
                                                     </div>
 
@@ -540,7 +555,9 @@
                     const el = document.getElementById(`temp-${room.id}`);
                     if (!el) return;
                     const t = parseFloat(room.temp);
+                    const badge = el.querySelector('.temp-offline-badge');
                     el.textContent = isNaN(t) ? '—' : `${t}°C`;
+                    if (badge) el.appendChild(badge);
                 });
             }).catch(() => {});
         }

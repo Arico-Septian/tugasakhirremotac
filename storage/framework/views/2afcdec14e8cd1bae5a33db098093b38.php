@@ -580,4 +580,4 @@
 </body>
 
 </html>
-<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/rooms/overview.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views\rooms\overview.blade.php ENDPATH**/ ?>
