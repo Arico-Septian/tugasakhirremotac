@@ -80,12 +80,14 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
                 if ($lastSeen) {
                     $lastSeenAt = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 15;
+                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 60;
                 }
 
-                // Auto-notify when device is offline > 2 minutes (deduped 15min via cache key inside Notification::deviceOffline)
+                // State-based notifications: only notify on state CHANGE
                 if (! $isOnline && $lastSeenAt && now()->diffInMinutes($lastSeenAt, true) >= 2) {
                     Notification::deviceOffline($room->name, $deviceId);
+                } elseif ($isOnline) {
+                    Notification::deviceOnline($room->name, $deviceId);
                 }
 
                 return [

@@ -239,13 +239,6 @@
                                                                     </span>
                                                                 </div>
 
-                                                                <div class="flex items-center justify-between mt-1"
-                                                                    style="font-size:11px;color:var(--ink-4);">
-                                                                    <span>Crisp</span>
-                                                                    <span
-                                                                        class="text-mono"><?php echo e($room->fuzzy['crisp_output'] ?? '-'); ?></span>
-                                                                </div>
-
                                                                 
                                                                 <?php if(!empty($room->decision)): ?>
                                                                     <div class="mt-2"
@@ -276,25 +269,6 @@
                                                                         </div>
                                                                     </div>
                                                                 <?php endif; ?>
-
-                                                                
-                                                                <div class="mt-2"
-                                                                    style="font-size:10.5px;color:var(--ink-4);line-height:1.4;">
-                                                                    <div class="text-mono">
-                                                                        μSuhu:
-                                                                        D=<?php echo e($room->fuzzy['membership_suhu']['dingin'] ?? 0); ?>,
-                                                                        N=<?php echo e($room->fuzzy['membership_suhu']['normal'] ?? 0); ?>,
-                                                                        P=<?php echo e($room->fuzzy['membership_suhu']['panas'] ?? 0); ?>
-
-                                                                    </div>
-                                                                    <div class="text-mono">
-                                                                        μΔT:
-                                                                        T=<?php echo e($room->fuzzy['membership_delta_t']['turun'] ?? 0); ?>,
-                                                                        S=<?php echo e($room->fuzzy['membership_delta_t']['stabil'] ?? 0); ?>,
-                                                                        N=<?php echo e($room->fuzzy['membership_delta_t']['naik'] ?? 0); ?>
-
-                                                                    </div>
-                                                                </div>
                                                             <?php endif; ?>
                                                         </div>
                                                     <?php endif; ?>

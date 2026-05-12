@@ -728,42 +728,13 @@
                                         style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px 20px;">
                                         <div class="temp-ring">
                                             <div class="temp-ring-inner">
-                                                <p class="ring-label">Target</p>
+                                                <p class="ring-label">Suhu Ac</p>
                                                 <div class="ring-temp">
                                                     <span class="temp-value">{{ $curTemp }}</span><span
                                                         class="unit">°C</span>
                                                 </div>
                                                 <p class="ring-summary">{{ $curMode }} · {{ $curFan }} ·
                                                     {{ $swingLabel }}</p>
-                                                @if (!empty($room->fuzzy))
-                                                    <div class="ring-fuzzy">
-                                                        <div class="ring-fuzzy__line">
-                                                            <span class="k">Suhu</span>
-                                                            <span
-                                                                class="v text-mono">{{ number_format($room->temperature ?? 0, 1) }}°C</span>
-                                                        </div>
-
-                                                        <div class="ring-fuzzy__line">
-                                                            <span class="k">ΔT</span>
-                                                            <span
-                                                                class="v text-mono">{{ number_format($room->delta_t ?? 0, 2) }}</span>
-                                                        </div>
-
-                                                        <div class="ring-fuzzy__badges">
-                                                            <span
-                                                                class="badge badge--cyan">{{ $room->fuzzy['status_pendinginan'] ?? '-' }}</span>
-                                                            <span
-                                                                class="badge badge--yellow">{{ $room->decision['action'] ?? 'DIAM' }}</span>
-                                                        </div>
-
-                                                        @if (!empty($room->decision))
-                                                            <div class="ring-fuzzy__sub text-mono">
-                                                                {{ $room->decision['setpoint_before'] ?? '-' }} →
-                                                                {{ $room->decision['setpoint_after'] ?? '-' }}
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @endif
                                             </div>
                                         </div>
                                         <div class="ctrl-row">

@@ -67,17 +67,37 @@ class Notification extends Model
 
     public static function deviceOffline(string $roomName, ?string $deviceId = null): ?self
     {
-        $key = "device_offline:{$roomName}";
+        $stateKey = "device_state:{$roomName}";
+        $prevState = cache()->get($stateKey);
 
-        if (cache()->has($key)) {
+        if ($prevState === 'offline') {
             return null;
         }
 
-        cache()->put($key, true, now()->addMinutes(15));
+        cache()->put($stateKey, 'offline', now()->addDays(7));
 
         return self::notify('device_offline', "ESP {$roomName} offline", [
             'severity' => 'error',
             'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " tidak terhubung. Cek koneksi WiFi atau power.",
+            'link' => '/dashboard',
+            'meta' => ['room' => $roomName, 'device_id' => $deviceId],
+        ]);
+    }
+
+    public static function deviceOnline(string $roomName, ?string $deviceId = null): ?self
+    {
+        $stateKey = "device_state:{$roomName}";
+        $prevState = cache()->get($stateKey);
+
+        if ($prevState === 'online') {
+            return null;
+        }
+
+        cache()->put($stateKey, 'online', now()->addDays(7));
+
+        return self::notify('device_online', "ESP {$roomName} online", [
+            'severity' => 'info',
+            'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " terhubung kembali.",
             'link' => '/dashboard',
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
         ]);

@@ -238,13 +238,6 @@
                                                                     </span>
                                                                 </div>
 
-                                                                <div class="flex items-center justify-between mt-1"
-                                                                    style="font-size:11px;color:var(--ink-4);">
-                                                                    <span>Crisp</span>
-                                                                    <span
-                                                                        class="text-mono">{{ $room->fuzzy['crisp_output'] ?? '-' }}</span>
-                                                                </div>
-
                                                                 {{-- KEPUTUSAN FUZZY --}}
                                                                 @if (!empty($room->decision))
                                                                     <div class="mt-2"
@@ -272,23 +265,6 @@
                                                                         </div>
                                                                     </div>
                                                                 @endif
-
-                                                                {{-- OPSIONAL --}}
-                                                                <div class="mt-2"
-                                                                    style="font-size:10.5px;color:var(--ink-4);line-height:1.4;">
-                                                                    <div class="text-mono">
-                                                                        μSuhu:
-                                                                        D={{ $room->fuzzy['membership_suhu']['dingin'] ?? 0 }},
-                                                                        N={{ $room->fuzzy['membership_suhu']['normal'] ?? 0 }},
-                                                                        P={{ $room->fuzzy['membership_suhu']['panas'] ?? 0 }}
-                                                                    </div>
-                                                                    <div class="text-mono">
-                                                                        μΔT:
-                                                                        T={{ $room->fuzzy['membership_delta_t']['turun'] ?? 0 }},
-                                                                        S={{ $room->fuzzy['membership_delta_t']['stabil'] ?? 0 }},
-                                                                        N={{ $room->fuzzy['membership_delta_t']['naik'] ?? 0 }}
-                                                                    </div>
-                                                                </div>
                                                             @endif
                                                         </div>
                                                     @endif
