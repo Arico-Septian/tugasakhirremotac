@@ -529,6 +529,11 @@
                 display: none;
             }
         }
+
+        /* Page sections spacing */
+        .app-content-inner > * + * {
+            margin-top: 32px;
+        }
     </style>
 </head>
 

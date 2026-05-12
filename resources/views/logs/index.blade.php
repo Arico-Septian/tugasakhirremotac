@@ -378,6 +378,11 @@
         .pager a:hover i {
             opacity: 1;
         }
+
+        /* Page sections spacing */
+        .app-content-inner > * + * {
+            margin-top: 32px;
+        }
     </style>
 </head>
 

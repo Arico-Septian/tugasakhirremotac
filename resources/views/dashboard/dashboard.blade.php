@@ -40,6 +40,14 @@
             box-shadow: var(--inset-hi);
         }
 
+        /* Server Rooms half-width on desktop */
+        @media (min-width: 1024px) {
+            .dashboard-rooms-panel {
+                width: 50%;
+                max-width: 50%;
+            }
+        }
+
         .dashboard-rooms-panel .panel-header {
             align-items: flex-start;
             margin-bottom: 16px;
@@ -112,6 +120,11 @@
             width: 5px;
             border-radius: 999px;
             background: #fca5a5;
+        }
+
+        /* Dashboard sections spacing */
+        .app-content-inner > * + * {
+            margin-top: 32px;
         }
 
         .dashboard-room-row:hover {
@@ -348,8 +361,13 @@
             }
         }
 
+        /* Dashboard stat card base styling */
+        .grid.grid-cols-2.lg\:grid-cols-4 .stat-card {
+            padding: 18px 20px;
+        }
+
         /* Stat card text styling */
-        .stat-label-sm {
+        .stat-card .stat-label-sm {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.1em;
@@ -357,7 +375,7 @@
             color: var(--ink-3);
         }
 
-        .stat-num-lg {
+        .stat-card .stat-num-lg {
             font-family: 'JetBrains Mono', monospace;
             font-size: 36px;
             font-weight: 700;
@@ -365,7 +383,7 @@
             margin: 8px 0 6px;
         }
 
-        .stat-sub {
+        .stat-card .stat-sub {
             font-size: 11px;
             color: var(--ink-3);
         }
@@ -416,8 +434,12 @@
 
         /* Stat cards optimization - Tablet (640px - 768px) */
         @media (min-width: 641px) and (max-width: 768px) {
+            .grid.grid-cols-2.lg\:grid-cols-4 {
+                gap: 12px;
+            }
+
             .stat-card {
-                padding: 16px;
+                padding: 16px 18px;
             }
 
             .stat-label-sm {
@@ -441,11 +463,11 @@
         /* Stat cards optimization for small screens (< 640px) */
         @media (max-width: 640px) {
             .grid.grid-cols-2.lg\:grid-cols-4 {
-                gap: 6px;
+                gap: 12px;
             }
 
             .stat-card {
-                padding: 12px;
+                padding: 14px 16px;
             }
 
             .stat-label-sm {
@@ -470,11 +492,11 @@
         /* Very small screens (< 480px) */
         @media (max-width: 480px) {
             .grid.grid-cols-2.lg\:grid-cols-4 {
-                gap: 8px;
+                gap: 10px;
             }
 
             .stat-card {
-                padding: 10px;
+                padding: 12px 14px;
             }
 
             .stat-label-sm {
@@ -483,7 +505,7 @@
             }
 
             .stat-num-lg {
-                font-size: 22px;
+                font-size: 24px;
                 margin: 4px 0 2px;
             }
 
@@ -573,6 +595,50 @@
                 min-height: 100px;
             }
         }
+
+        /* Tablet portrait (769px - 1023px) — promote stat grid to 4 columns */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .grid.grid-cols-2.lg\:grid-cols-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 14px 16px;
+            }
+
+            .stat-card .stat-label-sm {
+                font-size: 9px;
+            }
+
+            .stat-card .stat-num-lg {
+                font-size: 28px;
+                margin: 6px 0 4px;
+            }
+
+            .stat-card .stat-sub {
+                font-size: 10px;
+            }
+
+            .stat-icon {
+                font-size: 18px;
+            }
+        }
+
+        /* Ultra-wide screens (>1600px) — cap content width for readability */
+        @media (min-width: 1600px) {
+            .app-content-inner {
+                max-width: 1480px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .app-content-inner {
+                max-width: 1600px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -605,10 +671,10 @@
         {{-- BODY --}}
         <div class="page-body">
             <div class="app-content">
-                <div class="app-content-inner space-y-6">
+                <div class="app-content-inner space-y-4">
 
                     {{-- Stat cards --}}
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                         <div class="stat-card acc-cyan">
                             <span class="accent-bar"></span>
                             <div class="flex items-start justify-between gap-3">
@@ -625,7 +691,7 @@
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <p class="stat-label">AC Units</p>
-                                    <p class="stat-value">{{ $totalAc }}</p>
+                                    <p class="stat-num-lg">{{ $totalAc }}</p>
                                     <p class="stat-meta">Across all rooms</p>
                                 </div>
                                 <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
@@ -636,18 +702,18 @@
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <p class="stat-label">Ac Active</p>
-                                    <p class="stat-value">{{ $activeAc }}</p>
+                                    <p class="stat-num-lg">{{ $activeAc }}</p>
                                     <p class="stat-meta">Currently powered on</p>
                                 </div>
                                 <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
                             </div>
                         </div>
-                        <div class="stat-card acc-slate">
+                        <div class="stat-card acc-coral">
                             <span class="accent-bar"></span>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <p class="stat-label">Ac Idle</p>
-                                    <p class="stat-value">{{ $inactiveAc }}</p>
+                                    <p class="stat-num-lg">{{ $inactiveAc }}</p>
                                     <p class="stat-meta">Powered off</p>
                                 </div>
                                 <div class="stat-icon"><i class="fa-regular fa-circle"></i></div>
