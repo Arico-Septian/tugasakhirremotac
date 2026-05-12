@@ -36,53 +36,125 @@
         .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
         .stat-card.acc-coral .stat-num-lg    { color: var(--coral); }
 
-        .user-row {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 16px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--panel-1);
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        tbody tr {
             border-bottom: 1px solid var(--line-soft);
             transition: background var(--t-fast);
         }
 
-        .user-row:hover {
+        tbody tr:hover {
             background: var(--panel-1);
         }
 
-        .user-row:last-child {
+        tbody tr:last-child {
             border-bottom: none;
         }
 
-        @media (max-width: 720px) {
-            .user-row {
-                grid-template-columns: 1fr;
-            }
-
-            .user-actions-wrap {
-                justify-content: flex-start;
-            }
+        td {
+            padding: 14px 16px;
+            vertical-align: middle;
         }
 
-        .user-avatar-wrap {
-            position: relative;
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .user-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink-0);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .user-handle {
+            font-size: 12px;
+            color: var(--ink-3);
+            margin: 3px 0 0;
+        }
+
+        .user-avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--bg-1);
             flex-shrink: 0;
         }
 
-        .avatar-status {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--ink-2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            border: 2px solid var(--bg-1);
+            flex-shrink: 0;
             background: var(--ink-3);
         }
 
-        .avatar-status.online {
+        .status-dot.online {
             background: var(--mint);
-            box-shadow: 0 0 0 4px rgba(110, 231, 183, .18);
+        }
+
+        .status-dot.active {
+            background: var(--mint);
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 720px) {
+            th, td {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .user-avatar-sm {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -169,121 +241,131 @@
                         
                         <div class="tbl-wrap">
                             <div class="tbl-toolbar">
-                                <form method="GET" action="/users" class="flex-1 min-w-[200px] max-w-md">
+                                <form method="GET" action="/users" style="flex:1;max-width:none;">
                                     <label class="search-input">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                         <input name="search" value="<?php echo e(request('search')); ?>"
                                             placeholder="Search by username…" autocomplete="off">
                                     </label>
                                 </form>
-                                <div class="segmented">
-                                    <a class="seg <?php echo e(!request('role') ? 'active' : ''); ?>" href="/users">All</a>
-                                    <a class="seg <?php echo e(request('role') == 'admin' ? 'active' : ''); ?>"
-                                        href="/users?role=admin">Admin</a>
-                                    <a class="seg <?php echo e(request('role') == 'operator' ? 'active' : ''); ?>"
-                                        href="/users?role=operator">Operator</a>
-                                    <a class="seg <?php echo e(request('role') == 'user' ? 'active' : ''); ?>"
-                                        href="/users?role=user">User</a>
+                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                    <div class="segmented">
+                                        <a class="seg <?php echo e(!request('role') ? 'active' : ''); ?>" href="/users">All</a>
+                                        <a class="seg <?php echo e(request('role') == 'admin' ? 'active' : ''); ?>"
+                                            href="/users?role=admin">Admin</a>
+                                        <a class="seg <?php echo e(request('role') == 'operator' ? 'active' : ''); ?>"
+                                            href="/users?role=operator">Operator</a>
+                                        <a class="seg <?php echo e(request('role') == 'user' ? 'active' : ''); ?>"
+                                            href="/users?role=user">User</a>
+                                    </div>
+                                    <button onclick="openModal()" type="button" class="btn btn-primary btn-sm">
+                                        <i class="fa-solid fa-user-plus text-[10px]"></i> Add User
+                                    </button>
                                 </div>
-                                <button onclick="openModal()" type="button" class="btn btn-primary btn-sm">
-                                    <i class="fa-solid fa-user-plus text-[10px]"></i> Add User
-                                </button>
                             </div>
 
-                            <div class="flex items-center justify-between px-4 py-2.5"
-                                style="background:var(--panel-1);border-bottom:1px solid var(--line-soft);">
-                                <p class="text-xs" style="color:var(--ink-3);">
-                                    Menampilkan <span class="text-mono"
-                                        style="color:var(--ink-0);"><?php echo e($users->count()); ?></span>
-                                    dari <span class="text-mono" style="color:var(--ink-0);"><?php echo e($totalUsers); ?></span>
-                                    user
-                                </p>
-                                <span class="pill pill-online" style="padding:3px 10px;font-size:10.5px;">
-                                    <span class="dot"></span><span>Live</span>
-                                </span>
-                            </div>
-
-                            <div id="user-list">
-                                <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <?php
-                                        $isOnline = $user->isOnline ?? false;
-                                        $statusText = $isOnline
-                                            ? 'Online'
-                                            : ($user->last_activity
-                                                ? \Carbon\Carbon::parse($user->last_activity)->diffForHumans()
-                                                : 'Offline');
-                                        $isActive = $user->is_active ?? true;
+                            <table id="user-list">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30%">USER</th>
+                                        <th style="width:15%">ROLE</th>
+                                        <th style="width:15%">STATUS</th>
+                                        <th style="width:15%">ACTIVE</th>
+                                        <th style="width:25%;text-align:right;padding-right:24px;">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <?php
+                                            $isOnline = $user->isOnline ?? false;
+                                            $isActive = $user->is_active ?? true;
+                                            $initials = strtoupper(substr($user->name, 0, 1));
+                                            $handle = '@' . strtolower(str_replace(' ', '', $user->name));
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <div class="user-cell">
+                                                    <?php
+                                        $colors = ['cyan', 'mint', 'lavender', 'coral'];
+                                        $colorIndex = ($user->id - 1) % 4;
+                                        $colorName = $colors[$colorIndex];
                                     ?>
-                                    <div class="user-row">
-                                        <div class="flex items-center gap-3 min-w-0">
-                                            <div class="user-avatar-wrap">
-                                                <div class="avatar avatar-lg">
-                                                    <?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
-                                                <span class="avatar-status <?php echo e($isOnline ? 'online' : ''); ?>"></span>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="text-sm font-semibold"
-                                                    style="color:var(--ink-0);line-height:1.2;"><?php echo e($user->name); ?></p>
-                                                <p class="text-xs mt-1 flex items-center gap-1.5"
-                                                    style="color:var(--ink-3);">
-                                                    <i class="fa-regular fa-circle text-[8px] <?php echo e($isOnline ? 'text-mint' : ''); ?>"
-                                                        style="<?php echo e($isOnline ? 'color:var(--mint);' : ''); ?>"></i>
-                                                    <?php echo e($statusText); ?>
+                                    <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
+                                                        <?php echo e($initials); ?>
 
-                                                </p>
-                                            </div>
-                                        </div>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <p class="user-name"><?php echo e($user->name); ?></p>
+                                                        <p class="user-handle"><?php echo e($handle); ?></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge-role <?php echo e($user->role); ?>">
+                                                    <?php if($user->role == 'admin'): ?>
+                                                        ADMINISTRATOR
+                                                    <?php elseif($user->role == 'operator'): ?>
+                                                        OPERATOR
+                                                    <?php else: ?>
+                                                        USER
+                                                    <?php endif; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="status-cell">
+                                                    <span class="status-dot <?php echo e($isOnline ? 'online' : ''); ?>"></span>
+                                                    <?php echo e($isOnline ? 'Online' : 'Offline'); ?>
 
-                                        <div class="user-actions-wrap flex items-center gap-2 flex-wrap justify-end">
-                                            <span class="badge-role <?php echo e($user->role); ?>">
-                                                <?php if($user->role == 'admin'): ?>
-                                                    <i class="fa-solid fa-crown text-[9px]"></i>Admin
-                                                <?php elseif($user->role == 'operator'): ?>
-                                                    <i class="fa-solid fa-gear text-[9px]"></i>Operator
-                                                <?php else: ?>
-                                                    <i class="fa-regular fa-user text-[9px]"></i>User
-                                                <?php endif; ?>
-                                            </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="status-cell">
+                                                    <span class="status-dot <?php echo e($isActive ? 'active' : ''); ?>"></span>
+                                                    <?php echo e($isActive ? 'Active' : 'Inactive'); ?>
 
-                                            <span class="pill <?php echo e($isActive ? 'pill-online' : 'pill-error'); ?>"
-                                                style="padding:3px 9px;font-size:10px;">
-                                                <span
-                                                    class="dot"></span><span><?php echo e($isActive ? 'Active' : 'Inactive'); ?></span>
-                                            </span>
-
-                                            <?php if($user->id !== Auth::user()->id): ?>
-                                                <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
-                                                    class="inline-flex"
-                                                    onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
-                                                    <?php echo csrf_field(); ?>
-                                                    <button type="submit"
-                                                        class="btn-icon <?php echo e($isActive ? 'warning' : ''); ?>"
-                                                        style="<?php echo e($isActive ? '' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
-                                                        title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
-                                                        <i
-                                                            class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[11px]"></i>
-                                                    </button>
-                                                </form>
-                                                <button
-                                                    onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
-                                                    type="button" class="btn-icon lavender" title="Edit role">
-                                                    <i class="fa-solid fa-pen text-[11px]"></i>
-                                                </button>
-                                                <button onclick="deleteUser(<?php echo e($user->id); ?>)" type="button"
-                                                    class="btn-icon danger" title="Delete user">
-                                                    <i class="fa-solid fa-trash text-[11px]"></i>
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                    <div class="empty-state">
-                                        <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
-                                        <p class="empty-title">No users found</p>
-                                        <p class="empty-sub">Try adjusting your search or filter</p>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="actions-cell">
+                                                    <?php if($user->id !== Auth::user()->id): ?>
+                                                        <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
+                                                            class="inline"
+                                                            onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
+                                                            <?php echo csrf_field(); ?>
+                                                            <button type="submit"
+                                                                class="btn-icon"
+                                                                style="<?php echo e($isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
+                                                                title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
+                                                                <i
+                                                                    class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[10px]"></i>
+                                                            </button>
+                                                        </form>
+                                                        <button
+                                                            onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
+                                                            type="button" class="btn-icon lavender" title="Edit role">
+                                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                                        </button>
+                                                        <button onclick="deleteUser(<?php echo e($user->id); ?>)" type="button"
+                                                            class="btn-icon danger" title="Delete user">
+                                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                                                    <p class="empty-title">No users found</p>
+                                                    <p class="empty-sub">Try adjusting your search or filter</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
 
                             <?php if($users->hasPages()): ?>
                                 <div class="tbl-footer">

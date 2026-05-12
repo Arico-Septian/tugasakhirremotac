@@ -19,65 +19,6 @@
 
         .toolbar-row .search-input { flex: 1; min-width: 240px; }
 
-        .date-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 14px;
-            background: var(--panel-1);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--r-md);
-            color: var(--ink-1);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--t-base);
-            font-family: inherit;
-        }
-
-        .date-btn:hover {
-            background: var(--panel-2);
-            border-color: var(--line);
-        }
-
-        .date-btn.active {
-            background: rgba(77, 212, 255, 0.08);
-            border-color: rgba(77, 212, 255, 0.35);
-            color: var(--cyan);
-        }
-
-        .date-menu {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            background: var(--panel-1);
-            border: 1px solid var(--line);
-            border-radius: var(--r-md);
-            box-shadow: var(--shadow);
-            min-width: 160px;
-            padding: 4px;
-            z-index: 50;
-            display: none;
-        }
-
-        .date-menu.open { display: block; }
-
-        .date-menu .item {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            border-radius: 6px;
-            color: var(--ink-1);
-            font-size: 12px;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .date-menu .item:hover { background: var(--panel-2); }
-        .date-menu .item.active { background: rgba(77, 212, 255, 0.1); color: var(--cyan); }
 
         .stat-card .stat-label-sm {
             font-size: 10px;
@@ -138,44 +79,13 @@
         .adv-filter {
             background: var(--panel-1);
             border: 1px solid var(--line-soft);
-            border-radius: var(--r-xl);
-            box-shadow: var(--inset-hi);
-            overflow: hidden;
+            border-top: none;
         }
-
-        .adv-filter > summary {
-            padding: 10px 14px;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--ink-1);
-            user-select: none;
-        }
-
-        .adv-filter > summary::-webkit-details-marker { display: none; }
-
-        .adv-filter > summary .chev {
-            margin-left: auto;
-            transition: transform 0.18s ease;
-            color: var(--ink-3);
-            font-size: 10px;
-        }
-
-        .adv-filter[open] > summary {
-            border-bottom: 1px solid var(--line-soft);
-            background: var(--panel-2);
-        }
-
-        .adv-filter[open] > summary .chev { transform: rotate(180deg); }
 
         .adv-filter-body {
             padding: 14px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
         }
 
@@ -345,7 +255,7 @@
                             );
 
                             $quickCats = [
-                                ''     => 'Semua',
+                                ''     => 'All',
                                 'auth' => 'Auth',
                                 'ac'   => 'AC',
                                 'room' => 'Ruangan',
@@ -354,10 +264,60 @@
                             $currentCat = in_array(request('activity'), ['auth', 'ac', 'room', 'user']) ? request('activity') : '';
                         @endphp
 
+                        {{-- Stats — 4 kartu sesuai mockup --}}
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                            <div class="stat-card acc-cyan">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Total Aktivitas</p>
+                                        <p class="stat-num-lg">{{ $stats['total'] }}</p>
+                                        <p class="stat-sub">Halaman {{ $logs->currentPage() }} / {{ $logs->lastPage() }}</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-mint">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Login Events</p>
+                                        <p class="stat-num-lg">{{ $stats['auth'] }}</p>
+                                        <p class="stat-sub">+{{ $stats['auth24'] }} dalam 24 jam</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-lavender">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Kontrol AC</p>
+                                        <p class="stat-num-lg">{{ $stats['ac'] }}</p>
+                                        <p class="stat-sub">on/off · mode · suhu</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Destructive</p>
+                                        <p class="stat-num-lg">{{ $stats['destructive'] }}</p>
+                                        <p class="stat-sub">delete user · room</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-trash"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Toolbar + Table wrapper (no space-y between them) --}}
+                        <div class="tbl-wrap">
                         {{-- Toolbar: search + quick category + date range --}}
                         <form method="GET" action="/logs" id="filterForm">
-                            <div class="toolbar-row">
-                                <label class="search-input">
+                            <div class="tbl-toolbar">
+                                <label class="search-input" style="flex:1;max-width:none;">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                     <input name="search" value="{{ request('search') }}" type="text"
                                         placeholder="Cari user / ruangan / aktivitas…" autocomplete="off">
@@ -368,42 +328,26 @@
                                     @endif
                                 </label>
 
-                                <div class="segmented">
-                                    @foreach ($quickCats as $val => $label)
-                                        <button type="button"
-                                            class="seg {{ $currentCat === $val ? 'active' : '' }}"
-                                            data-quick="{{ $val }}">{{ $label }}</button>
-                                    @endforeach
-                                </div>
-
-                                <div style="position:relative;">
-                                    <button type="button" id="dateBtn"
-                                        class="date-btn {{ $currentRange ? 'active' : '' }}">
-                                        <i class="fa-regular fa-calendar text-[11px]"></i>
-                                        <span>{{ $currentRange ? $rangeOptions[$currentRange] : 'Rentang' }}</span>
-                                        <i class="fa-solid fa-chevron-down text-[9px]"
-                                            style="opacity:0.6;"></i>
-                                    </button>
-                                    <div id="dateMenu" class="date-menu">
-                                        @foreach ($rangeOptions as $val => $label)
+                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                    <div class="segmented">
+                                        @foreach ($quickCats as $val => $label)
                                             <button type="button"
-                                                class="item {{ $currentRange === $val ? 'active' : '' }}"
-                                                data-range="{{ $val }}">{{ $label }}</button>
+                                                class="seg {{ $currentCat === $val ? 'active' : '' }}"
+                                                data-quick="{{ $val }}">{{ $label }}</button>
                                         @endforeach
-                                        <button type="button" class="item" id="customRangeBtn">Custom…</button>
                                     </div>
+
+                                    @if (Auth::user()->role == 'admin')
+                                        <button type="button" onclick="deleteAllLogs()"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa-solid fa-trash text-[10px]"></i> Delete Activity
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
 
                             {{-- Advanced (custom date / specific user / specific room) --}}
-                            <details class="adv-filter mt-3"
-                                @if (request('user_id') || request('room') || request('date_from') || request('date_to') || (request('activity') && !in_array(request('activity'), ['auth','ac','room','user']))) open @endif>
-                                <summary>
-                                    <i class="fa-solid fa-sliders text-[11px]"
-                                        style="color:var(--lavender);"></i>
-                                    Filter lanjutan
-                                    <i class="fa-solid fa-chevron-down chev"></i>
-                                </summary>
+                            <div class="adv-filter">
                                 <div class="adv-filter-body">
                                     <div class="field">
                                         <label class="field-label">User</label>
@@ -458,15 +402,9 @@
                                                 <i class="fa-solid fa-xmark text-[10px]"></i> Reset
                                             </a>
                                         @endif
-                                        @if (Auth::user()->role == 'admin')
-                                            <button type="button" onclick="deleteAllLogs()"
-                                                class="btn btn-danger btn-sm">
-                                                <i class="fa-solid fa-trash text-[10px]"></i> Hapus Semua
-                                            </button>
-                                        @endif
                                     </div>
                                 </div>
-                            </details>
+                            </div>
                         </form>
 
                         {{-- Active filter tags --}}
@@ -515,60 +453,11 @@
                             </div>
                         @endif
 
-                        {{-- Stats — 4 kartu sesuai mockup --}}
-                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                            <div class="stat-card acc-cyan">
-                                <span class="accent-bar"></span>
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p class="stat-label-sm">Total Aktivitas</p>
-                                        <p class="stat-num-lg">{{ $stats['total'] }}</p>
-                                        <p class="stat-sub">Halaman {{ $logs->currentPage() }} / {{ $logs->lastPage() }}</p>
-                                    </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                                </div>
-                            </div>
-                            <div class="stat-card acc-mint">
-                                <span class="accent-bar"></span>
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p class="stat-label-sm">Login Events</p>
-                                        <p class="stat-num-lg">{{ $stats['auth'] }}</p>
-                                        <p class="stat-sub">+{{ $stats['auth24'] }} dalam 24 jam</p>
-                                    </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
-                                </div>
-                            </div>
-                            <div class="stat-card acc-lavender">
-                                <span class="accent-bar"></span>
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p class="stat-label-sm">Kontrol AC</p>
-                                        <p class="stat-num-lg">{{ $stats['ac'] }}</p>
-                                        <p class="stat-sub">on/off · mode · suhu</p>
-                                    </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
-                                </div>
-                            </div>
-                            <div class="stat-card acc-coral">
-                                <span class="accent-bar"></span>
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p class="stat-label-sm">Destructive</p>
-                                        <p class="stat-num-lg">{{ $stats['destructive'] }}</p>
-                                        <p class="stat-sub">delete user · room</p>
-                                    </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-trash"></i></div>
-                                </div>
-                            </div>
-                        </div>
-
                         @php
                             $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
                         @endphp
 
                         {{-- Log table --}}
-                        <div class="tbl-wrap">
                             {{-- Mobile cards --}}
                             <div class="md:hidden">
                                 @forelse ($logs as $log)
@@ -721,6 +610,7 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
 
                     </div>
                 </div>
@@ -746,47 +636,6 @@
                 window.location.href = url.toString();
             });
         });
-
-        // Date range dropdown
-        const dateBtn = document.getElementById('dateBtn');
-        const dateMenu = document.getElementById('dateMenu');
-        if (dateBtn && dateMenu) {
-            dateBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dateMenu.classList.toggle('open');
-            });
-            document.addEventListener('click', (e) => {
-                if (!dateMenu.contains(e.target) && e.target !== dateBtn) {
-                    dateMenu.classList.remove('open');
-                }
-            });
-            dateMenu.querySelectorAll('[data-range]').forEach(item => {
-                item.addEventListener('click', () => {
-                    const val = item.getAttribute('data-range');
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete('page');
-                    url.searchParams.delete('date_from');
-                    url.searchParams.delete('date_to');
-                    if (val) {
-                        url.searchParams.set('range', val);
-                    } else {
-                        url.searchParams.delete('range');
-                    }
-                    window.location.href = url.toString();
-                });
-            });
-            const customBtn = document.getElementById('customRangeBtn');
-            if (customBtn) {
-                customBtn.addEventListener('click', () => {
-                    dateMenu.classList.remove('open');
-                    const adv = document.querySelector('.adv-filter');
-                    if (adv) {
-                        adv.setAttribute('open', '');
-                        adv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                });
-            }
-        }
 
         function removeFilter(key) {
             const url = new URL(window.location.href);

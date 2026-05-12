@@ -36,53 +36,125 @@
         .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
         .stat-card.acc-coral .stat-num-lg    { color: var(--coral); }
 
-        .user-row {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 16px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--panel-1);
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        tbody tr {
             border-bottom: 1px solid var(--line-soft);
             transition: background var(--t-fast);
         }
 
-        .user-row:hover {
+        tbody tr:hover {
             background: var(--panel-1);
         }
 
-        .user-row:last-child {
+        tbody tr:last-child {
             border-bottom: none;
         }
 
-        @media (max-width: 720px) {
-            .user-row {
-                grid-template-columns: 1fr;
-            }
-
-            .user-actions-wrap {
-                justify-content: flex-start;
-            }
+        td {
+            padding: 14px 16px;
+            vertical-align: middle;
         }
 
-        .user-avatar-wrap {
-            position: relative;
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .user-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink-0);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .user-handle {
+            font-size: 12px;
+            color: var(--ink-3);
+            margin: 3px 0 0;
+        }
+
+        .user-avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--bg-1);
             flex-shrink: 0;
         }
 
-        .avatar-status {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--ink-2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            border: 2px solid var(--bg-1);
+            flex-shrink: 0;
             background: var(--ink-3);
         }
 
-        .avatar-status.online {
+        .status-dot.online {
             background: var(--mint);
-            box-shadow: 0 0 0 4px rgba(110, 231, 183, .18);
+        }
+
+        .status-dot.active {
+            background: var(--mint);
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 720px) {
+            th, td {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .user-avatar-sm {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -169,120 +241,128 @@
                         {{-- User table card --}}
                         <div class="tbl-wrap">
                             <div class="tbl-toolbar">
-                                <form method="GET" action="/users" class="flex-1 min-w-[200px] max-w-md">
+                                <form method="GET" action="/users" style="flex:1;max-width:none;">
                                     <label class="search-input">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                         <input name="search" value="{{ request('search') }}"
                                             placeholder="Search by username…" autocomplete="off">
                                     </label>
                                 </form>
-                                <div class="segmented">
-                                    <a class="seg {{ !request('role') ? 'active' : '' }}" href="/users">All</a>
-                                    <a class="seg {{ request('role') == 'admin' ? 'active' : '' }}"
-                                        href="/users?role=admin">Admin</a>
-                                    <a class="seg {{ request('role') == 'operator' ? 'active' : '' }}"
-                                        href="/users?role=operator">Operator</a>
-                                    <a class="seg {{ request('role') == 'user' ? 'active' : '' }}"
-                                        href="/users?role=user">User</a>
+                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                    <div class="segmented">
+                                        <a class="seg {{ !request('role') ? 'active' : '' }}" href="/users">All</a>
+                                        <a class="seg {{ request('role') == 'admin' ? 'active' : '' }}"
+                                            href="/users?role=admin">Admin</a>
+                                        <a class="seg {{ request('role') == 'operator' ? 'active' : '' }}"
+                                            href="/users?role=operator">Operator</a>
+                                        <a class="seg {{ request('role') == 'user' ? 'active' : '' }}"
+                                            href="/users?role=user">User</a>
+                                    </div>
+                                    <button onclick="openModal()" type="button" class="btn btn-primary btn-sm">
+                                        <i class="fa-solid fa-user-plus text-[10px]"></i> Add User
+                                    </button>
                                 </div>
-                                <button onclick="openModal()" type="button" class="btn btn-primary btn-sm">
-                                    <i class="fa-solid fa-user-plus text-[10px]"></i> Add User
-                                </button>
                             </div>
 
-                            <div class="flex items-center justify-between px-4 py-2.5"
-                                style="background:var(--panel-1);border-bottom:1px solid var(--line-soft);">
-                                <p class="text-xs" style="color:var(--ink-3);">
-                                    Menampilkan <span class="text-mono"
-                                        style="color:var(--ink-0);">{{ $users->count() }}</span>
-                                    dari <span class="text-mono" style="color:var(--ink-0);">{{ $totalUsers }}</span>
-                                    user
-                                </p>
-                                <span class="pill pill-online" style="padding:3px 10px;font-size:10.5px;">
-                                    <span class="dot"></span><span>Live</span>
-                                </span>
-                            </div>
-
-                            <div id="user-list">
-                                @forelse ($users as $user)
-                                    @php
-                                        $isOnline = $user->isOnline ?? false;
-                                        $statusText = $isOnline
-                                            ? 'Online'
-                                            : ($user->last_activity
-                                                ? \Carbon\Carbon::parse($user->last_activity)->diffForHumans()
-                                                : 'Offline');
-                                        $isActive = $user->is_active ?? true;
+                            <table id="user-list">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30%">USER</th>
+                                        <th style="width:15%">ROLE</th>
+                                        <th style="width:15%">STATUS</th>
+                                        <th style="width:15%">ACTIVE</th>
+                                        <th style="width:25%;text-align:right;padding-right:24px;">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($users as $user)
+                                        @php
+                                            $isOnline = $user->isOnline ?? false;
+                                            $isActive = $user->is_active ?? true;
+                                            $initials = strtoupper(substr($user->name, 0, 1));
+                                            $handle = '@' . strtolower(str_replace(' ', '', $user->name));
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="user-cell">
+                                                    @php
+                                        $colors = ['cyan', 'mint', 'lavender', 'coral'];
+                                        $colorIndex = ($user->id - 1) % 4;
+                                        $colorName = $colors[$colorIndex];
                                     @endphp
-                                    <div class="user-row">
-                                        <div class="flex items-center gap-3 min-w-0">
-                                            <div class="user-avatar-wrap">
-                                                <div class="avatar avatar-lg">
-                                                    {{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                                                <span class="avatar-status {{ $isOnline ? 'online' : '' }}"></span>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="text-sm font-semibold"
-                                                    style="color:var(--ink-0);line-height:1.2;">{{ $user->name }}</p>
-                                                <p class="text-xs mt-1 flex items-center gap-1.5"
-                                                    style="color:var(--ink-3);">
-                                                    <i class="fa-regular fa-circle text-[8px] {{ $isOnline ? 'text-mint' : '' }}"
-                                                        style="{{ $isOnline ? 'color:var(--mint);' : '' }}"></i>
-                                                    {{ $statusText }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="user-actions-wrap flex items-center gap-2 flex-wrap justify-end">
-                                            <span class="badge-role {{ $user->role }}">
-                                                @if ($user->role == 'admin')
-                                                    <i class="fa-solid fa-crown text-[9px]"></i>Admin
-                                                @elseif ($user->role == 'operator')
-                                                    <i class="fa-solid fa-gear text-[9px]"></i>Operator
-                                                @else
-                                                    <i class="fa-regular fa-user text-[9px]"></i>User
-                                                @endif
-                                            </span>
-
-                                            <span class="pill {{ $isActive ? 'pill-online' : 'pill-error' }}"
-                                                style="padding:3px 9px;font-size:10px;">
-                                                <span
-                                                    class="dot"></span><span>{{ $isActive ? 'Active' : 'Inactive' }}</span>
-                                            </span>
-
-                                            @if ($user->id !== Auth::user()->id)
-                                                <form action="/users/status/{{ $user->id }}" method="POST"
-                                                    class="inline-flex"
-                                                    onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="btn-icon {{ $isActive ? 'warning' : '' }}"
-                                                        style="{{ $isActive ? '' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);' }}"
-                                                        title="{{ $isActive ? 'Deactivate user' : 'Activate user' }}">
-                                                        <i
-                                                            class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-[11px]"></i>
-                                                    </button>
-                                                </form>
-                                                <button
-                                                    onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
-                                                    type="button" class="btn-icon lavender" title="Edit role">
-                                                    <i class="fa-solid fa-pen text-[11px]"></i>
-                                                </button>
-                                                <button onclick="deleteUser({{ $user->id }})" type="button"
-                                                    class="btn-icon danger" title="Delete user">
-                                                    <i class="fa-solid fa-trash text-[11px]"></i>
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="empty-state">
-                                        <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
-                                        <p class="empty-title">No users found</p>
-                                        <p class="empty-sub">Try adjusting your search or filter</p>
-                                    </div>
-                                @endforelse
-                            </div>
+                                    <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
+                                                        {{ $initials }}
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <p class="user-name">{{ $user->name }}</p>
+                                                        <p class="user-handle">{{ $handle }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge-role {{ $user->role }}">
+                                                    @if ($user->role == 'admin')
+                                                        ADMINISTRATOR
+                                                    @elseif ($user->role == 'operator')
+                                                        OPERATOR
+                                                    @else
+                                                        USER
+                                                    @endif
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="status-cell">
+                                                    <span class="status-dot {{ $isOnline ? 'online' : '' }}"></span>
+                                                    {{ $isOnline ? 'Online' : 'Offline' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="status-cell">
+                                                    <span class="status-dot {{ $isActive ? 'active' : '' }}"></span>
+                                                    {{ $isActive ? 'Active' : 'Inactive' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="actions-cell">
+                                                    @if ($user->id !== Auth::user()->id)
+                                                        <form action="/users/status/{{ $user->id }}" method="POST"
+                                                            class="inline"
+                                                            onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="btn-icon"
+                                                                style="{{ $isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);' }}"
+                                                                title="{{ $isActive ? 'Deactivate user' : 'Activate user' }}">
+                                                                <i
+                                                                    class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-[10px]"></i>
+                                                            </button>
+                                                        </form>
+                                                        <button
+                                                            onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
+                                                            type="button" class="btn-icon lavender" title="Edit role">
+                                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                                        </button>
+                                                        <button onclick="deleteUser({{ $user->id }})" type="button"
+                                                            class="btn-icon danger" title="Delete user">
+                                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                                                    <p class="empty-title">No users found</p>
+                                                    <p class="empty-sub">Try adjusting your search or filter</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
 
                             @if ($users->hasPages())
                                 <div class="tbl-footer">

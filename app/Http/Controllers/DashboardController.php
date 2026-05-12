@@ -12,6 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
         $rooms = Room::with(['acUnits.status'])
+            ->orderBy('floor')
             ->orderBy('name')
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
