@@ -100,6 +100,52 @@
             margin: 3px 0 0;
         }
 
+        .user-email {
+            font-size: 12px;
+            color: var(--ink-4);
+            margin: 2px 0 0;
+        }
+
+        /* Deactivated user styling */
+        tbody tr.inactive {
+            opacity: 0.55;
+        }
+
+        tbody tr.inactive:hover {
+            opacity: 0.7;
+        }
+
+        /* Role color badges */
+        .badge-role {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-role.admin {
+            background: var(--coral-soft);
+            color: var(--coral);
+            border: 1px solid var(--coral-soft-2);
+        }
+
+        .badge-role.operator {
+            background: var(--amber-soft);
+            color: var(--amber);
+            border: 1px solid var(--amber-soft-2);
+        }
+
+        .badge-role.user {
+            background: var(--cyan-soft);
+            color: var(--cyan);
+            border: 1px solid var(--cyan-soft-2);
+        }
+
         .user-avatar-sm {
             width: 36px;
             height: 36px;
@@ -154,6 +200,249 @@
                 width: 32px;
                 height: 32px;
                 font-size: 12px;
+            }
+        }
+
+        /* Toolbar responsiveness for very small screens */
+        @media (max-width: 480px) {
+            .tbl-toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tbl-toolbar > form {
+                flex: 1;
+                width: 100%;
+            }
+
+            .tbl-toolbar > div {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+
+            .segmented {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 4px;
+            }
+
+            .segmented .seg {
+                font-size: 11px;
+                padding: 7px 8px;
+            }
+
+            .tbl-toolbar .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Filter chips */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 0;
+            align-items: center;
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        .filter-chips span {
+            font-size: 12px;
+            color: var(--ink-3);
+            font-weight: 500;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(77, 212, 255, 0.1);
+            border: 1px solid rgba(77, 212, 255, 0.25);
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--cyan);
+        }
+
+        .filter-chip button {
+            background: none;
+            border: none;
+            color: var(--cyan);
+            cursor: pointer;
+            padding: 0;
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .filter-chip button:hover {
+            opacity: 1;
+        }
+
+        /* Enhanced pagination */
+        .pager {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pager a, .pager span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink-2);
+            background: transparent;
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: all 0.12s ease;
+        }
+
+        .pager a {
+            cursor: pointer;
+        }
+
+        .pager a:hover {
+            background: var(--panel-2);
+            color: var(--ink-0);
+            border-color: var(--line);
+        }
+
+        .pager .active {
+            background: var(--cyan-soft);
+            color: var(--cyan);
+            border-color: var(--cyan-soft-2);
+            font-weight: 600;
+        }
+
+        .pager .disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .pager i {
+            opacity: 0.7;
+        }
+
+        .pager a:hover i {
+            opacity: 1;
+        }
+
+        /* Sortable table headers */
+        .user-table th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: background 0.12s ease;
+        }
+
+        .user-table th:hover {
+            background: var(--panel-2);
+        }
+
+        .user-table th.sortable::after {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-left: 6px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%23999"><path d="M3 2L6 0l3 2M3 10L6 12l3-2"/></svg>') center no-repeat;
+            background-size: contain;
+            opacity: 0.4;
+            vertical-align: -1px;
+        }
+
+        .user-table th.sort-asc::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%234dd4ff"><path d="M6 1L3 4h6z"/></svg>');
+            opacity: 1;
+        }
+
+        .user-table th.sort-desc::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%234dd4ff"><path d="M6 11L3 8h6z"/></svg>');
+            opacity: 1;
+        }
+
+        /* Mobile cards view */
+        .user-cards {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .user-cards {
+                display: block;
+            }
+
+            .user-card {
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--line-soft);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .user-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .user-card-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .user-card-name {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                min-width: 0;
+            }
+
+            .user-card-name-text {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--ink-0);
+            }
+
+            .user-card-handle {
+                font-size: 11px;
+                color: var(--ink-3);
+            }
+
+            .user-card-status {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                font-size: 12px;
+                color: var(--ink-2);
+            }
+
+            .user-card-role {
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .user-card-actions {
+                display: flex;
+                gap: 6px;
+                justify-content: flex-end;
+            }
+
+            .user-table {
+                display: none;
             }
         }
     </style>
@@ -264,13 +553,120 @@
                                 </div>
                             </div>
 
-                            <table id="user-list">
+                            {{-- Filter chips --}}
+                            @if (request('role') || request('search'))
+                                <div class="filter-chips">
+                                    <span>Filters:</span>
+                                    @if (request('search'))
+                                        <div class="filter-chip">
+                                            <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                                            "{{ request('search') }}"
+                                            <button onclick="window.location.href='/users'" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+                                        </div>
+                                    @endif
+                                    @if (request('role'))
+                                        @php
+                                            $roleLabel = match(request('role')) {
+                                                'admin' => 'Administrator',
+                                                'operator' => 'Operator',
+                                                'user' => 'User',
+                                                default => request('role')
+                                            };
+                                        @endphp
+                                        <div class="filter-chip">
+                                            <i class="fa-solid fa-filter text-[9px]"></i>
+                                            {{ $roleLabel }}
+                                            <button onclick="window.location.href='/users'" title="Clear role filter"><i class="fa-solid fa-xmark"></i></button>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+
+                            {{-- Mobile cards view --}}
+                            <div class="user-cards">
+                                @forelse ($users as $user)
+                                    @php
+                                        $isOnline = $user->isOnline ?? false;
+                                        $isActive = $user->is_active ?? true;
+                                        $initials = strtoupper(substr($user->name, 0, 1));
+                                        $handle = '@' . strtolower(str_replace(' ', '', $user->name));
+                                        $colors = ['cyan', 'mint', 'lavender', 'coral'];
+                                        $colorIndex = ($user->id - 1) % 4;
+                                        $colorName = $colors[$colorIndex];
+                                        $roleLabel = match($user->role) {
+                                            'admin' => 'ADMINISTRATOR',
+                                            'operator' => 'OPERATOR',
+                                            default => 'USER'
+                                        };
+                                    @endphp
+                                    <div class="user-card">
+                                        <div class="user-card-header">
+                                            <div class="user-card-info">
+                                                <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
+                                                    {{ $initials }}
+                                                </div>
+                                                <div class="user-card-name">
+                                                    <span class="user-card-name-text">{{ $user->name }}</span>
+                                                    <span class="user-card-handle">{{ $handle }}</span>
+                                                    @if ($user->email)
+                                                        <span style="font-size:11px;color:var(--ink-4);margin-top:2px;display:block;">{{ $user->email }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <span class="badge-role {{ $user->role }}" style="font-size:10px;padding:4px 8px;">{{ substr($roleLabel, 0, 3) }}</span>
+                                        </div>
+                                        <div style="display:flex;gap:10px;font-size:12px;color:var(--ink-3);">
+                                            <div class="user-card-status">
+                                                <span class="status-dot {{ $isOnline ? 'online' : '' }}"></span>
+                                                {{ $isOnline ? 'Online' : 'Offline' }}
+                                            </div>
+                                            <div class="user-card-status">
+                                                <span class="status-dot {{ $isActive ? 'active' : '' }}"></span>
+                                                {{ $isActive ? 'Active' : 'Inactive' }}
+                                            </div>
+                                        </div>
+                                        @if ($user->id !== Auth::user()->id)
+                                            <div class="user-card-actions">
+                                                <form action="/users/status/{{ $user->id }}" method="POST"
+                                                    class="inline"
+                                                    onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="btn-icon"
+                                                        style="{{ $isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);' }}"
+                                                        title="{{ $isActive ? 'Deactivate user' : 'Activate user' }}">
+                                                        <i class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-[10px]"></i>
+                                                    </button>
+                                                </form>
+                                                <button
+                                                    onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
+                                                    type="button" class="btn-icon lavender" title="Edit role">
+                                                    <i class="fa-solid fa-pen text-[10px]"></i>
+                                                </button>
+                                                <button onclick="deleteUser({{ $user->id }})" type="button"
+                                                    class="btn-icon danger" title="Delete user">
+                                                    <i class="fa-solid fa-trash text-[10px]"></i>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="empty-state" style="margin: 20px;">
+                                        <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                                        <p class="empty-title">No users found</p>
+                                        <p class="empty-sub">{{ (request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started' }}</p>
+                                    </div>
+                                @endforelse
+                            </div>
+
+                            {{-- Desktop table view --}}
+                            <table id="user-list" class="user-table">
                                 <thead>
                                     <tr>
-                                        <th style="width:30%">USER</th>
-                                        <th style="width:15%">ROLE</th>
-                                        <th style="width:15%">STATUS</th>
-                                        <th style="width:15%">ACTIVE</th>
+                                        <th style="width:30%;" class="sortable" data-sort="name" onclick="handleSort('name')">USER</th>
+                                        <th style="width:15%;" class="sortable" data-sort="role" onclick="handleSort('role')">ROLE</th>
+                                        <th style="width:15%;" class="sortable" data-sort="last_activity" onclick="handleSort('last_activity')">STATUS</th>
+                                        <th style="width:15%;" class="sortable" data-sort="is_active" onclick="handleSort('is_active')">ACTIVE</th>
                                         <th style="width:25%;text-align:right;padding-right:24px;">ACTIONS</th>
                                     </tr>
                                 </thead>
@@ -282,7 +678,7 @@
                                             $initials = strtoupper(substr($user->name, 0, 1));
                                             $handle = '@' . strtolower(str_replace(' ', '', $user->name));
                                         @endphp
-                                        <tr>
+                                        <tr class="{{ !$isActive ? 'inactive' : '' }}">
                                             <td>
                                                 <div class="user-cell">
                                                     @php
@@ -296,6 +692,9 @@
                                                     <div class="user-info">
                                                         <p class="user-name">{{ $user->name }}</p>
                                                         <p class="user-handle">{{ $handle }}</p>
+                                                        @if ($user->email)
+                                                            <p class="user-email">{{ $user->email }}</p>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </td>
@@ -356,7 +755,7 @@
                                                 <div class="empty-state">
                                                     <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
                                                     <p class="empty-title">No users found</p>
-                                                    <p class="empty-sub">Try adjusting your search or filter</p>
+                                                    <p class="empty-sub">{{ (request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started' }}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -596,6 +995,40 @@
         }
         window.addEventListener('online', () => setSystemStatus(true));
         window.addEventListener('offline', () => setSystemStatus(false));
+
+        // Column sorting
+        function handleSort(column) {
+            const url = new URL(window.location.href);
+            const currentSort = url.searchParams.get('sort');
+            const currentOrder = url.searchParams.get('order') || 'asc';
+
+            if (currentSort === column) {
+                url.searchParams.set('order', currentOrder === 'asc' ? 'desc' : 'asc');
+            } else {
+                url.searchParams.set('sort', column);
+                url.searchParams.set('order', 'asc');
+            }
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }
+
+        function initializeSortIndicators() {
+            const params = new URLSearchParams(window.location.search);
+            const sortColumn = params.get('sort');
+            const sortOrder = params.get('order') || 'asc';
+
+            if (sortColumn) {
+                const th = document.querySelector(`th[data-sort="${sortColumn}"]`);
+                if (th) {
+                    th.classList.remove('sortable');
+                    th.classList.add(sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSortIndicators();
+        });
     </script>
     @include('components.sidebar-scripts')
 </body>

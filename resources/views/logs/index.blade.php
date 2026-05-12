@@ -101,6 +101,49 @@
             }
         }
 
+        /* Toolbar responsiveness for very small screens */
+        @media (max-width: 480px) {
+            .tbl-toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tbl-toolbar label.search-input {
+                flex: 1;
+                width: 100%;
+            }
+
+            .tbl-toolbar > div {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+
+            .segmented {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 4px;
+            }
+
+            .segmented .seg {
+                font-size: 11px;
+                padding: 7px 8px;
+            }
+
+            .btn.btn-danger {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Advanced filter landscape mode */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .adv-filter-body {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
         .adv-filter-body .field { margin: 0; }
 
         .tbl tbody tr { transition: background 0.12s ease; }
@@ -162,6 +205,95 @@
 
         .log-time .t { color: var(--ink-1); font-size: 12.5px; font-weight: 500; }
         .log-time .d { color: var(--ink-4); font-size: 10.5px; }
+
+        /* Sortable table headers */
+        .tbl-log th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: background 0.12s ease;
+        }
+
+        .tbl-log th:hover {
+            background: var(--panel-2);
+        }
+
+        .tbl-log th.sortable::after {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-left: 6px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%23999"><path d="M3 2L6 0l3 2M3 10L6 12l3-2"/></svg>') center no-repeat;
+            background-size: contain;
+            opacity: 0.4;
+            vertical-align: -1px;
+        }
+
+        .tbl-log th.sort-asc::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%234dd4ff"><path d="M6 1L3 4h6z"/></svg>');
+            opacity: 1;
+        }
+
+        .tbl-log th.sort-desc::after {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="%234dd4ff"><path d="M6 11L3 8h6z"/></svg>');
+            opacity: 1;
+        }
+
+        /* Enhanced pagination */
+        .pager {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pager a, .pager span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink-2);
+            background: transparent;
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: all 0.12s ease;
+        }
+
+        .pager a {
+            cursor: pointer;
+        }
+
+        .pager a:hover {
+            background: var(--panel-2);
+            color: var(--ink-0);
+            border-color: var(--line);
+        }
+
+        .pager .active {
+            background: var(--cyan-soft);
+            color: var(--cyan);
+            border-color: var(--cyan-soft-2);
+            font-weight: 600;
+        }
+
+        .pager .disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .pager i {
+            opacity: 0.7;
+        }
+
+        .pager a:hover i {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -407,12 +539,14 @@
                                         <input class="input" type="date" name="date_to"
                                             value="{{ request('date_to') }}" onchange="this.form.submit()" style="cursor:pointer;">
                                     </div>
-                                    <div class="field" style="align-self:end;display:flex;gap:8px;">
-                                        <a href="/logs" class="btn btn-sm"
-                                            style="background:var(--panel-2);border-color:var(--line);{{ count($activeFilters) ? '' : 'opacity:0.5;pointer-events:none;' }}">
-                                            <i class="fa-solid fa-xmark text-[10px]"></i> Reset
-                                        </a>
-                                    </div>
+                                    @if (count($activeFilters))
+                                        <div class="field" style="align-self:end;display:flex;gap:8px;">
+                                            <a href="/logs" class="btn btn-sm"
+                                                style="background:var(--panel-2);border-color:var(--line);">
+                                                <i class="fa-solid fa-xmark text-[10px]"></i> Reset
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </form>
@@ -504,11 +638,11 @@
                                 <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th style="width:22%;">USER</th>
-                                            <th style="width:18%;">ROOM</th>
+                                            <th style="width:22%;" class="sortable" data-sort="user_name" onclick="handleSort('user_name')">USER</th>
+                                            <th style="width:18%;" class="sortable" data-sort="room" onclick="handleSort('room')">ROOM</th>
                                             <th>DETAIL</th>
-                                            <th style="width:16%;">ACTIVITY</th>
-                                            <th style="width:14%;" class="whitespace-nowrap">TIME</th>
+                                            <th style="width:16%;" class="sortable" data-sort="activity" onclick="handleSort('activity')">ACTIVITY</th>
+                                            <th style="width:14%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -680,7 +814,38 @@
         window.addEventListener('offline', () => setSystemStatus(false));
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
+            initializeSortIndicators();
         });
+
+        // Column sorting
+        function handleSort(column) {
+            const url = new URL(window.location.href);
+            const currentSort = url.searchParams.get('sort');
+            const currentOrder = url.searchParams.get('order') || 'asc';
+
+            if (currentSort === column) {
+                url.searchParams.set('order', currentOrder === 'asc' ? 'desc' : 'asc');
+            } else {
+                url.searchParams.set('sort', column);
+                url.searchParams.set('order', 'asc');
+            }
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }
+
+        function initializeSortIndicators() {
+            const params = new URLSearchParams(window.location.search);
+            const sortColumn = params.get('sort');
+            const sortOrder = params.get('order') || 'asc';
+
+            if (sortColumn) {
+                const th = document.querySelector(`th[data-sort="${sortColumn}"]`);
+                if (th) {
+                    th.classList.remove('sortable');
+                    th.classList.add(sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            }
+        }
     </script>
 </body>
 

@@ -271,6 +271,9 @@ class RoomController extends Controller
             ->get();
         $latestTemperatures = RoomTemperature::latestByNormalizedRoom();
 
+        $onlineRooms = 0;
+        $offlineRooms = 0;
+
         foreach ($rooms as $room) {
             $lastTempRecord = $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name));
             $room->temperature = optional($lastTempRecord)->temperature;
@@ -293,6 +296,8 @@ class RoomController extends Controller
                 && now()->diffInSeconds($lastSeen, true) <= 60;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
+
+            $isOnline ? $onlineRooms++ : $offlineRooms++;
         }
 
         $roomsByFloor = $rooms->groupBy(fn($r) => $r->floor ?: 'Lainnya');

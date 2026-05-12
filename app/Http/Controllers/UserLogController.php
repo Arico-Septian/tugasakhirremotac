@@ -81,6 +81,25 @@ class UserLogController extends Controller
             });
         }
 
+        // Sorting
+        $sort = $request->input('sort', 'created_at');
+        $order = $request->input('order', 'desc');
+
+        if (!in_array($sort, ['user_name', 'room', 'activity', 'created_at'])) {
+            $sort = 'created_at';
+        }
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
+        if ($sort === 'user_name') {
+            $query->leftJoin('users', 'user_logs.user_id', '=', 'users.id')
+                  ->orderBy('users.name', $order)
+                  ->select('user_logs.*');
+        } else {
+            $query->orderBy($sort, $order);
+        }
+
         $logs  = $query->paginate(25)->withQueryString();
         $users = User::orderBy('name')->get(['id', 'name']);
         $rooms = UserLog::whereNotNull('room')->distinct()->orderBy('room')->pluck('room');

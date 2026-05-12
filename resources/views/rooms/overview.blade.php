@@ -124,6 +124,106 @@
             border-radius: 3px;
             letter-spacing: 0.05em;
         }
+
+        /* Toolbar responsiveness for small screens */
+        @media (max-width: 480px) {
+            .flex.flex-row.items-center {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .flex.flex-row.items-center > label {
+                width: 100%;
+                flex: 1;
+                max-width: none;
+            }
+
+            .flex.flex-row.items-center > .segmented {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+
+            .segmented .seg {
+                font-size: 11px;
+                padding: 8px 6px;
+                min-height: 36px;
+            }
+        }
+
+        /* Grid optimization for mobile */
+        @media (max-width: 480px) {
+            .floor-grid {
+                grid-template-columns: 1fr !important;
+                gap: 2px !important;
+                margin-bottom: 3px !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .floor-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .room-card {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .room-card h3 {
+                font-size: 13px;
+            }
+
+            .ac-mini > div {
+                padding: 6px 5px;
+            }
+
+            .ac-mini .num {
+                font-size: 14px;
+            }
+
+            .ac-mini .lbl {
+                font-size: 8.5px;
+            }
+        }
+
+        /* Touch targets optimization */
+        @media (max-width: 640px) {
+            .btn.btn-primary.btn-sm {
+                min-height: 40px;
+                padding: 8px 12px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .room-card {
+                padding: 10px;
+                gap: 6px;
+            }
+
+            .room-card h3 {
+                font-size: 12px;
+            }
+
+            .ac-mini > div {
+                padding: 4px 4px;
+            }
+
+            .ac-mini .num {
+                font-size: 12px;
+            }
+
+            .floor-section-header {
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 

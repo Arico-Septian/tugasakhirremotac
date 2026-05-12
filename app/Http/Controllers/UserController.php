@@ -13,16 +13,28 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::select('id', 'name', 'role', 'is_active', 'last_activity')
+        $query = User::select('id', 'name', 'role', 'is_active', 'last_activity')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
             ->when($request->filled('role'), function ($query) use ($request) {
                 $query->where('role', $request->role);
-            })
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+            });
+
+        // Sorting
+        $sort = $request->input('sort', 'created_at');
+        $order = $request->input('order', 'desc');
+
+        if (!in_array($sort, ['name', 'role', 'last_activity', 'is_active', 'created_at'])) {
+            $sort = 'created_at';
+        }
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
+        $query->orderBy($sort, $order);
+
+        $users = $query->paginate(15)->withQueryString();
 
         $totalUsers = User::count();
 

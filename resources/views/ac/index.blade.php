@@ -139,6 +139,64 @@
                     transparent 200deg);
             position: relative;
             box-shadow: 0 20px 60px rgba(77, 212, 255, 0.10);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* #10 Temperature color indicator */
+        .temp-ring.temp-cool {
+            background: conic-gradient(from 215deg,
+                    transparent 0deg,
+                    rgba(77, 212, 255, 0.85) 60deg,
+                    rgba(180, 163, 255, 0.85) 130deg,
+                    rgba(180, 163, 255, 0.25) 175deg,
+                    transparent 200deg);
+            box-shadow: 0 20px 60px rgba(77, 212, 255, 0.10);
+        }
+
+        .temp-ring.temp-warm {
+            background: conic-gradient(from 215deg,
+                    transparent 0deg,
+                    rgba(250, 204, 21, 0.85) 60deg,
+                    rgba(251, 146, 60, 0.85) 130deg,
+                    rgba(251, 146, 60, 0.25) 175deg,
+                    transparent 200deg);
+            box-shadow: 0 20px 60px rgba(250, 204, 21, 0.10);
+        }
+
+        .temp-ring.temp-hot {
+            background: conic-gradient(from 215deg,
+                    transparent 0deg,
+                    rgba(248, 113, 113, 0.85) 60deg,
+                    rgba(244, 63, 94, 0.85) 130deg,
+                    rgba(244, 63, 94, 0.25) 175deg,
+                    transparent 200deg);
+            box-shadow: 0 20px 60px rgba(248, 113, 113, 0.10);
+        }
+
+        /* #1 Responsive temperature ring */
+        @media (max-width: 640px) {
+            .temp-ring {
+                width: 160px;
+                height: 160px;
+                box-shadow: 0 12px 40px rgba(77, 212, 255, 0.08);
+            }
+
+            .ring-temp {
+                font-size: 48px;
+            }
+
+            .ring-temp .unit {
+                font-size: 14px;
+                margin-top: 4px;
+            }
+
+            .ring-label {
+                font-size: 9px;
+            }
+
+            .ring-summary {
+                font-size: 10px;
+            }
         }
 
         .temp-ring-inner {
@@ -596,6 +654,113 @@
                     rgba(77, 212, 255, .24),
                     rgba(77, 212, 255, .10));
         }
+
+        /* #2 Toolbar responsiveness for small screens */
+        @media (max-width: 480px) {
+            .selector-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .selector-bar > div {
+                width: 100%;
+            }
+
+            .selector-bar > div:first-child {
+                order: 1;
+            }
+
+            .selector-bar > div:last-child {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .selector-bar > div:last-child > div {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 4px;
+            }
+
+            .btn.btn-sm {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .btn-icon {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* #3 Mobile layout optimization */
+        @media (max-width: 640px) {
+            .grid[class*="md:grid-cols"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            .panel {
+                padding: 16px 12px;
+            }
+        }
+
+        /* #4 Touch targets minimum 44x44px */
+        @media (max-width: 640px) {
+            .ctrl-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 16px;
+            }
+
+            .power-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 22px;
+            }
+
+            .mode-btn-h,
+            .mode-btn-v {
+                min-height: 44px;
+                padding: 12px 8px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .selector {
+                padding: 9px 12px;
+                min-height: 40px;
+            }
+        }
+
+        /* Landscape mode optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .temp-ring {
+                width: 140px;
+                height: 140px;
+            }
+
+            .ring-temp {
+                font-size: 40px;
+            }
+
+            .ctrl-row {
+                gap: 18px;
+            }
+
+            .ring-chips {
+                gap: 6px;
+            }
+
+            .ring-chip {
+                font-size: 9.5px;
+                padding: 4px 10px;
+            }
+        }
     </style>
 </head>
 
@@ -726,7 +891,10 @@
                                     @endphp
                                     <div class="panel"
                                         style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px 20px;">
-                                        <div class="temp-ring">
+                                        @php
+                                            $tempCategory = $curTemp <= 20 ? 'cool' : ($curTemp <= 25 ? 'warm' : 'hot');
+                                        @endphp
+                                        <div class="temp-ring temp-{{ $tempCategory }}" id="tempRing-{{ $ac->id }}">
                                             <div class="temp-ring-inner">
                                                 <p class="ring-label">Suhu Ac</p>
                                                 <div class="ring-temp">
@@ -1310,6 +1478,105 @@
             }
         });
         if (window.history.replaceState) window.history.replaceState(null, null, window.location.href);
+
+        /* #10 Temperature ring color indicator */
+        function updateTempRingColor(acId, temp) {
+            const ring = document.getElementById(`tempRing-${acId}`);
+            if (!ring) return;
+
+            ring.classList.remove('temp-cool', 'temp-warm', 'temp-hot');
+            if (temp <= 20) {
+                ring.classList.add('temp-cool');
+            } else if (temp <= 25) {
+                ring.classList.add('temp-warm');
+            } else {
+                ring.classList.add('temp-hot');
+            }
+        }
+
+        /* #5 Control feedback toast for temperature changes */
+        document.querySelectorAll('#ac-' + currentAcId + ' .ctrl-row').forEach(row => {
+            row.addEventListener('submit', function(e) {
+                if (this.classList.contains('temperature-form')) {
+                    const temp = this.dataset.temp;
+                    if (window.smToast) {
+                        setTimeout(() => {
+                            window.smToast(`Temperature set to ${temp}°C`, 'success');
+                        }, 500);
+                    }
+                }
+            });
+        });
+
+        /* #5 Control feedback toast for mode/fan/swing changes */
+        document.querySelectorAll('.control-form').forEach(form => {
+            const originalSubmit = form.onsubmit;
+            form.addEventListener('submit', function(e) {
+                const action = this.action;
+                const acName = this.closest('.ac-panel')?.dataset.acName || 'AC';
+
+                if (action.includes('/mode/')) {
+                    const mode = action.split('/mode/')[1];
+                    setTimeout(() => {
+                        if (window.smToast) window.smToast(`${acName} mode changed to ${mode}`, 'success');
+                    }, 600);
+                } else if (action.includes('/fan-speed/')) {
+                    const speed = action.split('/fan-speed/')[1];
+                    setTimeout(() => {
+                        if (window.smToast) window.smToast(`${acName} fan speed set to ${speed}`, 'success');
+                    }, 600);
+                } else if (action.includes('/swing/')) {
+                    const swing = action.split('/swing/')[1];
+                    setTimeout(() => {
+                        if (window.smToast) window.smToast(`${acName} swing changed`, 'success');
+                    }, 600);
+                }
+            });
+        });
+
+        /* #5 Control feedback toast for power toggle */
+        document.querySelectorAll('.power-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const acName = this.dataset.acName || 'AC';
+                const isPowerOn = (this.dataset.acPower || 'OFF').toUpperCase() === 'ON';
+                const newState = isPowerOn ? 'OFF' : 'ON';
+
+                setTimeout(() => {
+                    if (window.smToast) {
+                        window.smToast(`${acName} power ${newState}`, 'success');
+                    }
+                }, 800);
+            });
+        });
+
+        /* Update temperature ring color on page load and when temperature changes via WebSocket */
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[id^="tempRing-"]').forEach(ring => {
+                const acId = ring.id.replace('tempRing-', '');
+                const temp = parseInt(ring.closest('.ac-panel')?.querySelector('.temp-value')?.textContent) || 24;
+                updateTempRingColor(acId, temp);
+            });
+        });
+
+        /* Listen for temperature updates via WebSocket or polling */
+        const originalUpdateEspStatus = updateEspStatus;
+        const updateEspStatusWithTemp = function() {
+            originalUpdateEspStatus();
+            setTimeout(() => {
+                document.querySelectorAll('[id^="temp-"]').forEach(el => {
+                    const tempText = el.textContent.match(/\d+/);
+                    if (tempText) {
+                        const temp = parseInt(tempText[0]);
+                        const acPanel = el.closest('.ac-panel');
+                        if (acPanel) {
+                            const acId = acPanel.id.replace('ac-', '');
+                            updateTempRingColor(acId, temp);
+                        }
+                    }
+                });
+            }, 100);
+        };
+        window.updateEspStatus = updateEspStatusWithTemp;
     </script>
     @include('components.sidebar-scripts')
 </body>
