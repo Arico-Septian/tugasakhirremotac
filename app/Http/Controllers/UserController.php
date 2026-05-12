@@ -21,7 +21,7 @@ class UserController extends Controller
                 $query->where('role', $request->role);
             })
             ->latest()
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         $totalUsers = User::count();
@@ -30,6 +30,7 @@ class UserController extends Controller
             ->where('last_activity', '>=', now()->subMinutes(2))
             ->count();
         $adminUsers = User::where('role', 'admin')->count();
+        $inactiveUsers = User::where('is_active', false)->count();
 
         $onlinePercentage = $totalUsers > 0 ? round(($onlineUsers / $totalUsers) * 100) : 0;
 
@@ -40,6 +41,7 @@ class UserController extends Controller
             'totalUsers',
             'onlineUsers',
             'adminUsers',
+            'inactiveUsers',
             'onlinePercentage',
             'newUsersThisWeek'
         ));

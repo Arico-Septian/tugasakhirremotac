@@ -10,6 +10,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
+        .stat-card .stat-label-sm {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .stat-card .stat-num-lg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0 6px;
+        }
+
+        .stat-card .stat-sub {
+            font-size: 11px;
+            color: var(--ink-3);
+        }
+
+        .stat-card.acc-cyan .stat-num-lg     { color: var(--cyan); }
+        .stat-card.acc-mint .stat-num-lg     { color: var(--mint); }
+        .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
+        .stat-card.acc-coral .stat-num-lg    { color: var(--coral); }
+
         .user-row {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
@@ -93,16 +119,14 @@
                     <div class="app-content-inner space-y-4">
 
                         
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Total Users</p>
-                                        <p class="stat-value"><?php echo e($totalUsers); ?></p>
-                                        <p class="stat-meta" style="color:var(--mint);">+<?php echo e($newUsersThisWeek ?? 0); ?>
-
-                                            this week</p>
+                                        <p class="stat-label-sm">Total Users</p>
+                                        <p class="stat-num-lg"><?php echo e($totalUsers); ?></p>
+                                        <p class="stat-sub">+<?php echo e($newUsersThisWeek ?? 0); ?> minggu ini</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
                                 </div>
@@ -111,9 +135,9 @@
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Online Now</p>
-                                        <p class="stat-value"><?php echo e($onlineUsers); ?></p>
-                                        <p class="stat-meta"><?php echo e($onlinePercentage); ?>% currently active</p>
+                                        <p class="stat-label-sm">Online Now</p>
+                                        <p class="stat-num-lg"><?php echo e($onlineUsers); ?></p>
+                                        <p class="stat-sub"><?php echo e($onlinePercentage); ?>% sedang aktif</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
                                 </div>
@@ -122,11 +146,22 @@
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Administrators</p>
-                                        <p class="stat-value"><?php echo e($adminUsers); ?></p>
-                                        <p class="stat-meta">System privileges</p>
+                                        <p class="stat-label-sm">Administrators</p>
+                                        <p class="stat-num-lg"><?php echo e($adminUsers); ?></p>
+                                        <p class="stat-sub">System privileges</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Inactive</p>
+                                        <p class="stat-num-lg"><?php echo e($inactiveUsers ?? 0); ?></p>
+                                        <p class="stat-sub">User dinonaktifkan</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-user-slash"></i></div>
                                 </div>
                             </div>
                         </div>
@@ -156,12 +191,12 @@
                             </div>
 
                             <div class="flex items-center justify-between px-4 py-2.5"
-                                style="background:rgba(255,255,255,0.02);border-bottom:1px solid var(--line-soft);">
+                                style="background:var(--panel-1);border-bottom:1px solid var(--line-soft);">
                                 <p class="text-xs" style="color:var(--ink-3);">
-                                    Showing <span class="text-mono"
+                                    Menampilkan <span class="text-mono"
                                         style="color:var(--ink-0);"><?php echo e($users->count()); ?></span>
-                                    of <span class="text-mono" style="color:var(--ink-0);"><?php echo e($totalUsers); ?></span>
-                                    users
+                                    dari <span class="text-mono" style="color:var(--ink-0);"><?php echo e($totalUsers); ?></span>
+                                    user
                                 </p>
                                 <span class="pill pill-online" style="padding:3px 10px;font-size:10.5px;">
                                     <span class="dot"></span><span>Live</span>
@@ -252,8 +287,50 @@
 
                             <?php if($users->hasPages()): ?>
                                 <div class="tbl-footer">
-                                    <p>Page <?php echo e($users->currentPage()); ?> of <?php echo e($users->lastPage()); ?></p>
-                                    <div class="pager"><?php echo e($users->links()); ?></div>
+                                    <p>
+                                        Menampilkan <span class="text-mono"
+                                            style="color:var(--ink-1);"><?php echo e($users->firstItem() ?? 0); ?>–<?php echo e($users->lastItem() ?? 0); ?></span>
+                                        dari <span class="text-mono"
+                                            style="color:var(--ink-1);"><?php echo e($users->total()); ?></span> user
+                                    </p>
+                                    <div class="pager">
+                                        <?php
+                                            $current = $users->currentPage();
+                                            $last = $users->lastPage();
+                                            $pages = [];
+                                            if ($last <= 7) {
+                                                $pages = range(1, $last);
+                                            } else {
+                                                $pages[] = 1;
+                                                if ($current > 3) $pages[] = '...';
+                                                for ($i = max(2, $current - 1); $i <= min($last - 1, $current + 1); $i++) $pages[] = $i;
+                                                if ($current < $last - 2) $pages[] = '...';
+                                                $pages[] = $last;
+                                            }
+                                        ?>
+
+                                        <?php if($users->onFirstPage()): ?>
+                                            <span class="disabled"><i class="fa-solid fa-chevron-left text-[9px]"></i></span>
+                                        <?php else: ?>
+                                            <a href="<?php echo e($users->previousPageUrl()); ?>"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
+                                        <?php endif; ?>
+
+                                        <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($p === '...'): ?>
+                                                <span class="disabled">…</span>
+                                            <?php elseif($p == $current): ?>
+                                                <span class="active text-mono"><?php echo e($p); ?></span>
+                                            <?php else: ?>
+                                                <a class="text-mono" href="<?php echo e($users->url($p)); ?>"><?php echo e($p); ?></a>
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                        <?php if($users->hasMorePages()): ?>
+                                            <a href="<?php echo e($users->nextPageUrl()); ?>"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
+                                        <?php else: ?>
+                                            <span class="disabled"><i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         </div>

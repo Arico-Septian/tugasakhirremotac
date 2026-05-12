@@ -10,37 +10,105 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @include('components.sidebar-styles')
     <style>
-        .filter-bar {
-            background: var(--panel-1);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--r-xl);
-            box-shadow: var(--inset-hi);
-            padding: 16px;
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-        }
-
-        .filter-grid .field {
-            margin: 0;
-        }
-
-        .filter-actions {
+        .toolbar-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
+
+        .toolbar-row .search-input { flex: 1; min-width: 240px; }
+
+        .date-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            border-radius: var(--r-md);
+            color: var(--ink-1);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--t-base);
+            font-family: inherit;
+        }
+
+        .date-btn:hover {
+            background: var(--panel-2);
+            border-color: var(--line);
+        }
+
+        .date-btn.active {
+            background: rgba(77, 212, 255, 0.08);
+            border-color: rgba(77, 212, 255, 0.35);
+            color: var(--cyan);
+        }
+
+        .date-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: var(--panel-1);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow);
+            min-width: 160px;
+            padding: 4px;
+            z-index: 50;
+            display: none;
+        }
+
+        .date-menu.open { display: block; }
+
+        .date-menu .item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            color: var(--ink-1);
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .date-menu .item:hover { background: var(--panel-2); }
+        .date-menu .item.active { background: rgba(77, 212, 255, 0.1); color: var(--cyan); }
+
+        .stat-card .stat-label-sm {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .stat-card .stat-num-lg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0 6px;
+        }
+
+        .stat-card .stat-sub {
+            font-size: 11px;
+            color: var(--ink-3);
+        }
+
+        .stat-card.acc-cyan .stat-num-lg   { color: var(--cyan); }
+        .stat-card.acc-mint .stat-num-lg   { color: var(--mint); }
+        .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
+        .stat-card.acc-coral .stat-num-lg  { color: var(--coral); }
 
         .active-filters {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 10px;
         }
 
         .filter-tag {
@@ -65,9 +133,113 @@
             opacity: 0.7;
         }
 
-        .filter-tag button:hover {
-            opacity: 1;
+        .filter-tag button:hover { opacity: 1; }
+
+        .adv-filter {
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            border-radius: var(--r-xl);
+            box-shadow: var(--inset-hi);
+            overflow: hidden;
         }
+
+        .adv-filter > summary {
+            padding: 10px 14px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-1);
+            user-select: none;
+        }
+
+        .adv-filter > summary::-webkit-details-marker { display: none; }
+
+        .adv-filter > summary .chev {
+            margin-left: auto;
+            transition: transform 0.18s ease;
+            color: var(--ink-3);
+            font-size: 10px;
+        }
+
+        .adv-filter[open] > summary {
+            border-bottom: 1px solid var(--line-soft);
+            background: var(--panel-2);
+        }
+
+        .adv-filter[open] > summary .chev { transform: rotate(180deg); }
+
+        .adv-filter-body {
+            padding: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .adv-filter-body .field { margin: 0; }
+
+        .tbl tbody tr { transition: background 0.12s ease; }
+        .tbl tbody tr:hover { background: var(--panel-2); }
+
+        .tbl.tbl-log th {
+            font-size: 10.5px;
+            letter-spacing: 0.1em;
+            padding: 12px 16px;
+        }
+
+        .tbl.tbl-log td {
+            padding: 10px 16px;
+            vertical-align: middle;
+            border-top: 1px solid var(--line-soft);
+        }
+
+        .tbl.tbl-log tbody tr:first-child td { border-top: none; }
+
+        .log-empty { color: var(--ink-5, var(--ink-4)); opacity: 0.5; }
+
+        .log-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .log-user .name {
+            color: var(--ink-0);
+            font-weight: 500;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-room {
+            color: var(--ink-1);
+            font-size: 13px;
+        }
+
+        .log-detail {
+            color: var(--ink-2);
+            font-size: 12.5px;
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-time {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .log-time .t { color: var(--ink-1); font-size: 12.5px; font-weight: 500; }
+        .log-time .d { color: var(--ink-4); font-size: 10.5px; }
     </style>
 </head>
 
@@ -147,41 +319,95 @@
                             }
 
                             $activityOptions = [
-                                'power_on' => 'Power ON',
+                                'auth'      => 'Auth (login/logout)',
+                                'ac'        => 'Kontrol AC',
+                                'room'      => 'Ruangan',
+                                'user'      => 'User',
+                                'power_on'  => 'Power ON',
                                 'power_off' => 'Power OFF',
-                                'temp' => 'Set Temperature',
-                                'mode' => 'Mode Change',
-                                'fan' => 'Fan Speed',
-                                'swing' => 'Swing',
-                                'auth' => 'Login / Logout',
-                                'user_mgmt' => 'User Management',
-                                'room_mgmt' => 'Room / AC Mgmt',
+                                'temp'      => 'Set Temperature',
+                                'mode'      => 'Mode Change',
+                                'fan'       => 'Fan Speed',
+                                'swing'     => 'Swing',
                             ];
 
+                            $rangeOptions = [
+                                ''      => 'Semua waktu',
+                                'today' => 'Hari ini',
+                                '7d'    => '7 Hari',
+                                '30d'   => '30 Hari',
+                            ];
+                            $currentRange = request('range', '');
+                            $rangeLabel = $rangeOptions[$currentRange] ?? 'Custom';
+
                             $activeFilters = array_filter(
-                                request()->only(['user_id', 'room', 'activity', 'date_from', 'date_to', 'search']),
+                                request()->only(['user_id', 'room', 'activity', 'date_from', 'date_to', 'search', 'range']),
                             );
+
+                            $quickCats = [
+                                ''     => 'Semua',
+                                'auth' => 'Auth',
+                                'ac'   => 'AC',
+                                'room' => 'Ruangan',
+                                'user' => 'User',
+                            ];
+                            $currentCat = in_array(request('activity'), ['auth', 'ac', 'room', 'user']) ? request('activity') : '';
                         @endphp
 
-                        {{-- Unified Filter Bar --}}
-                        <div class="filter-bar">
-                            <form method="GET" action="/logs" id="filterForm">
-                                <div class="filter-grid">
-                                    {{-- Search --}}
-                                    <div class="field" style="grid-column: span 2;">
-                                        <label class="field-label">Search</label>
-                                        <div class="input-icon-wrap">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                            <input class="input" type="text" name="search"
-                                                value="{{ request('search') }}"
-                                                placeholder="User, room, atau detail AC...">
-                                        </div>
-                                    </div>
+                        {{-- Toolbar: search + quick category + date range --}}
+                        <form method="GET" action="/logs" id="filterForm">
+                            <div class="toolbar-row">
+                                <label class="search-input">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input name="search" value="{{ request('search') }}" type="text"
+                                        placeholder="Cari user / ruangan / aktivitas…" autocomplete="off">
+                                    @if (request('search'))
+                                        <button type="button" class="clear" title="Clear"
+                                            onclick="removeFilter('search')"><i
+                                                class="fa-solid fa-xmark text-[10px]"></i></button>
+                                    @endif
+                                </label>
 
-                                    {{-- User --}}
+                                <div class="segmented">
+                                    @foreach ($quickCats as $val => $label)
+                                        <button type="button"
+                                            class="seg {{ $currentCat === $val ? 'active' : '' }}"
+                                            data-quick="{{ $val }}">{{ $label }}</button>
+                                    @endforeach
+                                </div>
+
+                                <div style="position:relative;">
+                                    <button type="button" id="dateBtn"
+                                        class="date-btn {{ $currentRange ? 'active' : '' }}">
+                                        <i class="fa-regular fa-calendar text-[11px]"></i>
+                                        <span>{{ $currentRange ? $rangeOptions[$currentRange] : 'Rentang' }}</span>
+                                        <i class="fa-solid fa-chevron-down text-[9px]"
+                                            style="opacity:0.6;"></i>
+                                    </button>
+                                    <div id="dateMenu" class="date-menu">
+                                        @foreach ($rangeOptions as $val => $label)
+                                            <button type="button"
+                                                class="item {{ $currentRange === $val ? 'active' : '' }}"
+                                                data-range="{{ $val }}">{{ $label }}</button>
+                                        @endforeach
+                                        <button type="button" class="item" id="customRangeBtn">Custom…</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Advanced (custom date / specific user / specific room) --}}
+                            <details class="adv-filter mt-3"
+                                @if (request('user_id') || request('room') || request('date_from') || request('date_to') || (request('activity') && !in_array(request('activity'), ['auth','ac','room','user']))) open @endif>
+                                <summary>
+                                    <i class="fa-solid fa-sliders text-[11px]"
+                                        style="color:var(--lavender);"></i>
+                                    Filter lanjutan
+                                    <i class="fa-solid fa-chevron-down chev"></i>
+                                </summary>
+                                <div class="adv-filter-body">
                                     <div class="field">
                                         <label class="field-label">User</label>
-                                        <select class="input" name="user_id">
+                                        <select class="input" name="user_id" onchange="this.form.submit()">
                                             <option value="">Semua User</option>
                                             @foreach ($users as $u)
                                                 <option value="{{ $u->id }}"
@@ -191,11 +417,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-
-                                    {{-- Room --}}
                                     <div class="field">
                                         <label class="field-label">Room</label>
-                                        <select class="input" name="room">
+                                        <select class="input" name="room" onchange="this.form.submit()">
                                             <option value="">Semua Room</option>
                                             @foreach ($rooms as $r)
                                                 <option value="{{ $r }}"
@@ -205,11 +429,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-
-                                    {{-- Activity --}}
                                     <div class="field">
-                                        <label class="field-label">Aksi</label>
-                                        <select class="input" name="activity">
+                                        <label class="field-label">Aksi spesifik</label>
+                                        <select class="input" name="activity" onchange="this.form.submit()">
                                             <option value="">Semua Aksi</option>
                                             @foreach ($activityOptions as $val => $label)
                                                 <option value="{{ $val }}"
@@ -219,112 +441,89 @@
                                             @endforeach
                                         </select>
                                     </div>
-
-                                    {{-- Date From --}}
                                     <div class="field">
                                         <label class="field-label">Dari Tanggal</label>
                                         <input class="input" type="date" name="date_from"
-                                            value="{{ request('date_from') }}">
+                                            value="{{ request('date_from') }}" onchange="this.form.submit()">
                                     </div>
-
-                                    {{-- Date To --}}
                                     <div class="field">
                                         <label class="field-label">Sampai Tanggal</label>
                                         <input class="input" type="date" name="date_to"
-                                            value="{{ request('date_to') }}">
+                                            value="{{ request('date_to') }}" onchange="this.form.submit()">
+                                    </div>
+                                    <div class="field" style="align-self:end;display:flex;gap:8px;">
+                                        @if (count($activeFilters))
+                                            <a href="/logs" class="btn btn-sm"
+                                                style="background:var(--panel-2);border-color:var(--line);">
+                                                <i class="fa-solid fa-xmark text-[10px]"></i> Reset
+                                            </a>
+                                        @endif
+                                        @if (Auth::user()->role == 'admin')
+                                            <button type="button" onclick="deleteAllLogs()"
+                                                class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash text-[10px]"></i> Hapus Semua
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
+                            </details>
+                        </form>
 
-                                <div class="filter-actions">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="fa-solid fa-filter text-[10px]"></i>
-                                        Filter
-                                    </button>
-                                    @if (count($activeFilters))
-                                        <a href="/logs" class="btn btn-sm"
-                                            style="background:var(--panel-2);border-color:var(--line);">
-                                            <i class="fa-solid fa-xmark text-[10px]"></i>
-                                            Reset
-                                        </a>
-                                    @endif
-                                    @if (Auth::user()->role == 'admin')
-                                        <button type="button" onclick="deleteAllLogs()" class="btn btn-danger btn-sm">
-                                            <i class="fa-solid fa-trash text-[10px]"></i>
-                                            <span class="hidden sm:inline">Hapus Semua</span>
+                        {{-- Active filter tags --}}
+                        @if (count($activeFilters))
+                            <div class="active-filters">
+                                @if (request('search'))
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                                        "{{ request('search') }}"
+                                        <button onclick="removeFilter('search')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
                                         </button>
-                                    @endif
-                                    <span class="text-xs" style="color:var(--ink-4);margin-left:4px;">
-                                        {{ $logs->total() }} hasil ditemukan
                                     </span>
-                                </div>
-                            </form>
+                                @endif
+                                @if (request('user_id'))
+                                    @php $uName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); @endphp
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-user text-[9px]"></i>
+                                        {{ $uName }}
+                                        <button onclick="removeFilter('user_id')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                @endif
+                                @if (request('room'))
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-server text-[9px]"></i>
+                                        {{ request('room') }}
+                                        <button onclick="removeFilter('room')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                @endif
+                                @if (request('date_from') || request('date_to'))
+                                    <span class="filter-tag">
+                                        <i class="fa-regular fa-calendar text-[9px]"></i>
+                                        {{ request('date_from') ? \Carbon\Carbon::parse(request('date_from'))->format('d M Y') : '...' }}
+                                        –
+                                        {{ request('date_to') ? \Carbon\Carbon::parse(request('date_to'))->format('d M Y') : '...' }}
+                                        <button onclick="removeFilter('date_from'); removeFilter('date_to')"
+                                            title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
 
-                            {{-- Active filter tags --}}
-                            @if (count($activeFilters))
-                                <div class="active-filters">
-                                    @if (request('search'))
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                                            "{{ request('search') }}"
-                                            <button onclick="removeFilter('search')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    @endif
-                                    @if (request('user_id'))
-                                        @php $uName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); @endphp
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-user text-[9px]"></i>
-                                            {{ $uName }}
-                                            <button onclick="removeFilter('user_id')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    @endif
-                                    @if (request('room'))
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-server text-[9px]"></i>
-                                            {{ request('room') }}
-                                            <button onclick="removeFilter('room')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    @endif
-                                    @if (request('activity'))
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-bolt text-[9px]"></i>
-                                            {{ $activityOptions[request('activity')] ?? request('activity') }}
-                                            <button onclick="removeFilter('activity')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    @endif
-                                    @if (request('date_from') || request('date_to'))
-                                        <span class="filter-tag">
-                                            <i class="fa-regular fa-calendar text-[9px]"></i>
-                                            {{ request('date_from') ? \Carbon\Carbon::parse(request('date_from'))->format('d M Y') : '...' }}
-                                            –
-                                            {{ request('date_to') ? \Carbon\Carbon::parse(request('date_to'))->format('d M Y') : '...' }}
-                                            <button onclick="removeFilter('date_from'); removeFilter('date_to')"
-                                                title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- Stats --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                        {{-- Stats — 4 kartu sesuai mockup --}}
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Total Activity</p>
-                                        <p class="stat-value">{{ $logs->total() }}</p>
-                                        <p class="stat-meta">
-                                            {{ count($activeFilters) ? 'Hasil filter' : 'All-time event count' }}</p>
+                                        <p class="stat-label-sm">Total Aktivitas</p>
+                                        <p class="stat-num-lg">{{ $stats['total'] }}</p>
+                                        <p class="stat-sub">Halaman {{ $logs->currentPage() }} / {{ $logs->lastPage() }}</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
                                 </div>
@@ -333,56 +532,73 @@
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Page</p>
-                                        <p class="stat-value">{{ $logs->currentPage() }}<span class="text-mono"
-                                                style="font-size:16px;color:var(--ink-3);"> /
-                                                {{ $logs->lastPage() }}</span></p>
-                                        <p class="stat-meta">{{ $logs->perPage() }} entries per page</p>
+                                        <p class="stat-label-sm">Login Events</p>
+                                        <p class="stat-num-lg">{{ $stats['auth'] }}</p>
+                                        <p class="stat-sub">+{{ $stats['auth24'] }} dalam 24 jam</p>
                                     </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                                    <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
                                 </div>
                             </div>
                             <div class="stat-card acc-lavender">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Showing</p>
-                                        <p class="stat-value">{{ $logs->firstItem() ?? 0 }}<span class="text-mono"
-                                                style="font-size:16px;color:var(--ink-3);">–{{ $logs->lastItem() ?? 0 }}</span>
-                                        </p>
-                                        <p class="stat-meta">In view right now</p>
+                                        <p class="stat-label-sm">Kontrol AC</p>
+                                        <p class="stat-num-lg">{{ $stats['ac'] }}</p>
+                                        <p class="stat-sub">on/off · mode · suhu</p>
                                     </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                                    <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Destructive</p>
+                                        <p class="stat-num-lg">{{ $stats['destructive'] }}</p>
+                                        <p class="stat-sub">delete user · room</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-trash"></i></div>
                                 </div>
                             </div>
                         </div>
+
+                        @php
+                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
+                        @endphp
 
                         {{-- Log table --}}
                         <div class="tbl-wrap">
                             {{-- Mobile cards --}}
                             <div class="md:hidden">
                                 @forelse ($logs as $log)
-                                    <div style="padding:14px 16px;border-bottom:1px solid var(--line-soft);">
+                                    <div style="padding:12px 16px;border-bottom:1px solid var(--line-soft);">
                                         <div class="flex items-center justify-between gap-2 mb-1.5">
-                                            <span class="text-sm font-semibold"
-                                                style="color:var(--ink-0);">{{ $log->user->name ?? '-' }}</span>
+                                            <div class="log-user">
+                                                <span class="avatar"
+                                                    style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
+                                                    {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
+                                                </span>
+                                                <span class="name">{{ $log->user->name ?? '—' }}</span>
+                                            </div>
                                             @php [$label, $class] = activityBadge($log->activity); @endphp
                                             <span class="act-badge {{ $class }}">{{ $label }}</span>
                                         </div>
                                         <div class="text-xs space-y-0.5" style="color:var(--ink-3);">
-                                            @if ($log->room)
-                                                <p><i
-                                                        class="fa-solid fa-server mr-1.5 text-[10px]"></i>{{ $log->room }}
-                                                </p>
+                                            @if (!$isEmpty($log->room))
+                                                <p><i class="fa-solid fa-server mr-1.5 text-[10px]"
+                                                        style="color:var(--ink-4);"></i>{{ $log->room }}</p>
                                             @endif
-                                            @if ($log->ac)
-                                                <p><i
-                                                        class="fa-solid fa-snowflake mr-1.5 text-[10px]"></i>{{ $log->ac }}
-                                                </p>
+                                            @if (!$isEmpty($log->ac))
+                                                <p><i class="fa-solid fa-snowflake mr-1.5 text-[10px]"
+                                                        style="color:var(--ink-4);"></i>{{ $log->ac }}</p>
                                             @endif
                                         </div>
                                         <p class="text-mono text-xs mt-1.5" style="color:var(--ink-4);">
-                                            {{ $log->created_at->format('d M Y H:i') }}</p>
+                                            {{ $log->created_at->format('H:i') }}
+                                            <span style="opacity:0.7;">·
+                                                {{ $log->created_at->format('d M Y') }}</span>
+                                        </p>
                                     </div>
                                 @empty
                                     <div class="empty-state">
@@ -395,39 +611,52 @@
 
                             {{-- Desktop table --}}
                             <div class="hidden md:block" style="overflow-x:auto;">
-                                <table class="tbl">
+                                <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th>User</th>
-                                            <th>Room</th>
+                                            <th style="width:22%;">User</th>
+                                            <th style="width:18%;">Room</th>
                                             <th>Detail</th>
-                                            <th>Activity</th>
-                                            <th class="whitespace-nowrap">Time</th>
+                                            <th style="width:16%;">Activity</th>
+                                            <th style="width:14%;" class="whitespace-nowrap">Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($logs as $log)
                                             <tr>
                                                 <td>
-                                                    <div class="flex items-center gap-2.5">
+                                                    <div class="log-user">
                                                         <span class="avatar"
-                                                            style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
+                                                            style="width:28px;height:28px;font-size:11px;border-radius:8px;flex-shrink:0;">
                                                             {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
                                                         </span>
-                                                        <span class="font-medium"
-                                                            style="color:var(--ink-0);">{{ $log->user->name ?? '—' }}</span>
+                                                        <span class="name">{{ $log->user->name ?? '—' }}</span>
                                                     </div>
                                                 </td>
-                                                <td>{{ $log->room ?? '—' }}</td>
-                                                <td class="max-w-[240px] truncate" title="{{ $log->ac }}">
-                                                    {{ $log->ac ?? '—' }}</td>
+                                                <td>
+                                                    @if ($isEmpty($log->room))
+                                                        <span class="log-empty">—</span>
+                                                    @else
+                                                        <span class="log-room">{{ $log->room }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($isEmpty($log->ac))
+                                                        <span class="log-empty">—</span>
+                                                    @else
+                                                        <span class="log-detail" title="{{ $log->ac }}">{{ $log->ac }}</span>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @php [$label, $class] = activityBadge($log->activity); @endphp
-                                                    <span
-                                                        class="act-badge {{ $class }}">{{ $label }}</span>
+                                                    <span class="act-badge {{ $class }}">{{ $label }}</span>
                                                 </td>
-                                                <td class="num whitespace-nowrap">
-                                                    {{ $log->created_at->format('d M Y H:i') }}</td>
+                                                <td>
+                                                    <div class="log-time">
+                                                        <span class="t">{{ $log->created_at->format('H:i') }}</span>
+                                                        <span class="d">{{ $log->created_at->format('d M Y') }}</span>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -447,28 +676,47 @@
 
                             <div class="tbl-footer">
                                 <p>
-                                    Showing <span class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->firstItem() ?? 0 }}</span>–<span
-                                        class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->lastItem() ?? 0 }}</span>
-                                    of <span class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->total() }}</span>
+                                    Menampilkan <span class="text-mono"
+                                        style="color:var(--ink-1);">{{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }}</span>
+                                    dari <span class="text-mono"
+                                        style="color:var(--ink-1);">{{ $logs->total() }}</span> aktivitas
                                 </p>
                                 <div class="pager">
+                                    @php
+                                        $current = $logs->currentPage();
+                                        $last = $logs->lastPage();
+                                        $pages = [];
+                                        if ($last <= 7) {
+                                            $pages = range(1, $last);
+                                        } else {
+                                            $pages[] = 1;
+                                            if ($current > 3) $pages[] = '...';
+                                            for ($i = max(2, $current - 1); $i <= min($last - 1, $current + 1); $i++) $pages[] = $i;
+                                            if ($current < $last - 2) $pages[] = '...';
+                                            $pages[] = $last;
+                                        }
+                                    @endphp
+
                                     @if ($logs->onFirstPage())
-                                        <span class="disabled"><i
-                                                class="fa-solid fa-chevron-left text-[9px]"></i></span>
+                                        <span class="disabled"><i class="fa-solid fa-chevron-left text-[9px]"></i></span>
                                     @else
-                                        <a href="{{ $logs->previousPageUrl() }}"><i
-                                                class="fa-solid fa-chevron-left text-[9px]"></i></a>
+                                        <a href="{{ $logs->previousPageUrl() }}"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
                                     @endif
-                                    <span class="active text-mono">{{ $logs->currentPage() }}</span>
+
+                                    @foreach ($pages as $p)
+                                        @if ($p === '...')
+                                            <span class="disabled">…</span>
+                                        @elseif ($p == $current)
+                                            <span class="active text-mono">{{ $p }}</span>
+                                        @else
+                                            <a class="text-mono" href="{{ $logs->url($p) }}">{{ $p }}</a>
+                                        @endif
+                                    @endforeach
+
                                     @if ($logs->hasMorePages())
-                                        <a href="{{ $logs->nextPageUrl() }}"><i
-                                                class="fa-solid fa-chevron-right text-[9px]"></i></a>
+                                        <a href="{{ $logs->nextPageUrl() }}"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
                                     @else
-                                        <span class="disabled"><i
-                                                class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                                        <span class="disabled"><i class="fa-solid fa-chevron-right text-[9px]"></i></span>
                                     @endif
                                 </div>
                             </div>
@@ -484,6 +732,62 @@
     @include('components.sidebar-scripts')
 
     <script>
+        // Quick category buttons → set activity = auth/ac/room/user
+        document.querySelectorAll('[data-quick]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.getAttribute('data-quick');
+                const url = new URL(window.location.href);
+                url.searchParams.delete('page');
+                if (val) {
+                    url.searchParams.set('activity', val);
+                } else {
+                    url.searchParams.delete('activity');
+                }
+                window.location.href = url.toString();
+            });
+        });
+
+        // Date range dropdown
+        const dateBtn = document.getElementById('dateBtn');
+        const dateMenu = document.getElementById('dateMenu');
+        if (dateBtn && dateMenu) {
+            dateBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dateMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!dateMenu.contains(e.target) && e.target !== dateBtn) {
+                    dateMenu.classList.remove('open');
+                }
+            });
+            dateMenu.querySelectorAll('[data-range]').forEach(item => {
+                item.addEventListener('click', () => {
+                    const val = item.getAttribute('data-range');
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('page');
+                    url.searchParams.delete('date_from');
+                    url.searchParams.delete('date_to');
+                    if (val) {
+                        url.searchParams.set('range', val);
+                    } else {
+                        url.searchParams.delete('range');
+                    }
+                    window.location.href = url.toString();
+                });
+            });
+            const customBtn = document.getElementById('customRangeBtn');
+            if (customBtn) {
+                customBtn.addEventListener('click', () => {
+                    dateMenu.classList.remove('open');
+                    const adv = document.querySelector('.adv-filter');
+                    if (adv) {
+                        adv.setAttribute('open', '');
+                        adv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        }
+
         function removeFilter(key) {
             const url = new URL(window.location.href);
             url.searchParams.delete(key);

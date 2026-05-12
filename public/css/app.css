@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -146,11 +148,8 @@
 html,
 :host {
   line-height: 1.5;
-  /* 1 */
-  -webkit-text-size-adjust: 100%;
-  /* 2 */
+  /* tab size */
   -moz-tab-size: 4;
-  /* 3 */
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
@@ -2200,8 +2199,6 @@ video {
    SmartAC — Premium Dashboard Design System
    Modern dark SaaS · glassmorphism · soft layered surfaces
    ============================================================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ----------------------------------------------------------------
    Tokens

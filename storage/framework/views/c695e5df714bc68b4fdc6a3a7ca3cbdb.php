@@ -10,37 +10,105 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
-        .filter-bar {
-            background: var(--panel-1);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--r-xl);
-            box-shadow: var(--inset-hi);
-            padding: 16px;
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-        }
-
-        .filter-grid .field {
-            margin: 0;
-        }
-
-        .filter-actions {
+        .toolbar-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
+
+        .toolbar-row .search-input { flex: 1; min-width: 240px; }
+
+        .date-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            border-radius: var(--r-md);
+            color: var(--ink-1);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--t-base);
+            font-family: inherit;
+        }
+
+        .date-btn:hover {
+            background: var(--panel-2);
+            border-color: var(--line);
+        }
+
+        .date-btn.active {
+            background: rgba(77, 212, 255, 0.08);
+            border-color: rgba(77, 212, 255, 0.35);
+            color: var(--cyan);
+        }
+
+        .date-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: var(--panel-1);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow);
+            min-width: 160px;
+            padding: 4px;
+            z-index: 50;
+            display: none;
+        }
+
+        .date-menu.open { display: block; }
+
+        .date-menu .item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            color: var(--ink-1);
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .date-menu .item:hover { background: var(--panel-2); }
+        .date-menu .item.active { background: rgba(77, 212, 255, 0.1); color: var(--cyan); }
+
+        .stat-card .stat-label-sm {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .stat-card .stat-num-lg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0 6px;
+        }
+
+        .stat-card .stat-sub {
+            font-size: 11px;
+            color: var(--ink-3);
+        }
+
+        .stat-card.acc-cyan .stat-num-lg   { color: var(--cyan); }
+        .stat-card.acc-mint .stat-num-lg   { color: var(--mint); }
+        .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
+        .stat-card.acc-coral .stat-num-lg  { color: var(--coral); }
 
         .active-filters {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 10px;
         }
 
         .filter-tag {
@@ -65,9 +133,113 @@
             opacity: 0.7;
         }
 
-        .filter-tag button:hover {
-            opacity: 1;
+        .filter-tag button:hover { opacity: 1; }
+
+        .adv-filter {
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            border-radius: var(--r-xl);
+            box-shadow: var(--inset-hi);
+            overflow: hidden;
         }
+
+        .adv-filter > summary {
+            padding: 10px 14px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-1);
+            user-select: none;
+        }
+
+        .adv-filter > summary::-webkit-details-marker { display: none; }
+
+        .adv-filter > summary .chev {
+            margin-left: auto;
+            transition: transform 0.18s ease;
+            color: var(--ink-3);
+            font-size: 10px;
+        }
+
+        .adv-filter[open] > summary {
+            border-bottom: 1px solid var(--line-soft);
+            background: var(--panel-2);
+        }
+
+        .adv-filter[open] > summary .chev { transform: rotate(180deg); }
+
+        .adv-filter-body {
+            padding: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .adv-filter-body .field { margin: 0; }
+
+        .tbl tbody tr { transition: background 0.12s ease; }
+        .tbl tbody tr:hover { background: var(--panel-2); }
+
+        .tbl.tbl-log th {
+            font-size: 10.5px;
+            letter-spacing: 0.1em;
+            padding: 12px 16px;
+        }
+
+        .tbl.tbl-log td {
+            padding: 10px 16px;
+            vertical-align: middle;
+            border-top: 1px solid var(--line-soft);
+        }
+
+        .tbl.tbl-log tbody tr:first-child td { border-top: none; }
+
+        .log-empty { color: var(--ink-5, var(--ink-4)); opacity: 0.5; }
+
+        .log-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .log-user .name {
+            color: var(--ink-0);
+            font-weight: 500;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-room {
+            color: var(--ink-1);
+            font-size: 13px;
+        }
+
+        .log-detail {
+            color: var(--ink-2);
+            font-size: 12.5px;
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-time {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .log-time .t { color: var(--ink-1); font-size: 12.5px; font-weight: 500; }
+        .log-time .d { color: var(--ink-4); font-size: 10.5px; }
     </style>
 </head>
 
@@ -147,41 +319,95 @@
                             }
 
                             $activityOptions = [
-                                'power_on' => 'Power ON',
+                                'auth'      => 'Auth (login/logout)',
+                                'ac'        => 'Kontrol AC',
+                                'room'      => 'Ruangan',
+                                'user'      => 'User',
+                                'power_on'  => 'Power ON',
                                 'power_off' => 'Power OFF',
-                                'temp' => 'Set Temperature',
-                                'mode' => 'Mode Change',
-                                'fan' => 'Fan Speed',
-                                'swing' => 'Swing',
-                                'auth' => 'Login / Logout',
-                                'user_mgmt' => 'User Management',
-                                'room_mgmt' => 'Room / AC Mgmt',
+                                'temp'      => 'Set Temperature',
+                                'mode'      => 'Mode Change',
+                                'fan'       => 'Fan Speed',
+                                'swing'     => 'Swing',
                             ];
 
+                            $rangeOptions = [
+                                ''      => 'Semua waktu',
+                                'today' => 'Hari ini',
+                                '7d'    => '7 Hari',
+                                '30d'   => '30 Hari',
+                            ];
+                            $currentRange = request('range', '');
+                            $rangeLabel = $rangeOptions[$currentRange] ?? 'Custom';
+
                             $activeFilters = array_filter(
-                                request()->only(['user_id', 'room', 'activity', 'date_from', 'date_to', 'search']),
+                                request()->only(['user_id', 'room', 'activity', 'date_from', 'date_to', 'search', 'range']),
                             );
+
+                            $quickCats = [
+                                ''     => 'Semua',
+                                'auth' => 'Auth',
+                                'ac'   => 'AC',
+                                'room' => 'Ruangan',
+                                'user' => 'User',
+                            ];
+                            $currentCat = in_array(request('activity'), ['auth', 'ac', 'room', 'user']) ? request('activity') : '';
                         ?>
 
                         
-                        <div class="filter-bar">
-                            <form method="GET" action="/logs" id="filterForm">
-                                <div class="filter-grid">
-                                    
-                                    <div class="field" style="grid-column: span 2;">
-                                        <label class="field-label">Search</label>
-                                        <div class="input-icon-wrap">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                            <input class="input" type="text" name="search"
-                                                value="<?php echo e(request('search')); ?>"
-                                                placeholder="User, room, atau detail AC...">
-                                        </div>
-                                    </div>
+                        <form method="GET" action="/logs" id="filterForm">
+                            <div class="toolbar-row">
+                                <label class="search-input">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input name="search" value="<?php echo e(request('search')); ?>" type="text"
+                                        placeholder="Cari user / ruangan / aktivitas…" autocomplete="off">
+                                    <?php if(request('search')): ?>
+                                        <button type="button" class="clear" title="Clear"
+                                            onclick="removeFilter('search')"><i
+                                                class="fa-solid fa-xmark text-[10px]"></i></button>
+                                    <?php endif; ?>
+                                </label>
 
-                                    
+                                <div class="segmented">
+                                    <?php $__currentLoopData = $quickCats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <button type="button"
+                                            class="seg <?php echo e($currentCat === $val ? 'active' : ''); ?>"
+                                            data-quick="<?php echo e($val); ?>"><?php echo e($label); ?></button>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+
+                                <div style="position:relative;">
+                                    <button type="button" id="dateBtn"
+                                        class="date-btn <?php echo e($currentRange ? 'active' : ''); ?>">
+                                        <i class="fa-regular fa-calendar text-[11px]"></i>
+                                        <span><?php echo e($currentRange ? $rangeOptions[$currentRange] : 'Rentang'); ?></span>
+                                        <i class="fa-solid fa-chevron-down text-[9px]"
+                                            style="opacity:0.6;"></i>
+                                    </button>
+                                    <div id="dateMenu" class="date-menu">
+                                        <?php $__currentLoopData = $rangeOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <button type="button"
+                                                class="item <?php echo e($currentRange === $val ? 'active' : ''); ?>"
+                                                data-range="<?php echo e($val); ?>"><?php echo e($label); ?></button>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <button type="button" class="item" id="customRangeBtn">Custom…</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <details class="adv-filter mt-3"
+                                <?php if(request('user_id') || request('room') || request('date_from') || request('date_to') || (request('activity') && !in_array(request('activity'), ['auth','ac','room','user']))): ?> open <?php endif; ?>>
+                                <summary>
+                                    <i class="fa-solid fa-sliders text-[11px]"
+                                        style="color:var(--lavender);"></i>
+                                    Filter lanjutan
+                                    <i class="fa-solid fa-chevron-down chev"></i>
+                                </summary>
+                                <div class="adv-filter-body">
                                     <div class="field">
                                         <label class="field-label">User</label>
-                                        <select class="input" name="user_id">
+                                        <select class="input" name="user_id" onchange="this.form.submit()">
                                             <option value="">Semua User</option>
                                             <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($u->id); ?>"
@@ -192,11 +418,9 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
-
-                                    
                                     <div class="field">
                                         <label class="field-label">Room</label>
-                                        <select class="input" name="room">
+                                        <select class="input" name="room" onchange="this.form.submit()">
                                             <option value="">Semua Room</option>
                                             <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($r); ?>"
@@ -207,11 +431,9 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
-
-                                    
                                     <div class="field">
-                                        <label class="field-label">Aksi</label>
-                                        <select class="input" name="activity">
+                                        <label class="field-label">Aksi spesifik</label>
+                                        <select class="input" name="activity" onchange="this.form.submit()">
                                             <option value="">Semua Aksi</option>
                                             <?php $__currentLoopData = $activityOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($val); ?>"
@@ -222,117 +444,93 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
-
-                                    
                                     <div class="field">
                                         <label class="field-label">Dari Tanggal</label>
                                         <input class="input" type="date" name="date_from"
-                                            value="<?php echo e(request('date_from')); ?>">
+                                            value="<?php echo e(request('date_from')); ?>" onchange="this.form.submit()">
                                     </div>
-
-                                    
                                     <div class="field">
                                         <label class="field-label">Sampai Tanggal</label>
                                         <input class="input" type="date" name="date_to"
-                                            value="<?php echo e(request('date_to')); ?>">
+                                            value="<?php echo e(request('date_to')); ?>" onchange="this.form.submit()">
+                                    </div>
+                                    <div class="field" style="align-self:end;display:flex;gap:8px;">
+                                        <?php if(count($activeFilters)): ?>
+                                            <a href="/logs" class="btn btn-sm"
+                                                style="background:var(--panel-2);border-color:var(--line);">
+                                                <i class="fa-solid fa-xmark text-[10px]"></i> Reset
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if(Auth::user()->role == 'admin'): ?>
+                                            <button type="button" onclick="deleteAllLogs()"
+                                                class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash text-[10px]"></i> Hapus Semua
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
-
-                                <div class="filter-actions">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="fa-solid fa-filter text-[10px]"></i>
-                                        Filter
-                                    </button>
-                                    <?php if(count($activeFilters)): ?>
-                                        <a href="/logs" class="btn btn-sm"
-                                            style="background:var(--panel-2);border-color:var(--line);">
-                                            <i class="fa-solid fa-xmark text-[10px]"></i>
-                                            Reset
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if(Auth::user()->role == 'admin'): ?>
-                                        <button type="button" onclick="deleteAllLogs()" class="btn btn-danger btn-sm">
-                                            <i class="fa-solid fa-trash text-[10px]"></i>
-                                            <span class="hidden sm:inline">Hapus Semua</span>
-                                        </button>
-                                    <?php endif; ?>
-                                    <span class="text-xs" style="color:var(--ink-4);margin-left:4px;">
-                                        <?php echo e($logs->total()); ?> hasil ditemukan
-                                    </span>
-                                </div>
-                            </form>
-
-                            
-                            <?php if(count($activeFilters)): ?>
-                                <div class="active-filters">
-                                    <?php if(request('search')): ?>
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                                            "<?php echo e(request('search')); ?>"
-                                            <button onclick="removeFilter('search')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    <?php endif; ?>
-                                    <?php if(request('user_id')): ?>
-                                        <?php $uName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); ?>
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-user text-[9px]"></i>
-                                            <?php echo e($uName); ?>
-
-                                            <button onclick="removeFilter('user_id')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    <?php endif; ?>
-                                    <?php if(request('room')): ?>
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-server text-[9px]"></i>
-                                            <?php echo e(request('room')); ?>
-
-                                            <button onclick="removeFilter('room')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    <?php endif; ?>
-                                    <?php if(request('activity')): ?>
-                                        <span class="filter-tag">
-                                            <i class="fa-solid fa-bolt text-[9px]"></i>
-                                            <?php echo e($activityOptions[request('activity')] ?? request('activity')); ?>
-
-                                            <button onclick="removeFilter('activity')" title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    <?php endif; ?>
-                                    <?php if(request('date_from') || request('date_to')): ?>
-                                        <span class="filter-tag">
-                                            <i class="fa-regular fa-calendar text-[9px]"></i>
-                                            <?php echo e(request('date_from') ? \Carbon\Carbon::parse(request('date_from'))->format('d M Y') : '...'); ?>
-
-                                            –
-                                            <?php echo e(request('date_to') ? \Carbon\Carbon::parse(request('date_to'))->format('d M Y') : '...'); ?>
-
-                                            <button onclick="removeFilter('date_from'); removeFilter('date_to')"
-                                                title="Hapus">
-                                                <i class="fa-solid fa-xmark text-[9px]"></i>
-                                            </button>
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                            </details>
+                        </form>
 
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                        <?php if(count($activeFilters)): ?>
+                            <div class="active-filters">
+                                <?php if(request('search')): ?>
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                                        "<?php echo e(request('search')); ?>"
+                                        <button onclick="removeFilter('search')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if(request('user_id')): ?>
+                                    <?php $uName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); ?>
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-user text-[9px]"></i>
+                                        <?php echo e($uName); ?>
+
+                                        <button onclick="removeFilter('user_id')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if(request('room')): ?>
+                                    <span class="filter-tag">
+                                        <i class="fa-solid fa-server text-[9px]"></i>
+                                        <?php echo e(request('room')); ?>
+
+                                        <button onclick="removeFilter('room')" title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if(request('date_from') || request('date_to')): ?>
+                                    <span class="filter-tag">
+                                        <i class="fa-regular fa-calendar text-[9px]"></i>
+                                        <?php echo e(request('date_from') ? \Carbon\Carbon::parse(request('date_from'))->format('d M Y') : '...'); ?>
+
+                                        –
+                                        <?php echo e(request('date_to') ? \Carbon\Carbon::parse(request('date_to'))->format('d M Y') : '...'); ?>
+
+                                        <button onclick="removeFilter('date_from'); removeFilter('date_to')"
+                                            title="Hapus">
+                                            <i class="fa-solid fa-xmark text-[9px]"></i>
+                                        </button>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Total Activity</p>
-                                        <p class="stat-value"><?php echo e($logs->total()); ?></p>
-                                        <p class="stat-meta">
-                                            <?php echo e(count($activeFilters) ? 'Hasil filter' : 'All-time event count'); ?></p>
+                                        <p class="stat-label-sm">Total Aktivitas</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['total']); ?></p>
+                                        <p class="stat-sub">Halaman <?php echo e($logs->currentPage()); ?> / <?php echo e($logs->lastPage()); ?></p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
                                 </div>
@@ -341,58 +539,75 @@
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Page</p>
-                                        <p class="stat-value"><?php echo e($logs->currentPage()); ?><span class="text-mono"
-                                                style="font-size:16px;color:var(--ink-3);"> /
-                                                <?php echo e($logs->lastPage()); ?></span></p>
-                                        <p class="stat-meta"><?php echo e($logs->perPage()); ?> entries per page</p>
+                                        <p class="stat-label-sm">Login Events</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['auth']); ?></p>
+                                        <p class="stat-sub">+<?php echo e($stats['auth24']); ?> dalam 24 jam</p>
                                     </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                                    <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
                                 </div>
                             </div>
                             <div class="stat-card acc-lavender">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label">Showing</p>
-                                        <p class="stat-value"><?php echo e($logs->firstItem() ?? 0); ?><span class="text-mono"
-                                                style="font-size:16px;color:var(--ink-3);">–<?php echo e($logs->lastItem() ?? 0); ?></span>
-                                        </p>
-                                        <p class="stat-meta">In view right now</p>
+                                        <p class="stat-label-sm">Kontrol AC</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['ac']); ?></p>
+                                        <p class="stat-sub">on/off · mode · suhu</p>
                                     </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                                    <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Destructive</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['destructive']); ?></p>
+                                        <p class="stat-sub">delete user · room</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-trash"></i></div>
                                 </div>
                             </div>
                         </div>
+
+                        <?php
+                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
+                        ?>
 
                         
                         <div class="tbl-wrap">
                             
                             <div class="md:hidden">
                                 <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <div style="padding:14px 16px;border-bottom:1px solid var(--line-soft);">
+                                    <div style="padding:12px 16px;border-bottom:1px solid var(--line-soft);">
                                         <div class="flex items-center justify-between gap-2 mb-1.5">
-                                            <span class="text-sm font-semibold"
-                                                style="color:var(--ink-0);"><?php echo e($log->user->name ?? '-'); ?></span>
+                                            <div class="log-user">
+                                                <span class="avatar"
+                                                    style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
+                                                    <?php echo e(strtoupper(substr($log->user->name ?? '?', 0, 1))); ?>
+
+                                                </span>
+                                                <span class="name"><?php echo e($log->user->name ?? '—'); ?></span>
+                                            </div>
                                             <?php [$label, $class] = activityBadge($log->activity); ?>
                                             <span class="act-badge <?php echo e($class); ?>"><?php echo e($label); ?></span>
                                         </div>
                                         <div class="text-xs space-y-0.5" style="color:var(--ink-3);">
-                                            <?php if($log->room): ?>
-                                                <p><i
-                                                        class="fa-solid fa-server mr-1.5 text-[10px]"></i><?php echo e($log->room); ?>
-
-                                                </p>
+                                            <?php if(!$isEmpty($log->room)): ?>
+                                                <p><i class="fa-solid fa-server mr-1.5 text-[10px]"
+                                                        style="color:var(--ink-4);"></i><?php echo e($log->room); ?></p>
                                             <?php endif; ?>
-                                            <?php if($log->ac): ?>
-                                                <p><i
-                                                        class="fa-solid fa-snowflake mr-1.5 text-[10px]"></i><?php echo e($log->ac); ?>
-
-                                                </p>
+                                            <?php if(!$isEmpty($log->ac)): ?>
+                                                <p><i class="fa-solid fa-snowflake mr-1.5 text-[10px]"
+                                                        style="color:var(--ink-4);"></i><?php echo e($log->ac); ?></p>
                                             <?php endif; ?>
                                         </div>
                                         <p class="text-mono text-xs mt-1.5" style="color:var(--ink-4);">
-                                            <?php echo e($log->created_at->format('d M Y H:i')); ?></p>
+                                            <?php echo e($log->created_at->format('H:i')); ?>
+
+                                            <span style="opacity:0.7;">·
+                                                <?php echo e($log->created_at->format('d M Y')); ?></span>
+                                        </p>
                                     </div>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <div class="empty-state">
@@ -405,40 +620,53 @@
 
                             
                             <div class="hidden md:block" style="overflow-x:auto;">
-                                <table class="tbl">
+                                <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th>User</th>
-                                            <th>Room</th>
+                                            <th style="width:22%;">User</th>
+                                            <th style="width:18%;">Room</th>
                                             <th>Detail</th>
-                                            <th>Activity</th>
-                                            <th class="whitespace-nowrap">Time</th>
+                                            <th style="width:16%;">Activity</th>
+                                            <th style="width:14%;" class="whitespace-nowrap">Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <tr>
                                                 <td>
-                                                    <div class="flex items-center gap-2.5">
+                                                    <div class="log-user">
                                                         <span class="avatar"
-                                                            style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
+                                                            style="width:28px;height:28px;font-size:11px;border-radius:8px;flex-shrink:0;">
                                                             <?php echo e(strtoupper(substr($log->user->name ?? '?', 0, 1))); ?>
 
                                                         </span>
-                                                        <span class="font-medium"
-                                                            style="color:var(--ink-0);"><?php echo e($log->user->name ?? '—'); ?></span>
+                                                        <span class="name"><?php echo e($log->user->name ?? '—'); ?></span>
                                                     </div>
                                                 </td>
-                                                <td><?php echo e($log->room ?? '—'); ?></td>
-                                                <td class="max-w-[240px] truncate" title="<?php echo e($log->ac); ?>">
-                                                    <?php echo e($log->ac ?? '—'); ?></td>
+                                                <td>
+                                                    <?php if($isEmpty($log->room)): ?>
+                                                        <span class="log-empty">—</span>
+                                                    <?php else: ?>
+                                                        <span class="log-room"><?php echo e($log->room); ?></span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <?php if($isEmpty($log->ac)): ?>
+                                                        <span class="log-empty">—</span>
+                                                    <?php else: ?>
+                                                        <span class="log-detail" title="<?php echo e($log->ac); ?>"><?php echo e($log->ac); ?></span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td>
                                                     <?php [$label, $class] = activityBadge($log->activity); ?>
-                                                    <span
-                                                        class="act-badge <?php echo e($class); ?>"><?php echo e($label); ?></span>
+                                                    <span class="act-badge <?php echo e($class); ?>"><?php echo e($label); ?></span>
                                                 </td>
-                                                <td class="num whitespace-nowrap">
-                                                    <?php echo e($log->created_at->format('d M Y H:i')); ?></td>
+                                                <td>
+                                                    <div class="log-time">
+                                                        <span class="t"><?php echo e($log->created_at->format('H:i')); ?></span>
+                                                        <span class="d"><?php echo e($log->created_at->format('d M Y')); ?></span>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                             <tr>
@@ -458,28 +686,47 @@
 
                             <div class="tbl-footer">
                                 <p>
-                                    Showing <span class="text-mono"
-                                        style="color:var(--ink-1);"><?php echo e($logs->firstItem() ?? 0); ?></span>–<span
-                                        class="text-mono"
-                                        style="color:var(--ink-1);"><?php echo e($logs->lastItem() ?? 0); ?></span>
-                                    of <span class="text-mono"
-                                        style="color:var(--ink-1);"><?php echo e($logs->total()); ?></span>
+                                    Menampilkan <span class="text-mono"
+                                        style="color:var(--ink-1);"><?php echo e($logs->firstItem() ?? 0); ?>–<?php echo e($logs->lastItem() ?? 0); ?></span>
+                                    dari <span class="text-mono"
+                                        style="color:var(--ink-1);"><?php echo e($logs->total()); ?></span> aktivitas
                                 </p>
                                 <div class="pager">
+                                    <?php
+                                        $current = $logs->currentPage();
+                                        $last = $logs->lastPage();
+                                        $pages = [];
+                                        if ($last <= 7) {
+                                            $pages = range(1, $last);
+                                        } else {
+                                            $pages[] = 1;
+                                            if ($current > 3) $pages[] = '...';
+                                            for ($i = max(2, $current - 1); $i <= min($last - 1, $current + 1); $i++) $pages[] = $i;
+                                            if ($current < $last - 2) $pages[] = '...';
+                                            $pages[] = $last;
+                                        }
+                                    ?>
+
                                     <?php if($logs->onFirstPage()): ?>
-                                        <span class="disabled"><i
-                                                class="fa-solid fa-chevron-left text-[9px]"></i></span>
+                                        <span class="disabled"><i class="fa-solid fa-chevron-left text-[9px]"></i></span>
                                     <?php else: ?>
-                                        <a href="<?php echo e($logs->previousPageUrl()); ?>"><i
-                                                class="fa-solid fa-chevron-left text-[9px]"></i></a>
+                                        <a href="<?php echo e($logs->previousPageUrl()); ?>"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
                                     <?php endif; ?>
-                                    <span class="active text-mono"><?php echo e($logs->currentPage()); ?></span>
+
+                                    <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($p === '...'): ?>
+                                            <span class="disabled">…</span>
+                                        <?php elseif($p == $current): ?>
+                                            <span class="active text-mono"><?php echo e($p); ?></span>
+                                        <?php else: ?>
+                                            <a class="text-mono" href="<?php echo e($logs->url($p)); ?>"><?php echo e($p); ?></a>
+                                        <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
                                     <?php if($logs->hasMorePages()): ?>
-                                        <a href="<?php echo e($logs->nextPageUrl()); ?>"><i
-                                                class="fa-solid fa-chevron-right text-[9px]"></i></a>
+                                        <a href="<?php echo e($logs->nextPageUrl()); ?>"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
                                     <?php else: ?>
-                                        <span class="disabled"><i
-                                                class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                                        <span class="disabled"><i class="fa-solid fa-chevron-right text-[9px]"></i></span>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -495,6 +742,62 @@
     <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <script>
+        // Quick category buttons → set activity = auth/ac/room/user
+        document.querySelectorAll('[data-quick]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.getAttribute('data-quick');
+                const url = new URL(window.location.href);
+                url.searchParams.delete('page');
+                if (val) {
+                    url.searchParams.set('activity', val);
+                } else {
+                    url.searchParams.delete('activity');
+                }
+                window.location.href = url.toString();
+            });
+        });
+
+        // Date range dropdown
+        const dateBtn = document.getElementById('dateBtn');
+        const dateMenu = document.getElementById('dateMenu');
+        if (dateBtn && dateMenu) {
+            dateBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dateMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!dateMenu.contains(e.target) && e.target !== dateBtn) {
+                    dateMenu.classList.remove('open');
+                }
+            });
+            dateMenu.querySelectorAll('[data-range]').forEach(item => {
+                item.addEventListener('click', () => {
+                    const val = item.getAttribute('data-range');
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('page');
+                    url.searchParams.delete('date_from');
+                    url.searchParams.delete('date_to');
+                    if (val) {
+                        url.searchParams.set('range', val);
+                    } else {
+                        url.searchParams.delete('range');
+                    }
+                    window.location.href = url.toString();
+                });
+            });
+            const customBtn = document.getElementById('customRangeBtn');
+            if (customBtn) {
+                customBtn.addEventListener('click', () => {
+                    dateMenu.classList.remove('open');
+                    const adv = document.querySelector('.adv-filter');
+                    if (adv) {
+                        adv.setAttribute('open', '');
+                        adv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        }
+
         function removeFilter(key) {
             const url = new URL(window.location.href);
             url.searchParams.delete(key);
