@@ -92,6 +92,115 @@
             border-radius: 3px;
             letter-spacing: 0.05em;
         }
+
+        /* Responsive search and filters */
+        @media (max-width: 768px) {
+            .flex.items-center.gap-2 > form {
+                flex: 1;
+                min-width: 160px;
+                max-width: 400px;
+                transition: flex 0.2s ease;
+            }
+
+            .flex.items-center.gap-2 > div {
+                display: inline-flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                flex-shrink: 0;
+            }
+
+            .segmented {
+                display: inline-flex;
+                gap: 3px;
+            }
+
+            .segmented .seg {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .search-input input {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+
+            .search-input i {
+                font-size: 13px;
+            }
+        }
+
+        /* Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .flex.items-center.gap-2 {
+                gap: 6px;
+            }
+
+            .flex.items-center.gap-2 > form {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .flex.items-center.gap-2 > form:focus-within {
+                flex: 1;
+            }
+
+            .flex.items-center.gap-2 > div {
+                display: inline-flex;
+                gap: 4px;
+                flex-wrap: nowrap;
+                flex-shrink: 0;
+            }
+
+            .segmented {
+                display: inline-flex;
+                gap: 2px;
+            }
+
+            .segmented .seg {
+                font-size: 10px;
+                padding: 5px 6px;
+                min-width: auto;
+            }
+
+            .search-input input {
+                font-size: 12px;
+                padding: 6px 8px 6px 28px;
+            }
+
+            .search-input input::placeholder {
+                color: var(--ink-3);
+                transition: color 0.2s ease;
+            }
+
+            .search-input input:focus::placeholder {
+                color: transparent;
+            }
+
+            .search-input i {
+                font-size: 12px;
+                transition: opacity 0.2s ease;
+            }
+
+            .search-input:focus-within i {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .flex.items-center.gap-2 > button.btn-primary {
+                padding: 6px 12px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .flex.items-center.gap-2 > button.btn-primary span {
+                display: inline;
+            }
+
+            .flex.items-center.gap-2 > button.btn-primary i {
+                margin-right: 4px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 
@@ -126,8 +235,8 @@
                 <div class="app-content">
                     <div class="app-content-inner space-y-4">
 
-                        <div class="flex items-center gap-3 flex-wrap">
-                            <form method="GET" action="<?php echo e(route('rooms.index')); ?>" class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <form method="GET" action="<?php echo e(route('rooms.index')); ?>" class="flex-1 min-w-0">
                                 <label class="search-input">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                     <input name="search" value="<?php echo e(request('search')); ?>" type="text"
@@ -139,16 +248,14 @@
                                 </label>
                             </form>
 
-                            <div class="flex gap-2 flex-shrink-0 flex-wrap items-center">
+                            <div class="flex gap-2 flex-shrink-0 items-center">
                                 <div class="segmented">
                                     <button class="seg active" data-room-filter="all" type="button">All</button>
                                     <button class="seg" data-room-filter="online" type="button">
-                                        <span class="dot"
-                                            style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
+                                        Online
                                     </button>
                                     <button class="seg" data-room-filter="offline" type="button">
-                                        <span class="dot"
-                                            style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
+                                        Offline
                                     </button>
                                 </div>
                                 <?php if(auth()->guard()->check()): ?>

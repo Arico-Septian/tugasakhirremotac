@@ -102,38 +102,122 @@
         }
 
         /* Toolbar responsiveness for very small screens */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .tbl-toolbar {
-                flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                padding: 10px 12px;
             }
 
             .tbl-toolbar label.search-input {
                 flex: 1;
-                width: 100%;
+                min-width: 160px;
+                max-width: 400px;
             }
 
             .tbl-toolbar > div {
-                flex-direction: column;
-                width: 100%;
-                gap: 8px;
+                display: inline-flex;
+                flex-wrap: nowrap;
+                gap: 6px;
+                align-items: center;
+                flex-shrink: 0;
             }
 
             .segmented {
-                width: 100%;
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 4px;
+                display: inline-flex;
+                gap: 3px;
             }
 
             .segmented .seg {
                 font-size: 11px;
-                padding: 7px 8px;
+                padding: 6px 10px;
             }
 
             .btn.btn-danger {
+                padding: 6px 10px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .search-input input {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+
+            .search-input i {
+                font-size: 13px;
+            }
+        }
+
+        /* Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .tbl-toolbar {
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .tbl-toolbar label.search-input {
+                flex: 0 1 120px;
+                min-width: 0;
+                transition: flex 0.2s ease;
+            }
+
+            .tbl-toolbar label.search-input:focus-within {
+                flex: 1;
+            }
+
+            .tbl-toolbar > div {
+                display: inline-flex;
+                gap: 4px;
+                align-items: center;
+                flex-shrink: 0;
+            }
+
+            .segmented {
+                display: inline-flex;
+                gap: 2px;
+            }
+
+            .segmented .seg {
+                font-size: 10px;
+                padding: 5px 6px;
+                min-width: auto;
+            }
+
+            .btn.btn-danger {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+
+            .btn.btn-danger span {
+                display: none;
+            }
+
+            .btn.btn-danger i {
+                margin: 0 !important;
+                font-size: 11px;
+            }
+
+            .search-input {
                 width: 100%;
-                justify-content: center;
+            }
+
+            .search-input input {
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+
+            .search-input input::placeholder {
+                color: transparent;
+            }
+
+            .search-input i {
+                font-size: 12px;
+                transition: opacity 0.2s ease;
+            }
+
+            .search-input:focus-within i {
+                opacity: 0;
+                pointer-events: none;
             }
         }
 
@@ -483,8 +567,8 @@
 
                                     <?php if(Auth::user()->role == 'admin'): ?>
                                         <button type="button" onclick="deleteAllLogs()"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="fa-solid fa-trash text-[10px]"></i> Delete Activity
+                                            class="btn btn-danger btn-sm" title="Delete Activity">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
                                         </button>
                                     <?php endif; ?>
                                 </div>

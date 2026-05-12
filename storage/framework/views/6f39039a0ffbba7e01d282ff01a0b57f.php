@@ -126,29 +126,89 @@
         }
 
         /* Toolbar responsiveness for small screens */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .flex.flex-row.items-center {
-                flex-direction: column;
                 gap: 8px;
             }
 
             .flex.flex-row.items-center > label {
-                width: 100%;
                 flex: 1;
-                max-width: none;
+                min-width: 160px;
+                max-width: 400px;
+                transition: flex 0.2s ease;
             }
 
             .flex.flex-row.items-center > .segmented {
-                width: 100%;
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 4px;
+                display: inline-flex;
+                gap: 3px;
+                flex-shrink: 0;
             }
 
             .segmented .seg {
                 font-size: 11px;
-                padding: 8px 6px;
-                min-height: 36px;
+                padding: 6px 10px;
+            }
+
+            .search-input input {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+
+            .search-input i {
+                font-size: 13px;
+            }
+        }
+
+        /* Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .flex.flex-row.items-center {
+                gap: 6px;
+            }
+
+            .flex.flex-row.items-center > label {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .flex.flex-row.items-center > label:focus-within {
+                flex: 1;
+            }
+
+            .flex.flex-row.items-center > .segmented {
+                display: inline-flex;
+                gap: 2px;
+                flex-shrink: 0;
+            }
+
+            .segmented .seg {
+                font-size: 10px;
+                padding: 5px 6px;
+                min-width: auto;
+                min-height: auto;
+            }
+
+            .search-input input {
+                font-size: 12px;
+                padding: 6px 8px 6px 28px;
+            }
+
+            .search-input input::placeholder {
+                color: var(--ink-3);
+                transition: color 0.2s ease;
+            }
+
+            .search-input input:focus::placeholder {
+                color: transparent;
+            }
+
+            .search-input i {
+                font-size: 12px;
+                transition: opacity 0.2s ease;
+            }
+
+            .search-input:focus-within i {
+                opacity: 0;
+                pointer-events: none;
             }
         }
 
@@ -262,7 +322,7 @@
                     <div class="app-content-inner space-y-4">
 
                         
-                        <div class="flex flex-row items-center gap-3">
+                        <div class="flex flex-row items-center gap-2">
                             <label class="search-input flex-1 min-w-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input id="searchInput" type="text" placeholder="Cari nama ruangan…"
@@ -271,12 +331,10 @@
                             <div class="segmented flex-shrink-0">
                                 <button class="seg active" data-filter="all">All</button>
                                 <button class="seg" data-filter="online">
-                                    <span class="dot"
-                                        style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
+                                    Online
                                 </button>
                                 <button class="seg" data-filter="offline">
-                                    <span class="dot"
-                                        style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
+                                    Offline
                                 </button>
                             </div>
                         </div>
