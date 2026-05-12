@@ -1176,7 +1176,7 @@
                                        class="dashboard-room-row"
                                        data-dashboard-room-id="<?php echo e($room->id); ?>">
                                         <div class="dashboard-room-main">
-                                            <h3 class="dashboard-room-name"><?php echo e(ucfirst($room->name)); ?></h3>
+                                            <h3 class="dashboard-room-name"><?php echo e($room->name); ?></h3>
                                             <p class="dashboard-room-meta">
                                                 <?php echo e($room->acUnits->count()); ?> unit &middot; <?php echo e($room->device_id ?: '-'); ?>
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title><?php echo e(ucwords($room->name)); ?> — AC Control</title>
+    <title><?php echo e($room->name); ?> — AC Control</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -853,7 +853,7 @@
                         <i class="fa-solid fa-arrow-left text-xs"></i>
                     </button>
                     <div class="app-header-title">
-                        <h1><?php echo e(ucwords($room->name)); ?></h1>
+                        <h1><?php echo e($room->name); ?></h1>
                         <p>AC control panel</p>
                     </div>
                 </div>
@@ -893,7 +893,7 @@
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
                                 </div>
-                                <span class="kbd hidden sm:inline"><?php echo e(strtoupper($room->name)); ?></span>
+                                <span class="kbd hidden sm:inline"><?php echo e($room->name); ?></span>
                             </div>
 
                             <?php if(auth()->guard()->check()): ?>
@@ -1197,7 +1197,7 @@
                     <h2 style="font-size:16px;font-weight:600;color:var(--ink-0);margin:0 0 4px;">Kontrol Semua AC</h2>
                     <p id="bulkModalDesc" class="text-sm" style="color:var(--ink-2);margin:0 0 4px;"></p>
                     <p class="text-xs" style="color:var(--ink-3);"><span
-                            style="color:var(--ink-0);font-weight:600;"><?php echo e(ucwords($room->name)); ?></span> ·
+                            style="color:var(--ink-0);font-weight:600;"><?php echo e($room->name); ?></span> ·
                         <?php echo e($acs->count()); ?> unit</p>
                 </div>
                 <div class="modal-footer" style="padding-top:6px;">

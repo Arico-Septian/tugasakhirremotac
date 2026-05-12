@@ -64,8 +64,7 @@
         .floor-label {
             font-size: 11px;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.04em;
             color: var(--ink-3);
             white-space: nowrap;
         }

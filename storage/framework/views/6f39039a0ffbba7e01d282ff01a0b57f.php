@@ -95,8 +95,7 @@
         .floor-label {
             font-size: 11px;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.04em;
             color: var(--ink-3);
             white-space: nowrap;
         }
@@ -381,7 +380,7 @@
                                                     <div class="flex items-start justify-between gap-2">
                                                         <h3 class="text-sm font-semibold text-tight"
                                                             style="color:var(--ink-0);line-height:1.25;">
-                                                            <?php echo e(ucfirst($room->name)); ?>
+                                                            <?php echo e($room->name); ?>
 
                                                         </h3>
                                                         <span
@@ -425,7 +424,7 @@
                                                             Detail
                                                         </a>
                                                         <button type="button"
-                                                            onclick="openHistory(<?php echo e($room->id); ?>, '<?php echo e(ucfirst($room->name)); ?>')"
+                                                            onclick="openHistory(<?php echo e($room->id); ?>, '<?php echo e($room->name); ?>')"
                                                             class="btn-icon lavender" title="Histori suhu 24 jam">
                                                             <i class="fa-solid fa-chart-line text-[10px]"></i>
                                                         </button>

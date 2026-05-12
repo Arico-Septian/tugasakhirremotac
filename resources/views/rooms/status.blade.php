@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Status AC — {{ ucwords($room->name) }}</title>
+    <title>Status AC — {{ $room->name }}</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
@@ -193,7 +193,7 @@
                     <i class="fa-solid fa-arrow-left text-xs"></i>
                 </button>
                 <div class="app-header-title">
-                    <h1>{{ ucwords($room->name) }}</h1>
+                    <h1>{{ $room->name }}</h1>
                     <p>AC status snapshot</p>
                 </div>
             </div>

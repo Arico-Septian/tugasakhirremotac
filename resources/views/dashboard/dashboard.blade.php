@@ -1176,7 +1176,7 @@
                                        class="dashboard-room-row"
                                        data-dashboard-room-id="{{ $room->id }}">
                                         <div class="dashboard-room-main">
-                                            <h3 class="dashboard-room-name">{{ ucfirst($room->name) }}</h3>
+                                            <h3 class="dashboard-room-name">{{ $room->name }}</h3>
                                             <p class="dashboard-room-meta">
                                                 {{ $room->acUnits->count() }} unit &middot; {{ $room->device_id ?: '-' }}
                                             </p>
