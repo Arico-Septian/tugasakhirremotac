@@ -63,9 +63,10 @@ class AcUnitController extends Controller
 
             $room->fuzzy = $fuzzyResult;
 
-            // ambil setpoint dari AC pertama
-            $currentSetpoint = (int) (
-                $room->acUnits->first()?->status?->set_temperature ?? 24
+            $currentSetpoint = (int) round(
+                $room->acUnits
+                    ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                    ->avg()
             );
 
             $room->decision = $fuzzyService->decideAction(
@@ -223,8 +224,10 @@ class AcUnitController extends Controller
             $deltaT
         );
 
-        $currentSetpoint = (int) (
-            $room->acUnits->first()?->status?->set_temperature ?? 24
+        $currentSetpoint = (int) round(
+            $room->acUnits
+                ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                ->avg()
         );
 
         $decision = $fuzzyService->decideAction(

@@ -58,8 +58,10 @@ class RunFuzzyLogic extends Command
 
             $fuzzyResult = $fuzzyService->calculate($currentTemp, $deltaT);
 
-            $currentSetpoint = (int) (
-                $room->acUnits->first()?->status?->set_temperature ?? 24
+            $currentSetpoint = (int) round(
+                $room->acUnits
+                    ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                    ->avg()
             );
 
             $decision = $fuzzyService->decideAction($fuzzyResult, $currentSetpoint);
