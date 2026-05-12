@@ -29,10 +29,12 @@
         }
 
         .stat-card .stat-num-lg {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-feature-settings: 'tnum' 1, 'lnum' 1, 'cv11' 1;
             font-size: 36px;
             font-weight: 700;
             line-height: 1;
+            letter-spacing: -0.02em;
             margin: 8px 0 6px;
         }
 
