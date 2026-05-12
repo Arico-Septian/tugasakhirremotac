@@ -49,15 +49,23 @@
             white-space: nowrap;
         }
 
-        /* Grid optimization for mobile */
-        @media (max-width: 480px) {
+        /* Grid optimization — order matters: broader → narrower */
+        /* Small phones / portrait phones (≤600px) — 2 columns */
+        @media (max-width: 600px) {
             .grid[class*="grid-cols"] {
-                grid-template-columns: 1fr !important;
-                gap: 2px !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
             }
 
             .ac-card {
                 padding: 12px;
+            }
+        }
+
+        /* Very small phones (≤480px) — keep 2 col but tighter; switch to 1 col under 360px */
+        @media (max-width: 480px) {
+            .grid[class*="grid-cols"] {
+                gap: 6px !important;
             }
 
             .ac-card .label-tag {
@@ -77,13 +85,18 @@
             }
         }
 
-        @media (max-width: 600px) {
+        /* Tiny phones (≤360px) — single column */
+        @media (max-width: 360px) {
             .grid[class*="grid-cols"] {
-                grid-template-columns: repeat(2, 1fr) !important;
+                grid-template-columns: 1fr !important;
             }
+        }
 
-            .ac-card {
-                padding: 12px;
+        /* Tablet portrait (769-1023px) — 3 columns instead of cramped 4 */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .grid[class*="grid-cols"] {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 12px !important;
             }
         }
 
@@ -100,7 +113,7 @@
             }
         }
 
-        /* Landscape mode */
+        /* Landscape mode (rotated phones) */
         @media (max-height: 600px) and (orientation: landscape) {
             .ac-card {
                 padding: 10px;
@@ -112,6 +125,49 @@
 
             .ac-stat .value {
                 font-size: 12px;
+            }
+        }
+
+        /* Header right cluster — wrap & shrink on tiny screens */
+        .main-header {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .main-header .pill {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .main-header .btn-icon {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .main-header .app-header-title h1 {
+                font-size: 15px;
+            }
+
+            .main-header .app-header-title p {
+                font-size: 10px;
+            }
+        }
+
+        /* Ultra-wide (>1600px) — cap content width */
+        @media (min-width: 1600px) {
+            .app-content-inner {
+                max-width: 1480px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .app-content-inner {
+                max-width: 1600px;
             }
         }
     </style>
@@ -161,7 +217,7 @@
                                             <p class="label-tag">AC <?php echo e($ac->ac_number); ?></p>
                                             <p class="text-sm font-semibold mt-0.5" style="color:var(--ink-0);"><?php echo e($ac->name ?: $ac->brand); ?></p>
                                         </div>
-                                        <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);">
+                                        <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
                                             <i class="fa-solid fa-snowflake text-[11px]"></i>
                                         </div>
                                     </div>
@@ -260,7 +316,6 @@ function loadStatus() {
         }).catch(() => {});
 }
 setInterval(loadStatus, 5000);
-document.removeEventListener('DOMContentLoaded', loadStatus);
 
 function setSystemStatus(online) {
     const el = document.getElementById('systemStatus');
