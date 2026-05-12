@@ -658,7 +658,7 @@
         /* #2 Toolbar responsiveness for small screens */
         @media (max-width: 768px) {
             .selector-bar {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 8px;
                 padding: 8px;
             }
@@ -666,13 +666,14 @@
             .selector-bar > div:first-child {
                 flex: 1;
                 min-width: 160px;
+                max-width: 400px;
                 order: 1;
             }
 
             .selector-bar > div:last-child {
                 order: 2;
                 display: flex;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 6px;
                 flex-shrink: 0;
             }
@@ -697,7 +698,7 @@
             }
 
             .selector-bar > div:first-child {
-                flex: 1;
+                flex: 0 1 120px;
                 min-width: 0;
             }
 
@@ -713,12 +714,12 @@
             .selector-bar > div:last-child {
                 display: inline-flex;
                 gap: 4px;
+                flex-shrink: 0;
             }
 
             .btn.btn-sm {
                 padding: 6px 8px;
                 font-size: 10px;
-                min-width: 32px;
             }
 
             .btn.btn-sm span {
@@ -727,6 +728,7 @@
 
             .btn.btn-sm i {
                 margin: 0 !important;
+                font-size: 11px;
             }
 
             .btn-icon {

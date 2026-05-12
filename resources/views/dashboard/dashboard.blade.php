@@ -348,26 +348,212 @@
             }
         }
 
-        /* Stat cards optimization for small screens */
-        @media (max-width: 480px) {
-            .grid.grid-cols-2.lg\:grid-cols-4 {
-                gap: 2px;
+        /* Stat card text styling */
+        .stat-label-sm {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .stat-num-lg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0 6px;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--ink-3);
+        }
+
+        .stat-card.acc-cyan .stat-num-lg     { color: var(--cyan); }
+        .stat-card.acc-mint .stat-num-lg     { color: var(--mint); }
+        .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
+        .stat-card.acc-coral .stat-num-lg    { color: var(--coral); }
+
+        /* Device compatibility - Tablet & Below (768px) */
+        @media (max-width: 768px) {
+            .dashboard-rooms-panel {
+                padding: 16px;
             }
 
+            .dashboard-rooms-title {
+                font-size: 17px;
+            }
+
+            .dashboard-rooms-subtitle {
+                font-size: 14px;
+            }
+
+            .dashboard-room-row {
+                padding: 12px 14px;
+                min-height: 64px;
+                gap: 10px;
+            }
+
+            .dashboard-room-name {
+                font-size: 14px;
+            }
+
+            .dashboard-room-meta {
+                font-size: 12px;
+            }
+
+            .dashboard-room-temp {
+                font-size: 13px;
+            }
+
+            .dashboard-room-status {
+                font-size: 10px;
+                padding: 4px 8px;
+                min-width: 60px;
+            }
+        }
+
+        /* Stat cards optimization - Tablet (640px - 768px) */
+        @media (min-width: 641px) and (max-width: 768px) {
             .stat-card {
-                padding: 14px;
+                padding: 16px;
             }
 
-            .stat-label {
+            .stat-label-sm {
+                font-size: 9px;
+            }
+
+            .stat-num-lg {
+                font-size: 32px;
+                margin: 6px 0 4px;
+            }
+
+            .stat-sub {
                 font-size: 10px;
             }
 
-            .stat-value {
-                font-size: 24px;
+            .stat-icon {
+                font-size: 20px;
+            }
+        }
+
+        /* Stat cards optimization for small screens (< 640px) */
+        @media (max-width: 640px) {
+            .grid.grid-cols-2.lg\:grid-cols-4 {
+                gap: 6px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-label-sm {
+                font-size: 9px;
+                letter-spacing: 0.08em;
+            }
+
+            .stat-num-lg {
+                font-size: 28px;
+                margin: 6px 0 4px;
+            }
+
+            .stat-sub {
+                font-size: 10px;
             }
 
             .stat-icon {
-                font-size: 18px;
+                font-size: 16px;
+            }
+        }
+
+        /* Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .grid.grid-cols-2.lg\:grid-cols-4 {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 10px;
+            }
+
+            .stat-label-sm {
+                font-size: 8px;
+                letter-spacing: 0.08em;
+            }
+
+            .stat-num-lg {
+                font-size: 22px;
+                margin: 4px 0 2px;
+            }
+
+            .stat-sub {
+                font-size: 9px;
+            }
+
+            .stat-icon {
+                font-size: 14px;
+            }
+
+            .dashboard-rooms-panel {
+                padding: 12px;
+            }
+
+            .dashboard-rooms-title {
+                font-size: 15px;
+            }
+
+            .dashboard-rooms-subtitle {
+                font-size: 12px;
+            }
+
+            .dashboard-room-row {
+                padding: 10px 12px;
+                min-height: 56px;
+                gap: 8px;
+                border-radius: 10px;
+            }
+
+            .dashboard-room-row::before {
+                width: 3px;
+            }
+
+            .dashboard-room-name {
+                font-size: 12px;
+            }
+
+            .dashboard-room-meta {
+                font-size: 11px;
+            }
+
+            .dashboard-room-temp {
+                font-size: 12px;
+            }
+
+            .dashboard-room-status {
+                font-size: 9px;
+                padding: 3px 6px;
+                min-width: 56px;
+            }
+
+            .dashboard-rooms-action {
+                min-height: 40px;
+                min-width: 70px;
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+        }
+
+        /* Temperature chart height responsive */
+        @media (max-width: 768px) {
+            div[style*="height:300px"] {
+                height: 250px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            div[style*="height:300px"] {
+                height: 200px !important;
             }
         }
 
@@ -381,6 +567,10 @@
             .dashboard-room-row {
                 padding: 12px 14px;
                 min-height: 72px;
+            }
+
+            .stat-card {
+                min-height: 100px;
             }
         }
     </style>
@@ -415,17 +605,17 @@
         {{-- BODY --}}
         <div class="page-body">
             <div class="app-content">
-                <div class="app-content-inner space-y-5">
+                <div class="app-content-inner space-y-6">
 
                     {{-- Stat cards --}}
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                         <div class="stat-card acc-cyan">
                             <span class="accent-bar"></span>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="stat-label">Rooms</p>
-                                    <p class="stat-value">{{ $rooms->count() }}</p>
-                                    <p class="stat-meta">Total registered</p>
+                                    <p class="stat-label-sm">Rooms</p>
+                                    <p class="stat-num-lg">{{ $rooms->count() }}</p>
+                                    <p class="stat-sub">Total registered</p>
                                 </div>
                                 <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
                             </div>
@@ -484,7 +674,6 @@
                                     <option value="10">Top 10</option>
                                     <option value="0">Semua</option>
                                 </select>
-                                <span id="chartLastUpdated" class="panel-meta">—</span>
                             </div>
                         </div>
                         <div style="height:300px;position:relative;">
@@ -768,9 +957,6 @@ function refreshTrendChart() {
                     infoEl.textContent = `Menampilkan ${data.shown} ruangan. Klik nama ruangan di legenda untuk show/hide.`;
                 }
             }
-
-            const tsEl = document.getElementById('chartLastUpdated');
-            if (tsEl) tsEl.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
         })
         .catch(() => {});
 }
