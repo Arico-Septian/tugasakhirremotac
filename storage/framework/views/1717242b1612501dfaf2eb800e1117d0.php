@@ -126,20 +126,6 @@
                         </div>
                     <?php endif; ?>
 
-                    
-                    <div class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> Histori</p>
-                                <h3 class="panel-title">Suhu Ruangan</h3>
-                                <p class="panel-subtitle">24 jam terakhir · rata-rata per jam</p>
-                            </div>
-                            <span id="histUpdated" class="panel-meta">—</span>
-                        </div>
-                        <div style="height:240px;">
-                            <canvas id="tempHistChart"></canvas>
-                        </div>
-                    </div>
 
                 </div>
             </div>
@@ -195,73 +181,6 @@ function loadStatus() {
 }
 setInterval(loadStatus, 5000);
 document.addEventListener('DOMContentLoaded', loadStatus);
-
-/* ===== Temperature history chart ===== */
-let histChart = null;
-function tempColor(t) {
-    if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.55)';
-    if (t > 30) return 'rgba(251,113,133,0.85)';
-    if (t > 25) return 'rgba(251,191,36,0.85)';
-    return 'rgba(77,212,255,0.85)';
-}
-function initHistChart(labels, temps) {
-    const ctx = document.getElementById('tempHistChart');
-    if (!ctx) return;
-    if (histChart) histChart.destroy();
-    histChart = new Chart(ctx, {
-        data: {
-            labels,
-            datasets: [
-                { type: 'bar', label: 'Suhu (°C)', data: temps,
-                  backgroundColor: temps.map(tempColor), borderRadius: 6,
-                  barPercentage: 0.75, categoryPercentage: 0.82 },
-                { type: 'line', label: 'Tren', data: temps,
-                  borderColor: 'rgba(245,247,251,0.28)', backgroundColor: 'transparent',
-                  tension: 0.4, pointBackgroundColor: '#f5f7fb', pointRadius: 3,
-                  borderWidth: 1.5, pointHoverRadius: 5 }
-            ]
-        },
-        options: {
-            maintainAspectRatio: false, responsive: true,
-            plugins: {
-                legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, boxWidth: 10, boxHeight: 10 } },
-                tooltip: {
-                    backgroundColor: 'rgba(7,16,31,0.96)',
-                    titleColor: '#f5f7fb', bodyColor: '#cbd5e1',
-                    borderColor: 'rgba(77,212,255,0.40)', borderWidth: 1,
-                    padding: 10, cornerRadius: 10, displayColors: false,
-                    callbacks: { label: c => ` ${c.parsed.y}°C` }
-                }
-            },
-            scales: {
-                x: { ticks: { color: '#64748b', font: { size: 10 }, maxRotation: 0 }, grid: { display: false } },
-                y: { suggestedMin: 18, suggestedMax: 38,
-                     ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
-                     grid: { color: 'rgba(255,255,255,0.04)' } }
-            }
-        }
-    });
-}
-function loadHistChart() {
-    fetch('/temperature/history/<?php echo e($room->id); ?>')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                const ctx = document.getElementById('tempHistChart');
-                if (ctx) {
-                    const c = ctx.getContext('2d');
-                    c.fillStyle = '#64748b'; c.font = '13px Inter'; c.textAlign = 'center';
-                    c.fillText('Belum ada data histori suhu', ctx.width / 2, 110);
-                }
-                return;
-            }
-            initHistChart(data.map(d => d.time), data.map(d => d.temp));
-            const el = document.getElementById('histUpdated');
-            if (el) el.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
-        }).catch(() => {});
-}
-document.addEventListener('DOMContentLoaded', loadHistChart);
-setInterval(loadHistChart, 60000);
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>

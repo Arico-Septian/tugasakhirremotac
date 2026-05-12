@@ -79,7 +79,6 @@ class Notification extends Model
         return self::notify('device_offline', "ESP {$roomName} offline", [
             'severity' => 'error',
             'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " tidak terhubung. Cek koneksi WiFi atau power.",
-            'link' => '/dashboard',
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
         ]);
     }
@@ -98,31 +97,7 @@ class Notification extends Model
         return self::notify('device_online', "ESP {$roomName} online", [
             'severity' => 'info',
             'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " terhubung kembali.",
-            'link' => '/dashboard',
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
-        ]);
-    }
-
-    public static function tempAlert(string $roomName, float $temp, string $reason): ?self
-    {
-        $key = "temp_alert:{$roomName}:{$reason}";
-
-        if (cache()->has($key)) {
-            return null;
-        }
-
-        cache()->put($key, true, now()->addMinutes(30));
-
-        $severity = $reason === 'too_hot' ? 'warning' : 'info';
-        $msg = $reason === 'too_hot'
-            ? "Suhu di " . ucwords($roomName) . " {$temp}°C — di atas threshold."
-            : "Suhu di " . ucwords($roomName) . " {$temp}°C — di bawah normal.";
-
-        return self::notify('temp_alert', "Temperature alert: " . ucwords($roomName), [
-            'severity' => $severity,
-            'message' => $msg,
-            'link' => '/rooms/overview',
-            'meta' => ['room' => $roomName, 'temperature' => $temp, 'reason' => $reason],
         ]);
     }
 }

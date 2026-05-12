@@ -23,3 +23,6 @@ Schedule::command('ac:run-timer')
 Schedule::command('fuzzy:run')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('notification:cleanup')
+    ->dailyAt('00:00');
