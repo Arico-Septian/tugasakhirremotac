@@ -85,8 +85,20 @@
         .adv-filter-body {
             padding: 14px;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .adv-filter-body {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .adv-filter-body {
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
 
         .adv-filter-body .field { margin: 0; }
@@ -389,76 +401,24 @@
                                         </select>
                                     </div>
                                     <div class="field">
-                                        <label class="field-label">Dari Tanggal</label>
+                                        <label class="field-label"><i class="fa-regular fa-calendar text-[10px]" style="margin-right:4px;"></i>Dari Tanggal</label>
                                         <input class="input" type="date" name="date_from"
-                                            value="<?php echo e(request('date_from')); ?>" onchange="this.form.submit()">
+                                            value="<?php echo e(request('date_from')); ?>" onchange="this.form.submit()" style="cursor:pointer;">
                                     </div>
                                     <div class="field">
-                                        <label class="field-label">Sampai Tanggal</label>
+                                        <label class="field-label"><i class="fa-regular fa-calendar text-[10px]" style="margin-right:4px;"></i>Sampai Tanggal</label>
                                         <input class="input" type="date" name="date_to"
-                                            value="<?php echo e(request('date_to')); ?>" onchange="this.form.submit()">
+                                            value="<?php echo e(request('date_to')); ?>" onchange="this.form.submit()" style="cursor:pointer;">
                                     </div>
                                     <div class="field" style="align-self:end;display:flex;gap:8px;">
-                                        <?php if(count($activeFilters)): ?>
-                                            <a href="/logs" class="btn btn-sm"
-                                                style="background:var(--panel-2);border-color:var(--line);">
-                                                <i class="fa-solid fa-xmark text-[10px]"></i> Reset
-                                            </a>
-                                        <?php endif; ?>
+                                        <a href="/logs" class="btn btn-sm"
+                                            style="background:var(--panel-2);border-color:var(--line);<?php echo e(count($activeFilters) ? '' : 'opacity:0.5;pointer-events:none;'); ?>">
+                                            <i class="fa-solid fa-xmark text-[10px]"></i> Reset
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </form>
-
-                        
-                        <?php if(count($activeFilters)): ?>
-                            <div class="active-filters">
-                                <?php if(request('search')): ?>
-                                    <span class="filter-tag">
-                                        <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                                        "<?php echo e(request('search')); ?>"
-                                        <button onclick="removeFilter('search')" title="Hapus">
-                                            <i class="fa-solid fa-xmark text-[9px]"></i>
-                                        </button>
-                                    </span>
-                                <?php endif; ?>
-                                <?php if(request('user_id')): ?>
-                                    <?php $uName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); ?>
-                                    <span class="filter-tag">
-                                        <i class="fa-solid fa-user text-[9px]"></i>
-                                        <?php echo e($uName); ?>
-
-                                        <button onclick="removeFilter('user_id')" title="Hapus">
-                                            <i class="fa-solid fa-xmark text-[9px]"></i>
-                                        </button>
-                                    </span>
-                                <?php endif; ?>
-                                <?php if(request('room')): ?>
-                                    <span class="filter-tag">
-                                        <i class="fa-solid fa-server text-[9px]"></i>
-                                        <?php echo e(request('room')); ?>
-
-                                        <button onclick="removeFilter('room')" title="Hapus">
-                                            <i class="fa-solid fa-xmark text-[9px]"></i>
-                                        </button>
-                                    </span>
-                                <?php endif; ?>
-                                <?php if(request('date_from') || request('date_to')): ?>
-                                    <span class="filter-tag">
-                                        <i class="fa-regular fa-calendar text-[9px]"></i>
-                                        <?php echo e(request('date_from') ? \Carbon\Carbon::parse(request('date_from'))->format('d M Y') : '...'); ?>
-
-                                        –
-                                        <?php echo e(request('date_to') ? \Carbon\Carbon::parse(request('date_to'))->format('d M Y') : '...'); ?>
-
-                                        <button onclick="removeFilter('date_from'); removeFilter('date_to')"
-                                            title="Hapus">
-                                            <i class="fa-solid fa-xmark text-[9px]"></i>
-                                        </button>
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
 
                         <?php
                             $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
@@ -501,22 +461,62 @@
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <div class="empty-state">
                                         <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-                                        <p class="empty-title">Tidak ada hasil</p>
-                                        <p class="empty-sub">Coba ubah atau reset filter</p>
+                                        <p class="empty-title">No activities found</p>
+                                        <p class="empty-sub"><?php echo e(count($activeFilters) ? 'Try adjusting your filters or ' : ''); ?><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
                                     </div>
                                 <?php endif; ?>
                             </div>
+
+                            
+                            <?php if(count($activeFilters)): ?>
+                                <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;align-items:center;border-bottom:1px solid var(--line-soft);">
+                                    <span style="font-size:12px;color:var(--ink-3);font-weight:500;">Filters:</span>
+                                    <?php if(request('search')): ?>
+                                        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
+                                            <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                                            "<?php echo e(request('search')); ?>"
+                                            <button onclick="removeFilter('search')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if(request('activity')): ?>
+                                        <?php $actLabel = $activityOptions[request('activity')] ?? request('activity'); ?>
+                                        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
+                                            <i class="fa-solid fa-filter text-[9px]"></i>
+                                            <?php echo e($actLabel); ?>
+
+                                            <button onclick="removeFilter('activity')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if(request('user_id')): ?>
+                                        <?php $userName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); ?>
+                                        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
+                                            <i class="fa-solid fa-user text-[9px]"></i>
+                                            <?php echo e($userName); ?>
+
+                                            <button onclick="removeFilter('user_id')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if(request('room')): ?>
+                                        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
+                                            <i class="fa-solid fa-server text-[9px]"></i>
+                                            <?php echo e(request('room')); ?>
+
+                                            <button onclick="removeFilter('room')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
 
                             
                             <div class="hidden md:block" style="overflow-x:auto;">
                                 <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th style="width:22%;">User</th>
-                                            <th style="width:18%;">Room</th>
-                                            <th>Detail</th>
-                                            <th style="width:16%;">Activity</th>
-                                            <th style="width:14%;" class="whitespace-nowrap">Time</th>
+                                            <th style="width:22%;">USER</th>
+                                            <th style="width:18%;">ROOM</th>
+                                            <th>DETAIL</th>
+                                            <th style="width:16%;">ACTIVITY</th>
+                                            <th style="width:14%;" class="whitespace-nowrap">TIME</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -563,8 +563,8 @@
                                                     <div class="empty-state">
                                                         <div class="empty-icon"><i
                                                                 class="fa-solid fa-magnifying-glass"></i></div>
-                                                        <p class="empty-title">Tidak ada hasil</p>
-                                                        <p class="empty-sub">Coba ubah atau reset filter</p>
+                                                        <p class="empty-title">No activities found</p>
+                                                        <p class="empty-sub"><?php echo e(count($activeFilters) ? 'Try adjusting your filters or ' : ''); ?><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
                                                     </div>
                                                 </td>
                                             </tr>
