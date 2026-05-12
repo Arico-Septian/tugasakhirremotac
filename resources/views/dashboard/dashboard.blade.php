@@ -10,6 +10,28 @@
     <script src="/js/chart.umd.js"></script>
     @include('components.sidebar-styles')
     <style>
+        .trend-filter-select {
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            color: var(--ink-1);
+            border-radius: var(--r-md);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            outline: none;
+            transition: var(--t-base);
+        }
+
+        .trend-filter-select:hover {
+            background: var(--panel-2);
+            border-color: var(--line);
+        }
+
+        .trend-filter-select:focus {
+            border-color: var(--cyan);
+        }
+
         .dashboard-rooms-panel {
             padding: 24px;
             border-radius: 20px;
@@ -277,18 +299,38 @@
                         </div>
                     </div>
 
-                    {{-- Temperature chart --}}
+                    {{-- Temperature trend chart (1 jam terakhir) --}}
                     <div class="panel">
                         <div class="panel-header">
                             <div>
-                                <p class="eyebrow"><i class="fa-solid fa-temperature-half"></i> Live</p>
+                                <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
                                 <h2 class="panel-title">Room Temperatures</h2>
                             </div>
-                            <span id="chartLastUpdated" class="panel-meta">—</span>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
+                                    <option value="1h">1 Jam</option>
+                                    <option value="3h">3 Jam</option>
+                                    <option value="6h">6 Jam</option>
+                                    <option value="24h">24 Jam</option>
+                                </select>
+                                <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
+                                    <option value="5">Top 5</option>
+                                    <option value="10">Top 10</option>
+                                    <option value="0">Semua</option>
+                                </select>
+                                <span id="chartLastUpdated" class="panel-meta">—</span>
+                            </div>
                         </div>
-                        <div style="height:280px;">
+                        <div style="height:300px;position:relative;">
                             <canvas id="tempChart"></canvas>
+                            <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
+                                <div style="text-align:center;">
+                                    <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
+                                    <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
+                                </div>
+                            </div>
                         </div>
+                        <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
                     </div>
 
                     {{-- Server rooms preview --}}
@@ -355,37 +397,12 @@
 @include('components.bottom-nav')
 
 <script>
-const roomNames = @json($rooms->pluck('name')->map(fn($n) => str_replace('server ', 'srv ', $n)));
-const roomTemps = @json($rooms->pluck('temperature')->map(fn($t) => is_null($t) ? null : (float)$t)->values());
-
 function tempColor(t) {
     if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.55)';
     if (t > 30) return 'rgba(251,113,133,0.85)';   // coral
     if (t > 25) return 'rgba(251,191,36,0.85)';    // amber
     return 'rgba(77,212,255,0.85)';                // cyan
 }
-
-const valueLabelPlugin = {
-    id: 'valueLabel',
-    afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-            if (ds.type !== 'bar') return;
-            const meta = chart.getDatasetMeta(i);
-            meta.data.forEach((bar, idx) => {
-                const v = ds.data[idx];
-                if (Number.isFinite(v) && v > 0) {
-                    ctx.save();
-                    ctx.fillStyle = '#f5f7fb';
-                    ctx.font = `600 ${window.innerWidth < 768 ? 9 : 10.5}px Inter`;
-                    ctx.textAlign = 'center';
-                    ctx.fillText(v + '°C', bar.x, bar.y - 6);
-                    ctx.restore();
-                }
-            });
-        });
-    }
-};
 
 /* ===== NOTIFICATIONS ===== */
 let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
@@ -431,59 +448,160 @@ function initChart() {
     const ctx = document.getElementById('tempChart');
     if (!ctx) return;
     tempChart = new Chart(ctx, {
-        plugins: [valueLabelPlugin],
-        data: {
-            labels: roomNames,
-            datasets: [
-                { type: 'bar', label: 'Temperature (°C)', data: roomTemps,
-                  backgroundColor: roomTemps.map(tempColor), borderRadius: 6,
-                  barPercentage: 0.7, categoryPercentage: 0.78 },
-                { type: 'line', label: 'Trend', data: roomTemps,
-                  borderColor: 'rgba(245,247,251,0.32)', backgroundColor: 'transparent',
-                  tension: 0.4, pointBackgroundColor: '#f5f7fb', pointRadius: 3, borderWidth: 1.5 }
-            ]
-        },
+        type: 'line',
+        data: { labels: [], datasets: [] },
         options: {
-            maintainAspectRatio: false, responsive: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, boxWidth: 10, boxHeight: 10 } },
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 },
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        usePointStyle: true,
+                        padding: 12,
+                        generateLabels: function(chart) {
+                            const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                            const labels = original.call(this, chart);
+                            labels.forEach((label, i) => {
+                                const ds = chart.data.datasets[i];
+                                if (ds && ds._isOffline) {
+                                    // Warna text memudar utk room offline
+                                    label.fontColor = '#64748b';
+                                }
+                            });
+                            return labels;
+                        }
+                    }
+                },
                 tooltip: {
                     backgroundColor: 'rgba(7,16,31,0.96)',
-                    titleColor: '#f5f7fb', bodyColor: '#cbd5e1',
-                    borderColor: 'rgba(77,212,255,0.35)', borderWidth: 1,
-                    padding: 10, cornerRadius: 10, displayColors: false,
-                    callbacks: { label: c => ` ${c.parsed.y}°C` }
+                    titleColor: '#f5f7fb',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(77,212,255,0.35)',
+                    borderWidth: 1,
+                    padding: 10,
+                    cornerRadius: 10,
+                    callbacks: {
+                        label: c => {
+                            const v = c.parsed.y;
+                            const valStr = v === null || isNaN(v) ? '—' : v + '°C';
+                            return ` ${c.dataset.label}: ${valStr}`;
+                        }
+                    }
                 }
             },
             scales: {
-                x: { ticks: { color: '#64748b', maxRotation: 0, font: { size: 10 } }, grid: { display: false } },
-                y: { suggestedMin: 20, suggestedMax: 40,
-                     ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
-                     grid: { color: 'rgba(255,255,255,0.04)' } }
+                x: {
+                    ticks: { color: '#64748b', maxRotation: 0, font: { size: 10 } },
+                    grid: { display: false }
+                },
+                y: {
+                    suggestedMin: 20,
+                    suggestedMax: 35,
+                    ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
+                    grid: { color: 'rgba(255,255,255,0.04)' }
+                }
             }
         }
     });
 }
 
 function refreshTemperature() {
-    if (!tempChart) return;
     fetch('/temperature')
         .then(r => r.ok ? r.json() : null)
         .then(data => {
-            if (!data || !tempChart) return;
-            const safe = data.map(r => { const t = parseFloat(r.temp); return isNaN(t) ? null : t; });
-            tempChart.data.datasets[0].data = safe;
-            tempChart.data.datasets[1].data = safe;
-            tempChart.data.datasets[0].backgroundColor = safe.map(tempColor);
-            tempChart.update();
-
+            if (!data) return;
             data.forEach(room => {
                 const tempEl = document.getElementById(`dashboard-room-temp-${room.id}`);
                 if (!tempEl) return;
-
                 const temp = parseFloat(room.temp);
                 tempEl.textContent = isNaN(temp) ? '-- \u00b0C' : `${temp.toFixed(1)}\u00b0C`;
             });
+        })
+        .catch(() => {});
+}
+
+function getTrendLimit() {
+    const saved = localStorage.getItem('trendLimit');
+    return saved !== null ? saved : '5';
+}
+
+function getTrendRange() {
+    const saved = localStorage.getItem('trendRange');
+    return saved !== null ? saved : '1h';
+}
+
+const RANGE_LABELS = {
+    '1h':  'Trend 1 jam terakhir',
+    '3h':  'Trend 3 jam terakhir',
+    '6h':  'Trend 6 jam terakhir',
+    '24h': 'Trend 24 jam terakhir',
+};
+
+function refreshTrendChart() {
+    if (!tempChart) return;
+    const limit = getTrendLimit();
+    const range = getTrendRange();
+
+    const labelEl = document.getElementById('trendRangeLabel');
+    if (labelEl) labelEl.textContent = RANGE_LABELS[range] || RANGE_LABELS['1h'];
+
+    fetch(`/temperature/trend?limit=${encodeURIComponent(limit)}&range=${encodeURIComponent(range)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data || !tempChart) return;
+
+            const hasAnyData = (data.datasets || []).some(ds =>
+                (ds.data || []).some(v => v !== null && !isNaN(v))
+            );
+
+            const emptyEl = document.getElementById('tempChartEmpty');
+            const canvasEl = document.getElementById('tempChart');
+            if (emptyEl && canvasEl) {
+                emptyEl.style.display = hasAnyData ? 'none' : 'flex';
+                canvasEl.style.display = hasAnyData ? 'block' : 'none';
+            }
+
+            tempChart.data.labels = data.labels || [];
+            tempChart.data.datasets = (data.datasets || []).map(ds => {
+                const tempStr = ds.current_temp !== null && ds.current_temp !== undefined
+                    ? `${Number(ds.current_temp).toFixed(1)}°C`
+                    : '—';
+                // Warna memudar untuk room offline (alpha ~35%)
+                const lineColor = ds.is_offline ? ds.color + '55' : ds.color;
+                const fillColor = ds.is_offline ? ds.color + '11' : ds.color + '22';
+                return {
+                    label: `${ds.room} (${tempStr})`,
+                    data: ds.data,
+                    borderColor: lineColor,
+                    backgroundColor: fillColor,
+                    tension: 0.35,
+                    borderWidth: ds.is_offline ? 1.5 : 2,
+                    pointRadius: ds.is_offline ? 2 : 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: lineColor,
+                    spanGaps: true,
+                    fill: false,
+                    _isOffline: ds.is_offline,
+                    _offlineSince: ds.offline_since,
+                };
+            });
+            tempChart.update();
+
+            const infoEl = document.getElementById('trendInfo');
+            if (infoEl) {
+                if (data.total_rooms > data.shown) {
+                    infoEl.textContent = `Menampilkan ${data.shown} dari ${data.total_rooms} ruangan (urutkan: suhu tertinggi). Klik nama ruangan di legenda untuk show/hide.`;
+                } else {
+                    infoEl.textContent = `Menampilkan ${data.shown} ruangan. Klik nama ruangan di legenda untuk show/hide.`;
+                }
+            }
 
             const tsEl = document.getElementById('chartLastUpdated');
             if (tsEl) tsEl.textContent = 'Updated ' + new Date().toLocaleTimeString('id-ID');
@@ -492,6 +610,7 @@ function refreshTemperature() {
 }
 
 setInterval(refreshTemperature, 5000);
+setInterval(refreshTrendChart, 30000);
 
 function refreshDashboardRoomStatuses() {
     fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
@@ -528,7 +647,27 @@ document.addEventListener('DOMContentLoaded', () => {
     initChart();
     setSystemStatus(navigator.onLine);
     updateNotifButton();
+
+    // Setup trend filter dropdowns
+    const trendSelect = document.getElementById('trendLimit');
+    if (trendSelect) {
+        trendSelect.value = getTrendLimit();
+        trendSelect.addEventListener('change', (e) => {
+            localStorage.setItem('trendLimit', e.target.value);
+            refreshTrendChart();
+        });
+    }
+    const rangeSelect = document.getElementById('trendRange');
+    if (rangeSelect) {
+        rangeSelect.value = getTrendRange();
+        rangeSelect.addEventListener('change', (e) => {
+            localStorage.setItem('trendRange', e.target.value);
+            refreshTrendChart();
+        });
+    }
+
     setTimeout(refreshTemperature, 400);
+    setTimeout(refreshTrendChart, 500);
     setTimeout(refreshDashboardRoomStatuses, 600);
 });
 </script>
