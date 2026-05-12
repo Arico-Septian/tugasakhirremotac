@@ -653,10 +653,16 @@
                                     <div style="padding:12px 16px;border-bottom:1px solid var(--line-soft);">
                                         <div class="flex items-center justify-between gap-2 mb-1.5">
                                             <div class="log-user">
-                                                <span class="avatar"
-                                                    style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
-                                                    {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
-                                                </span>
+                                                @if ($log->user && $log->user->avatar_url)
+                                                    <img src="{{ $log->user->avatar_url }}" alt="{{ $log->user->name }}"
+                                                         class="avatar"
+                                                         style="width:26px;height:26px;border-radius:7px;object-fit:cover;">
+                                                @else
+                                                    <span class="avatar"
+                                                        style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">
+                                                        {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
+                                                    </span>
+                                                @endif
                                                 <span class="name">{{ $log->user->name ?? '—' }}</span>
                                             </div>
                                             @php [$label, $class] = activityBadge($log->activity); @endphp
@@ -741,10 +747,16 @@
                                             <tr>
                                                 <td>
                                                     <div class="log-user">
-                                                        <span class="avatar"
-                                                            style="width:28px;height:28px;font-size:11px;border-radius:8px;flex-shrink:0;">
-                                                            {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
-                                                        </span>
+                                                        @if ($log->user && $log->user->avatar_url)
+                                                            <img src="{{ $log->user->avatar_url }}" alt="{{ $log->user->name }}"
+                                                                 class="avatar"
+                                                                 style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+                                                        @else
+                                                            <span class="avatar"
+                                                                style="width:28px;height:28px;font-size:11px;border-radius:8px;flex-shrink:0;">
+                                                                {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
+                                                            </span>
+                                                        @endif
                                                         <span class="name">{{ $log->user->name ?? '—' }}</span>
                                                     </div>
                                                 </td>

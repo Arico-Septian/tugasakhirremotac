@@ -8,6 +8,7 @@ class User extends Authenticatable
 {
     protected $fillable = [
         'name',
+        'avatar',
         'password',
         'role',
         'is_active',
@@ -30,7 +31,12 @@ class User extends Authenticatable
         'is_online' => 'boolean',
     ];
 
-    protected $appends = ['isOnline', 'status_text'];
+    protected $appends = ['isOnline', 'status_text', 'avatar_url'];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->avatar ? asset('storage/' . $this->avatar) : null;
+    }
 
     public function isAdmin()
     {

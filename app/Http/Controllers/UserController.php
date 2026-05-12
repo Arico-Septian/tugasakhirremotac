@@ -7,13 +7,14 @@ use App\Models\UserLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::select('id', 'name', 'role', 'is_active', 'last_activity')
+        $query = User::select('id', 'name', 'avatar', 'role', 'is_active', 'last_activity')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
@@ -158,6 +159,60 @@ class UserController extends Controller
     {
         $user = Auth::user();
         return view('profile.index', compact('user'));
+    }
+
+    public function uploadAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ], [
+            'avatar.required' => 'Pilih file gambar dulu.',
+            'avatar.image'    => 'File harus berupa gambar.',
+            'avatar.mimes'    => 'Format yang didukung: JPG, PNG, WEBP.',
+            'avatar.max'      => 'Ukuran maksimal 2 MB.',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->avatar = $path;
+        $user->save();
+
+        UserLog::create([
+            'user_id' => $user->id,
+            'room' => $user->name,
+            'ac' => '-',
+            'activity' => 'update_avatar',
+        ]);
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function deleteAvatar()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->avatar = null;
+        $user->save();
+
+        UserLog::create([
+            'user_id' => $user->id,
+            'room' => $user->name,
+            'ac' => '-',
+            'activity' => 'remove_avatar',
+        ]);
+
+        return back()->with('success', 'Foto profil dihapus.');
     }
 
     public function changePassword(Request $request)

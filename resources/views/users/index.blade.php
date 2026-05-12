@@ -693,9 +693,14 @@
                                     <div class="user-card">
                                         <div class="user-card-header">
                                             <div class="user-card-info">
-                                                <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
-                                                    {{ $initials }}
-                                                </div>
+                                                @if ($user->avatar_url)
+                                                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                                                         class="user-avatar-sm" style="object-fit:cover;">
+                                                @else
+                                                    <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
+                                                        {{ $initials }}
+                                                    </div>
+                                                @endif
                                                 <div class="user-card-name">
                                                     <span class="user-card-name-text">{{ $user->name }}</span>
                                                     <span class="user-card-handle">{{ $handle }}</span>
@@ -777,9 +782,14 @@
                                         $colorIndex = ($user->id - 1) % 4;
                                         $colorName = $colors[$colorIndex];
                                     @endphp
-                                    <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
-                                                        {{ $initials }}
-                                                    </div>
+                                    @if ($user->avatar_url)
+                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                                             class="user-avatar-sm" style="object-fit:cover;">
+                                    @else
+                                        <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
+                                            {{ $initials }}
+                                        </div>
+                                    @endif
                                                     <div class="user-info">
                                                         <p class="user-name">{{ $user->name }}</p>
                                                         <p class="user-handle">{{ $handle }}</p>

@@ -75,9 +75,14 @@
     
     <div class="sidebar-footer">
         <div class="profile-full">
-            <a href="/profile" class="avatar" title="View profile">
-                <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+            <a href="/profile" class="avatar" title="View profile" style="padding:0;overflow:hidden;">
+                <?php if(Auth::user()->avatar_url): ?>
+                    <img src="<?php echo e(Auth::user()->avatar_url); ?>" alt="<?php echo e(Auth::user()->name); ?>"
+                         style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                <?php else: ?>
+                    <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
 
+                <?php endif; ?>
             </a>
             <a href="/profile" class="profile-info menu-text" style="text-decoration:none;">
                 <p class="name"><?php echo e(Auth::user()->name); ?></p>

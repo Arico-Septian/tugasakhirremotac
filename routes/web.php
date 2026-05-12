@@ -58,6 +58,8 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/recent-activities', [DashboardController::class, 'recentActivities'])->name('dashboard.recent-activities');
     Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/profile/avatar', [UserController::class, 'uploadAvatar'])->name('profile.avatar.upload');
+    Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/rooms/overview', [RoomController::class, 'overview'])->name('rooms.overview');
     Route::get('/rooms/{id}/status', [RoomController::class, 'status']);

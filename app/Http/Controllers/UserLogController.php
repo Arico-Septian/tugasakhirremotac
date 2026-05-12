@@ -27,7 +27,7 @@ class UserLogController extends Controller
             });
         };
 
-        $query = UserLog::with('user:id,name')->latest();
+        $query = UserLog::with('user:id,name,avatar')->latest();
 
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);

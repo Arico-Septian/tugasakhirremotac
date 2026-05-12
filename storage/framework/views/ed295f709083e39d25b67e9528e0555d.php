@@ -694,10 +694,15 @@
                                     <div class="user-card">
                                         <div class="user-card-header">
                                             <div class="user-card-info">
-                                                <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
-                                                    <?php echo e($initials); ?>
+                                                <?php if($user->avatar_url): ?>
+                                                    <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                                         class="user-avatar-sm" style="object-fit:cover;">
+                                                <?php else: ?>
+                                                    <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
+                                                        <?php echo e($initials); ?>
 
-                                                </div>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <div class="user-card-name">
                                                     <span class="user-card-name-text"><?php echo e($user->name); ?></span>
                                                     <span class="user-card-handle"><?php echo e($handle); ?></span>
@@ -781,10 +786,15 @@
                                         $colorIndex = ($user->id - 1) % 4;
                                         $colorName = $colors[$colorIndex];
                                     ?>
-                                    <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
-                                                        <?php echo e($initials); ?>
+                                    <?php if($user->avatar_url): ?>
+                                        <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                             class="user-avatar-sm" style="object-fit:cover;">
+                                    <?php else: ?>
+                                        <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
+                                            <?php echo e($initials); ?>
 
-                                                    </div>
+                                        </div>
+                                    <?php endif; ?>
                                                     <div class="user-info">
                                                         <p class="user-name"><?php echo e($user->name); ?></p>
                                                         <p class="user-handle"><?php echo e($handle); ?></p>

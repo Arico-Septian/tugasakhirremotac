@@ -186,10 +186,24 @@
 
                     
                     <div class="panel panel-lg" style="display:flex;align-items:center;gap:18px;">
-                        <div class="avatar avatar-xl"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
+                        <div class="avatar-wrap" style="position:relative;flex-shrink:0;">
+                            <?php if($user->avatar_url): ?>
+                                <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                     class="avatar avatar-xl"
+                                     style="object-fit:cover;width:64px;height:64px;border-radius:999px;">
+                            <?php else: ?>
+                                <div class="avatar avatar-xl"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
+                            <?php endif; ?>
+                            <button type="button" id="avatarBtn"
+                                    title="<?php echo e($user->avatar ? 'Ubah foto' : 'Tambah foto'); ?>"
+                                    onclick="document.getElementById('avatarInput').click()"
+                                    style="position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:999px;background:var(--cyan);border:2px solid var(--panel-1);color:#0b1220;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.25);">
+                                <i class="fa-solid fa-camera text-[10px]"></i>
+                            </button>
+                        </div>
                         <div class="flex-1 min-w-0">
                             <h2 style="font-size:18px;font-weight:600;color:var(--ink-0);margin:0;letter-spacing:-0.01em;"><?php echo e($user->name); ?></h2>
-                            <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
                                 <span class="badge-role <?php echo e($user->role); ?>"><?php echo e(strtoupper($user->role)); ?></span>
                                 <?php if($user->last_activity): ?>
                                     <span class="text-xs" style="color:var(--ink-3);">
@@ -198,8 +212,28 @@
                                     </span>
                                 <?php endif; ?>
                             </div>
+                            <?php if($user->avatar): ?>
+                                <form method="POST" action="<?php echo e(route('profile.avatar.delete')); ?>" style="margin-top:8px;display:inline-block;"
+                                      onsubmit="return confirm('Hapus foto profil?');">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
+                                    <button type="submit"
+                                            style="background:transparent;border:none;color:var(--coral);font-size:11px;font-weight:600;cursor:pointer;padding:0;">
+                                        <i class="fa-solid fa-trash text-[9px]"></i> Hapus foto
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
                     </div>
+
+                    
+                    <form id="avatarForm" method="POST" action="<?php echo e(route('profile.avatar.upload')); ?>"
+                          enctype="multipart/form-data" style="display:none;">
+                        <?php echo csrf_field(); ?>
+                        <input type="file" id="avatarInput" name="avatar"
+                               accept="image/jpeg,image/png,image/webp"
+                               onchange="handleAvatarSelect(this)">
+                    </form>
 
                     
                     <div class="panel panel-lg mt-4">
@@ -266,6 +300,23 @@
 <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
+function handleAvatarSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran file maksimal 2 MB.');
+        input.value = '';
+        return;
+    }
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+        alert('Format yang didukung: JPG, PNG, WEBP.');
+        input.value = '';
+        return;
+    }
+    document.getElementById('avatarForm').submit();
+}
+
 function toggleTheme() {
     const root = document.documentElement;
     const current = root.getAttribute('data-theme') || 'dark';
