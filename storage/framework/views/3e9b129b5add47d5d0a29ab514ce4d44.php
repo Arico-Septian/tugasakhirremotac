@@ -656,42 +656,109 @@
         }
 
         /* #2 Toolbar responsiveness for small screens */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .selector-bar {
-                flex-direction: column;
+                flex-wrap: wrap;
                 gap: 8px;
-                padding: 10px;
-            }
-
-            .selector-bar > div {
-                width: 100%;
+                padding: 8px;
             }
 
             .selector-bar > div:first-child {
+                flex: 1;
+                min-width: 160px;
                 order: 1;
             }
 
             .selector-bar > div:last-child {
                 order: 2;
                 display: flex;
-                flex-direction: column;
+                flex-wrap: wrap;
                 gap: 6px;
-            }
-
-            .selector-bar > div:last-child > div {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 4px;
+                flex-shrink: 0;
             }
 
             .btn.btn-sm {
-                padding: 8px 10px;
+                padding: 7px 10px;
                 font-size: 11px;
+                white-space: nowrap;
             }
 
             .btn-icon {
                 width: 36px;
                 height: 36px;
+            }
+        }
+
+        /* #2b Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .selector-bar {
+                padding: 6px;
+                gap: 6px;
+            }
+
+            .selector-bar > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .selector {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .selector i {
+                font-size: 9px;
+            }
+
+            .selector-bar > div:last-child {
+                display: inline-flex;
+                gap: 4px;
+            }
+
+            .btn.btn-sm {
+                padding: 6px 8px;
+                font-size: 10px;
+                min-width: 32px;
+            }
+
+            .btn.btn-sm span {
+                display: none;
+            }
+
+            .btn.btn-sm i {
+                margin: 0 !important;
+            }
+
+            .btn-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+        }
+
+        /* #2c Tablet medium screens (600px - 768px) */
+        @media (min-width: 600px) and (max-width: 768px) {
+            .selector-bar {
+                padding: 9px;
+                gap: 10px;
+            }
+
+            .selector-bar > div:first-child {
+                flex: 1;
+            }
+
+            .selector {
+                padding: 7px 11px;
+                font-size: 12px;
+            }
+
+            .btn.btn-sm {
+                padding: 7px 9px;
+                font-size: 11px;
+            }
+
+            .btn.btn-sm span {
+                display: inline;
             }
         }
 

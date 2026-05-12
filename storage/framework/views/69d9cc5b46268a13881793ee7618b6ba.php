@@ -176,47 +176,211 @@
 
         @media (max-width: 640px) {
             .dashboard-rooms-panel {
-                padding: 18px;
+                padding: 16px;
             }
 
             .dashboard-rooms-panel .panel-header {
-                flex-wrap: nowrap;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .dashboard-rooms-title {
+                font-size: 17px;
+                flex: 1;
             }
 
             .dashboard-rooms-action {
-                min-width: 84px;
-                min-height: 50px;
+                min-width: 80px;
+                min-height: 44px;
                 padding: 8px 12px;
                 font-size: 12px;
+                flex-shrink: 0;
             }
 
             .dashboard-room-row {
                 grid-template-columns: 1fr auto;
                 gap: 10px;
-                padding-right: 12px;
+                padding: 12px 14px;
+                min-height: 68px;
             }
 
             .dashboard-room-temp {
                 grid-column: 2;
                 grid-row: 1;
-                min-width: 62px;
+                min-width: 60px;
                 font-size: 13px;
+                text-align: right;
             }
 
             .dashboard-room-status {
                 grid-column: 2;
                 grid-row: 2;
-                min-width: 74px;
+                min-width: 72px;
                 font-size: 10px;
-                padding: 5px 9px;
+                padding: 4px 8px;
             }
 
             .dashboard-room-name {
-                font-size: 15px;
+                font-size: 14px;
             }
 
             .dashboard-room-meta {
                 font-size: 12px;
+                margin-top: 2px;
+            }
+
+            .dashboard-room-main {
+                padding-left: 16px;
+            }
+
+            .dashboard-room-row::before {
+                width: 4px;
+                left: 14px;
+            }
+        }
+
+        /* Very small screens (< 480px) */
+        @media (max-width: 480px) {
+            .dashboard-rooms-panel {
+                padding: 12px;
+                border-radius: 16px;
+            }
+
+            .dashboard-rooms-panel .panel-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .dashboard-rooms-title {
+                font-size: 16px;
+            }
+
+            .dashboard-rooms-action {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+
+            .dashboard-room-list {
+                gap: 8px;
+            }
+
+            .dashboard-room-row {
+                grid-template-columns: 1fr auto;
+                gap: 8px;
+                padding: 10px 12px;
+                min-height: 64px;
+                border-radius: 12px;
+            }
+
+            .dashboard-room-row::before {
+                width: 3px;
+                left: 12px;
+            }
+
+            .dashboard-room-main {
+                padding-left: 12px;
+                min-width: 0;
+            }
+
+            .dashboard-room-name {
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .dashboard-room-meta {
+                font-size: 11px;
+            }
+
+            .dashboard-room-temp {
+                min-width: 50px;
+                font-size: 12px;
+                padding: 0 4px;
+            }
+
+            .dashboard-room-status {
+                min-width: 60px;
+                font-size: 9px;
+                padding: 3px 6px;
+            }
+
+            .trend-filter-select {
+                font-size: 10px;
+                padding: 5px 8px;
+            }
+        }
+
+        /* Landscape mode (max-height: 600px) */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .dashboard-rooms-panel {
+                padding: 12px;
+            }
+
+            .dashboard-rooms-title {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .dashboard-room-row {
+                min-height: 56px;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .dashboard-room-name {
+                font-size: 13px;
+            }
+
+            .dashboard-room-meta {
+                font-size: 11px;
+            }
+
+            .dashboard-room-temp {
+                font-size: 12px;
+            }
+
+            .dashboard-room-status {
+                font-size: 9px;
+                padding: 3px 6px;
+            }
+        }
+
+        /* Stat cards optimization for small screens */
+        @media (max-width: 480px) {
+            .grid.grid-cols-2.lg\:grid-cols-4 {
+                gap: 2px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-icon {
+                font-size: 18px;
+            }
+        }
+
+        /* Touch target optimization */
+        @media (hover: none) and (pointer: coarse) {
+            .dashboard-rooms-action {
+                min-height: 48px;
+                min-width: 48px;
+            }
+
+            .dashboard-room-row {
+                padding: 12px 14px;
+                min-height: 72px;
             }
         }
     </style>
