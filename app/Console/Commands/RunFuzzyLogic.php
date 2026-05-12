@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\AcControlController;
+use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomTemperature;
 use App\Services\FuzzyMamdaniService;
@@ -43,9 +44,20 @@ class RunFuzzyLogic extends Command
                 ->take(2)
                 ->get();
 
-            if ($tempHistory->isEmpty()) {
+            $isDeviceOnline = $room->device_status === 'online';
+            $isTempAvailable = !$tempHistory->isEmpty();
+
+            if (!$isTempAvailable) {
+                Notification::fuzzyWarning($room->name, 'temperature_offline');
                 continue;
             }
+
+            if (!$isDeviceOnline) {
+                Notification::fuzzyWarning($room->name, 'device_offline');
+                continue;
+            }
+
+            Notification::fuzzyRecovery($room->name);
 
             $currentTemp = $tempHistory->first()->temperature;
             $previousTemp = $tempHistory->count() > 1
@@ -65,6 +77,13 @@ class RunFuzzyLogic extends Command
             );
 
             $decision = $fuzzyService->decideAction($fuzzyResult, $currentSetpoint);
+
+            Notification::fuzzyAction(
+                $room->name,
+                $decision['action'],
+                $decision['setpoint_before'],
+                $decision['setpoint_after']
+            );
 
             if ($decision['action'] === 'DIAM') {
                 continue;

@@ -100,4 +100,83 @@ class Notification extends Model
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
         ]);
     }
+
+    public static function fuzzyAction(string $roomName, string $action, int $setpointBefore, int $setpointAfter): ?self
+    {
+        $stateKey = "fuzzy_action:{$roomName}";
+        $prevAction = cache()->get($stateKey);
+
+        if ($prevAction === $action) {
+            return null;
+        }
+
+        cache()->put($stateKey, $action, now()->addDays(7));
+
+        $title = "Fuzzy Logic: {$roomName}";
+        $message = self::buildFuzzyMessage($roomName, $action, $setpointBefore, $setpointAfter);
+        $severity = $action === 'DIAM' ? 'info' : 'warning';
+
+        return self::notify('fuzzy_action', $title, [
+            'severity' => $severity,
+            'message' => $message,
+            'meta' => [
+                'room' => $roomName,
+                'action' => $action,
+                'setpoint_before' => $setpointBefore,
+                'setpoint_after' => $setpointAfter,
+            ],
+        ]);
+    }
+
+    private static function buildFuzzyMessage(string $roomName, string $action, int $before, int $after): string
+    {
+        $room = ucwords($roomName);
+
+        return match ($action) {
+            'TURUNKAN' => "AC {$room}: Sistem mendeteksi panas, mendinginkan ({$before}°C → {$after}°C)",
+            'NAIKKAN' => "AC {$room}: Sistem mendeteksi dingin, memanaskan ({$before}°C → {$after}°C)",
+            default => "AC {$room}: Status stabil ({$before}°C)",
+        };
+    }
+
+    public static function fuzzyWarning(string $roomName, string $reason = 'temperature_offline'): ?self
+    {
+        $stateKey = "fuzzy_warning:{$roomName}:{$reason}";
+        $lastWarning = cache()->get($stateKey);
+
+        if ($lastWarning === 'warned') {
+            return null;
+        }
+
+        cache()->put($stateKey, 'warned', now()->addMinutes(30));
+
+        $message = match ($reason) {
+            'device_offline' => "ESP ruangan " . ucwords($roomName) . " offline — Fuzzy logic tidak berjalan. Periksa koneksi device.",
+            default => "Sensor suhu ruangan " . ucwords($roomName) . " offline — Fuzzy logic tidak berjalan. Periksa koneksi sensor.",
+        };
+
+        return self::notify('fuzzy_warning', "Fuzzy Logic: {$roomName}", [
+            'severity' => 'error',
+            'message' => $message,
+            'meta' => ['room' => $roomName, 'reason' => $reason],
+        ]);
+    }
+
+    public static function fuzzyRecovery(string $roomName): ?self
+    {
+        $stateKey = "fuzzy_warning:{$roomName}";
+        $wasWarned = cache()->has($stateKey);
+
+        cache()->forget($stateKey);
+
+        if (!$wasWarned) {
+            return null;
+        }
+
+        return self::notify('fuzzy_recovery', "Fuzzy Logic: {$roomName}", [
+            'severity' => 'info',
+            'message' => "Sensor suhu ruangan " . ucwords($roomName) . " online — Fuzzy logic active kembali.",
+            'meta' => ['room' => $roomName, 'reason' => 'temperature_online'],
+        ]);
+    }
 }
