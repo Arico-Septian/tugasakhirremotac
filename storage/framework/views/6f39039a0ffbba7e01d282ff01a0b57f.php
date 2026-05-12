@@ -534,20 +534,6 @@
             });
         });
 
-        document.querySelectorAll('[data-floor]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isActive = this.classList.contains('active');
-                document.querySelectorAll('[data-floor]').forEach(b => b.classList.remove('active'));
-                if (isActive) {
-                    activeFloor = 'all';
-                } else {
-                    this.classList.add('active');
-                    activeFloor = this.dataset.floor;
-                }
-                applyFilter();
-            });
-        });
-
         document.addEventListener('DOMContentLoaded', applyFilter);
 
         function setRoomStatus(card, online) {

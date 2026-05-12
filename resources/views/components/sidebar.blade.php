@@ -13,7 +13,7 @@
             </div>
             <div class="brand-text menu-text">
                 <span class="name">SmartAC</span>
-                <span class="sub">Control Suite</span>
+                <span class="sub">Control System</span>
             </div>
         </div>
         <button onclick="toggleSidebar()" type="button"
