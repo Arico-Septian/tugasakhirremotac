@@ -1,3 +1,125 @@
+@auth
+{{-- ===== Idle auto-logout modal ===== --}}
+<div id="idleWarnModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(7,16,31,0.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+    <div style="max-width:380px;width:100%;background:var(--panel-1);border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="width:36px;height:36px;border-radius:10px;background:rgba(251,191,36,0.14);border:1px solid rgba(251,191,36,0.34);display:inline-flex;align-items:center;justify-content:center;color:#fbbf24;">
+                <i class="fa-solid fa-clock"></i>
+            </span>
+            <div>
+                <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--ink-0);">Sesi akan berakhir</h3>
+            </div>
+        </div>
+        <p style="margin:0 0 14px;font-size:13px;line-height:1.5;color:var(--ink-2);">
+            Anda tidak aktif untuk beberapa waktu. Sesi akan otomatis berakhir dalam
+            <strong id="idleCountdown" style="color:var(--coral);font-family:'JetBrains Mono',monospace;">60</strong> detik.
+        </p>
+        <div style="display:flex;gap:8px;">
+            <button type="button" id="idleStayBtn" class="btn btn-primary" style="flex:1;">Tetap login</button>
+            <button type="button" id="idleLogoutBtn" class="btn btn-ghost" style="flex:1;">Logout sekarang</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ===== Idle auto-logout (role-based) ===== */
+(function () {
+    const ROLE = @json(auth()->user()->role ?? 'user');
+    const IDLE_MINUTES = { admin: 15, operator: 30, user: 60 };
+    const WARN_SECONDS = 60;
+    const IDLE_MS = (IDLE_MINUTES[ROLE] ?? 60) * 60 * 1000;
+    const PING_THROTTLE_MS = 60 * 1000;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const modal = document.getElementById('idleWarnModal');
+    const countdownEl = document.getElementById('idleCountdown');
+    const stayBtn = document.getElementById('idleStayBtn');
+    const logoutBtn = document.getElementById('idleLogoutBtn');
+
+    let lastActivity = Date.now();
+    let lastPing = 0;
+    let warnTimer = null;
+    let logoutTimer = null;
+    let countdownTimer = null;
+    let warning = false;
+
+    function showModal() {
+        if (!modal) return;
+        modal.style.display = 'flex';
+        warning = true;
+        let remaining = WARN_SECONDS;
+        countdownEl.textContent = remaining;
+        countdownTimer = setInterval(() => {
+            remaining--;
+            countdownEl.textContent = remaining;
+            if (remaining <= 0) clearInterval(countdownTimer);
+        }, 1000);
+        logoutTimer = setTimeout(doLogout, WARN_SECONDS * 1000);
+    }
+
+    function hideModal() {
+        if (!modal) return;
+        modal.style.display = 'none';
+        warning = false;
+        clearTimeout(logoutTimer);
+        clearInterval(countdownTimer);
+    }
+
+    function doLogout() {
+        hideModal();
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/logout';
+        const t = document.createElement('input');
+        t.type = 'hidden'; t.name = '_token'; t.value = csrf;
+        form.appendChild(t);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function pingServer() {
+        const now = Date.now();
+        if (now - lastPing < PING_THROTTLE_MS) return;
+        lastPing = now;
+        fetch('/session/ping', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        }).catch(() => {});
+    }
+
+    function resetIdle() {
+        lastActivity = Date.now();
+        if (warning) {
+            hideModal();
+            pingServer();
+        }
+        clearTimeout(warnTimer);
+        warnTimer = setTimeout(showModal, Math.max(IDLE_MS - WARN_SECONDS * 1000, 1000));
+    }
+
+    function onUserInput() {
+        const now = Date.now();
+        if (now - lastActivity < 2000) return;
+        resetIdle();
+        pingServer();
+    }
+
+    ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+        window.addEventListener(evt, onUserInput, { passive: true });
+    });
+
+    stayBtn?.addEventListener('click', () => {
+        resetIdle();
+        pingServer();
+    });
+    logoutBtn?.addEventListener('click', doLogout);
+
+    resetIdle();
+})();
+</script>
+@endauth
+
 <script>
 /* ===== SIDEBAR TOGGLE ===== */
 function toggleSidebar() {
