@@ -48,6 +48,293 @@
             }
         }
 
+        /* Chart row: Temperature Chart (wide) + Recent Activity (narrow) */
+        .dashboard-chart-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-chart-row {
+                grid-template-columns: 2fr 1fr;
+                gap: 16px;
+                align-items: stretch;
+            }
+        }
+
+        .dashboard-chart-panel,
+        .dashboard-activity-panel {
+            min-width: 0;
+        }
+
+        /* ===== Recent Activity widget — premium ===== */
+        .dashboard-activity-panel {
+            padding: 18px 16px 14px;
+            border-radius: 20px;
+            background:
+                linear-gradient(180deg, rgba(34, 211, 238, 0.06) 0%, transparent 40%),
+                var(--panel-1);
+            border: 1px solid var(--line-soft);
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.04) inset,
+                0 10px 30px -18px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-activity-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(34,211,238,0.45), transparent);
+            opacity: 0.7;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .activity-title-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .activity-title-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(167,139,250,0.18));
+            border: 1px solid rgba(34,211,238,0.30);
+            color: var(--cyan);
+            font-size: 11px;
+        }
+
+        .activity-title {
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--ink-0);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(52, 211, 153, 0.10);
+            border: 1px solid rgba(52, 211, 153, 0.32);
+            color: var(--mint);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            backdrop-filter: blur(8px);
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--mint);
+            box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+            animation: livePulse 1.8s ease-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+            70%  { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 360px;
+            padding-right: 4px;
+            margin-right: -4px;
+        }
+
+        .activity-list::-webkit-scrollbar { width: 4px; }
+        .activity-list::-webkit-scrollbar-track { background: transparent; }
+        .activity-list::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 999px;
+        }
+        .activity-list::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.35); }
+
+        .activity-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 4px 32px 1fr;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px 10px 8px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+            border: 1px solid var(--line-soft);
+            transition: all 0.18s ease;
+        }
+
+        .activity-item:hover {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-color: rgba(148, 163, 184, 0.25);
+            transform: translateX(2px);
+        }
+
+        .activity-rail {
+            width: 3px;
+            min-height: 28px;
+            border-radius: 999px;
+            align-self: stretch;
+            background: var(--tone, #94a3b8);
+            box-shadow: 0 0 8px -1px var(--tone, transparent);
+            opacity: 0.85;
+        }
+
+        .activity-icon-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in srgb, var(--tone, #94a3b8) 14%, transparent);
+            border: 1px solid color-mix(in srgb, var(--tone, #94a3b8) 30%, transparent);
+            color: var(--tone, #94a3b8);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Tone variants — sets --tone per item */
+        .activity-item.tone-cyan     { --tone: #22d3ee; }
+        .activity-item.tone-mint     { --tone: #34d399; }
+        .activity-item.tone-lavender { --tone: #a78bfa; }
+        .activity-item.tone-coral    { --tone: #fb7185; }
+        .activity-item.tone-amber    { --tone: #fbbf24; }
+        .activity-item.tone-sky      { --tone: #38bdf8; }
+        .activity-item.tone-slate    { --tone: #94a3b8; }
+
+        .activity-body {
+            min-width: 0;
+        }
+
+        .activity-line {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .activity-user {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink-0);
+            letter-spacing: -0.005em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--ink-4);
+            flex-shrink: 0;
+        }
+
+        .activity-desc {
+            margin: 2px 0 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: var(--ink-2);
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .activity-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .activity-chips .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: rgba(148, 163, 184, 0.10);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            color: var(--ink-3);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .activity-chips .chip i {
+            font-size: 8px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-activity-panel {
+                padding: 14px 12px 12px;
+            }
+
+            .activity-title {
+                font-size: 14px;
+            }
+
+            .activity-title-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .activity-list {
+                max-height: 300px;
+            }
+
+            .activity-item {
+                grid-template-columns: 3px 28px 1fr;
+                padding: 9px 10px 9px 7px;
+                gap: 8px;
+            }
+
+            .activity-icon-wrap {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .activity-user,
+            .activity-desc {
+                font-size: 11px;
+            }
+
+            .activity-time {
+                font-size: 9px;
+            }
+        }
+
         .dashboard-rooms-panel .panel-header {
             align-items: flex-start;
             margin-bottom: 16px;
@@ -722,36 +1009,80 @@
                     </div>
 
                     
-                    <div class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
-                                <h2 class="panel-title">Room Temperatures</h2>
-                            </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
-                                    <option value="1h">1 Jam</option>
-                                    <option value="3h">3 Jam</option>
-                                    <option value="6h">6 Jam</option>
-                                    <option value="24h">24 Jam</option>
-                                </select>
-                                <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
-                                    <option value="5">Top 5</option>
-                                    <option value="10">Top 10</option>
-                                    <option value="0">Semua</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="height:300px;position:relative;">
-                            <canvas id="tempChart"></canvas>
-                            <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
-                                <div style="text-align:center;">
-                                    <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
-                                    <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
+                    <div class="dashboard-chart-row">
+                        
+                        <div class="panel dashboard-chart-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
+                                    <h2 class="panel-title">Room Temperatures</h2>
+                                </div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
+                                        <option value="1h">1 Jam</option>
+                                        <option value="3h">3 Jam</option>
+                                        <option value="6h">6 Jam</option>
+                                        <option value="24h">24 Jam</option>
+                                    </select>
+                                    <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
+                                        <option value="5">Top 5</option>
+                                        <option value="10">Top 10</option>
+                                        <option value="0">Semua</option>
+                                    </select>
                                 </div>
                             </div>
+                            <div style="height:300px;position:relative;">
+                                <canvas id="tempChart"></canvas>
+                                <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
+                                    <div style="text-align:center;">
+                                        <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
+                                        <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
                         </div>
-                        <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
+
+                        
+                        <section class="panel dashboard-activity-panel">
+                            <div class="activity-header">
+                                <h2 class="activity-title">Aktivitas Terkini</h2>
+                                <span class="activity-title-icon"><i class="fa-solid fa-bolt"></i></span>
+                            </div>
+
+                            <div class="activity-list" id="activityList">
+                                <?php $__empty_1 = true; $__currentLoopData = $recentActivities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <div class="activity-item tone-<?php echo e($log['tone']); ?>">
+                                        <div class="activity-rail"></div>
+                                        <div class="activity-icon-wrap">
+                                            <i class="<?php echo e($log['icon']); ?>"></i>
+                                        </div>
+                                        <div class="activity-body">
+                                            <div class="activity-line">
+                                                <span class="activity-user"><?php echo e($log['user_name']); ?></span>
+                                                <span class="activity-time"><?php echo e($log['time']); ?></span>
+                                            </div>
+                                            <p class="activity-desc"><?php echo e($log['description']); ?></p>
+                                            <?php if($log['room'] || $log['ac']): ?>
+                                                <div class="activity-chips">
+                                                    <?php if($log['room']): ?>
+                                                        <span class="chip"><i class="fa-solid fa-door-open"></i><?php echo e($log['room']); ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if($log['ac']): ?>
+                                                        <span class="chip"><i class="fa-solid fa-snowflake"></i><?php echo e($log['ac']); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                    <div class="empty-state" style="padding:24px 12px;">
+                                        <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                        <p class="empty-title">Belum ada aktivitas</p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </section>
                     </div>
 
                     
@@ -1089,6 +1420,72 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(refreshTemperature, 400);
     setTimeout(refreshTrendChart, 500);
     setTimeout(refreshDashboardRoomStatuses, 600);
+
+    // Recent Activity live polling
+    const activityList = document.getElementById('activityList');
+    const liveBadge = document.getElementById('activityLiveBadge');
+    const allowedTones = ['cyan', 'mint', 'lavender', 'coral', 'amber', 'sky', 'slate'];
+    const allowedIconPrefix = /^fa-(solid|regular|brands)\s+fa-[a-z0-9-]+$/i;
+
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function safeIcon(icon) {
+        const v = String(icon || '').trim();
+        return allowedIconPrefix.test(v) ? v : 'fa-solid fa-circle-info';
+    }
+
+    function safeTone(tone) {
+        return allowedTones.includes(tone) ? tone : 'slate';
+    }
+
+    function renderActivity(item) {
+        const tone = safeTone(item.tone);
+        const icon = safeIcon(item.icon);
+        const name = escapeHtml(item.user_name || 'System');
+        const desc = escapeHtml(item.description || item.raw_activity || '');
+        const time = escapeHtml(item.time || '');
+        const room = item.room ? `<span class="chip"><i class="fa-solid fa-door-open"></i>${escapeHtml(item.room)}</span>` : '';
+        const ac = item.ac ? `<span class="chip"><i class="fa-solid fa-snowflake"></i>${escapeHtml(item.ac)}</span>` : '';
+        const chips = (room || ac) ? `<div class="activity-chips">${room}${ac}</div>` : '';
+
+        return `
+            <div class="activity-item tone-${tone}" data-id="${item.id}">
+                <div class="activity-rail"></div>
+                <div class="activity-icon-wrap"><i class="${icon}"></i></div>
+                <div class="activity-body">
+                    <div class="activity-line">
+                        <span class="activity-user">${name}</span>
+                        <span class="activity-time">${time}</span>
+                    </div>
+                    <p class="activity-desc">${desc}</p>
+                    ${chips}
+                </div>
+            </div>
+        `;
+    }
+
+    async function refreshRecentActivities() {
+        if (!activityList) return;
+        try {
+            const res = await fetch('/dashboard/recent-activities', { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) throw new Error('fetch failed');
+            const data = await res.json();
+            if (!Array.isArray(data) || data.length === 0) return;
+            activityList.innerHTML = data.map(renderActivity).join('');
+            if (liveBadge) liveBadge.style.opacity = '1';
+        } catch (e) {
+            if (liveBadge) liveBadge.style.opacity = '0.5';
+        }
+    }
+
+    setInterval(refreshRecentActivities, 12000);
 });
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>

@@ -54,6 +54,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/recent-activities', [DashboardController::class, 'recentActivities'])->name('dashboard.recent-activities');
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/rooms/overview', [RoomController::class, 'overview'])->name('rooms.overview');
