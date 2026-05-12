@@ -11,9 +11,10 @@
     @include('components.sidebar-styles')
     <style>
         .filter-bar {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--panel-1);
             border: 1px solid var(--line-soft);
             border-radius: var(--r-xl);
+            box-shadow: var(--inset-hi);
             padding: 16px;
         }
 
@@ -241,7 +242,7 @@
                                     </button>
                                     @if (count($activeFilters))
                                         <a href="/logs" class="btn btn-sm"
-                                            style="background:rgba(255,255,255,0.05);border-color:var(--line);">
+                                            style="background:var(--panel-2);border-color:var(--line);">
                                             <i class="fa-solid fa-xmark text-[10px]"></i>
                                             Reset
                                         </a>

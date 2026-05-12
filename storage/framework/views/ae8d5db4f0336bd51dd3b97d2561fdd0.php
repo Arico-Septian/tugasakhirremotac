@@ -11,9 +11,10 @@
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         .filter-bar {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--panel-1);
             border: 1px solid var(--line-soft);
             border-radius: var(--r-xl);
+            box-shadow: var(--inset-hi);
             padding: 16px;
         }
 
@@ -244,7 +245,7 @@
                                     </button>
                                     <?php if(count($activeFilters)): ?>
                                         <a href="/logs" class="btn btn-sm"
-                                            style="background:rgba(255,255,255,0.05);border-color:var(--line);">
+                                            style="background:var(--panel-2);border-color:var(--line);">
                                             <i class="fa-solid fa-xmark text-[10px]"></i>
                                             Reset
                                         </a>

@@ -35,7 +35,9 @@
         .dashboard-rooms-panel {
             padding: 24px;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.035);
+            background: var(--panel-1);
+            border: 1px solid var(--line-soft);
+            box-shadow: var(--inset-hi);
         }
 
         .dashboard-rooms-panel .panel-header {
@@ -62,7 +64,7 @@
             min-height: 60px;
             padding: 10px 16px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--panel-2);
             border: 1px solid var(--line-soft);
             color: var(--ink-0);
             display: inline-flex;
@@ -90,7 +92,7 @@
             min-height: 72px;
             padding: 14px 16px 14px 18px;
             border-radius: 14px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--panel-2);
             border: 1px solid var(--line-soft);
             color: inherit;
             display: grid;

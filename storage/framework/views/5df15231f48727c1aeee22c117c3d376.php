@@ -139,17 +139,18 @@
                                 </label>
                             </form>
 
-                            <div class="flex gap-2 flex-shrink-0 flex-wrap">
-                                <div style="width:1px;background:var(--line-soft);margin:0 2px;"></div>
-                                <button class="filter-pill active" data-room-filter="all" type="button">All</button>
-                                <button class="filter-pill" data-room-filter="online" type="button">
-                                    <span class="dot"
-                                        style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
-                                </button>
-                                <button class="filter-pill" data-room-filter="offline" type="button">
-                                    <span class="dot"
-                                        style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
-                                </button>
+                            <div class="flex gap-2 flex-shrink-0 flex-wrap items-center">
+                                <div class="segmented">
+                                    <button class="seg active" data-room-filter="all" type="button">All</button>
+                                    <button class="seg" data-room-filter="online" type="button">
+                                        <span class="dot"
+                                            style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
+                                    </button>
+                                    <button class="seg" data-room-filter="offline" type="button">
+                                        <span class="dot"
+                                            style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
+                                    </button>
+                                </div>
                                 <?php if(auth()->guard()->check()): ?>
                                     <?php if(in_array(Auth::user()->role, ['admin', 'operator'])): ?>
                                         <button onclick="openModal()" class="btn btn-primary btn-sm" type="button">

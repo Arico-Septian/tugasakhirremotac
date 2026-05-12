@@ -162,19 +162,19 @@
                     <div class="app-content-inner space-y-4">
 
                         
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <label class="search-input flex-1">
+                        <div class="flex flex-row items-center gap-3">
+                            <label class="search-input flex-1 min-w-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input id="searchInput" type="text" placeholder="Cari nama ruangan…"
                                     autocomplete="off">
                             </label>
-                            <div class="flex gap-2 flex-shrink-0 flex-wrap">
-                                <button class="filter-pill active" data-filter="all">All</button>
-                                <button class="filter-pill" data-filter="online">
+                            <div class="segmented flex-shrink-0">
+                                <button class="seg active" data-filter="all">All</button>
+                                <button class="seg" data-filter="online">
                                     <span class="dot"
                                         style="width:6px;height:6px;border-radius:50%;background:var(--mint);"></span>Online
                                 </button>
-                                <button class="filter-pill" data-filter="offline">
+                                <button class="seg" data-filter="offline">
                                     <span class="dot"
                                         style="width:6px;height:6px;border-radius:50%;background:var(--coral);"></span>Offline
                                 </button>
@@ -367,21 +367,19 @@
 
         document.getElementById('searchInput')?.addEventListener('input', applyFilter);
 
-        document.querySelectorAll('.filter-pill[data-filter]').forEach(btn => {
+        document.querySelectorAll('[data-filter]').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-pill[data-filter]').forEach(b => b.classList.remove(
-                    'active'));
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 activeStatus = this.dataset.filter;
                 applyFilter();
             });
         });
 
-        document.querySelectorAll('.filter-pill[data-floor]').forEach(btn => {
+        document.querySelectorAll('[data-floor]').forEach(btn => {
             btn.addEventListener('click', function() {
                 const isActive = this.classList.contains('active');
-                document.querySelectorAll('.filter-pill[data-floor]').forEach(b => b.classList.remove(
-                    'active'));
+                document.querySelectorAll('[data-floor]').forEach(b => b.classList.remove('active'));
                 if (isActive) {
                     activeFloor = 'all';
                 } else {
