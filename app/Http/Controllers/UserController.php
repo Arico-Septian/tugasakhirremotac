@@ -71,13 +71,13 @@ class UserController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^\S+$/',
+                'regex:/^[A-Z]\S*$/',
                 Rule::unique('users', 'name'),
             ],
             'password' => 'required|string|min:8',
             'role' => 'required|in:admin,operator,user'
         ], [
-            'name.regex' => 'Username tidak boleh mengandung spasi.',
+            'name.regex' => 'Huruf awal username harus kapital dan tidak boleh mengandung spasi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);
 

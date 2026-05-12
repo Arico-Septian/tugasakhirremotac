@@ -939,10 +939,11 @@
                 <div class="modal-body space-y-3">
                     <div class="field">
                         <label class="field-label">Username</label>
-                        <input class="input" type="text" name="name" placeholder="johndoe (tanpa spasi)"
-                            pattern="\S+" title="Username tidak boleh mengandung spasi"
+                        <input class="input" type="text" name="name" id="newUserName"
+                            placeholder="Johndoe (huruf awal kapital, tanpa spasi)"
+                            pattern="[A-Z]\S*" title="Huruf awal harus kapital dan tidak boleh ada spasi"
                             autocomplete="off" required>
-                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Tidak boleh mengandung spasi</p>
+                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Huruf awal kapital, tanpa spasi</p>
                     </div>
                     <div class="field">
                         <label class="field-label">Password</label>

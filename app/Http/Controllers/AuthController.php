@@ -24,8 +24,11 @@ class AuthController extends Controller
         }
 
         $credentials = $request->validate([
-            'name' => 'required|string|max:255',
-            'password' => 'required|string'
+            'name' => ['required', 'string', 'max:255', 'regex:/^[A-Z]\S*$/'],
+            'password' => 'required|string|min:8',
+        ], [
+            'name.regex' => 'Huruf awal username harus kapital dan tidak boleh mengandung spasi.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $key = $this->rateLimitKey($request);
@@ -73,7 +76,29 @@ class AuthController extends Controller
             'activity' => 'login'
         ]);
 
-        return redirect()->intended(route('dashboard'));
+        $intended = $request->session()->pull('url.intended');
+        if ($intended && $this->isPageUrl($intended)) {
+            return redirect($intended);
+        }
+        return redirect()->route('dashboard');
+    }
+
+    private function isPageUrl(string $url): bool
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        $apiPaths = [
+            '/temperature', '/temperatures',
+            '/device-status', '/ac-status',
+            '/notifications/recent',
+            '/dashboard/recent-activities',
+            '/session/ping',
+            '/logout',
+        ];
+        foreach ($apiPaths as $p) {
+            if (str_starts_with($path, $p)) return false;
+        }
+        if (str_starts_with($path, '/api/')) return false;
+        return true;
     }
 
     public function logout(Request $request)

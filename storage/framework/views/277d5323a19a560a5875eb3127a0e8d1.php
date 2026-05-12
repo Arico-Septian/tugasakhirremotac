@@ -573,14 +573,15 @@
                 <div class="field">
                     <label class="field-label" for="username">
                         <span>Username</span>
-                        <span class="help">tanpa spasi</span>
+                        <span class="help">huruf awal kapital, tanpa spasi</span>
                     </label>
                     <div class="input-wrap" id="usernameWrap">
                         <span class="leading"><i class="fa-regular fa-user"></i></span>
                         <input id="username" type="text" name="name"
                                required autofocus autocomplete="username"
-                               pattern="\S+" title="Username tidak boleh mengandung spasi"
-                               placeholder="contoh: andi"
+                               pattern="[A-Z]\S*"
+                               title="Huruf awal harus kapital dan tidak boleh ada spasi"
+                               placeholder="contoh: Andi"
                                value="<?php echo e(old('name')); ?>">
                         <span class="valid-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                     </div>
