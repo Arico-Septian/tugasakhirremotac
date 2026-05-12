@@ -1,753 +1,1100 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AC Control System | Premium IoT Climate Control</title>
+    <title>Control AC — Cooling, Reimagined</title>
 
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- AOS CSS -->
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-        /* ===== CUSTOM STYLES ===== */
-        * {
-            box-sizing: border-box;
+        :root {
+            --bg-0:  #060912;
+            --bg-1:  #0a0f1c;
+            --panel:    #0e1424;
+            --panel-2:  #131a2e;
+            --panel-3:  #182238;
+            --line:     rgba(255, 255, 255, 0.08);
+            --line-2:   rgba(255, 255, 255, 0.14);
+            --line-3:   rgba(255, 255, 255, 0.22);
+            --ink-0: #f4f6fb;
+            --ink-1: #d8def0;
+            --ink-2: #9aa3bd;
+            --ink-3: #6b7596;
+            --ink-4: #4a5273;
+            --cyan:     #5ed0ff;
+            --mint:     #6ee7b7;
+            --lavender: #b4a3ff;
+            --coral:    #fb7185;
+            --amber:    #fbbf24;
+            --sky:      #38bdf8;
+            --pink:     #f0abfc;
+            --shadow-1: 0 1px 0 rgba(255,255,255,0.06) inset, 0 10px 30px -15px rgba(0,0,0,0.7);
+            --shadow-2: 0 1px 0 rgba(255,255,255,0.08) inset, 0 20px 60px -20px rgba(0,0,0,0.8);
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--ink-0);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        /* Premium Gradient Background */
-        .premium-bg {
             background:
-                linear-gradient(rgba(10, 20, 80, 0.7), rgba(10, 20, 80, 0.9)),
-                url('/images/wallpaper.jpeg') no-repeat center center fixed;
-            position: relative;
-        }
-        .premium-bg::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15), transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(30, 64, 175, 0.2), transparent 50%);
-            z-index: 0;
-        }
-        /* Animated Gradient Border */
-        .gradient-border {
-            position: relative;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
+                linear-gradient(rgba(6, 9, 18, 0.86), rgba(6, 9, 18, 0.92)),
+                url('/images/wallpaper.jpeg') center/cover no-repeat fixed;
         }
 
-        .gradient-border::before {
+        /* ===== Accent glow — localized, not full wash ===== */
+        .glow-top {
+            position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
+            width: 1200px; height: 700px;
+            background: radial-gradient(ellipse at center, rgba(94, 208, 255, 0.18) 0%, transparent 55%);
+            filter: blur(40px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-right {
+            position: fixed; top: 30%; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(180, 163, 255, 0.16) 0%, transparent 60%);
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .grid-overlay {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(circle at center, black, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at center, black, transparent 75%);
+        }
+
+        /* Cursor spotlight */
+        .spotlight {
+            position: fixed; pointer-events: none; z-index: 1;
+            width: 500px; height: 500px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(94,208,255,0.06) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.5s ease;
+        }
+        body:hover .spotlight { opacity: 1; }
+
+        /* ===== Typography ===== */
+        .serif {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-weight: 600;
+        }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(110, 231, 183, 0.6); }
+            70%  { box-shadow: 0 0 0 9px rgba(110, 231, 183, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(110, 231, 183, 0); }
+        }
+
+        /* ===== Nav ===== */
+        .nav {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(6, 9, 18, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid transparent;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .nav.scrolled {
+            background: rgba(6, 9, 18, 0.92);
+            border-bottom-color: var(--line);
+        }
+        .nav-inner {
+            max-width: 1320px; margin: 0 auto;
+            padding: 18px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 24px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-mark {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: conic-gradient(from 220deg, #5ed0ff, #b4a3ff, #fb7185, #fbbf24, #6ee7b7, #5ed0ff);
+            display: inline-flex; align-items: center; justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 24px -8px rgba(94,208,255,0.4);
+        }
+        .brand-mark .mark-inner {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            background: var(--panel);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: var(--cyan);
+            font-size: 14px;
+        }
+        .brand-name { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; color: var(--ink-0); }
+        .brand-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-3); margin-top: 4px; text-transform: uppercase; }
+
+        .nav-links { display: flex; align-items: center; gap: 2px; }
+        .nav-links a {
+            color: var(--ink-1); text-decoration: none;
+            font-size: 13px; font-weight: 500;
+            padding: 8px 14px; border-radius: 10px;
+            transition: all 0.18s ease;
+        }
+        .nav-links a:hover { color: var(--ink-0); background: rgba(255,255,255,0.04); }
+
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .lang-pill {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 9px 14px; border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--line);
+            color: var(--ink-2);
+            font-size: 11.5px; font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 10px;
+            background: var(--ink-0); color: #0a0e1c;
+            font-size: 13px; font-weight: 700;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            box-shadow: 0 8px 24px -8px rgba(244, 246, 251, 0.25);
+        }
+        .btn-pill:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -8px rgba(244,246,251,0.4); }
+        .menu-toggle { display: none; background: transparent; border: 1px solid var(--line); color: var(--ink-1); width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
+
+        /* ===== Section base ===== */
+        .section { max-width: 1320px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 2; }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em;
+            color: var(--cyan); text-transform: uppercase;
+        }
+        .eyebrow::before {
+            content: ''; width: 22px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan));
+        }
+
+        /* ===== HERO ===== */
+        .hero { padding: 72px 0 56px; position: relative; }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+        .hero-main {
+            position: relative;
+            padding: 52px 52px 44px;
+            border-radius: 28px;
+            background: linear-gradient(160deg, var(--panel) 0%, var(--bg-1) 100%);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-2);
+            overflow: hidden;
+            min-height: 580px;
+            display: flex; flex-direction: column;
+        }
+        .hero-main::before {
             content: '';
             position: absolute;
-            inset: -1px;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe);
-            border-radius: 24px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--line-2), transparent);
         }
+        .hero-main::after {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 400px; height: 400px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(94,208,255,0.15) 0%, transparent 60%);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+        .hero-main > * { position: relative; z-index: 2; }
 
-        .gradient-border:hover::before {
-            opacity: 1;
+        .hero-h1 {
+            font-size: clamp(48px, 6vw, 86px);
+            font-weight: 800;
+            line-height: 1.0;
+            letter-spacing: -0.04em;
         }
-
-        /* Glass Morphism Premium */
-        .glass-premium {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-      /* Animated Gradient Text */
-        .gradient-text {
-            background: linear-gradient(135deg, #3b82f6, #1e40af);
-            background-size: 200% 200%;
+        .hero-h1 .accent {
+            display: inline-block;
+            background: linear-gradient(135deg, #5ed0ff 0%, #b4a3ff 50%, #f0abfc 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            animation: gradientShift 3s ease infinite;
-        }
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            padding: 0 2px;
         }
 
-        /* Floating Animation */
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-20px);
-            }
+        .hero-sub {
+            margin-top: 24px;
+            max-width: 520px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--ink-1);
         }
 
-        .float {
-            animation: float 6s ease-in-out infinite;
+        .hero-cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-cta-primary {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 14px 24px; border-radius: 12px;
+            background: var(--ink-0); color: #0a0e1c;
+            font-size: 14px; font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 30px -10px rgba(244,246,251,0.30);
+        }
+        .btn-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(244,246,251,0.42); }
+
+        .btn-cta-ghost {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 14px 22px; border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line-2);
+            color: var(--ink-1);
+            font-size: 14px; font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-cta-ghost:hover { background: rgba(255,255,255,0.08); color: var(--ink-0); border-color: var(--line-3); }
+        .play-icon {
+            width: 22px; height: 22px; border-radius: 999px;
+            background: linear-gradient(135deg, var(--cyan), var(--lavender));
+            color: #0a0e1c;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 9px;
         }
 
-        .float-delayed {
-            animation: float 6s ease-in-out infinite 2s;
+        .hero-trust {
+            margin-top: auto; padding-top: 44px;
+            display: flex; gap: 36px; flex-wrap: wrap;
+            border-top: 1px solid var(--line);
+            margin-left: -52px; margin-right: -52px;
+            padding-left: 52px; padding-right: 52px;
+        }
+        .hero-trust .item { display: flex; flex-direction: column; gap: 4px; }
+        .hero-trust .num {
+            font-size: 24px; font-weight: 800; letter-spacing: -0.025em;
+            font-feature-settings: 'tnum' 1, 'lnum' 1;
+            color: var(--ink-0);
+        }
+        .hero-trust .lbl {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+            color: var(--ink-3); text-transform: uppercase;
         }
 
-        /* Glow Effect */
-        .glow {
-            box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
-            transition: box-shadow 0.3s ease;
-        }
+        /* ===== Right aside ===== */
+        .hero-aside { display: grid; gap: 16px; grid-template-rows: 1fr auto; }
 
-        .glow:hover {
-            box-shadow: 0 0 50px rgba(102, 126, 234, 0.8);
-        }
-
-        /* Button Hover Effect */
-        .btn-premium {
+        .status-card {
+            padding: 32px 32px 26px;
+            border-radius: 24px;
+            background: linear-gradient(160deg, var(--panel-2) 0%, var(--panel) 100%);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-1);
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
-
-        .btn-premium::before {
+        .status-card::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn-premium:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        /* Scroll Reveal Animation */
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-
-        .scroll-reveal.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Custom Cursor */
-        .custom-cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(102, 126, 234, 0.8);
-            border-radius: 50%;
-            position: fixed;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(180,163,255,0.18) 0%, transparent 60%);
+            filter: blur(20px);
             pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
-            backdrop-filter: blur(2px);
         }
+        .status-card > * { position: relative; z-index: 2; }
 
-        .custom-cursor-dot {
-            width: 4px;
-            height: 4px;
-            background: #667eea;
-            border-radius: 50%;
-            position: fixed;
+        .status-title {
+            margin-top: 14px;
+            font-size: 32px; line-height: 1.05;
+            letter-spacing: -0.025em;
+        }
+        .status-list { margin-top: 26px; display: flex; flex-direction: column; gap: 20px; }
+        .status-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 14px;
+            align-items: center;
+        }
+        .status-dot { width: 9px; height: 9px; border-radius: 999px; flex-shrink: 0; }
+        .status-dot.mint  { background: var(--mint);  box-shadow: 0 0 14px rgba(110,231,183,0.6); }
+        .status-dot.amber { background: var(--amber); box-shadow: 0 0 14px rgba(251,191,36,0.5); }
+        .status-dot.coral { background: var(--coral); box-shadow: 0 0 14px rgba(251,113,133,0.5); animation: pulse 2s ease-out infinite; }
+
+        .status-row .text-main { font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--ink-0); }
+        .status-row .text-sub { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
+        .status-row .num {
+            font-size: 22px; font-weight: 700;
+            font-feature-settings: 'tnum' 1, 'lnum' 1;
+            letter-spacing: -0.02em;
+        }
+        .status-row .num.mint  { color: var(--mint); }
+        .status-row .num.amber { color: var(--amber); }
+        .status-row .num.coral { color: var(--coral); }
+
+        /* Spec list with colored icons per item */
+        .spec-list { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+        .spec-row {
+            display: flex; align-items: flex-start; gap: 12px;
+        }
+        .spec-ic {
+            width: 30px; height: 30px; border-radius: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        .spec-row:hover .spec-ic { transform: scale(1.08); }
+        .spec-ic.cyan     { background: rgba(94,208,255,0.14); border: 1px solid rgba(94,208,255,0.32); color: var(--cyan); box-shadow: 0 0 16px -3px rgba(94,208,255,0.28); }
+        .spec-ic.mint     { background: rgba(110,231,183,0.14); border: 1px solid rgba(110,231,183,0.32); color: var(--mint); box-shadow: 0 0 16px -3px rgba(110,231,183,0.28); }
+        .spec-ic.lavender { background: rgba(180,163,255,0.14); border: 1px solid rgba(180,163,255,0.32); color: var(--lavender); box-shadow: 0 0 16px -3px rgba(180,163,255,0.28); }
+        .spec-ic.amber    { background: rgba(251,191,36,0.14);  border: 1px solid rgba(251,191,36,0.32);  color: var(--amber);    box-shadow: 0 0 16px -3px rgba(251,191,36,0.28); }
+        .spec-ic.coral    { background: rgba(251,113,133,0.14); border: 1px solid rgba(251,113,133,0.32); color: var(--coral);    box-shadow: 0 0 16px -3px rgba(251,113,133,0.28); }
+
+        .spec-row .text-main { font-size: 13.5px; font-weight: 600; line-height: 1.25; color: var(--ink-0); margin-top: 5px; }
+        .spec-row .text-sub  { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; line-height: 1.4; }
+
+        .status-cta {
+            margin-top: 28px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            color: var(--ink-1);
+            text-decoration: none;
+            font-size: 13.5px; font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .status-cta:hover { background: rgba(255,255,255,0.08); color: var(--ink-0); border-color: var(--line-2); }
+
+        .anomaly-card {
+            padding: 26px 28px 24px;
+            border-radius: 20px;
+            background: linear-gradient(160deg, var(--panel-2) 0%, var(--panel) 100%);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-1);
+            position: relative;
+            overflow: hidden;
+        }
+        .anomaly-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(251,113,133,0.14) 0%, transparent 60%);
+            filter: blur(20px);
             pointer-events: none;
-            z-index: 9999;
         }
+        .anomaly-card > * { position: relative; z-index: 2; }
 
-        /* Feature Card Hover */
-        .feature-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .badge-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px; border-radius: 999px;
+            background: rgba(180,163,255,0.14);
+            border: 1px solid rgba(180,163,255,0.30);
+            color: var(--lavender);
+            font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
-
-        .feature-card:hover {
-            transform: translateY(-10px) scale(1.02);
+        .anomaly-title {
+            margin-top: 14px;
+            font-size: 24px; line-height: 1.1; letter-spacing: -0.02em;
         }
+        .anomaly-desc {
+            margin-top: 10px;
+            font-size: 13px; line-height: 1.55;
+            color: var(--ink-2);
+        }
+        .anomaly-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 16px;
+            color: var(--lavender);
+            font-size: 13px; font-weight: 600;
+            text-decoration: none;
+            transition: gap 0.2s ease;
+        }
+        .anomaly-link:hover { gap: 12px; color: var(--pink); }
 
-        /* Stats Counter */
-        .stat-number {
-            font-size: 3rem;
+        /* ===== FEATURES BENTO ===== */
+        .features { padding: 80px 0; }
+        .features-head {
+            display: flex; justify-content: space-between; align-items: end;
+            gap: 24px; flex-wrap: wrap; margin-bottom: 40px;
+        }
+        .features-h2 {
+            font-size: clamp(36px, 4vw, 56px);
+            line-height: 1.04; letter-spacing: -0.03em;
+            max-width: 680px;
             font-weight: 800;
-            background: linear-gradient(135deg, #fff, #a5b4fc);
-            -webkit-background-clip: text;
-            background-clip: text;
+        }
+        .features-h2 .accent {
+            background: linear-gradient(135deg, #5ed0ff, #b4a3ff);
+            -webkit-background-clip: text; background-clip: text;
             color: transparent;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic; font-weight: 600;
+        }
+        .features-sub { font-size: 14px; color: var(--ink-2); max-width: 320px; line-height: 1.6; }
+
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+        .bento-card {
+            position: relative;
+            padding: 30px;
+            border-radius: 22px;
+            background: linear-gradient(160deg, var(--panel) 0%, var(--bg-1) 100%);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 240px;
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--line-2);
+            box-shadow: var(--shadow-2);
+        }
+        .bento-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 30%;
+            width: 40%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--line-2), transparent);
+        }
+        .bento-card .ic {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            margin-bottom: 18px;
+        }
+        .bento-card.cyan    .ic { background: rgba(94,208,255,0.14); color: var(--cyan); border: 1px solid rgba(94,208,255,0.32); box-shadow: 0 0 24px -4px rgba(94,208,255,0.25); }
+        .bento-card.mint    .ic { background: rgba(110,231,183,0.14); color: var(--mint); border: 1px solid rgba(110,231,183,0.32); box-shadow: 0 0 24px -4px rgba(110,231,183,0.25); }
+        .bento-card.lavender .ic { background: rgba(180,163,255,0.14); color: var(--lavender); border: 1px solid rgba(180,163,255,0.32); box-shadow: 0 0 24px -4px rgba(180,163,255,0.25); }
+        .bento-card.amber   .ic { background: rgba(251,191,36,0.14); color: var(--amber); border: 1px solid rgba(251,191,36,0.32); box-shadow: 0 0 24px -4px rgba(251,191,36,0.25); }
+        .bento-card.sky     .ic { background: rgba(56,189,248,0.14); color: var(--sky); border: 1px solid rgba(56,189,248,0.32); box-shadow: 0 0 24px -4px rgba(56,189,248,0.25); }
+
+        .bento-card h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; color: var(--ink-0); }
+        .bento-card p  { margin-top: 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+
+        .bento-card.wide-3 { grid-column: span 3; }
+        .bento-card.wide-2 { grid-column: span 2; }
+        .bento-card.wide-4 { grid-column: span 4; min-height: 300px; }
+
+        .preview-card { padding: 28px; min-height: 300px; grid-column: span 4; }
+        .preview-card .mini-dashboard {
+            margin-top: 16px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .preview-stat {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.30);
+            border: 1px solid var(--line);
+        }
+        .preview-stat .lbl { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase; }
+        .preview-stat .val { font-size: 24px; font-weight: 800; margin-top: 4px; letter-spacing: -0.025em; font-feature-settings: 'tnum' 1, 'lnum' 1; }
+        .preview-stat.cyan    .val { color: var(--cyan); }
+        .preview-stat.mint    .val { color: var(--mint); }
+        .preview-stat.lavender .val { color: var(--lavender); }
+
+        .mini-chart { margin-top: 14px; height: 56px; }
+
+        /* ===== METRICS STRIP ===== */
+        .metrics {
+            padding: 36px 38px;
+            background: linear-gradient(180deg, rgba(20, 28, 50, 0.5), rgba(14, 20, 36, 0.5));
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--shadow-1);
+        }
+        .metrics-inner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .metric { text-align: left; position: relative; }
+        .metric:not(:first-child) { padding-left: 24px; border-left: 1px solid var(--line); }
+        .metric .v {
+            font-size: 42px; font-weight: 800; letter-spacing: -0.035em;
+            font-feature-settings: 'tnum' 1, 'lnum' 1;
+            color: var(--ink-0);
+            line-height: 1;
+        }
+        .metric .v sup { font-size: 18px; color: var(--ink-3); margin-left: 2px; top: -10px; }
+        .metric .l { font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin-top: 8px; letter-spacing: 0.05em; }
+
+        /* ===== HOW IT WORKS ===== */
+        .how { padding: 80px 0; }
+        .how-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 36px; }
+        .how-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .step {
+            padding: 30px 28px;
+            border-radius: 20px;
+            background: linear-gradient(160deg, var(--panel) 0%, var(--bg-1) 100%);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .step:hover {
+            border-color: var(--line-2);
+            transform: translateY(-3px);
+        }
+        .step .num-circle {
+            width: 38px; height: 38px; border-radius: 11px;
+            background: rgba(94,208,255,0.12);
+            border: 1px solid rgba(94,208,255,0.32);
+            color: var(--cyan);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .step h4 { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink-0); }
+        .step p { margin-top: 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+
+        /* ===== CTA FINAL ===== */
+        .cta-final { padding: 60px 0 100px; }
+        .cta-box {
+            position: relative;
+            padding: 72px 56px;
+            border-radius: 32px;
+            background: linear-gradient(160deg, var(--panel-2) 0%, var(--panel) 100%);
+            border: 1px solid var(--line-2);
+            box-shadow: var(--shadow-2);
+            text-align: center;
+            overflow: hidden;
+        }
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -160px; left: 20%;
+            width: 600px; height: 400px;
+            background: radial-gradient(ellipse, rgba(94,208,255,0.18) 0%, transparent 60%);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+        .cta-box::after {
+            content: '';
+            position: absolute;
+            bottom: -160px; right: 20%;
+            width: 600px; height: 400px;
+            background: radial-gradient(ellipse, rgba(180,163,255,0.18) 0%, transparent 60%);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+        .cta-box > * { position: relative; z-index: 2; }
+        .cta-h2 {
+            font-size: clamp(40px, 5vw, 68px);
+            line-height: 1.04; letter-spacing: -0.035em;
+            max-width: 820px; margin: 14px auto 0;
+            font-weight: 800;
+        }
+        .cta-h2 .accent {
+            background: linear-gradient(135deg, #5ed0ff, #b4a3ff);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic; font-weight: 600;
+        }
+        .cta-sub {
+            margin-top: 20px;
+            font-size: 15.5px; color: var(--ink-1); max-width: 560px;
+            margin-left: auto; margin-right: auto; line-height: 1.6;
+        }
+        .cta-buttons { margin-top: 36px; display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+        /* ===== Footer ===== */
+        .footer {
+            border-top: 1px solid var(--line);
+            padding: 36px 0 30px;
+            background: rgba(6, 9, 18, 0.5);
+        }
+        .footer-inner {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 24px; flex-wrap: wrap;
+        }
+        .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+        .footer-links a { color: var(--ink-3); text-decoration: none; font-size: 12.5px; font-weight: 500; transition: color 0.18s ease; }
+        .footer-links a:hover { color: var(--ink-1); }
+        .footer-copy { font-size: 12px; color: var(--ink-4); }
+
+        /* ===== Reveal ===== */
+        .reveal {
+            opacity: 0; transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Hide scrollbars completely — all browsers including mobile */
+        html, body, * {
+            scrollbar-width: none !important;
+            scrollbar-color: transparent transparent !important;
+            -ms-overflow-style: none !important;
+        }
+        html { overflow-x: hidden; }
+        body { -webkit-overflow-scrolling: touch; }
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar,
+        *::-webkit-scrollbar,
+        *::-webkit-scrollbar-track,
+        *::-webkit-scrollbar-thumb,
+        *::-webkit-scrollbar-corner,
+        *::-webkit-scrollbar-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
         }
 
-        /* Smooth Scroll */
-        html {
-            scroll-behavior: smooth;
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-main { padding: 40px 32px 32px; min-height: 0; }
+            .hero-trust { margin-left: -32px; margin-right: -32px; padding-left: 32px; padding-right: 32px; }
+            .bento { grid-template-columns: repeat(2, 1fr); }
+            .bento-card.wide-3, .bento-card.wide-2, .bento-card.wide-4, .preview-card { grid-column: span 2; }
+            .metrics-inner { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+            .metric:nth-child(3) { padding-left: 0; border-left: 0; }
+            .how-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+        }
+
+        @media (max-width: 640px) {
+            .nav-inner { padding: 14px 18px; }
+            .section { padding: 0 18px; }
+            .brand-tag { display: none; }
+            .lang-pill { display: none; }
+            .btn-pill { padding: 8px 14px; font-size: 12px; }
+            .hero { padding: 36px 0 32px; }
+            .hero-main { padding: 28px 22px 24px; border-radius: 20px; }
+            .hero-trust { margin-left: -22px; margin-right: -22px; padding-left: 22px; padding-right: 22px; gap: 22px; padding-top: 28px; }
+            .hero-trust .num { font-size: 20px; }
+            .hero-h1 { font-size: 38px; letter-spacing: -0.025em; }
+            .hero-sub { font-size: 14.5px; }
+            .btn-cta-primary, .btn-cta-ghost { padding: 12px 18px; font-size: 13px; }
+            .status-card { padding: 24px 22px 20px; border-radius: 20px; }
+            .status-title { font-size: 26px; }
+            .anomaly-card { padding: 22px 20px 20px; }
+            .bento { grid-template-columns: 1fr; }
+            .bento-card, .bento-card.wide-3, .bento-card.wide-2, .bento-card.wide-4, .preview-card { grid-column: span 1; min-height: 0; padding: 24px 22px; }
+            .metrics { padding: 28px 24px; }
+            .metrics-inner { grid-template-columns: 1fr 1fr; gap: 24px 18px; }
+            .metric:not(:first-child) { padding-left: 0; border-left: 0; }
+            .metric .v { font-size: 32px; }
+            .cta-box { padding: 48px 26px; border-radius: 24px; }
+            .features, .how, .cta-final { padding: 56px 0; }
+        }
+
+        /* Very small phones (<360px) */
+        @media (max-width: 360px) {
+            .nav-inner { padding: 12px 14px; }
+            .section { padding: 0 14px; }
+            .hero-h1 { font-size: 32px; letter-spacing: -0.02em; }
+            .hero-sub { font-size: 13.5px; }
+            .hero-main { padding: 22px 18px 20px; }
+            .hero-trust { margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px; gap: 18px; }
+            .hero-trust .num { font-size: 18px; }
+            .status-title, .features-h2, .cta-h2 { font-size: 24px !important; }
+            .features, .how, .cta-final { padding: 44px 0; }
+            .metric .v { font-size: 28px; }
+            .bento-card { padding: 20px 18px; }
+        }
+
+        /* Landscape mobile (short screens) */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero { padding: 24px 0; }
+            .hero-main { padding: 26px 28px 24px; min-height: 0; }
+            .hero-h1 { font-size: 38px; }
+            .hero-trust { padding-top: 22px; gap: 22px; }
+            .glow-top, .glow-right { opacity: 0.55; }
+            .features, .how, .cta-final { padding: 40px 0; }
+        }
+
+        /* Touch devices — disable cursor spotlight (waste on touch) */
+        @media (hover: none) and (pointer: coarse) {
+            .spotlight { display: none !important; }
+            .btn-cta-primary, .btn-cta-ghost, .btn-pill, .status-cta { min-height: 44px; }
+            .menu-toggle, .lang-pill { min-width: 44px; min-height: 44px; }
+        }
+
+        /* Respect prefers-reduced-motion — disable decorative animations */
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+            .glow-top, .glow-right { animation: none !important; }
+            .spotlight { display: none !important; }
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
+<body>
 
-<body class="premium-bg text-white relative">
+    <div class="glow-top"></div>
+    <div class="glow-right"></div>
+    <div class="grid-overlay"></div>
+    <div class="spotlight" id="spotlight"></div>
 
-    <!-- Custom Cursor -->
-    <div class="custom-cursor hidden md:block"></div>
-    <div class="custom-cursor-dot hidden md:block"></div>
-
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm -z-10"></div>
-
-    <!-- Particles Background -->
-    <div id="tsparticles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
-
-    <!-- Animated Background Blobs -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-5">
-        <div class="absolute top-20 left-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div
-            class="absolute bottom-20 right-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000">
-        </div>
-        <div class="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-800/10 rounded-full blur-3xl animate-pulse delay-2000">
-        </div>
-    </div>
-
-    <!-- ==================== NAVBAR ==================== -->
-    <nav class="fixed top-0 left-0 w-full z-50 glass-premium backdrop-blur-xl">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-snowflake text-2xl text-blue-400"></i>
-                <span class="text-xl font-bold gradient-text">SmartAC</span>
-            </div>
-            <div class="hidden md:flex gap-8">
-                <a href="#home" class="hover:text-blue-400 transition">Home</a>
-                <a href="#features" class="hover:text-blue-400 transition">Features</a>
-                <a href="#about" class="hover:text-blue-400 transition">About</a>
-                <a href="#contact" class="hover:text-blue-400 transition">Contact</a>
-            </div>
-            <a href="/login"
-                class="bg-gradient-to-r from-blue-600 to-blue-900 px-5 py-2 rounded-full text-sm font-semibold hover:scale-105 transition">
-                Get Started
+    
+    <nav class="nav" id="topNav">
+        <div class="nav-inner">
+            <a href="#produk" class="brand" style="text-decoration:none;color:inherit;">
+                <div class="brand-mark">
+                    <div class="mark-inner"><i class="fa-solid fa-snowflake"></i></div>
+                </div>
+                <div>
+                    <div class="brand-name">Control AC</div>
+                    <div class="brand-tag">Cooling, Reimagined</div>
+                </div>
             </a>
+
+            <div class="nav-links">
+                <a href="#produk">Produk</a>
+                <a href="#fitur">Fitur</a>
+                <a href="#cara-kerja">Cara Kerja</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button" class="lang-pill">
+                    <i class="fa-solid fa-globe" style="font-size:10px;opacity:0.7;"></i>
+                    <span>ID</span>
+                </button>
+                <a href="<?php echo e(route('login')); ?>" class="btn-pill">
+                    Masuk
+                    <i class="fa-solid fa-arrow-right" style="font-size:10px;"></i>
+                </a>
+                <button type="button" class="menu-toggle" aria-label="Menu">
+                    <i class="fa-solid fa-bars" style="font-size:13px;"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- ==================== HERO SECTION ==================== -->
-    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+    
+    <section class="hero section" id="produk">
+        <div class="hero-grid">
+            <div class="hero-main reveal">
+                <h1 class="hero-h1">
+                    Cooling that<br>
+                    <span class="accent">thinks</span><br>
+                    before you do.
+                </h1>
 
-        <!-- Floating Elements -->
-        <div class="absolute top-20 left-10 text-6xl float opacity-20">❄️</div>
-        <div class="absolute bottom-20 right-10 text-8xl float-delayed opacity-20">🌡️</div>
+                <p class="hero-sub">
+                    Pantau setiap ruangan server. Pelajari ritmenya. Sistem akan
+                    menjaga suhu tetap stabil — bahkan ketika Anda tidur.
+                </p>
 
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <div data-aos="zoom-in-down" class="inline-block mb-6">
-                <div class="glass-premium rounded-full px-6 py-2 text-sm">
-                    <i class="fa-solid fa-microchip mr-2"></i> IoT Powered System
+                <div class="hero-cta">
+                    <a href="<?php echo e(route('login')); ?>" class="btn-cta-primary">
+                        Mulai gratis
+                        <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                    </a>
+                </div>
+
+                <div class="hero-trust">
+                    <div class="item">
+                        <div class="num">10</div>
+                        <div class="lbl">Ruangan aktif</div>
+                    </div>
+                    <div class="item">
+                        <div class="num">99.9<sup style="font-size:14px;color:var(--ink-3);">%</sup></div>
+                        <div class="lbl">Uptime</div>
+                    </div>
+                    <div class="item">
+                        <div class="num">&lt;2<sup style="font-size:14px;color:var(--ink-3);">s</sup></div>
+                        <div class="lbl">Latency</div>
+                    </div>
+                    <div class="item">
+                        <div class="num">24/7</div>
+                        <div class="lbl">Monitor</div>
+                    </div>
                 </div>
             </div>
 
-            <h1 data-aos="fade-up" class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
-                Intelligent
-                <span class="gradient-text block">Climate Control</span>
-            </h1>
+            <aside class="hero-aside">
+                <section class="status-card reveal">
+                    <p class="eyebrow">Specs</p>
+                    <h2 class="serif status-title">Dibangun untuk<br>skala.</h2>
 
-            <p data-aos="fade-up" data-aos-delay="200"
-                class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
-                Experience the future of air conditioning management with real-time monitoring,
-                smart automation, and energy-efficient technology.
+                    <div class="spec-list">
+                        <div class="spec-row">
+                            <span class="spec-ic cyan"><i class="fa-solid fa-plug"></i></span>
+                            <div>
+                                <p class="text-main">MQTT + WebSocket realtime</p>
+                                <p class="text-sub">Sub-detik update via Laravel Reverb</p>
+                            </div>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-ic lavender"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <p class="text-main">Multi-role hierarchy</p>
+                                <p class="text-sub">Admin · Operator · User</p>
+                            </div>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-ic mint"><i class="fa-solid fa-microchip"></i></span>
+                            <div>
+                                <p class="text-main">ESP32 auto-discovery</p>
+                                <p class="text-sub">Plug, flash, langsung jalan</p>
+                            </div>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-ic amber"><i class="fa-solid fa-clipboard-list"></i></span>
+                            <div>
+                                <p class="text-main">Activity logs lengkap</p>
+                                <p class="text-sub">Audit trail per aksi user</p>
+                            </div>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-ic coral"><i class="fa-solid fa-bell-slash"></i></span>
+                            <div>
+                                <p class="text-main">Notification deduplication</p>
+                                <p class="text-sub">Tidak spam saat insiden panjang</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#cara-kerja" class="status-cta">
+                        <span>Lihat cara kerja</span>
+                        <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                    </a>
+                </section>
+
+                <section class="anomaly-card reveal">
+                    <span class="badge-pill">
+                        <i class="fa-solid fa-sparkles" style="font-size:9px;"></i>
+                        Baru
+                    </span>
+                    <h3 class="serif anomaly-title">Anomali, dideteksi dini.</h3>
+                    <p class="anomaly-desc">Sistem belajar pola normal tiap ruangan. Saat ada yang janggal — Anda yang pertama tahu.</p>
+                    <a href="#fitur" class="anomaly-link">
+                        Pelajari lebih lanjut
+                        <i class="fa-solid fa-arrow-right" style="font-size:10px;"></i>
+                    </a>
+                </section>
+            </aside>
+        </div>
+    </section>
+
+    
+    <section class="features section" id="fitur">
+        <div class="features-head reveal">
+            <h2 class="features-h2">
+                Bukan sekadar remote AC.<br><span class="accent">Sistem yang berpikir</span> untuk Anda.
+            </h2>
+            <p class="features-sub">Tiap fitur dibangun untuk membuat ruangan server selalu dingin, tanpa Anda perlu memikirkannya.</p>
+        </div>
+
+        <div class="bento">
+            <div class="bento-card wide-3 cyan reveal">
+                <span class="ic"><i class="fa-solid fa-bolt"></i></span>
+                <h3>Realtime · sub-detik</h3>
+                <p>Setiap perubahan suhu, status AC, atau koneksi ESP32 ter-update langsung via MQTT + WebSocket. Tidak ada lag.</p>
+            </div>
+
+            <div class="bento-card wide-3 lavender reveal">
+                <span class="ic"><i class="fa-solid fa-clock"></i></span>
+                <h3>Jadwal otomatis</h3>
+                <p>Atur AC nyala/mati per ruangan, per jam. Sistem eksekusi tepat waktu dengan toleransi ±30 detik.</p>
+            </div>
+
+            <div class="bento-card wide-2 mint reveal">
+                <span class="ic"><i class="fa-solid fa-bell"></i></span>
+                <h3>Notifikasi cerdas</h3>
+                <p>Device offline, suhu di atas ambang, anomali — semua jadi alert yang bisa di-action.</p>
+            </div>
+
+            <div class="bento-card preview-card wide-4 sky reveal">
+                <span class="ic"><i class="fa-solid fa-chart-line"></i></span>
+                <h3>Trend &amp; histori 24 jam</h3>
+                <p>Visualisasi performa tiap ruangan — lihat kapan suhu naik, berapa lama AC bekerja.</p>
+                <div class="mini-dashboard">
+                    <div class="preview-stat cyan"><div class="lbl">Server 14</div><div class="val">22.4°</div></div>
+                    <div class="preview-stat mint"><div class="lbl">AC Aktif</div><div class="val">8</div></div>
+                    <div class="preview-stat lavender"><div class="lbl">Comfort</div><div class="val">73%</div></div>
+                </div>
+                <svg class="mini-chart" viewBox="0 0 400 56" preserveAspectRatio="none" fill="none">
+                    <path d="M0 36 Q 40 22, 70 28 T 130 24 T 200 32 T 270 16 T 340 24 T 400 18"
+                          stroke="url(#chart-grad)" stroke-width="2.2" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="chart-grad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#5ed0ff" stop-opacity="0.5"/>
+                            <stop offset="50%" stop-color="#b4a3ff"/>
+                            <stop offset="100%" stop-color="#6ee7b7" stop-opacity="0.6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="section" id="statistik">
+        <div class="metrics reveal">
+            <div class="metrics-inner">
+                <div class="metric">
+                    <p class="v">10K<sup>+</sup></p>
+                    <p class="l">Aksi terkontrol</p>
+                </div>
+                <div class="metric">
+                    <p class="v">99.9<sup>%</sup></p>
+                    <p class="l">Uptime sistem</p>
+                </div>
+                <div class="metric">
+                    <p class="v">&lt;500<sup>ms</sup></p>
+                    <p class="l">Response broadcast</p>
+                </div>
+                <div class="metric">
+                    <p class="v">3</p>
+                    <p class="l">Role hierarchy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="how section" id="cara-kerja">
+        <div class="how-head reveal">
+            <div>
+                <p class="eyebrow">Cara Kerja</p>
+                <h2 class="features-h2" style="margin-top:14px;">Tiga langkah, <span class="accent">selesai.</span></h2>
+            </div>
+            <p class="features-sub">Dari unboxing ESP32 hingga monitoring live, prosesnya tidak lebih dari 10 menit.</p>
+        </div>
+
+        <div class="how-grid">
+            <div class="step reveal">
+                <div class="num-circle">01</div>
+                <h4>Hubungkan ESP32</h4>
+                <p>Flash firmware, pasang sensor di ruangan, dan device otomatis ter-discover oleh sistem.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num-circle">02</div>
+                <h4>Atur ruangan &amp; AC</h4>
+                <p>Tambah ruangan, daftarkan unit AC, pilih merk. Mapping topik MQTT otomatis terbentuk.</p>
+            </div>
+            <div class="step reveal">
+                <div class="num-circle">03</div>
+                <h4>Biarkan sistem bekerja</h4>
+                <p>Jadwal, anomali, notifikasi — semua jalan di latar. Anda hanya perlu lihat dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="cta-final section">
+        <div class="cta-box reveal">
+            <span class="eyebrow"><i class="fa-solid fa-bolt" style="font-size:9px;"></i> Siap dipakai</span>
+            <h2 class="cta-h2">
+                Mulai pantau ruangan Anda <span class="accent">hari ini.</span>
+            </h2>
+            <p class="cta-sub">
+                Akun gratis untuk semua role. Login dengan akun yang sudah dibuat administrator.
             </p>
-
-            <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/login"
-                    class="btn-premium bg-gradient-to-r from-blue-600 to-blue-900 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl transition inline-flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rocket"></i> Launch Dashboard
+            <div class="cta-buttons">
+                <a href="<?php echo e(route('login')); ?>" class="btn-cta-primary">
+                    Masuk ke Sistem
+                    <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
                 </a>
-                <a href="#features"
-                    class="glass-premium px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition inline-flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i> Watch Demo
+                <a href="#fitur" class="btn-cta-ghost">
+                    <span class="play-icon"><i class="fa-solid fa-circle-info"></i></span>
+                    Pelajari fitur
                 </a>
             </div>
-
-            <!-- Stats -->
-            <div data-aos="fade-up" data-aos-delay="600"
-                class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-10 border-t border-white/10">
-                <div>
-                    <div class="stat-number">500+</div>
-                    <div class="text-sm text-gray-400">Active Devices</div>
-                </div>
-                <div>
-                    <div class="stat-number">99.9%</div>
-                    <div class="text-sm text-gray-400">Uptime</div>
-                </div>
-                <div>
-                    <div class="stat-number">24/7</div>
-                    <div class="text-sm text-gray-400">Monitoring</div>
-                </div>
-                <div>
-                    <div class="stat-number">30%</div>
-                    <div class="text-sm text-gray-400">Energy Savings</div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- ==================== FEATURES SECTION ==================== -->
-    <section id="features" class="py-24 px-6 relative">
-        <div class="container mx-auto max-w-7xl">
-            <div class="text-center mb-16">
-                <div data-aos="fade-up" class="inline-block glass-premium rounded-full px-6 py-2 text-sm mb-4">
-                    <i class="fa-solid fa-gem mr-2"></i> Premium Features
+    
+    <footer class="footer">
+        <div class="section footer-inner">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="brand-mark" style="width:32px;height:32px;border-radius:9px;">
+                    <div class="mark-inner" style="width:26px;height:26px;font-size:12px;border-radius:7px;"><i class="fa-solid fa-snowflake"></i></div>
                 </div>
-                <h2 data-aos="fade-up" data-aos-delay="100" class="text-3xl md:text-5xl font-bold mb-4">
-                    Why Choose <span class="gradient-text">SmartAC?</span>
-                </h2>
-                <p data-aos="fade-up" data-aos-delay="200" class="text-gray-400 max-w-2xl mx-auto">
-                    Cutting-edge technology combined with elegant design for the ultimate control experience
-                </p>
+                <span style="font-size:13px;font-weight:600;color:var(--ink-1);">Control AC</span>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div data-aos="fade-up" data-aos-delay="300"
-                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div
-                        class="w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fa-solid fa-bolt text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Real-Time Intelligence</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        Instant system feedback with live data synchronization and predictive analytics
-                    </p>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="400"
-                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div
-                        class="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Seamless Remote Access</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        Control your AC system anytime, anywhere with our cloud-based platform
-                    </p>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="500"
-                    class="feature-card glass-premium rounded-2xl p-8 text-center hover:glow transition-all">
-                    <div
-                        class="w-20 h-20 bg-gradient-to-r from-pink-600 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i class="fa-solid fa-chart-line text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Energy Efficiency</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        Reduce energy consumption by up to 30% with smart scheduling and automation
-                    </p>
-                </div>
+            <div class="footer-links">
+                <a href="#produk">Produk</a>
+                <a href="#fitur">Fitur</a>
+                <a href="#cara-kerja">Cara kerja</a>
+                <a href="<?php echo e(route('login')); ?>">Masuk</a>
             </div>
-        </div>
-    </section>
-
-    <!-- ==================== HOW IT WORKS ==================== -->
-    <section class="py-24 px-6 bg-gradient-to-b from-transparent to-white/5">
-        <div class="container mx-auto max-w-7xl">
-            <div class="text-center mb-16">
-                <h2 data-aos="fade-up" class="text-3xl md:text-5xl font-bold mb-4">
-                    How It <span class="gradient-text">Works</span>
-                </h2>
-                <p data-aos="fade-up" data-aos-delay="100" class="text-gray-400 max-w-2xl mx-auto">
-                    Simple setup, powerful results — in just three steps
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div data-aos="fade-up" data-aos-delay="200" class="text-center">
-                    <div
-                        class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
-                        1</div>
-                    <h3 class="text-xl font-bold mb-3">Install Device</h3>
-                    <p class="text-gray-400">Connect your ESP32 device to power and network</p>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="300" class="text-center">
-                    <div
-                        class="w-24 h-24 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
-                        2</div>
-                    <h3 class="text-xl font-bold mb-3">Configure System</h3>
-                    <p class="text-gray-400">Set your preferences and automation rules</p>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="400" class="text-center">
-                    <div
-                        class="w-24 h-24 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-lg">
-                        3</div>
-                    <h3 class="text-xl font-bold mb-3">Enjoy Control</h3>
-                    <p class="text-gray-400">Monitor and manage your AC from anywhere</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== ILLUSTRATION SECTION ==================== -->
-    <section id="about" class="py-24 px-6">
-        <div class="container mx-auto max-w-7xl">
-            <div class="flex flex-col md:flex-row items-center gap-12">
-                <div data-aos="fade-right" class="flex-1 text-center md:text-left">
-                    <div class="inline-block glass-premium rounded-full px-6 py-2 text-sm mb-4">
-                        <i class="fa-solid fa-microchip mr-2"></i> Advanced Technology
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6">
-                        Built with
-                        <span class="gradient-text">ESP32 & MQTT</span>
-                    </h2>
-                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
-                        Our system leverages the power of ESP32 microcontrollers and MQTT protocol
-                        to deliver lightning-fast responses and reliable communication between your
-                        devices and the cloud platform.
-                    </p>
-                    <div class="flex gap-4 justify-center md:justify-start">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-check-circle text-green-500"></i>
-                            <span>Low Latency</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-check-circle text-green-500"></i>
-                            <span>Secure Connection</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-check-circle text-green-500"></i>
-                            <span>Scalable</span>
-                        </div>
-                    </div>
-                </div>
-                <div data-aos="fade-left" class="flex-1">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-900 rounded-full blur-3xl opacity-30">
-                        </div>
-                        <img src="https://cdn-icons-png.flaticon.com/512/1048/1048943.png"
-                            class="relative w-full max-w-md mx-auto float" alt="Smart AC Illustration">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== TESTIMONIALS ==================== -->
-    <section class="py-24 px-6 bg-gradient-to-t from-transparent to-white/5">
-        <div class="container mx-auto max-w-7xl">
-            <div class="text-center mb-16">
-                <h2 data-aos="fade-up" class="text-3xl md:text-5xl font-bold mb-4">
-                    What Our <span class="gradient-text">Clients Say</span>
-                </h2>
-                <p data-aos="fade-up" data-aos-delay="100" class="text-gray-400 max-w-2xl mx-auto">
-                    Trusted by businesses and homeowners worldwide
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div data-aos="fade-up" data-aos-delay="200" class="glass-premium rounded-2xl p-8">
-                    <i class="fa-solid fa-quote-left text-4xl text-blue-500 mb-4"></i>
-                    <p class="text-gray-300 leading-relaxed mb-6">
-                        "The best investment we've made for our office. Energy bills reduced by 25% and employees are
-                        more comfortable."
-                    </p>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-blue-900 flex items-center justify-center">
-                            <i class="fa-solid fa-user text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Michael Chen</p>
-                            <p class="text-sm text-gray-400">Facility Manager</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="300" class="glass-premium rounded-2xl p-8">
-                    <i class="fa-solid fa-quote-left text-4xl text-purple-500 mb-4"></i>
-                    <p class="text-gray-300 leading-relaxed mb-6">
-                        "Finally, an AC control system that actually works. The real-time monitoring is a game changer."
-                    </p>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
-                            <i class="fa-solid fa-user text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Sarah Johnson</p>
-                            <p class="text-sm text-gray-400">Homeowner</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div data-aos="fade-up" data-aos-delay="400" class="glass-premium rounded-2xl p-8">
-                    <i class="fa-solid fa-quote-left text-4xl text-pink-500 mb-4"></i>
-                    <p class="text-gray-300 leading-relaxed mb-6">
-                        "Amazing support team and incredible technology. Highly recommended for any smart building."
-                    </p>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-600 to-orange-600 flex items-center justify-center">
-                            <i class="fa-solid fa-user text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold">David Williams</p>
-                            <p class="text-sm text-gray-400">Building Owner</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== CTA SECTION ==================== -->
-    <section class="py-24 px-6">
-        <div class="container mx-auto max-w-5xl">
-            <div data-aos="zoom-in" class="glass-premium rounded-3xl p-12 text-center relative overflow-hidden">
-                <div
-                    class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-r from-blue-600 to-blue-900 rounded-full blur-3xl opacity-20">
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">
-                    Ready to Get Started?
-                </h2>
-                <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-                    Join thousands of satisfied users and transform your climate control experience today
-                </p>
-                <a href="/login"
-                    class="btn-premium bg-gradient-to-r from-blue-600 to-blue-900 px-10 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-2 hover:shadow-2xl transition">
-                    <i class="fa-solid fa-arrow-right"></i> Start Free Trial
-                </a>
-                <p class="text-sm text-gray-400 mt-6">No credit card required · Free 14-day trial</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== FOOTER ==================== -->
-    <footer id="contact" class="py-12 px-6 border-t border-white/10">
-        <div class="container mx-auto max-w-7xl">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fa-solid fa-snowflake text-2xl text-blue-400"></i>
-                        <span class="text-xl font-bold gradient-text">SmartAC</span>
-                    </div>
-                    <p class="text-gray-400 text-sm">
-                        Intelligent climate control for modern environments
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Product</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
-                        <li><a href="#" class="hover:text-white transition">Pricing</a></li>
-                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Company</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Connect</h4>
-                    <div class="flex gap-4">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
-                            <i class="fa-brands fa-github"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center pt-8 border-t border-white/10">
-                <p class="text-gray-400 text-sm">
-                    Designed & Developed by <span class="font-semibold text-white">Arico Official</span>
-                </p>
-                <p class="text-gray-500 text-xs mt-2">© 2026 SmartAC. All rights reserved.</p>
-            </div>
+            <div class="footer-copy">© 2026 Control AC — SmartAC IoT Platform</div>
         </div>
     </footer>
 
-    <!-- ==================== SCRIPTS ==================== -->
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
-
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100
-        });
+        // Nav scrolled state
+        const nav = document.getElementById('topNav');
+        const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
 
-        // Particles Configuration (Premium)
-        if (window.innerWidth > 768) {
-            tsParticles.load('tsparticles', {
-                particles: {
-                    number: {
-                        value: 80,
-                        density: {
-                            enable: true,
-                            area: 800
-                        }
-                    },
-                    color: {
-                        value: ["#667eea", "#764ba2", "#f093fb", "#4facfe"]
-                    },
-                    shape: {
-                        type: "circle"
-                    },
-                    opacity: {
-                        value: 0.3,
-                        random: true
-                    },
-                    size: {
-                        value: 2,
-                        random: true
-                    },
-                    move: {
-                        enable: true,
-                        speed: 1,
-                        direction: "none",
-                        random: true,
-                        straight: false
-                    },
-                    links: {
-                        enable: true,
-                        color: "#ffffff",
-                        opacity: 0.1,
-                        distance: 150
-                    },
-                    interactivity: {
-                        events: {
-                            onHover: {
-                                enable: true,
-                                mode: "grab"
-                            },
-                            onClick: {
-                                enable: true,
-                                mode: "push"
-                            }
-                        }
-                    }
+        // Reveal on scroll
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    io.unobserve(e.target);
                 }
             });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        // Cursor spotlight (skip on touch / reduced motion)
+        const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!isTouch && !reducedMotion) {
+            const spotlight = document.getElementById('spotlight');
+            let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+            let cx = tx, cy = ty;
+            window.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
+            (function tick() {
+                cx += (tx - cx) * 0.08;
+                cy += (ty - cy) * 0.08;
+                spotlight.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+                requestAnimationFrame(tick);
+            })();
         }
 
-        // Vanilla Tilt for 3D Cards
-        VanillaTilt.init(document.querySelectorAll('.feature-card, .glass-premium'), {
-            max: 5,
-            speed: 400,
-            glare: true,
-            'max-glare': 0.1,
-            scale: 1.02
-        });
-
-        // Custom Cursor
-        const cursor = document.querySelector('.custom-cursor');
-        const cursorDot = document.querySelector('.custom-cursor-dot');
-
-        if (cursor && cursorDot && window.innerWidth > 768) {
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
-                cursorDot.style.transform = `translate(${e.clientX - 2}px, ${e.clientY - 2}px)`;
-            });
-
-            document.querySelectorAll('a, button').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    cursor.style.transform = 'scale(1.5)';
-                    cursor.style.borderColor = '#f093fb';
-                });
-                el.addEventListener('mouseleave', () => {
-                    cursor.style.transform = 'scale(1)';
-                    cursor.style.borderColor = 'rgba(102, 126, 234, 0.8)';
-                });
-            });
-        }
-
-        // Scroll Reveal
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
-
-        // Smooth Scroll for Nav Links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href !== "#" && href !== "#home") {
-                    e.preventDefault();
-                    const target = document.querySelector(href);
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                }
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', (e) => {
+                const id = a.getAttribute('href').slice(1);
+                const el = document.getElementById(id);
+                if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
             });
         });
-
-        // Parallax Effect
-        if (window.innerWidth > 768) {
-            window.addEventListener('mousemove', (e) => {
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
-                document.querySelectorAll('.float, .float-delayed').forEach(el => {
-                    const moveX = (x - 0.5) * 20;
-                    const moveY = (y - 0.5) * 20;
-                    el.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                });
-            });
-        }
     </script>
-</body>
 
+</body>
 </html>
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/welcome.blade.php ENDPATH**/ ?>
