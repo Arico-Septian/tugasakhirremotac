@@ -70,10 +70,14 @@ class UserController extends Controller
                 'required',
                 'string',
                 'max:255',
+                'regex:/^\S+$/',
                 Rule::unique('users', 'name'),
             ],
-            'password' => 'required|min:6',
+            'password' => 'required|string|min:8',
             'role' => 'required|in:admin,operator,user'
+        ], [
+            'name.regex' => 'Username tidak boleh mengandung spasi.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $user = User::create([

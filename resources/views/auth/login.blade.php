@@ -97,6 +97,7 @@
                         <i class="fa-regular fa-user"></i>
                         <input class="input" type="text" name="name"
                                required autofocus autocomplete="username"
+                               pattern="\S+" title="Username tidak boleh mengandung spasi"
                                placeholder="Enter your username"
                                value="{{ old('name') }}">
                     </div>
@@ -108,6 +109,7 @@
                         <i class="fa-solid fa-lock"></i>
                         <input class="input" type="password" name="password" id="password"
                                required autocomplete="current-password"
+                               minlength="8" title="Password minimal 8 karakter"
                                placeholder="Enter your password" style="padding-right:42px;">
                         <button type="button" onclick="togglePassword()"
                                 class="btn-icon" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;background:transparent;border-color:transparent;">

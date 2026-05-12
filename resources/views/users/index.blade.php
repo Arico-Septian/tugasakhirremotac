@@ -926,13 +926,17 @@
                 @csrf
                 <div class="modal-body space-y-3">
                     <div class="field">
-                        <label class="field-label">Name</label>
-                        <input class="input" type="text" name="name" placeholder="John Doe" required>
+                        <label class="field-label">Username</label>
+                        <input class="input" type="text" name="name" placeholder="johndoe (tanpa spasi)"
+                            pattern="\S+" title="Username tidak boleh mengandung spasi"
+                            autocomplete="off" required>
+                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Tidak boleh mengandung spasi</p>
                     </div>
                     <div class="field">
                         <label class="field-label">Password</label>
-                        <input class="input" type="password" name="password" placeholder="Minimum 6 characters"
-                            required>
+                        <input class="input" type="password" name="password" placeholder="Minimum 8 karakter"
+                            minlength="8" required>
+                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Minimal 8 karakter</p>
                     </div>
                     <div class="field">
                         <label class="field-label">Role</label>

@@ -6,7 +6,152 @@
     <title>My Profile — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+    <style>
+        /* ===== Theme toggle button ===== */
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--panel-2);
+            border: 1px solid var(--line-soft);
+            color: var(--ink-1);
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+        .theme-toggle:hover {
+            border-color: var(--line);
+            color: var(--ink-0);
+        }
+        .theme-toggle .icon-sun { display: none; }
+        .theme-toggle .icon-moon { display: inline-block; }
+        html[data-theme="light"] .theme-toggle .icon-sun { display: inline-block; }
+        html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+        /* ===== Light theme overrides (POC: profile page) =====
+           Higher specificity (html[data-theme]) + !important to beat sidebar-styles. */
+        html[data-theme="light"] {
+            --bg-0: #f5f7fa !important;
+            --bg-1: #ffffff !important;
+            --bg-2: #f8fafc !important;
+            --bg-3: #e2e8f0 !important;
+
+            --panel-1: rgba(255, 255, 255, 0.95) !important;
+            --panel-2: rgba(255, 255, 255, 0.85) !important;
+            --panel-3: rgba(15, 23, 42, 0.04) !important;
+
+            --line-soft:   rgba(15, 23, 42, 0.06) !important;
+            --line:        rgba(15, 23, 42, 0.10) !important;
+            --line-strong: rgba(15, 23, 42, 0.18) !important;
+
+            --ink-0: #0f172a !important;
+            --ink-1: #1e293b !important;
+            --ink-2: #475569 !important;
+            --ink-3: #64748b !important;
+            --ink-4: #94a3b8 !important;
+
+            --cyan:     #0891b2 !important;
+            --mint:     #059669 !important;
+            --lavender: #7c3aed !important;
+            --coral:    #e11d48 !important;
+            --amber:    #d97706 !important;
+        }
+
+        /* Light theme: replace dark wallpaper + tint */
+        html[data-theme="light"] body {
+            background:
+                linear-gradient(rgba(241, 245, 249, 0.7), rgba(241, 245, 249, 0.7)),
+                url('/images/wallpaper.jpeg') center/cover no-repeat fixed !important;
+        }
+
+        html[data-theme="light"] .main-content {
+            background: rgba(255, 255, 255, 0.55) !important;
+        }
+
+        html[data-theme="light"] .custom-bg {
+            background: transparent !important;
+        }
+
+        /* Panels & inputs in light mode */
+        html[data-theme="light"] .panel,
+        html[data-theme="light"] .panel-lg {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+        }
+
+        html[data-theme="light"] .input {
+            background: #ffffff !important;
+            border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] .input::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="light"] .btn-icon {
+            background: rgba(15, 23, 42, 0.04) !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            color: #475569 !important;
+        }
+
+        html[data-theme="light"] .btn-icon:hover {
+            background: rgba(15, 23, 42, 0.08) !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] .main-header {
+            background: rgba(255, 255, 255, 0.75) !important;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+            backdrop-filter: blur(12px);
+        }
+
+        html[data-theme="light"] .theme-toggle {
+            background: rgba(15, 23, 42, 0.04) !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            color: #475569 !important;
+        }
+
+        html[data-theme="light"] .theme-toggle:hover {
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] .avatar {
+            background: linear-gradient(135deg, #0891b2, #7c3aed) !important;
+            color: #ffffff !important;
+        }
+
+        html[data-theme="light"] .badge-role.admin {
+            background: rgba(225, 29, 72, 0.12) !important;
+            color: #be123c !important;
+        }
+
+        html[data-theme="light"] .badge-role.operator {
+            background: rgba(217, 119, 6, 0.12) !important;
+            color: #b45309 !important;
+        }
+
+        html[data-theme="light"] .badge-role.user {
+            background: rgba(8, 145, 178, 0.12) !important;
+            color: #0e7490 !important;
+        }
+    </style>
 </head>
 <body>
 <div class="custom-bg"></div>
@@ -25,6 +170,12 @@
                     <h1>My Profile</h1>
                     <p>Account &amp; security settings</p>
                 </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+                    <i class="fa-solid fa-moon text-xs icon-moon"></i>
+                    <i class="fa-solid fa-sun text-xs icon-sun"></i>
+                </button>
             </div>
         </header>
 
@@ -114,6 +265,14 @@
 <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
+function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+}
+
 function togglePw(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon = btn.querySelector('i');
