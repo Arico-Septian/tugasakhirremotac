@@ -172,7 +172,7 @@
         .activity-item {
             position: relative;
             display: grid;
-            grid-template-columns: 4px 32px 1fr;
+            grid-template-columns: 4px 34px 1fr;
             align-items: flex-start;
             gap: 10px;
             padding: 10px 12px 10px 8px;
@@ -210,6 +210,53 @@
             color: var(--tone, #94a3b8);
             font-size: 12px;
             flex-shrink: 0;
+        }
+
+        /* Avatar with activity icon badge overlay */
+        .activity-avatar-wrap {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+        }
+
+        .activity-avatar-img,
+        .activity-avatar-fallback {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            object-fit: cover;
+            background: linear-gradient(135deg, color-mix(in srgb, var(--tone, #94a3b8) 35%, #1e293b), color-mix(in srgb, var(--tone, #94a3b8) 18%, #0f172a));
+            color: #ffffff;
+            border: 1px solid color-mix(in srgb, var(--tone, #94a3b8) 40%, transparent);
+        }
+
+        .activity-icon-badge {
+            position: absolute;
+            right: -3px;
+            bottom: -3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--tone, #94a3b8);
+            color: #0b1220;
+            font-size: 9px;
+            border: 2px solid var(--panel-1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+
+        .activity-item.tone-coral .activity-icon-badge,
+        .activity-item.tone-lavender .activity-icon-badge,
+        .activity-item.tone-slate .activity-icon-badge {
+            color: #ffffff;
         }
 
         /* Tone variants — sets --tone per item */
@@ -304,7 +351,7 @@
             }
 
             .activity-item {
-                grid-template-columns: 3px 28px 1fr;
+                grid-template-columns: 3px 30px 1fr;
                 padding: 9px 10px 9px 7px;
                 gap: 8px;
             }
@@ -313,6 +360,25 @@
                 width: 28px;
                 height: 28px;
                 font-size: 11px;
+            }
+
+            .activity-avatar-wrap {
+                width: 30px;
+                height: 30px;
+            }
+
+            .activity-avatar-img,
+            .activity-avatar-fallback {
+                width: 30px;
+                height: 30px;
+                font-size: 11px;
+            }
+
+            .activity-icon-badge {
+                width: 15px;
+                height: 15px;
+                font-size: 8px;
+                border-width: 1.5px;
             }
 
             .activity-user,
@@ -1046,8 +1112,13 @@
                                 <?php $__empty_1 = true; $__currentLoopData = $recentActivities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <div class="activity-item tone-<?php echo e($log['tone']); ?>">
                                         <div class="activity-rail"></div>
-                                        <div class="activity-icon-wrap">
-                                            <i class="<?php echo e($log['icon']); ?>"></i>
+                                        <div class="activity-avatar-wrap">
+                                            <?php if(!empty($log['user_avatar'])): ?>
+                                                <img src="<?php echo e($log['user_avatar']); ?>" alt="<?php echo e($log['user_name']); ?>" class="activity-avatar-img">
+                                            <?php else: ?>
+                                                <div class="activity-avatar-fallback"><?php echo e($log['user_initial']); ?></div>
+                                            <?php endif; ?>
+                                            <span class="activity-icon-badge"><i class="<?php echo e($log['icon']); ?>"></i></span>
                                         </div>
                                         <div class="activity-body">
                                             <div class="activity-line">
@@ -1441,16 +1512,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const tone = safeTone(item.tone);
         const icon = safeIcon(item.icon);
         const name = escapeHtml(item.user_name || 'System');
+        const initial = escapeHtml(item.user_initial || (item.user_name || '?').charAt(0).toUpperCase());
         const desc = escapeHtml(item.description || item.raw_activity || '');
         const time = escapeHtml(item.time || '');
         const room = item.room ? `<span class="chip"><i class="fa-solid fa-door-open"></i>${escapeHtml(item.room)}</span>` : '';
         const ac = item.ac ? `<span class="chip"><i class="fa-solid fa-snowflake"></i>${escapeHtml(item.ac)}</span>` : '';
         const chips = (room || ac) ? `<div class="activity-chips">${room}${ac}</div>` : '';
 
+        const avatar = item.user_avatar
+            ? `<img src="${escapeHtml(item.user_avatar)}" alt="${name}" class="activity-avatar-img">`
+            : `<div class="activity-avatar-fallback">${initial}</div>`;
+
         return `
             <div class="activity-item tone-${tone}" data-id="${item.id}">
                 <div class="activity-rail"></div>
-                <div class="activity-icon-wrap"><i class="${icon}"></i></div>
+                <div class="activity-avatar-wrap">
+                    ${avatar}
+                    <span class="activity-icon-badge"><i class="${icon}"></i></span>
+                </div>
                 <div class="activity-body">
                     <div class="activity-line">
                         <span class="activity-user">${name}</span>

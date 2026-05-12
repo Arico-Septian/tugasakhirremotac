@@ -87,6 +87,7 @@ class DashboardController extends Controller
             'user_name' => $name,
             'user_initial' => mb_strtoupper(mb_substr($name, 0, 1)),
             'user_id' => $log->user_id,
+            'user_avatar' => $log->user?->avatar_url,
             'raw_activity' => $activity,
             'description' => $meta['description'],
             'icon' => $meta['icon'],
