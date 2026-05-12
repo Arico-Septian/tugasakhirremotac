@@ -46,29 +46,23 @@ if not exist artisan (
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-echo [1/4] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
+echo [1/3] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
 call :start_service "SmartAC MQTT Subscriber" "mqtt"
 
 timeout /t 1 /nobreak >nul
 
-echo [2/4] Menjalankan Vite dev server (hot reload CSS/JS)...
-call :start_service "SmartAC Vite Dev" "vite"
-
-timeout /t 1 /nobreak >nul
-
-echo [3/4] Menjalankan queue worker dan scheduler...
+echo [2/3] Menjalankan queue worker dan scheduler...
 call :start_service "SmartAC Queue Worker" "queue"
 call :start_service "SmartAC Scheduler" "scheduler"
 
 echo.
-echo [4/4] Memulai Laravel web server...
+echo [3/3] Memulai Laravel web server...
 echo.
 echo ========================================
 echo   SEMUA SERVICE BERJALAN
 echo ========================================
 echo Log service :
 echo   - storage\logs\mqtt-subscriber.log
-echo   - storage\logs\vite-dev.log
 echo   - storage\logs\queue.log
 echo   - storage\logs\scheduler.log
 echo.
@@ -116,14 +110,6 @@ if /i "%SERVICE%"=="mqtt" (
     goto :run_mqtt
 )
 
-if /i "%SERVICE%"=="vite" (
-    title SmartAC Vite Dev
-    set "SERVICE_NAME=Vite Dev Server"
-    set "SERVICE_LOG=%LOG_DIR%\vite-dev.log"
-    set "SERVICE_COMMAND=npm run dev"
-    goto :run_vite
-)
-
 if /i "%SERVICE%"=="queue" (
     title SmartAC Queue Worker
     set "SERVICE_NAME=Queue Worker"
@@ -161,11 +147,6 @@ exit /b
 :run_mqtt
 call :print_service_header
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { & '%PHP%' '%ARTISAN%' mqtt:subscribe 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath '%SERVICE_LOG%' -Value $_ -Encoding UTF8 } }"
-goto :service_stopped
-
-:run_vite
-call :print_service_header
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { npm run dev 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath '%SERVICE_LOG%' -Value $_ -Encoding UTF8 } }"
 goto :service_stopped
 
 :run_queue
