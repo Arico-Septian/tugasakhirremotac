@@ -1,5 +1,16 @@
 
 <style>
+    /* Hide all visual scrollbars (scroll wheel/touch tetap berfungsi) */
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    *::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
     /* Wallpaper — gradient overlay di atas gambar dalam satu deklarasi background */
     html, body { height: 100%; overflow: hidden; }
     body {

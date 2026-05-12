@@ -27,18 +27,92 @@
         .ic-swing  { --icon-color: var(--lavender); }
         .ic-timer  { --icon-color: var(--amber); }
 
-        @media (max-width: 640px) { .ac-card { padding: 12px; } }
+        @media (max-width: 640px) {
+            .ac-card {
+                padding: 12px;
+            }
+        }
 
         .temp-offline-badge {
-            display: inline-block;
-            margin-left: 4px;
-            padding: 2px 6px;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+            padding: 3px 8px;
             background-color: var(--coral);
             color: white;
             font-size: 9px;
             font-weight: 600;
-            border-radius: 3px;
+            border-radius: 4px;
             letter-spacing: 0.05em;
+            vertical-align: middle;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* Grid optimization for mobile */
+        @media (max-width: 480px) {
+            .grid[class*="grid-cols"] {
+                grid-template-columns: 1fr !important;
+                gap: 2px !important;
+            }
+
+            .ac-card {
+                padding: 12px;
+            }
+
+            .ac-card .label-tag {
+                font-size: 10px;
+            }
+
+            .ac-stat {
+                font-size: 12px;
+            }
+
+            .ac-stat .label {
+                font-size: 11px;
+            }
+
+            .ac-stat .value {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid[class*="grid-cols"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .ac-card {
+                padding: 12px;
+            }
+        }
+
+        /* Touch targets optimization */
+        @media (max-width: 640px) {
+            .btn.btn-primary.btn-sm {
+                min-height: 40px;
+                padding: 8px 12px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .ac-card {
+                padding: 10px;
+            }
+
+            .ac-stat .label {
+                font-size: 10px;
+            }
+
+            .ac-stat .value {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -67,19 +141,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span class="pill <?php echo e(($room->device_status ?? 'offline') === 'online' ? 'pill-online' : 'pill-error'); ?>">
-                    <span class="dot"></span>
-                    <span>ESP <?php echo e(($room->device_status ?? 'offline') === 'online' ? 'Online' : 'Offline'); ?></span>
-                </span>
-                <?php
-                    $t = $room->temperature;
-                    $tcls = $t === null ? 'idle' : ($t > 30 ? 'hot' : ($t > 25 ? 'warm' : 'cool'));
-                ?>
-                <span class="temp-chip <?php echo e($tcls); ?> hidden sm:inline-flex">
-                    <i class="fa-solid fa-temperature-half text-[10px]"></i><?php echo e($t ?? '—'); ?>°C
-                    <?php if($room->temperature_is_offline): ?>
-                        <span class="temp-offline-badge">OFFLINE</span>
-                    <?php endif; ?>
+                <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                <span id="systemStatus" class="pill pill-offline">
+                    <span class="dot"></span><span>Offline</span>
                 </span>
             </div>
         </header>
@@ -196,7 +260,21 @@ function loadStatus() {
         }).catch(() => {});
 }
 setInterval(loadStatus, 5000);
-document.addEventListener('DOMContentLoaded', loadStatus);
+document.removeEventListener('DOMContentLoaded', loadStatus);
+
+function setSystemStatus(online) {
+    const el = document.getElementById('systemStatus');
+    if (!el) return;
+    el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+    el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+}
+window.addEventListener('online',  () => setSystemStatus(true));
+window.addEventListener('offline', () => setSystemStatus(false));
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadStatus();
+    setSystemStatus(navigator.onLine);
+});
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>

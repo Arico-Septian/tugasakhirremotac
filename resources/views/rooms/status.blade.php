@@ -141,19 +141,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span class="pill {{ ($room->device_status ?? 'offline') === 'online' ? 'pill-online' : 'pill-error' }}">
-                    <span class="dot"></span>
-                    <span>ESP {{ ($room->device_status ?? 'offline') === 'online' ? 'Online' : 'Offline' }}</span>
-                </span>
-                @php
-                    $t = $room->temperature;
-                    $tcls = $t === null ? 'idle' : ($t > 30 ? 'hot' : ($t > 25 ? 'warm' : 'cool'));
-                @endphp
-                <span class="temp-chip {{ $tcls }} hidden sm:inline-flex">
-                    <i class="fa-solid fa-temperature-half text-[10px]"></i>{{ $t ?? '—' }}°C
-                    @if ($room->temperature_is_offline)
-                        <span class="temp-offline-badge">OFFLINE</span>
-                    @endif
+                @include('components.notification-bell')
+                <span id="systemStatus" class="pill pill-offline">
+                    <span class="dot"></span><span>Offline</span>
                 </span>
             </div>
         </header>
@@ -270,7 +260,20 @@ function loadStatus() {
         }).catch(() => {});
 }
 setInterval(loadStatus, 5000);
-document.addEventListener('DOMContentLoaded', loadStatus);
+
+function setSystemStatus(online) {
+    const el = document.getElementById('systemStatus');
+    if (!el) return;
+    el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+    el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+}
+window.addEventListener('online',  () => setSystemStatus(true));
+window.addEventListener('offline', () => setSystemStatus(false));
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadStatus();
+    setSystemStatus(navigator.onLine);
+});
 </script>
 @include('components.sidebar-scripts')
 </body>

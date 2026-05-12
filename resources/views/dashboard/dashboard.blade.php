@@ -167,17 +167,7 @@
             flex: 1;
             overflow-y: auto;
             max-height: 360px;
-            padding-right: 4px;
-            margin-right: -4px;
         }
-
-        .activity-list::-webkit-scrollbar { width: 4px; }
-        .activity-list::-webkit-scrollbar-track { background: transparent; }
-        .activity-list::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.2);
-            border-radius: 999px;
-        }
-        .activity-list::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.35); }
 
         .activity-item {
             position: relative;
