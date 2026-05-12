@@ -144,11 +144,13 @@ class Notification extends Model
         $stateKey = "fuzzy_warning:{$roomName}:{$reason}";
         $lastWarning = cache()->get($stateKey);
 
+        // Sudah pernah notif untuk reason ini → skip sampai recovery
         if ($lastWarning === 'warned') {
             return null;
         }
 
-        cache()->put($stateKey, 'warned', now()->addMinutes(30));
+        // TTL panjang (7 hari) — tidak expire selama belum recovery
+        cache()->put($stateKey, 'warned', now()->addDays(7));
 
         $message = match ($reason) {
             'device_offline' => "ESP ruangan " . ucwords($roomName) . " offline — Fuzzy logic tidak berjalan. Periksa koneksi device.",
@@ -164,19 +166,33 @@ class Notification extends Model
 
     public static function fuzzyRecovery(string $roomName): ?self
     {
-        $stateKey = "fuzzy_warning:{$roomName}";
-        $wasWarned = cache()->has($stateKey);
+        // Cek SEMUA reason keys (temperature & device offline)
+        $reasons = ['temperature_offline', 'device_offline'];
+        $wasWarned = false;
+        $recoveredReason = null;
 
-        cache()->forget($stateKey);
+        foreach ($reasons as $reason) {
+            $key = "fuzzy_warning:{$roomName}:{$reason}";
+            if (cache()->has($key)) {
+                $wasWarned = true;
+                $recoveredReason = $reason;
+                cache()->forget($key);
+            }
+        }
 
+        // Tidak ada warning sebelumnya → tidak perlu notif recovery
         if (!$wasWarned) {
             return null;
         }
 
+        $message = $recoveredReason === 'device_offline'
+            ? "ESP ruangan " . ucwords($roomName) . " online — Fuzzy logic aktif kembali."
+            : "Sensor suhu ruangan " . ucwords($roomName) . " online — Fuzzy logic aktif kembali.";
+
         return self::notify('fuzzy_recovery', "Fuzzy Logic: {$roomName}", [
             'severity' => 'info',
-            'message' => "Sensor suhu ruangan " . ucwords($roomName) . " online — Fuzzy logic active kembali.",
-            'meta' => ['room' => $roomName, 'reason' => 'temperature_online'],
+            'message' => $message,
+            'meta' => ['room' => $roomName, 'reason' => 'recovered'],
         ]);
     }
 }
