@@ -305,6 +305,39 @@
         }
         .input-wrap .trailing:hover { color: var(--ink-1); }
 
+        /* Live validation checkmark — appears when field is valid & filled */
+        .input-wrap .valid-check {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px;
+            border-radius: 999px;
+            background: rgba(110, 231, 183, 0.16);
+            border: 1px solid rgba(110, 231, 183, 0.36);
+            color: var(--mint);
+            font-size: 9px;
+            margin-right: 10px;
+            opacity: 0;
+            transform: scale(0.7);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            pointer-events: none;
+        }
+        .input-wrap input:valid:not(:placeholder-shown) ~ .valid-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* CapsLock warning */
+        .caps-warn {
+            margin-top: 8px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--amber);
+        }
+        .caps-warn i { font-size: 10px; }
+        .caps-warn.visible { display: inline-flex; }
+
         .submit-btn {
             margin-top: 8px;
             width: 100%;
@@ -399,14 +432,14 @@
             .brand-panel {
                 padding: 32px 28px;
                 min-height: 0;
-                order: 1;
+                order: 2;
             }
             .brand-hero { font-size: 32px; margin-top: 28px; }
             .brand-features { padding-top: 24px; }
             .form-panel {
                 padding: 34px 28px 26px;
                 min-height: 0;
-                order: 2;
+                order: 1;
             }
             .form-footer { margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
         }
@@ -542,13 +575,14 @@
                         <span>Username</span>
                         <span class="help">tanpa spasi</span>
                     </label>
-                    <div class="input-wrap">
+                    <div class="input-wrap" id="usernameWrap">
                         <span class="leading"><i class="fa-regular fa-user"></i></span>
                         <input id="username" type="text" name="name"
                                required autofocus autocomplete="username"
                                pattern="\S+" title="Username tidak boleh mengandung spasi"
                                placeholder="contoh: andi"
                                value="{{ old('name') }}">
+                        <span class="valid-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                     </div>
                 </div>
 
@@ -557,16 +591,21 @@
                         <span>Password</span>
                         <span class="help">min. 8 karakter</span>
                     </label>
-                    <div class="input-wrap">
+                    <div class="input-wrap" id="passwordWrap">
                         <span class="leading"><i class="fa-solid fa-lock"></i></span>
                         <input id="password" type="password" name="password"
                                required autocomplete="current-password"
                                minlength="8" title="Password minimal 8 karakter"
                                placeholder="••••••••">
+                        <span class="valid-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                         <button type="button" class="trailing" onclick="togglePassword()" aria-label="Show password">
                             <i id="toggleIcon" class="fa-regular fa-eye"></i>
                         </button>
                     </div>
+                    <p class="caps-warn" id="capsWarn">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        CapsLock aktif
+                    </p>
                 </div>
 
                 <button type="submit" class="submit-btn" id="loginBtn">
@@ -602,6 +641,20 @@
         document.getElementById('loginForm')?.addEventListener('submit', () => {
             document.getElementById('loginBtn').classList.add('is-loading');
         });
+
+        // CapsLock detection on password field
+        const pwInput = document.getElementById('password');
+        const capsWarn = document.getElementById('capsWarn');
+        function checkCaps(e) {
+            if (!capsWarn) return;
+            const on = typeof e.getModifierState === 'function' && e.getModifierState('CapsLock');
+            capsWarn.classList.toggle('visible', !!on);
+        }
+        if (pwInput) {
+            pwInput.addEventListener('keydown', checkCaps);
+            pwInput.addEventListener('keyup', checkCaps);
+            pwInput.addEventListener('blur', () => capsWarn?.classList.remove('visible'));
+        }
     </script>
 </body>
 </html>
