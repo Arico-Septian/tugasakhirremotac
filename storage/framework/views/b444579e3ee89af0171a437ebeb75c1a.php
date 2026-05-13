@@ -53,12 +53,10 @@
         height: 64px;
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 24px;
-        /* Match sidebar — same radial glow + linear gradient + shadow */
+        /* Match sidebar — full-opaque base agar main-content tint tidak bocor masuk */
         background:
-            radial-gradient(420px 280px at 50% 0%, rgba(94, 208, 255, 0.08), transparent 70%),
-            linear-gradient(180deg, rgba(12, 22, 44, 0.96), rgba(7, 14, 28, 0.98)) !important;
-        -webkit-backdrop-filter: blur(20px);
-        backdrop-filter: blur(20px);
+            radial-gradient(420px 280px at 50% 0%, rgba(94, 208, 255, 0.10), transparent 70%),
+            rgb(14, 25, 49) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
         color: var(--ink-0);
