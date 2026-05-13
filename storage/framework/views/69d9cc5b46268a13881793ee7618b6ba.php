@@ -725,10 +725,18 @@
             color: var(--ink-3);
         }
 
-        .stat-card.acc-cyan .stat-num-lg     { color: var(--cyan); }
-        .stat-card.acc-mint .stat-num-lg     { color: var(--mint); }
-        .stat-card.acc-lavender .stat-num-lg { color: var(--lavender); }
-        .stat-card.acc-coral .stat-num-lg    { color: var(--coral); }
+        /* Angka utama selalu putih untuk hierarki yang kuat */
+        .stat-card .stat-num-lg { color: var(--ink-0); }
+
+        /* Label kecil di atas mengambil warna accent per kartu */
+        .stat-card.acc-cyan     .stat-label-sm,
+        .stat-card.acc-cyan     .stat-label    { color: var(--cyan); }
+        .stat-card.acc-mint     .stat-label-sm,
+        .stat-card.acc-mint     .stat-label    { color: var(--mint); }
+        .stat-card.acc-lavender .stat-label-sm,
+        .stat-card.acc-lavender .stat-label    { color: var(--lavender); }
+        .stat-card.acc-coral    .stat-label-sm,
+        .stat-card.acc-coral    .stat-label    { color: var(--coral); }
 
         /* Device compatibility - Tablet & Below (768px) */
         @media (max-width: 768px) {

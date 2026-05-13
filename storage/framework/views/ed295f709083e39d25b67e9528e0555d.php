@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>User Management — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    @include('components.sidebar-styles')
+    <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         .stat-card .stat-label-sm {
             font-size: 10px;
@@ -548,7 +548,7 @@
     <div id="overlay"></div>
 
     <div class="layout">
-        @include('components.sidebar')
+        <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <div class="main-content">
             <header class="main-header">
@@ -562,7 +562,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    @include('components.notification-bell')
+                    <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                     <span id="systemStatus" class="pill pill-online">
                         <span class="dot"></span>
                         <span>Online</span>
@@ -574,15 +574,15 @@
                 <div class="app-content">
                     <div class="app-content-inner space-y-4">
 
-                        {{-- Stats --}}
+                        
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Total Users</p>
-                                        <p class="stat-num-lg">{{ $totalUsers }}</p>
-                                        <p class="stat-sub">+{{ $newUsersThisWeek ?? 0 }} minggu ini</p>
+                                        <p class="stat-num-lg"><?php echo e($totalUsers); ?></p>
+                                        <p class="stat-sub">+<?php echo e($newUsersThisWeek ?? 0); ?> minggu ini</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
                                 </div>
@@ -592,8 +592,8 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Online Now</p>
-                                        <p class="stat-num-lg">{{ $onlineUsers }}</p>
-                                        <p class="stat-sub">{{ $onlinePercentage }}% sedang aktif</p>
+                                        <p class="stat-num-lg"><?php echo e($onlineUsers); ?></p>
+                                        <p class="stat-sub"><?php echo e($onlinePercentage); ?>% sedang aktif</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
                                 </div>
@@ -603,7 +603,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Administrators</p>
-                                        <p class="stat-num-lg">{{ $adminUsers }}</p>
+                                        <p class="stat-num-lg"><?php echo e($adminUsers); ?></p>
                                         <p class="stat-sub">System privileges</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
@@ -614,7 +614,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Inactive</p>
-                                        <p class="stat-num-lg">{{ $inactiveUsers ?? 0 }}</p>
+                                        <p class="stat-num-lg"><?php echo e($inactiveUsers ?? 0); ?></p>
                                         <p class="stat-sub">User dinonaktifkan</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-user-slash"></i></div>
@@ -622,24 +622,24 @@
                             </div>
                         </div>
 
-                        {{-- User table card --}}
+                        
                         <div class="tbl-wrap">
                             <div class="tbl-toolbar">
                                 <form method="GET" action="/users" style="flex:1;max-width:none;">
                                     <label class="search-input">
                                         <i class="fa-solid fa-magnifying-glass"></i>
-                                        <input name="search" value="{{ request('search') }}"
+                                        <input name="search" value="<?php echo e(request('search')); ?>"
                                             placeholder="Search by username…" autocomplete="off">
                                     </label>
                                 </form>
                                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                                     <div class="segmented">
-                                        <a class="seg {{ !request('role') ? 'active' : '' }}" href="/users">All</a>
-                                        <a class="seg {{ request('role') == 'admin' ? 'active' : '' }}"
+                                        <a class="seg <?php echo e(!request('role') ? 'active' : ''); ?>" href="/users">All</a>
+                                        <a class="seg <?php echo e(request('role') == 'admin' ? 'active' : ''); ?>"
                                             href="/users?role=admin">Admin</a>
-                                        <a class="seg {{ request('role') == 'operator' ? 'active' : '' }}"
+                                        <a class="seg <?php echo e(request('role') == 'operator' ? 'active' : ''); ?>"
                                             href="/users?role=operator">Operator</a>
-                                        <a class="seg {{ request('role') == 'user' ? 'active' : '' }}"
+                                        <a class="seg <?php echo e(request('role') == 'user' ? 'active' : ''); ?>"
                                             href="/users?role=user">User</a>
                                     </div>
                                     <button onclick="openModal()" type="button" class="btn btn-primary btn-sm">
@@ -648,39 +648,40 @@
                                 </div>
                             </div>
 
-                            {{-- Filter chips --}}
-                            @if (request('role') || request('search'))
+                            
+                            <?php if(request('role') || request('search')): ?>
                                 <div class="filter-chips">
                                     <span>Filters:</span>
-                                    @if (request('search'))
+                                    <?php if(request('search')): ?>
                                         <div class="filter-chip">
                                             <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                                            "{{ request('search') }}"
+                                            "<?php echo e(request('search')); ?>"
                                             <button onclick="window.location.href='/users'" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
                                         </div>
-                                    @endif
-                                    @if (request('role'))
-                                        @php
+                                    <?php endif; ?>
+                                    <?php if(request('role')): ?>
+                                        <?php
                                             $roleLabel = match(request('role')) {
                                                 'admin' => 'Administrator',
                                                 'operator' => 'Operator',
                                                 'user' => 'User',
                                                 default => request('role')
                                             };
-                                        @endphp
+                                        ?>
                                         <div class="filter-chip">
                                             <i class="fa-solid fa-filter text-[9px]"></i>
-                                            {{ $roleLabel }}
+                                            <?php echo e($roleLabel); ?>
+
                                             <button onclick="window.location.href='/users'" title="Clear role filter"><i class="fa-solid fa-xmark"></i></button>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
-                            {{-- Mobile cards view --}}
+                            
                             <div class="user-cards">
-                                @forelse ($users as $user)
-                                    @php
+                                <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <?php
                                         $isOnline = $user->isOnline ?? false;
                                         $isActive = $user->is_active ?? true;
                                         $initials = strtoupper(substr($user->name, 0, 1));
@@ -693,73 +694,76 @@
                                             'operator' => 'OPERATOR',
                                             default => 'USER'
                                         };
-                                    @endphp
+                                    ?>
                                     <div class="user-card">
                                         <div class="user-card-header">
                                             <div class="user-card-info">
-                                                @if ($user->avatar_url)
-                                                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                                                <?php if($user->avatar_url): ?>
+                                                    <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
                                                          class="user-avatar-sm" style="object-fit:cover;">
-                                                @else
-                                                    <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
-                                                        {{ $initials }}
+                                                <?php else: ?>
+                                                    <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
+                                                        <?php echo e($initials); ?>
+
                                                     </div>
-                                                @endif
+                                                <?php endif; ?>
                                                 <div class="user-card-name">
-                                                    <span class="user-card-name-text">{{ $user->name }}</span>
-                                                    <span class="user-card-handle">{{ $handle }}</span>
-                                                    @if ($user->email)
-                                                        <span style="font-size:11px;color:var(--ink-4);margin-top:2px;display:block;">{{ $user->email }}</span>
-                                                    @endif
+                                                    <span class="user-card-name-text"><?php echo e($user->name); ?></span>
+                                                    <span class="user-card-handle"><?php echo e($handle); ?></span>
+                                                    <?php if($user->email): ?>
+                                                        <span style="font-size:11px;color:var(--ink-4);margin-top:2px;display:block;"><?php echo e($user->email); ?></span>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <span class="badge-role {{ $user->role }}" style="font-size:10px;padding:4px 8px;">{{ substr($roleLabel, 0, 3) }}</span>
+                                            <span class="badge-role <?php echo e($user->role); ?>" style="font-size:10px;padding:4px 8px;"><?php echo e(substr($roleLabel, 0, 3)); ?></span>
                                         </div>
                                         <div style="display:flex;gap:10px;font-size:12px;color:var(--ink-3);">
                                             <div class="user-card-status">
-                                                <span class="status-dot {{ $isOnline ? 'online' : '' }}"></span>
-                                                {{ $isOnline ? 'Online' : 'Offline' }}
+                                                <span class="status-dot <?php echo e($isOnline ? 'online' : ''); ?>"></span>
+                                                <?php echo e($isOnline ? 'Online' : 'Offline'); ?>
+
                                             </div>
                                             <div class="user-card-status">
-                                                <span class="status-dot {{ $isActive ? 'active' : '' }}"></span>
-                                                {{ $isActive ? 'Active' : 'Inactive' }}
+                                                <span class="status-dot <?php echo e($isActive ? 'active' : ''); ?>"></span>
+                                                <?php echo e($isActive ? 'Active' : 'Inactive'); ?>
+
                                             </div>
                                         </div>
-                                        @if ($user->id !== Auth::user()->id)
+                                        <?php if($user->id !== Auth::user()->id): ?>
                                             <div class="user-card-actions">
-                                                <form action="/users/status/{{ $user->id }}" method="POST"
+                                                <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
                                                     class="inline"
-                                                    onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
-                                                    @csrf
+                                                    onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
+                                                    <?php echo csrf_field(); ?>
                                                     <button type="submit"
                                                         class="btn-icon"
-                                                        style="{{ $isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);' }}"
-                                                        title="{{ $isActive ? 'Deactivate user' : 'Activate user' }}">
-                                                        <i class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-[10px]"></i>
+                                                        style="<?php echo e($isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
+                                                        title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
+                                                        <i class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[10px]"></i>
                                                     </button>
                                                 </form>
                                                 <button
-                                                    onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
+                                                    onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
                                                     type="button" class="btn-icon lavender" title="Edit role">
                                                     <i class="fa-solid fa-pen text-[10px]"></i>
                                                 </button>
-                                                <button onclick="deleteUser({{ $user->id }})" type="button"
+                                                <button onclick="deleteUser(<?php echo e($user->id); ?>)" type="button"
                                                     class="btn-icon danger" title="Delete user">
                                                     <i class="fa-solid fa-trash text-[10px]"></i>
                                                 </button>
                                             </div>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
-                                @empty
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <div class="empty-state" style="margin: 20px;">
                                         <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
                                         <p class="empty-title">No users found</p>
-                                        <p class="empty-sub">{{ (request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started' }}</p>
+                                        <p class="empty-sub"><?php echo e((request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started'); ?></p>
                                     </div>
-                                @endforelse
+                                <?php endif; ?>
                             </div>
 
-                            {{-- Desktop table view --}}
+                            
                             <table id="user-list" class="user-table">
                                 <thead>
                                     <tr>
@@ -771,113 +775,116 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($users as $user)
-                                        @php
+                                    <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <?php
                                             $isOnline = $user->isOnline ?? false;
                                             $isActive = $user->is_active ?? true;
                                             $initials = strtoupper(substr($user->name, 0, 1));
                                             $handle = '@' . strtolower(str_replace(' ', '', $user->name));
-                                        @endphp
-                                        <tr class="{{ !$isActive ? 'inactive' : '' }}">
+                                        ?>
+                                        <tr class="<?php echo e(!$isActive ? 'inactive' : ''); ?>">
                                             <td>
                                                 <div class="user-cell">
-                                                    @php
+                                                    <?php
                                         $colors = ['cyan', 'mint', 'lavender', 'coral'];
                                         $colorIndex = ($user->id - 1) % 4;
                                         $colorName = $colors[$colorIndex];
-                                    @endphp
-                                    @if ($user->avatar_url)
-                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                                    ?>
+                                    <?php if($user->avatar_url): ?>
+                                        <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
                                              class="user-avatar-sm" style="object-fit:cover;">
-                                    @else
-                                        <div class="user-avatar-sm" style="background:var(--{{ $colorName }});">
-                                            {{ $initials }}
+                                    <?php else: ?>
+                                        <div class="user-avatar-sm" style="background:var(--<?php echo e($colorName); ?>);">
+                                            <?php echo e($initials); ?>
+
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                                     <div class="user-info">
-                                                        <p class="user-name">{{ $user->name }}</p>
-                                                        <p class="user-handle">{{ $handle }}</p>
-                                                        @if ($user->email)
-                                                            <p class="user-email">{{ $user->email }}</p>
-                                                        @endif
+                                                        <p class="user-name"><?php echo e($user->name); ?></p>
+                                                        <p class="user-handle"><?php echo e($handle); ?></p>
+                                                        <?php if($user->email): ?>
+                                                            <p class="user-email"><?php echo e($user->email); ?></p>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="badge-role {{ $user->role }}">
-                                                    @if ($user->role == 'admin')
+                                                <span class="badge-role <?php echo e($user->role); ?>">
+                                                    <?php if($user->role == 'admin'): ?>
                                                         ADMINISTRATOR
-                                                    @elseif ($user->role == 'operator')
+                                                    <?php elseif($user->role == 'operator'): ?>
                                                         OPERATOR
-                                                    @else
+                                                    <?php else: ?>
                                                         USER
-                                                    @endif
+                                                    <?php endif; ?>
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="status-cell">
-                                                    <span class="status-dot {{ $isOnline ? 'online' : '' }}"></span>
-                                                    {{ $isOnline ? 'Online' : 'Offline' }}
+                                                    <span class="status-dot <?php echo e($isOnline ? 'online' : ''); ?>"></span>
+                                                    <?php echo e($isOnline ? 'Online' : 'Offline'); ?>
+
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="status-cell">
-                                                    <span class="status-dot {{ $isActive ? 'active' : '' }}"></span>
-                                                    {{ $isActive ? 'Active' : 'Inactive' }}
+                                                    <span class="status-dot <?php echo e($isActive ? 'active' : ''); ?>"></span>
+                                                    <?php echo e($isActive ? 'Active' : 'Inactive'); ?>
+
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="actions-cell">
-                                                    @if ($user->id !== Auth::user()->id)
-                                                        <form action="/users/status/{{ $user->id }}" method="POST"
+                                                    <?php if($user->id !== Auth::user()->id): ?>
+                                                        <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
                                                             class="inline"
-                                                            onsubmit="return confirm('{{ $isActive ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
-                                                            @csrf
+                                                            onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
+                                                            <?php echo csrf_field(); ?>
                                                             <button type="submit"
                                                                 class="btn-icon"
-                                                                style="{{ $isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);' }}"
-                                                                title="{{ $isActive ? 'Deactivate user' : 'Activate user' }}">
+                                                                style="<?php echo e($isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
+                                                                title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
                                                                 <i
-                                                                    class="fa-solid {{ $isActive ? 'fa-user-slash' : 'fa-user-check' }} text-[10px]"></i>
+                                                                    class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[10px]"></i>
                                                             </button>
                                                         </form>
                                                         <button
-                                                            onclick="editRole({{ $user->id }}, '{{ $user->role }}')"
+                                                            onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
                                                             type="button" class="btn-icon lavender" title="Edit role">
                                                             <i class="fa-solid fa-pen text-[10px]"></i>
                                                         </button>
-                                                        <button onclick="deleteUser({{ $user->id }})" type="button"
+                                                        <button onclick="deleteUser(<?php echo e($user->id); ?>)" type="button"
                                                             class="btn-icon danger" title="Delete user">
                                                             <i class="fa-solid fa-trash text-[10px]"></i>
                                                         </button>
-                                                    @endif
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                         <tr>
                                             <td colspan="5">
                                                 <div class="empty-state">
                                                     <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
                                                     <p class="empty-title">No users found</p>
-                                                    <p class="empty-sub">{{ (request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started' }}</p>
+                                                    <p class="empty-sub"><?php echo e((request('search') || request('role')) ? 'Try adjusting your filters or <a href="/users" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a>' : '<a href="javascript:void(0)" onclick="openModal()" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">Add a new user</a> to get started'); ?></p>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforelse
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
 
-                            @if ($users->hasPages())
+                            <?php if($users->hasPages()): ?>
                                 <div class="tbl-footer">
                                     <p>
                                         Menampilkan <span class="text-mono"
-                                            style="color:var(--ink-1);">{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</span>
+                                            style="color:var(--ink-1);"><?php echo e($users->firstItem() ?? 0); ?>–<?php echo e($users->lastItem() ?? 0); ?></span>
                                         dari <span class="text-mono"
-                                            style="color:var(--ink-1);">{{ $users->total() }}</span> user
+                                            style="color:var(--ink-1);"><?php echo e($users->total()); ?></span> user
                                     </p>
                                     <div class="pager">
-                                        @php
+                                        <?php
                                             $current = $users->currentPage();
                                             $last = $users->lastPage();
                                             $pages = [];
@@ -890,32 +897,32 @@
                                                 if ($current < $last - 2) $pages[] = '...';
                                                 $pages[] = $last;
                                             }
-                                        @endphp
+                                        ?>
 
-                                        @if ($users->onFirstPage())
+                                        <?php if($users->onFirstPage()): ?>
                                             <span class="disabled"><i class="fa-solid fa-chevron-left text-[9px]"></i></span>
-                                        @else
-                                            <a href="{{ $users->previousPageUrl() }}"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
-                                        @endif
+                                        <?php else: ?>
+                                            <a href="<?php echo e($users->previousPageUrl()); ?>"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
+                                        <?php endif; ?>
 
-                                        @foreach ($pages as $p)
-                                            @if ($p === '...')
+                                        <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($p === '...'): ?>
                                                 <span class="disabled">…</span>
-                                            @elseif ($p == $current)
-                                                <span class="active text-mono">{{ $p }}</span>
-                                            @else
-                                                <a class="text-mono" href="{{ $users->url($p) }}">{{ $p }}</a>
-                                            @endif
-                                        @endforeach
+                                            <?php elseif($p == $current): ?>
+                                                <span class="active text-mono"><?php echo e($p); ?></span>
+                                            <?php else: ?>
+                                                <a class="text-mono" href="<?php echo e($users->url($p)); ?>"><?php echo e($p); ?></a>
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                        @if ($users->hasMorePages())
-                                            <a href="{{ $users->nextPageUrl() }}"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
-                                        @else
+                                        <?php if($users->hasMorePages()): ?>
+                                            <a href="<?php echo e($users->nextPageUrl()); ?>"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
+                                        <?php else: ?>
                                             <span class="disabled"><i class="fa-solid fa-chevron-right text-[9px]"></i></span>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
                     </div>
@@ -924,9 +931,9 @@
         </div>
     </div>
 
-    @include('components.bottom-nav')
+    <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Modal: add user --}}
+    
     <div id="modal" class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
@@ -939,7 +946,7 @@
                         class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="addUserForm" method="POST" action="/users">
-                @csrf
+                <?php echo csrf_field(); ?>
                 <div class="modal-body space-y-3">
                     <div class="field">
                         <label class="field-label">Username</label>
@@ -972,7 +979,7 @@
         </div>
     </div>
 
-    {{-- Modal: edit role --}}
+    
     <div id="editRoleModal" class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
@@ -984,8 +991,8 @@
                         class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="editRoleForm" method="POST">
-                @csrf
-                @method('PUT')
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('PUT'); ?>
                 <input type="hidden" name="user_id" id="edit_user_id">
                 <div class="modal-body">
                     <div class="field">
@@ -1083,15 +1090,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             startActivityPing();
             setSystemStatus(navigator.onLine);
-            @if (session('success'))
-                window.smToast("{{ session('success') }}", 'success');
-            @endif
-            @if (session('error'))
-                window.smToast("{{ session('error') }}", 'error');
-            @endif
-            @if ($errors->any())
-                window.smToast("{{ $errors->first() }}", 'error');
-            @endif
+            <?php if(session('success')): ?>
+                window.smToast("<?php echo e(session('success')); ?>", 'success');
+            <?php endif; ?>
+            <?php if(session('error')): ?>
+                window.smToast("<?php echo e(session('error')); ?>", 'error');
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
+                window.smToast("<?php echo e($errors->first()); ?>", 'error');
+            <?php endif; ?>
         });
         window.addEventListener('beforeunload', () => {
             if (pingInterval) clearInterval(pingInterval);
@@ -1140,7 +1147,8 @@
             initializeSortIndicators();
         });
     </script>
-    @include('components.sidebar-scripts')
+    <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 
 </html>
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/users/index.blade.php ENDPATH**/ ?>

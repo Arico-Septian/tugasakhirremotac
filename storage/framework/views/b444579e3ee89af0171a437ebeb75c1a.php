@@ -15,7 +15,7 @@
     html, body { height: 100%; overflow: hidden; }
     body {
         background:
-            linear-gradient(rgba(7,16,31,0.55), rgba(7,16,31,0.55)),
+            linear-gradient(rgba(7,16,31,0.46), rgba(7,16,31,0.46)),
             url('/images/wallpaper.jpeg') center/cover no-repeat fixed !important;
     }
 
@@ -26,9 +26,9 @@
         --bg-1:    #0c1830 !important;
     }
 
-    /* Area konten utama diberi tint gelap agar wallpaper tidak terlalu kontras */
+    /* Area konten utama diberi tint tipis — sedikit lebih terang agar wallpaper terlihat */
     .main-content {
-        background: rgba(7, 16, 31, 0.45);
+        background: rgba(7, 16, 31, 0.36);
     }
 
     /* Backwards-compat aliases for legacy class names used across pages */
@@ -53,10 +53,11 @@
         height: 64px;
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 24px;
-        /* Match sidebar — full-opaque base agar main-content tint tidak bocor masuk */
+        /* Match sidebar — radial glow + linear gradient identik dengan sidebar,
+           solid (alpha 1) supaya tint .main-content tidak bocor dan bikin terlihat lebih gelap */
         background:
-            radial-gradient(420px 280px at 50% 0%, rgba(94, 208, 255, 0.10), transparent 70%),
-            rgb(14, 25, 49) !important;
+            radial-gradient(600px 200px at 50% 0%, rgba(94, 208, 255, 0.10), transparent 70%),
+            linear-gradient(180deg, rgb(16, 28, 54) 0%, rgb(12, 22, 44) 100%) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
         color: var(--ink-0);
