@@ -6,6 +6,7 @@ use App\Events\DeviceStatusUpdated;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Models\Room;
+use App\Models\RoomTemperature;
 use App\Services\MqttService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -264,6 +265,45 @@ class MqttSubscribe extends Command
                             Cache::put('raspi_temperature', $temp, 300);
                             $this->line("RASPI TEMP: {$temp}°C");
                         }
+                    },
+
+                    /* === ROOM SENSOR (DHT from ESP32 per ruangan) === */
+                    'room/+/sensor' => function ($topic, $message) {
+                        $data = json_decode($message, true);
+                        if (! is_array($data)) {
+                            $this->error("ROOM SENSOR: payload bukan JSON valid → {$message}");
+                            return;
+                        }
+
+                        $room = $data['room'] ?? null;
+                        $temp = $data['suhu'] ?? $data['temperature'] ?? null;
+
+                        // fallback ambil room dari topic kalau tidak ada di payload
+                        if (! $room) {
+                            $parts = explode('/', $topic);
+                            $room = $parts[1] ?? null;
+                        }
+
+                        if (! $room || $temp === null) {
+                            $this->error("ROOM SENSOR: room atau suhu kosong");
+                            return;
+                        }
+
+                        $room = RoomTemperature::normalizeRoomName($room);
+                        $temp = (float) $temp;
+
+                        if ($temp <= 0 || $temp > 100) {
+                            $this->error("ROOM SENSOR {$room}: suhu out of range ({$temp})");
+                            return;
+                        }
+
+                        RoomTemperature::create([
+                            'room' => $room,
+                            'temperature' => $temp,
+                        ]);
+
+                        Cache::put("room_temp_{$room}", $temp, 300);
+                        $this->line("ROOM TEMP [{$room}]: {$temp}°C");
                     },
 
                     /* === HEARTBEAT === */

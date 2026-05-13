@@ -10,6 +10,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @include('components.sidebar-styles')
     <style>
+        /* ===== Temperature color scheme (match fuzzy graph) =====
+           - cool (dingin)   → biru
+           - warm (stabil)   → hijau
+           - hot  (panas)    → orange */
+        .temp-chip.cool {
+            background: rgba(94, 208, 255, 0.14) !important;
+            color: #5ed0ff !important;
+        }
+        .temp-chip.warm {
+            background: rgba(110, 231, 183, 0.14) !important;
+            color: #6ee7b7 !important;
+        }
+        .temp-chip.hot {
+            background: rgba(251, 146, 60, 0.18) !important;
+            color: #fb923c !important;
+        }
+
+        /* Keputusan text color follows action */
+        .keputusan-yellow { color: #facc15 !important; } /* TURUNKAN */
+        .keputusan-cool   { color: #5ed0ff !important; } /* NAIKKAN */
+        .keputusan-warm   { color: #6ee7b7 !important; } /* DIAM (stabil) */
+        .keputusan-hot    { color: #fb923c !important; }
+        .keputusan-idle   { color: var(--ink-3) !important; }
+
         .room-card {
             position: relative;
             background: var(--panel-1);
@@ -366,12 +390,21 @@
                                                                     <div class="mt-2"
                                                                         style="font-size:11px;color:var(--ink-3);">
 
+                                                                        @php
+                                                                            $action = strtoupper($room->decision['action'] ?? 'DIAM');
+                                                                            $keputusanClass = match($action) {
+                                                                                'TURUNKAN' => 'keputusan-yellow',
+                                                                                'NAIKKAN'  => 'keputusan-cool',
+                                                                                'DIAM'     => 'keputusan-warm',
+                                                                                default    => 'keputusan-idle',
+                                                                            };
+                                                                        @endphp
                                                                         <div class="flex items-center justify-between">
                                                                             <span>Keputusan</span>
 
-                                                                            <span class="text-mono"
-                                                                                style="font-weight:700;color:#facc15;">
-                                                                                {{ $room->decision['action'] ?? 'DIAM' }}
+                                                                            <span class="text-mono {{ $keputusanClass }}"
+                                                                                style="font-weight:700;">
+                                                                                {{ $action }}
                                                                             </span>
                                                                         </div>
 

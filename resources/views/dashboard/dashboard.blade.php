@@ -40,30 +40,22 @@
             box-shadow: var(--inset-hi);
         }
 
-        /* Server Rooms half-width on desktop */
-        @media (min-width: 1024px) {
-            .dashboard-rooms-panel {
-                width: 50%;
-                max-width: 50%;
-            }
-        }
-
-        /* Chart row: Temperature Chart (wide) + Recent Activity (narrow) */
-        .dashboard-chart-row {
+        /* Bottom row: Server Rooms + Recent Activity (side-by-side desktop) */
+        .dashboard-bottom-row {
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
         }
 
         @media (min-width: 1024px) {
-            .dashboard-chart-row {
-                grid-template-columns: 2fr 1fr;
+            .dashboard-bottom-row {
+                grid-template-columns: 1fr 1fr;
                 gap: 16px;
-                align-items: stretch;
+                align-items: start;
             }
         }
 
-        .dashboard-chart-panel,
+        .dashboard-rooms-panel,
         .dashboard-activity-panel {
             min-width: 0;
         }
@@ -1066,88 +1058,41 @@
                         </div>
                     </div>
 
-                    {{-- Temperature trend chart + Recent Activity row --}}
-                    <div class="dashboard-chart-row">
-                        {{-- Temperature trend chart (1 jam terakhir) --}}
-                        <div class="panel dashboard-chart-panel">
-                            <div class="panel-header">
-                                <div>
-                                    <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
-                                    <h2 class="panel-title">Room Temperatures</h2>
-                                </div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
-                                        <option value="1h">1 Jam</option>
-                                        <option value="3h">3 Jam</option>
-                                        <option value="6h">6 Jam</option>
-                                        <option value="24h">24 Jam</option>
-                                    </select>
-                                    <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
-                                        <option value="5">Top 5</option>
-                                        <option value="10">Top 10</option>
-                                        <option value="0">Semua</option>
-                                    </select>
-                                </div>
+                    {{-- Temperature trend chart (full width) --}}
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
+                                <h2 class="panel-title">Room Temperatures</h2>
                             </div>
-                            <div style="height:300px;position:relative;">
-                                <canvas id="tempChart"></canvas>
-                                <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
-                                    <div style="text-align:center;">
-                                        <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
-                                        <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
-                                    </div>
-                                </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
+                                    <option value="1h">1 Jam</option>
+                                    <option value="3h">3 Jam</option>
+                                    <option value="6h">6 Jam</option>
+                                    <option value="24h">24 Jam</option>
+                                </select>
+                                <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
+                                    <option value="5">Top 5</option>
+                                    <option value="10">Top 10</option>
+                                    <option value="0">Semua</option>
+                                </select>
                             </div>
-                            <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
                         </div>
-
-                        {{-- Recent Activity widget --}}
-                        <section class="panel dashboard-activity-panel">
-                            <div class="activity-header">
-                                <h2 class="activity-title">Aktivitas Terkini</h2>
-                                <span class="activity-title-icon"><i class="fa-solid fa-bolt"></i></span>
+                        <div style="height:300px;position:relative;">
+                            <canvas id="tempChart"></canvas>
+                            <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
+                                <div style="text-align:center;">
+                                    <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
+                                    <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
+                                </div>
                             </div>
-
-                            <div class="activity-list" id="activityList">
-                                @forelse ($recentActivities as $log)
-                                    <div class="activity-item tone-{{ $log['tone'] }}">
-                                        <div class="activity-rail"></div>
-                                        <div class="activity-avatar-wrap">
-                                            @if (!empty($log['user_avatar']))
-                                                <img src="{{ $log['user_avatar'] }}" alt="{{ $log['user_name'] }}" class="activity-avatar-img">
-                                            @else
-                                                <div class="activity-avatar-fallback">{{ $log['user_initial'] }}</div>
-                                            @endif
-                                            <span class="activity-icon-badge"><i class="{{ $log['icon'] }}"></i></span>
-                                        </div>
-                                        <div class="activity-body">
-                                            <div class="activity-line">
-                                                <span class="activity-user">{{ $log['user_name'] }}</span>
-                                                <span class="activity-time">{{ $log['time'] }}</span>
-                                            </div>
-                                            <p class="activity-desc">{{ $log['description'] }}</p>
-                                            @if ($log['room'] || $log['ac'])
-                                                <div class="activity-chips">
-                                                    @if ($log['room'])
-                                                        <span class="chip"><i class="fa-solid fa-door-open"></i>{{ $log['room'] }}</span>
-                                                    @endif
-                                                    @if ($log['ac'])
-                                                        <span class="chip"><i class="fa-solid fa-snowflake"></i>{{ $log['ac'] }}</span>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="empty-state" style="padding:24px 12px;">
-                                        <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                                        <p class="empty-title">Belum ada aktivitas</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </section>
+                        </div>
+                        <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
                     </div>
 
+                    {{-- Bottom row: Server Rooms + Recent Activity --}}
+                    <div class="dashboard-bottom-row">
                     {{-- Server rooms preview --}}
                     <section class="panel dashboard-rooms-panel">
                         <div class="panel-header">
@@ -1202,6 +1147,53 @@
                             </div>
                         @endif
                     </section>
+
+                    {{-- Recent Activity widget --}}
+                    <section class="panel dashboard-activity-panel">
+                        <div class="activity-header">
+                            <h2 class="activity-title">Aktivitas Terkini</h2>
+                            <span class="activity-title-icon"><i class="fa-solid fa-bolt"></i></span>
+                        </div>
+
+                        <div class="activity-list" id="activityList">
+                            @forelse ($recentActivities as $log)
+                                <div class="activity-item tone-{{ $log['tone'] }}">
+                                    <div class="activity-rail"></div>
+                                    <div class="activity-avatar-wrap">
+                                        @if (!empty($log['user_avatar']))
+                                            <img src="{{ $log['user_avatar'] }}" alt="{{ $log['user_name'] }}" class="activity-avatar-img">
+                                        @else
+                                            <div class="activity-avatar-fallback">{{ $log['user_initial'] }}</div>
+                                        @endif
+                                        <span class="activity-icon-badge"><i class="{{ $log['icon'] }}"></i></span>
+                                    </div>
+                                    <div class="activity-body">
+                                        <div class="activity-line">
+                                            <span class="activity-user">{{ $log['user_name'] }}</span>
+                                            <span class="activity-time">{{ $log['time'] }}</span>
+                                        </div>
+                                        <p class="activity-desc">{{ $log['description'] }}</p>
+                                        @if ($log['room'] || $log['ac'])
+                                            <div class="activity-chips">
+                                                @if ($log['room'])
+                                                    <span class="chip"><i class="fa-solid fa-door-open"></i>{{ $log['room'] }}</span>
+                                                @endif
+                                                @if ($log['ac'])
+                                                    <span class="chip"><i class="fa-solid fa-snowflake"></i>{{ $log['ac'] }}</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="empty-state" style="padding:24px 12px;">
+                                    <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                    <p class="empty-title">Belum ada aktivitas</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </section>
+                    </div>
 
                 </div>
             </div>
