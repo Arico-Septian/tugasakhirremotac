@@ -53,16 +53,29 @@
         height: 64px;
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 24px;
-        /* Match sidebar's TOP region — solid navy, no glow (sama persis dengan brand area sidebar) */
-        background: rgba(12, 22, 44, 0.96) !important;
+        /* Match sidebar — same radial glow + linear gradient + shadow */
+        background:
+            radial-gradient(420px 280px at 50% 0%, rgba(94, 208, 255, 0.08), transparent 70%),
+            linear-gradient(180deg, rgba(12, 22, 44, 0.96), rgba(7, 14, 28, 0.98)) !important;
         -webkit-backdrop-filter: blur(20px);
         backdrop-filter: blur(20px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
         color: var(--ink-0);
         position: sticky; top: 0;
         z-index: 30;
     }
-    /* Subtle accent line under header (matches sidebar style) */
+    /* Top accent line (mirrors sidebar's ::before) */
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 16%; right: 16%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.32), transparent);
+        pointer-events: none;
+        z-index: 2;
+    }
+    /* Subtle accent line under header (matches sidebar's brand::after style) */
     .main-header::after {
         content: '';
         position: absolute;
