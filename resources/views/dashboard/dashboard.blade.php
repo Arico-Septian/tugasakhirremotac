@@ -173,7 +173,7 @@
             position: relative;
             display: grid;
             grid-template-columns: 4px 34px 1fr;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
             padding: 10px 12px 10px 8px;
             border-radius: 12px;
