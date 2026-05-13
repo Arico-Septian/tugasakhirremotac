@@ -36,6 +36,10 @@
                 <i class="fa-solid fa-grip"></i>
                 <span class="menu-text">Room & Ac</span>
             </a>
+        </div>
+
+        <p class="nav-section-label">overview suhu</p>
+        <div class="nav-list">
             <a href="{{ route('monitoring') }}"
                class="nav-link menu-link {{ request()->routeIs('monitoring') ? 'active' : '' }}">
                 <i class="fa-brands fa-raspberry-pi"></i>
@@ -55,19 +59,14 @@
         @endif
 
         @if ($role === 'admin')
-            <p class="nav-section-label">manage user</p>
+            <p class="nav-section-label">manage user &amp; log</p>
             <div class="nav-list">
                 <a href="/users"
                    class="nav-link menu-link {{ request()->is('users*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users-gear"></i>
                     <span class="menu-text">Users</span>
                 </a>
-            </div>
-        @endif
 
-        @if ($role === 'admin')
-            <p class="nav-section-label">manage log</p>
-            <div class="nav-list">
                 <a href="/logs"
                    class="nav-link menu-link {{ request()->is('logs*') ? 'active' : '' }}">
                     <i class="fa-solid fa-clock-rotate-left"></i>

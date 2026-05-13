@@ -36,6 +36,10 @@
                 <i class="fa-solid fa-grip"></i>
                 <span class="menu-text">Room & Ac</span>
             </a>
+        </div>
+
+        <p class="nav-section-label">overview suhu</p>
+        <div class="nav-list">
             <a href="<?php echo e(route('monitoring')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('monitoring') ? 'active' : ''); ?>">
                 <i class="fa-brands fa-raspberry-pi"></i>
@@ -55,19 +59,14 @@
         <?php endif; ?>
 
         <?php if($role === 'admin'): ?>
-            <p class="nav-section-label">manage user</p>
+            <p class="nav-section-label">manage user &amp; log</p>
             <div class="nav-list">
                 <a href="/users"
                    class="nav-link menu-link <?php echo e(request()->is('users*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-users-gear"></i>
                     <span class="menu-text">Users</span>
                 </a>
-            </div>
-        <?php endif; ?>
 
-        <?php if($role === 'admin'): ?>
-            <p class="nav-section-label">manage log</p>
-            <div class="nav-list">
                 <a href="/logs"
                    class="nav-link menu-link <?php echo e(request()->is('logs*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-clock-rotate-left"></i>
