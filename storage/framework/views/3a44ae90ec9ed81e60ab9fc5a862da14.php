@@ -24,7 +24,7 @@
 
     
     <nav class="nav-scroll">
-        <p class="nav-section-label">Overview</p>
+        <p class="nav-section-label">OVERVIEW</p>
         <div class="nav-list">
             <a href="<?php echo e(route('dashboard')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>">
@@ -34,12 +34,8 @@
             <a href="<?php echo e(route('rooms.overview')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('rooms.overview') || request()->is('rooms/*/status') ? 'active' : ''); ?>">
                 <i class="fa-solid fa-grip"></i>
-                <span class="menu-text">Room & Ac</span>
+                <span class="menu-text">Server Rooms</span>
             </a>
-        </div>
-
-        <p class="nav-section-label">overview suhu</p>
-        <div class="nav-list">
             <a href="<?php echo e(route('monitoring')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('monitoring') ? 'active' : ''); ?>">
                 <i class="fa-brands fa-raspberry-pi"></i>
@@ -48,7 +44,7 @@
         </div>
 
         <?php if($isAdminOp): ?>
-            <p class="nav-section-label">Manage ac</p>
+            <p class="nav-section-label">MANAGEMENT</p>
             <div class="nav-list">
                 <a href="/rooms"
                    class="nav-link menu-link <?php echo e(request()->is('rooms*') && !request()->routeIs('rooms.overview') && !request()->is('rooms/*/status') ? 'active' : ''); ?>">
@@ -59,14 +55,13 @@
         <?php endif; ?>
 
         <?php if($role === 'admin'): ?>
-            <p class="nav-section-label">manage user &amp; log</p>
+            <p class="nav-section-label">ADMINISTRATION</p>
             <div class="nav-list">
                 <a href="/users"
                    class="nav-link menu-link <?php echo e(request()->is('users*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-users-gear"></i>
                     <span class="menu-text">Users</span>
                 </a>
-
                 <a href="/logs"
                    class="nav-link menu-link <?php echo e(request()->is('logs*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-clock-rotate-left"></i>
