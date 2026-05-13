@@ -46,6 +46,14 @@ if not exist artisan (
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
+echo [0/3] Membersihkan cache konfigurasi (config + cache)...
+"%PHP%" "%ARTISAN%" config:clear >nul 2>&1
+"%PHP%" "%ARTISAN%" cache:clear >nul 2>&1
+"%PHP%" "%ARTISAN%" route:clear >nul 2>&1
+"%PHP%" "%ARTISAN%" view:clear >nul 2>&1
+echo Cache cleared.
+echo.
+
 echo [1/3] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
 call :start_service "SmartAC MQTT Subscriber" "mqtt"
 
@@ -146,17 +154,26 @@ exit /b
 
 :run_mqtt
 call :print_service_header
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { & '%PHP%' '%ARTISAN%' mqtt:subscribe 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath '%SERVICE_LOG%' -Value $_ -Encoding UTF8 } }"
+echo MQTT subscriber akan otomatis restart kalau crash (delay 5 detik).
+echo Tekan Ctrl+C dua kali untuk benar-benar berhenti.
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === MQTT subscriber start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'mqtt:subscribe' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! MQTT subscriber exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
 :run_queue
 call :print_service_header
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { & '%PHP%' '%ARTISAN%' queue:work --sleep=3 --tries=3 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath '%SERVICE_LOG%' -Value $_ -Encoding UTF8 } }"
+echo Queue worker akan otomatis restart kalau crash (delay 5 detik).
+echo Tekan Ctrl+C dua kali untuk benar-benar berhenti.
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Queue worker start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'queue:work' '--sleep=3' '--tries=3' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Queue worker exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
 :run_scheduler
 call :print_service_header
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { & '%PHP%' '%ARTISAN%' schedule:work 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath '%SERVICE_LOG%' -Value $_ -Encoding UTF8 } }"
+echo Scheduler akan otomatis restart kalau crash (delay 5 detik).
+echo Tekan Ctrl+C dua kali untuk benar-benar berhenti.
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Scheduler start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'schedule:work' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Scheduler exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
 :service_stopped
