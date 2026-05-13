@@ -34,7 +34,7 @@
             <a href="<?php echo e(route('rooms.overview')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('rooms.overview') || request()->is('rooms/*/status') ? 'active' : ''); ?>">
                 <i class="fa-solid fa-grip"></i>
-                <span class="menu-text">List Room & Ac</span>
+                <span class="menu-text">Room & Ac</span>
             </a>
             <a href="<?php echo e(route('monitoring')); ?>"
                class="nav-link menu-link <?php echo e(request()->routeIs('monitoring') ? 'active' : ''); ?>">
@@ -44,24 +44,30 @@
         </div>
 
         <?php if($isAdminOp): ?>
-            <p class="nav-section-label">Manage</p>
+            <p class="nav-section-label">Manage ac</p>
             <div class="nav-list">
                 <a href="/rooms"
                    class="nav-link menu-link <?php echo e(request()->is('rooms*') && !request()->routeIs('rooms.overview') && !request()->is('rooms/*/status') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-server"></i>
-                    <span class="menu-text">Control Rooms &amp; AC</span>
+                    <span class="menu-text">Rooms &amp; AC</span>
                 </a>
             </div>
         <?php endif; ?>
 
         <?php if($role === 'admin'): ?>
-            <p class="nav-section-label">Admin</p>
+            <p class="nav-section-label">manage user</p>
             <div class="nav-list">
                 <a href="/users"
                    class="nav-link menu-link <?php echo e(request()->is('users*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-users-gear"></i>
                     <span class="menu-text">Users</span>
                 </a>
+            </div>
+        <?php endif; ?>
+
+        <?php if($role === 'admin'): ?>
+            <p class="nav-section-label">manage log</p>
+            <div class="nav-list">
                 <a href="/logs"
                    class="nav-link menu-link <?php echo e(request()->is('logs*') ? 'active' : ''); ?>">
                     <i class="fa-solid fa-clock-rotate-left"></i>
