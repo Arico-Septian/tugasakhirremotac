@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Events\DeviceStatusUpdated;
+use App\Events\RoomTemperatureUpdated;
 use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Models\Room;
@@ -297,6 +298,17 @@ class MqttSubscribe extends Command
                             return;
                         }
 
+                        // Drop pesan dari ruangan yang tidak terdaftar di DB
+                        // (proteksi dari ESP32 lama / topic asing di public broker)
+                        $knownRooms = Cache::remember('known_room_names', 30, fn () => Room::pluck('name')
+                            ->map(RoomTemperature::normalizeRoomName(...))
+                            ->all());
+
+                        if (! \in_array($room, $knownRooms, true)) {
+                            $this->warn("ROOM SENSOR [{$room}]: room tidak terdaftar di DB, di-drop");
+                            return;
+                        }
+
                         RoomTemperature::create([
                             'room' => $room,
                             'temperature' => $temp,
@@ -304,6 +316,9 @@ class MqttSubscribe extends Command
 
                         Cache::put("room_temp_{$room}", $temp, 300);
                         $this->line("ROOM TEMP [{$room}]: {$temp}°C");
+
+                        // Broadcast suhu real-time ke browser via Reverb
+                        event(new RoomTemperatureUpdated($room, $temp));
                     },
 
                     /* === HEARTBEAT === */
@@ -393,9 +408,16 @@ class MqttSubscribe extends Command
         $deviceId = $this->normalize($deviceId);
         $now = now();
 
-        Cache::put("device_{$deviceId}_last_seen", $now->toDateTimeString(), 60);
-        Cache::put("device_status_{$deviceId}", 'online', 60);
+        Cache::put("device_{$deviceId}_last_seen", $now->toDateTimeString(), 30);
+        Cache::put("device_status_{$deviceId}", 'online', 30);
         Cache::forget("device_unknown_{$deviceId}");
+
+        // Track semua device yang pernah ping (untuk `device:list-active`)
+        $seen = Cache::get('seen_device_ids', []);
+        if (! \in_array($deviceId, $seen, true)) {
+            $seen[] = $deviceId;
+            Cache::put('seen_device_ids', $seen, 3600);
+        }
 
         Room::where('device_id', $deviceId)->update([
             'device_status' => 'online',

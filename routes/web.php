@@ -86,7 +86,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
                 if ($lastSeen) {
                     $lastSeenAt = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 60;
+                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 25;
                 }
 
                 // State-based notifications: only notify on state CHANGE
@@ -147,9 +147,13 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         return Room::orderBy('name')
             ->get()
             ->map(function ($room) use ($latestTemperatures) {
-                $temperature = optional(
-                    $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
-                )->temperature;
+                $record = $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name));
+                $temperature = $record?->temperature;
+
+                // Stale check: kalau record terakhir > 60s, anggap sensor mati → null
+                if ($record && now()->diffInSeconds($record->created_at, true) > 60) {
+                    $temperature = null;
+                }
 
                 return [
                     'id' => $room->id,

@@ -5,15 +5,16 @@ namespace App\Events;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class DeviceStatusUpdated implements ShouldBroadcast
+class RoomTemperatureUpdated implements ShouldBroadcast
 {
-    public $deviceId;
-    public $status;
+    public $room;
 
-    public function __construct($deviceId, $status)
+    public $temperature;
+
+    public function __construct(string $room, float $temperature)
     {
-        $this->deviceId = $deviceId;
-        $this->status = $status;
+        $this->room = $room;
+        $this->temperature = $temperature;
     }
 
     public function broadcastOn()
@@ -23,6 +24,6 @@ class DeviceStatusUpdated implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'DeviceStatusUpdated';
+        return 'RoomTemperatureUpdated';
     }
 }

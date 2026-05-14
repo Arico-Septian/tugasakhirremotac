@@ -8,6 +8,7 @@
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .trend-filter-select {
@@ -1459,6 +1460,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initChart();
     setSystemStatus(navigator.onLine);
     updateNotifButton();
+
+    // Real-time via Reverb: trigger refresh segera saat event masuk
+    if (window.Echo) {
+        window.Echo.channel('device-status')
+            .listen('.DeviceStatusUpdated', () => {
+                refreshDashboardRoomStatuses();
+                refreshTemperature();
+            })
+            .listen('.RoomTemperatureUpdated', () => {
+                refreshTemperature();
+            });
+    }
 
     // Setup trend filter dropdowns
     const trendSelect = document.getElementById('trendLimit');

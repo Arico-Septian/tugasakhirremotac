@@ -46,7 +46,7 @@ if not exist artisan (
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-echo [0/3] Membersihkan cache konfigurasi (config + cache)...
+echo [0/4] Membersihkan cache konfigurasi (config + cache)...
 "%PHP%" "%ARTISAN%" config:clear >nul 2>&1
 "%PHP%" "%ARTISAN%" cache:clear >nul 2>&1
 "%PHP%" "%ARTISAN%" route:clear >nul 2>&1
@@ -54,17 +54,29 @@ echo [0/3] Membersihkan cache konfigurasi (config + cache)...
 echo Cache cleared.
 echo.
 
-echo [1/3] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
+if not exist "%PROJECT_DIR%public\build\manifest.json" (
+    echo Asset Vite belum di-build. Menjalankan "npm run build"...
+    call npm run build
+    echo.
+)
+
+echo [1/4] Menjalankan MQTT subscriber (AC control + device status + suhu raspi)...
 call :start_service "SmartAC MQTT Subscriber" "mqtt"
 
 timeout /t 1 /nobreak >nul
 
-echo [2/3] Menjalankan queue worker dan scheduler...
+echo [2/4] Menjalankan queue worker dan scheduler...
 call :start_service "SmartAC Queue Worker" "queue"
 call :start_service "SmartAC Scheduler" "scheduler"
 
 echo.
-echo [3/3] Memulai Laravel web server...
+echo [3/4] Menjalankan Reverb WebSocket server (real-time push)...
+call :start_service "SmartAC Reverb Server" "reverb"
+
+timeout /t 1 /nobreak >nul
+
+echo.
+echo [4/4] Memulai Laravel web server...
 echo.
 echo ========================================
 echo   SEMUA SERVICE BERJALAN
@@ -73,6 +85,7 @@ echo Log service :
 echo   - storage\logs\mqtt-subscriber.log
 echo   - storage\logs\queue.log
 echo   - storage\logs\scheduler.log
+echo   - storage\logs\reverb.log
 echo.
 
 timeout /t 2 /nobreak >nul
@@ -134,6 +147,14 @@ if /i "%SERVICE%"=="scheduler" (
     goto :run_scheduler
 )
 
+if /i "%SERVICE%"=="reverb" (
+    title SmartAC Reverb Server
+    set "SERVICE_NAME=Reverb Server"
+    set "SERVICE_LOG=%LOG_DIR%\reverb.log"
+    set "SERVICE_COMMAND=%PHP% %ARTISAN% reverb:start"
+    goto :run_reverb
+)
+
 echo Service "%SERVICE%" tidak dikenal.
 pause
 exit /b 1
@@ -174,6 +195,14 @@ echo Scheduler akan otomatis restart kalau crash (delay 5 detik).
 echo Tekan Ctrl+C dua kali untuk benar-benar berhenti.
 echo.
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Scheduler start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'schedule:work' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Scheduler exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
+goto :service_stopped
+
+:run_reverb
+call :print_service_header
+echo Reverb WebSocket server (port 8080) - real-time push ke browser.
+echo Auto-restart kalau crash (delay 5 detik). Ctrl+C 2x untuk berhenti.
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Reverb server start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'reverb:start' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Reverb server exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
 :service_stopped
