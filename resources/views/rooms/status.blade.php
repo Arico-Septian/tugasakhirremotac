@@ -298,18 +298,19 @@ function loadStatus() {
         .then(data => {
             if (!Array.isArray(data)) return;
             data.forEach(item => {
-                const ac = item.acUnit || item;
-                if (!ac?.id) return;
-                const id = ac.id;
-                updateElement('power-' + id, item.power || 'OFF');
+                // Laravel serialize relationship sebagai snake_case (ac_unit), bukan acUnit
+                const ac = item.ac_unit || item.acUnit;
+                const id = ac?.id ?? item.ac_unit_id;
+                if (!id) return;
+                updateElement('power-' + id, (item.power || 'OFF').toUpperCase());
                 updateElement('temp-'  + id, (item.set_temperature ?? 24) + '°C');
                 updateElement('mode-'  + id, (item.mode || 'AUTO').toUpperCase());
                 updateElement('fan-'   + id, (item.fan_speed || 'AUTO').toUpperCase());
                 updateElement('swing-' + id, (item.swing || 'OFF').toUpperCase());
                 const timerEl = document.getElementById('timer-' + id);
-                if (timerEl) {
-                    const on  = formatTime(ac.timer_on  || item.timer_on);
-                    const off = formatTime(ac.timer_off || item.timer_off);
+                if (timerEl && ac) {
+                    const on  = formatTime(ac.timer_on);
+                    const off = formatTime(ac.timer_off);
                     if (on || off) {
                         timerEl.innerHTML = (on ? `<div>ON ${on}</div>` : '') + (off ? `<div>OFF ${off}</div>` : '');
                     }

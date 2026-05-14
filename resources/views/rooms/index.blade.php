@@ -429,7 +429,8 @@
                                                         <div
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">
                                                             <p class="text-mono text-base font-bold"
-                                                                style="color:var(--mint);line-height:1;">
+                                                                style="color:var(--mint);line-height:1;"
+                                                                id="active-{{ $room->id }}">
                                                                 {{ $activeAcs }}</p>
                                                             <p class="label-tag mt-1" style="font-size:9.5px;">Active
                                                             </p>
@@ -437,7 +438,8 @@
                                                         <div
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">
                                                             <p class="text-mono text-base font-bold"
-                                                                style="color:var(--ink-2);line-height:1;">
+                                                                style="color:var(--ink-2);line-height:1;"
+                                                                id="idle-{{ $room->id }}">
                                                                 {{ $idleAcs }}</p>
                                                             <p class="label-tag mt-1" style="font-size:9.5px;">Idle
                                                             </p>
@@ -666,12 +668,36 @@
             applyRoomFilter();
             refreshRoomStatuses();
 
-            // Real-time via Reverb: refresh segera saat device/suhu berubah
+            // Real-time via Reverb: refresh segera saat device/suhu/AC berubah (tanpa reload)
+            function refreshAcCounters() {
+                fetch('/api/ac-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!Array.isArray(data)) return;
+                        // Group by room_id, count power=ON vs OFF
+                        const counts = {};
+                        data.forEach(item => {
+                            const roomId = item.ac_unit?.room?.id ?? item.acUnit?.room?.id;
+                            if (!roomId) return;
+                            if (!counts[roomId]) counts[roomId] = { active: 0, idle: 0 };
+                            if ((item.power || 'OFF').toUpperCase() === 'ON') counts[roomId].active++;
+                            else counts[roomId].idle++;
+                        });
+                        // Update DOM
+                        Object.entries(counts).forEach(([roomId, c]) => {
+                            const a = document.getElementById(`active-${roomId}`);
+                            const i = document.getElementById(`idle-${roomId}`);
+                            if (a) a.textContent = c.active;
+                            if (i) i.textContent = c.idle;
+                        });
+                    })
+                    .catch(() => {});
+            }
+
             if (window.Echo) {
                 window.Echo.channel('device-status')
                     .listen('.DeviceStatusUpdated', () => refreshRoomStatuses())
                     .listen('.RoomTemperatureUpdated', () => {
-                        // Trigger refresh suhu (gunakan logic interval di atas)
                         fetch('/temperature', { headers: { 'Accept': 'application/json' } })
                             .then(r => r.ok ? r.json() : null)
                             .then(data => {
@@ -686,7 +712,8 @@
                                     }
                                 });
                             }).catch(() => {});
-                    });
+                    })
+                    .listen('.AcStatusUpdated', () => refreshAcCounters());
             }
 
             @if (session('success'))

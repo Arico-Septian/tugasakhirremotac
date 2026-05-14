@@ -407,12 +407,14 @@
 
                                                     <div class="ac-mini">
                                                         <div>
-                                                            <p class="num" style="color:var(--mint);">
+                                                            <p class="num" style="color:var(--mint);"
+                                                                id="ov-active-{{ $room->id }}">
                                                                 {{ $activeCount }}</p>
                                                             <p class="lbl">Active</p>
                                                         </div>
                                                         <div>
-                                                            <p class="num" style="color:var(--ink-2);">
+                                                            <p class="num" style="color:var(--ink-2);"
+                                                                id="ov-idle-{{ $room->id }}">
                                                                 {{ $inactiveCount }}</p>
                                                             <p class="lbl">Idle</p>
                                                         </div>
@@ -716,7 +718,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
 
-            // Real-time via Reverb: trigger refresh segera saat event masuk
+            // Real-time: counter Active/Idle per kartu tanpa reload
+            function refreshAcCountersOverview() {
+                fetch('/api/ac-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!Array.isArray(data)) return;
+                        const counts = {};
+                        data.forEach(item => {
+                            const roomId = item.ac_unit?.room?.id ?? item.acUnit?.room?.id;
+                            if (!roomId) return;
+                            if (!counts[roomId]) counts[roomId] = { active: 0, idle: 0 };
+                            if ((item.power || 'OFF').toUpperCase() === 'ON') counts[roomId].active++;
+                            else counts[roomId].idle++;
+                        });
+                        Object.entries(counts).forEach(([roomId, c]) => {
+                            const a = document.getElementById(`ov-active-${roomId}`);
+                            const i = document.getElementById(`ov-idle-${roomId}`);
+                            if (a) a.textContent = c.active;
+                            if (i) i.textContent = c.idle;
+                        });
+                    })
+                    .catch(() => {});
+            }
+
             if (window.Echo) {
                 window.Echo.channel('device-status')
                     .listen('.DeviceStatusUpdated', () => {
@@ -725,7 +750,8 @@
                     })
                     .listen('.RoomTemperatureUpdated', () => {
                         refreshTemps();
-                    });
+                    })
+                    .listen('.AcStatusUpdated', () => refreshAcCountersOverview());
             }
         });
     </script>

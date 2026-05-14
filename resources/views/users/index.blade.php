@@ -593,8 +593,8 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Online Now</p>
-                                        <p class="stat-num-lg">{{ $onlineUsers }}</p>
-                                        <p class="stat-sub">{{ $onlinePercentage }}% sedang aktif</p>
+                                        <p class="stat-num-lg" id="onlineUsersCount">{{ $onlineUsers }}</p>
+                                        <p class="stat-sub"><span id="onlineUsersPct">{{ $onlinePercentage }}</span>% sedang aktif</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
                                 </div>
@@ -1085,19 +1085,27 @@
             startActivityPing();
             setSystemStatus(navigator.onLine);
 
-            // Real-time: refresh halaman saat user lain login/logout (NotificationCreated saat login dll)
-            // atau saat user log activity tercatat (UserLogCreated)
-            if (window.Echo) {
-                let reloadTimer = null;
-                const debounceReload = () => {
-                    if (reloadTimer) clearTimeout(reloadTimer);
-                    reloadTimer = setTimeout(() => {
-                        if (!document.hidden) location.reload();
-                    }, 2000);
-                };
-                window.Echo.channel('device-status')
-                    .listen('.UserLogCreated', debounceReload);
+            // Real-time: update counter online users tanpa reload halaman
+            function refreshUsersOnline() {
+                fetch('/users-online', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data) return;
+                        const c = document.getElementById('onlineUsersCount');
+                        const p = document.getElementById('onlineUsersPct');
+                        if (c && data.online !== undefined) c.textContent = data.online;
+                        if (p && data.percentage !== undefined) p.textContent = data.percentage;
+                    })
+                    .catch(() => {});
             }
+
+            if (window.Echo) {
+                window.Echo.channel('device-status')
+                    .listen('.UserLogCreated', () => refreshUsersOnline());
+            }
+
+            // Poll juga tiap 30s sebagai fallback (kalau WS putus)
+            setInterval(refreshUsersOnline, 30000);
             @if (session('success'))
                 window.smToast("{{ session('success') }}", 'success');
             @endif

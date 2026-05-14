@@ -8,6 +8,7 @@
     <title>Notifikasi — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .nlist-item {
@@ -274,6 +275,19 @@
         window.addEventListener('offline', () => setSystemStatus(false));
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
+
+            // Real-time: muat notifikasi baru ke daftar tanpa reload
+            if (window.Echo) {
+                let pendingTimer = null;
+                const refreshList = () => {
+                    if (pendingTimer) clearTimeout(pendingTimer);
+                    pendingTimer = setTimeout(() => {
+                        if (!document.hidden) location.reload();
+                    }, 1500);
+                };
+                window.Echo.channel('device-status')
+                    .listen('.NotificationCreated', refreshList);
+            }
         });
     </script>
 

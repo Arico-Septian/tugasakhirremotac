@@ -481,10 +481,16 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
         Route::get('/users-online', function () {
+            $total = User::count();
+            $online = User::where('is_active', true)
+                ->where('last_activity', '>=', now()->subMinutes(2))
+                ->count();
+
             return response()->json([
-                'count' => User::where('is_active', true)
-                    ->where('last_activity', '>=', now()->subMinutes(5))
-                    ->count(),
+                'count' => $online,
+                'online' => $online,
+                'total' => $total,
+                'percentage' => $total > 0 ? (int) round(($online / $total) * 100) : 0,
             ]);
         });
     });

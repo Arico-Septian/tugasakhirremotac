@@ -922,6 +922,21 @@
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
             initializeSortIndicators();
+
+            // Real-time: refresh saat ada log baru (debounce untuk hindari spam reload)
+            if (window.Echo) {
+                let logReloadTimer = null;
+                window.Echo.channel('device-status')
+                    .listen('.UserLogCreated', () => {
+                        if (logReloadTimer) clearTimeout(logReloadTimer);
+                        logReloadTimer = setTimeout(() => {
+                            // Skip kalau user lagi cari/filter atau di halaman selain pertama
+                            const url = new URL(window.location.href);
+                            const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
+                            if (!document.hidden && onFirstPage) location.reload();
+                        }, 1500);
+                    });
+            }
         });
 
         // Column sorting

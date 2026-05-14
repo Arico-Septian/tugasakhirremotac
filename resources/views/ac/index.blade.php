@@ -1501,28 +1501,80 @@
             updateEspStatus();
             setInterval(updateEspStatus, 5000);
 
-            // Real-time: ESP status + AC state push via Reverb
+            // Real-time: ESP status + AC state push via Reverb (update DOM langsung tanpa reload)
             if (window.Echo) {
                 const currentRoomId = Number(document.getElementById('espStatusPill')?.dataset.roomId);
-                let acReloadTimer = null;
 
-                // Debounce reload supaya bulk on/off tidak trigger 10x reload
-                const scheduleAcReload = (eventRoomId) => {
-                    // Hanya reload kalau AC yang berubah ada di ruangan yang sedang dibuka
-                    if (eventRoomId && currentRoomId && Number(eventRoomId) !== currentRoomId) return;
-                    if (acReloadTimer) clearTimeout(acReloadTimer);
-                    acReloadTimer = setTimeout(() => {
-                        // Skip kalau user sedang fokus di form/modal (hindari kehilangan input)
-                        const activeTag = document.activeElement?.tagName;
-                        const modalOpen = document.querySelector('.is-open');
-                        if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || modalOpen) return;
-                        if (!document.hidden) location.reload();
-                    }, 800);
-                };
+                const swingLabelMap = { off: 'Diam', full: 'Full', half: '½', down: 'Bawah' };
+                const ucfirst = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+
+                function updateAcPanel(payload) {
+                    if (!payload?.ac_unit_id) return;
+                    if (currentRoomId && payload.room_id && Number(payload.room_id) !== currentRoomId) return;
+
+                    const panel = document.getElementById(`ac-${payload.ac_unit_id}`);
+                    if (!panel) return;
+
+                    const power = (payload.power || 'OFF').toUpperCase();
+                    const mode = (payload.mode || 'COOL').toLowerCase();
+                    const fan = (payload.fan_speed || 'AUTO').toLowerCase();
+                    const swing = (payload.swing || 'OFF').toLowerCase();
+                    const temp = Number(payload.set_temperature) || 24;
+
+                    // Temp value
+                    const valEl = panel.querySelector('.temp-value');
+                    if (valEl) valEl.textContent = temp;
+
+                    // Temp ring color category
+                    const ring = document.getElementById(`tempRing-${payload.ac_unit_id}`);
+                    if (ring) {
+                        ring.classList.remove('temp-cool', 'temp-warm', 'temp-hot');
+                        ring.classList.add(temp <= 20 ? 'temp-cool' : (temp <= 25 ? 'temp-warm' : 'temp-hot'));
+                    }
+
+                    // Ring summary: "Cool · Auto · Diam"
+                    const summary = panel.querySelector('.ring-summary');
+                    if (summary) {
+                        summary.textContent = `${ucfirst(mode)} · ${ucfirst(fan)} · ${swingLabelMap[swing] || ucfirst(swing)}`;
+                    }
+
+                    // Power button (toggle .on)
+                    const powerBtn = panel.querySelector('.power-btn');
+                    if (powerBtn) powerBtn.classList.toggle('on', power === 'ON');
+
+                    // Power form data attribute (dipakai modal konfirmasi)
+                    const powerForm = panel.querySelector('.power-form');
+                    if (powerForm) powerForm.dataset.acPower = power;
+
+                    // +/- temp button onclick handlers (selalu refer ke nilai temp saat ini)
+                    const ctrlBtns = panel.querySelectorAll('.ctrl-row .ctrl-btn');
+                    if (ctrlBtns.length >= 2) {
+                        ctrlBtns[0].setAttribute('onclick', `setTemp(${payload.ac_unit_id}, ${temp - 1})`);
+                        ctrlBtns[1].setAttribute('onclick', `setTemp(${payload.ac_unit_id}, ${temp + 1})`);
+                    }
+
+                    // Mode / Fan / Swing buttons — toggle .active sesuai value baru
+                    const setActiveByForm = (actionPrefix, value) => {
+                        panel.querySelectorAll(`form[action^="${actionPrefix}"]`).forEach(form => {
+                            const action = form.getAttribute('action') || '';
+                            const segment = action.split('/').pop();
+                            const btn = form.querySelector('button');
+                            if (btn) {
+                                btn.classList.toggle('active', segment === value);
+                                // Restore opacity & inner HTML kalau sebelumnya kena spinner submit
+                                btn.style.opacity = '';
+                                btn.style.pointerEvents = '';
+                            }
+                        });
+                    };
+                    setActiveByForm(`/ac/${payload.ac_unit_id}/mode/`, mode);
+                    setActiveByForm(`/ac/${payload.ac_unit_id}/fan-speed/`, fan);
+                    setActiveByForm(`/ac/${payload.ac_unit_id}/swing/`, swing);
+                }
 
                 window.Echo.channel('device-status')
                     .listen('.DeviceStatusUpdated', () => updateEspStatus())
-                    .listen('.AcStatusUpdated', (e) => scheduleAcReload(e?.room_id));
+                    .listen('.AcStatusUpdated', (e) => updateAcPanel(e));
             }
 
             @if (session('new_ac_id'))
