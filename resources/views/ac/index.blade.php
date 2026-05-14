@@ -8,6 +8,7 @@
     <title>{{ $room->name }} — AC Control</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .ac-panel {
@@ -1500,10 +1501,28 @@
             updateEspStatus();
             setInterval(updateEspStatus, 5000);
 
-            // Real-time: ESP status push via Reverb
+            // Real-time: ESP status + AC state push via Reverb
             if (window.Echo) {
+                const currentRoomId = Number(document.getElementById('espStatusPill')?.dataset.roomId);
+                let acReloadTimer = null;
+
+                // Debounce reload supaya bulk on/off tidak trigger 10x reload
+                const scheduleAcReload = (eventRoomId) => {
+                    // Hanya reload kalau AC yang berubah ada di ruangan yang sedang dibuka
+                    if (eventRoomId && currentRoomId && Number(eventRoomId) !== currentRoomId) return;
+                    if (acReloadTimer) clearTimeout(acReloadTimer);
+                    acReloadTimer = setTimeout(() => {
+                        // Skip kalau user sedang fokus di form/modal (hindari kehilangan input)
+                        const activeTag = document.activeElement?.tagName;
+                        const modalOpen = document.querySelector('.is-open');
+                        if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || modalOpen) return;
+                        if (!document.hidden) location.reload();
+                    }, 800);
+                };
+
                 window.Echo.channel('device-status')
-                    .listen('.DeviceStatusUpdated', () => updateEspStatus());
+                    .listen('.DeviceStatusUpdated', () => updateEspStatus())
+                    .listen('.AcStatusUpdated', (e) => scheduleAcReload(e?.room_id));
             }
 
             @if (session('new_ac_id'))

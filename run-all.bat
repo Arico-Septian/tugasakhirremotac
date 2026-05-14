@@ -52,6 +52,12 @@ echo [0/4] Membersihkan cache konfigurasi (config + cache)...
 "%PHP%" "%ARTISAN%" route:clear >nul 2>&1
 "%PHP%" "%ARTISAN%" view:clear >nul 2>&1
 echo Cache cleared.
+
+REM Hapus public/hot kalau ada (stale marker dari sesi Vite sebelumnya yang tidak bersih)
+if exist "%PROJECT_DIR%public\hot" (
+    del /q "%PROJECT_DIR%public\hot" >nul 2>&1
+    echo Stale Vite marker dihapus (public/hot).
+)
 echo.
 
 if not exist "%PROJECT_DIR%public\build\manifest.json" (

@@ -8,6 +8,7 @@
     <title>Manajemen Ruangan — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         /* ===== Temperature color scheme (match fuzzy graph) =====

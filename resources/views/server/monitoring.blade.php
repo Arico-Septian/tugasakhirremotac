@@ -11,6 +11,7 @@
     <title>Monitoring Raspberry Pi — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .raspi-card {
