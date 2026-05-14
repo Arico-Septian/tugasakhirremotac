@@ -4,9 +4,9 @@ namespace App\Events;
 
 use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class NotificationCreated implements ShouldBroadcast
+class NotificationCreated implements ShouldBroadcastNow
 {
     public array $payload;
 

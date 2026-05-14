@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,8 +71,8 @@
                 var(--panel-1);
             border: 1px solid var(--line-soft);
             box-shadow:
-                0 1px 0 rgba(255,255,255,0.04) inset,
-                0 10px 30px -18px rgba(0,0,0,0.5);
+                0 1px 0 rgba(255, 255, 255, 0.04) inset,
+                0 10px 30px -18px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             position: relative;
@@ -83,7 +84,7 @@
             position: absolute;
             inset: 0 0 auto 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(34,211,238,0.45), transparent);
+            background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.45), transparent);
             opacity: 0.7;
         }
 
@@ -108,8 +109,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(167,139,250,0.18));
-            border: 1px solid rgba(34,211,238,0.30);
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(167, 139, 250, 0.18));
+            border: 1px solid rgba(34, 211, 238, 0.30);
             color: var(--cyan);
             font-size: 11px;
         }
@@ -148,9 +149,17 @@
         }
 
         @keyframes livePulse {
-            0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
-            70%  { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+            }
+
+            70% {
+                box-shadow: 0 0 0 7px rgba(52, 211, 153, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+            }
         }
 
         .activity-list {
@@ -170,13 +179,13 @@
             gap: 10px;
             padding: 10px 12px 10px 8px;
             border-radius: 12px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
             border: 1px solid var(--line-soft);
             transition: all 0.18s ease;
         }
 
         .activity-item:hover {
-            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
             border-color: rgba(148, 163, 184, 0.25);
             transform: translateX(2px);
         }
@@ -243,7 +252,7 @@
             color: #0b1220;
             font-size: 9px;
             border: 2px solid var(--panel-1);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         .activity-item.tone-coral .activity-icon-badge,
@@ -253,13 +262,33 @@
         }
 
         /* Tone variants — sets --tone per item */
-        .activity-item.tone-cyan     { --tone: #22d3ee; }
-        .activity-item.tone-mint     { --tone: #34d399; }
-        .activity-item.tone-lavender { --tone: #a78bfa; }
-        .activity-item.tone-coral    { --tone: #fb7185; }
-        .activity-item.tone-amber    { --tone: #fbbf24; }
-        .activity-item.tone-sky      { --tone: #38bdf8; }
-        .activity-item.tone-slate    { --tone: #94a3b8; }
+        .activity-item.tone-cyan {
+            --tone: #22d3ee;
+        }
+
+        .activity-item.tone-mint {
+            --tone: #34d399;
+        }
+
+        .activity-item.tone-lavender {
+            --tone: #a78bfa;
+        }
+
+        .activity-item.tone-coral {
+            --tone: #fb7185;
+        }
+
+        .activity-item.tone-amber {
+            --tone: #fbbf24;
+        }
+
+        .activity-item.tone-sky {
+            --tone: #38bdf8;
+        }
+
+        .activity-item.tone-slate {
+            --tone: #94a3b8;
+        }
 
         .activity-body {
             min-width: 0;
@@ -459,7 +488,7 @@
         }
 
         /* Dashboard sections spacing */
-        .app-content-inner > * + * {
+        .app-content-inner>*+* {
             margin-top: 32px;
         }
 
@@ -727,17 +756,30 @@
         }
 
         /* Angka utama selalu putih untuk hierarki yang kuat */
-        .stat-card .stat-num-lg { color: var(--ink-0); }
+        .stat-card .stat-num-lg {
+            color: var(--ink-0);
+        }
 
         /* Label kecil di atas mengambil warna accent per kartu */
-        .stat-card.acc-cyan     .stat-label-sm,
-        .stat-card.acc-cyan     .stat-label    { color: var(--cyan); }
-        .stat-card.acc-mint     .stat-label-sm,
-        .stat-card.acc-mint     .stat-label    { color: var(--mint); }
+        .stat-card.acc-cyan .stat-label-sm,
+        .stat-card.acc-cyan .stat-label {
+            color: var(--cyan);
+        }
+
+        .stat-card.acc-mint .stat-label-sm,
+        .stat-card.acc-mint .stat-label {
+            color: var(--mint);
+        }
+
         .stat-card.acc-lavender .stat-label-sm,
-        .stat-card.acc-lavender .stat-label    { color: var(--lavender); }
-        .stat-card.acc-coral    .stat-label-sm,
-        .stat-card.acc-coral    .stat-label    { color: var(--coral); }
+        .stat-card.acc-lavender .stat-label {
+            color: var(--lavender);
+        }
+
+        .stat-card.acc-coral .stat-label-sm,
+        .stat-card.acc-coral .stat-label {
+            color: var(--coral);
+        }
 
         /* Device compatibility - Tablet & Below (768px) */
         @media (max-width: 768px) {
@@ -987,571 +1029,739 @@
         }
     </style>
 </head>
+
 <body>
-<div class="custom-bg"></div>
-<div id="overlay"></div>
+    <div class="custom-bg"></div>
+    <div id="overlay"></div>
 
-<div class="layout">
-    <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <div class="layout">
+        <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <div class="main-content">
-        
-        <header class="main-header">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                    <i class="fa-solid fa-bars text-xs"></i>
-                </button>
-                <div class="app-header-title">
-                    <h1>Dashboard</h1>
-                    <p>Overview &amp; live monitoring</p>
+        <div class="main-content">
+            
+            <header class="main-header">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
+                        <i class="fa-solid fa-bars text-xs"></i>
+                    </button>
+                    <div class="app-header-title">
+                        <h1>Dashboard</h1>
+                        <p>Overview &amp; live monitoring</p>
+                    </div>
                 </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-                <span id="systemStatus" class="pill pill-offline">
-                    <span class="dot"></span><span>Offline</span>
-                </span>
-            </div>
-        </header>
+                <div class="flex items-center gap-2">
+                    <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <span id="systemStatus" class="pill pill-offline">
+                        <span class="dot"></span><span>Offline</span>
+                    </span>
+                </div>
+            </header>
 
-        
-        <div class="page-body">
-            <div class="app-content">
-                <div class="app-content-inner space-y-4">
+            
+            <div class="page-body">
+                <div class="app-content">
+                    <div class="app-content-inner space-y-4">
 
-                    
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                        <div class="stat-card acc-cyan">
-                            <span class="accent-bar"></span>
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="stat-label-sm">Rooms</p>
-                                    <p class="stat-num-lg"><?php echo e($rooms->count()); ?></p>
-                                    <p class="stat-sub">Total registered</p>
-                                </div>
-                                <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
-                            </div>
-                        </div>
-                        <div class="stat-card acc-lavender">
-                            <span class="accent-bar"></span>
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="stat-label">AC Units</p>
-                                    <p class="stat-num-lg"><?php echo e($totalAc); ?></p>
-                                    <p class="stat-meta">Across all rooms</p>
-                                </div>
-                                <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
-                            </div>
-                        </div>
-                        <div class="stat-card acc-mint">
-                            <span class="accent-bar"></span>
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="stat-label">Ac Active</p>
-                                    <p class="stat-num-lg"><?php echo e($activeAc); ?></p>
-                                    <p class="stat-meta">Currently powered on</p>
-                                </div>
-                                <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
-                            </div>
-                        </div>
-                        <div class="stat-card acc-coral">
-                            <span class="accent-bar"></span>
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="stat-label">Ac Idle</p>
-                                    <p class="stat-num-lg"><?php echo e($inactiveAc); ?></p>
-                                    <p class="stat-meta">Powered off</p>
-                                </div>
-                                <div class="stat-icon"><i class="fa-regular fa-circle"></i></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span id="trendRangeLabel">Trend 1 jam terakhir</span></p>
-                                <h2 class="panel-title">Room Temperatures</h2>
-                            </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
-                                    <option value="1h">1 Jam</option>
-                                    <option value="3h">3 Jam</option>
-                                    <option value="6h">6 Jam</option>
-                                    <option value="24h">24 Jam</option>
-                                </select>
-                                <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
-                                    <option value="5">Top 5</option>
-                                    <option value="10">Top 10</option>
-                                    <option value="0">Semua</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="height:300px;position:relative;">
-                            <canvas id="tempChart"></canvas>
-                            <div id="tempChartEmpty" class="empty-state" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
-                                <div style="text-align:center;">
-                                    <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
-                                    <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
-                                </div>
-                            </div>
-                        </div>
-                        <p id="trendInfo" class="panel-meta" style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
-                    </div>
-
-                    
-                    <div class="dashboard-bottom-row">
-                    
-                    <section class="panel dashboard-rooms-panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2 class="dashboard-rooms-title">Server Rooms</h2>
-                                <p class="dashboard-rooms-subtitle"><?php echo e($totalRooms); ?> ruangan terdaftar</p>
-                            </div>
-                            <a href="<?php echo e(route('rooms.overview')); ?>" class="dashboard-rooms-action" aria-label="Lihat semua server rooms">
-                                <span>Lihat<br>semua</span>
-                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            </a>
-                        </div>
-
-                        <?php
-                            $previewRooms = $rooms->take(4);
-                        ?>
-
-                        <?php if($previewRooms->isNotEmpty()): ?>
-                            <div class="dashboard-room-list">
-                                <?php $__currentLoopData = $previewRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <?php
-                                        $temperature = $room->temperature;
-                                        $status = $room->device_status === 'online' ? 'online' : 'offline';
-                                    ?>
-                                    <a href="<?php echo e(route('rooms.overview')); ?>"
-                                       class="dashboard-room-row"
-                                       data-dashboard-room-id="<?php echo e($room->id); ?>">
-                                        <div class="dashboard-room-main">
-                                            <h3 class="dashboard-room-name"><?php echo e($room->name); ?></h3>
-                                            <p class="dashboard-room-meta">
-                                                <?php echo e($room->acUnits->count()); ?> unit &middot; <?php echo e($room->device_id ?: '-'); ?>
-
-                                            </p>
-                                        </div>
-                                        <div id="dashboard-room-temp-<?php echo e($room->id); ?>" class="dashboard-room-temp">
-                                            <?php if($temperature !== null): ?>
-                                                <?php echo e(number_format((float) $temperature, 1)); ?>&deg;C
-                                            <?php else: ?>
-                                                -- &deg;C
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="dashboard-room-status <?php echo e($status); ?>">
-                                            <?php echo e(strtoupper($status)); ?>
-
-                                        </div>
-                                    </a>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </div>
-                        <?php else: ?>
-                            <div class="empty-state" style="padding:28px 12px;">
-                                <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
-                                <p class="empty-title">Belum ada ruangan</p>
-                                <p class="empty-sub">Tambahkan ruangan untuk mulai monitoring</p>
-                            </div>
-                        <?php endif; ?>
-                    </section>
-
-                    
-                    <section class="panel dashboard-activity-panel">
-                        <div class="activity-header">
-                            <h2 class="activity-title">Aktivitas Terkini</h2>
-                            <span class="activity-title-icon"><i class="fa-solid fa-bolt"></i></span>
-                        </div>
-
-                        <div class="activity-list" id="activityList">
-                            <?php $__empty_1 = true; $__currentLoopData = $recentActivities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                <div class="activity-item tone-<?php echo e($log['tone']); ?>">
-                                    <div class="activity-rail"></div>
-                                    <div class="activity-avatar-wrap">
-                                        <?php if(!empty($log['user_avatar'])): ?>
-                                            <img src="<?php echo e($log['user_avatar']); ?>" alt="<?php echo e($log['user_name']); ?>" class="activity-avatar-img">
-                                        <?php else: ?>
-                                            <div class="activity-avatar-fallback"><?php echo e($log['user_initial']); ?></div>
-                                        <?php endif; ?>
-                                        <span class="activity-icon-badge"><i class="<?php echo e($log['icon']); ?>"></i></span>
+                        
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                            <div class="stat-card acc-cyan">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Rooms</p>
+                                        <p class="stat-num-lg"><?php echo e($rooms->count()); ?></p>
+                                        <p class="stat-sub">Total registered</p>
                                     </div>
-                                    <div class="activity-body">
-                                        <div class="activity-line">
-                                            <span class="activity-user"><?php echo e($log['user_name']); ?></span>
-                                            <span class="activity-time"><?php echo e($log['time']); ?></span>
-                                        </div>
-                                        <p class="activity-desc"><?php echo e($log['description']); ?></p>
-                                        <?php if($log['room'] || $log['ac']): ?>
-                                            <div class="activity-chips">
-                                                <?php if($log['room']): ?>
-                                                    <span class="chip"><i class="fa-solid fa-door-open"></i><?php echo e($log['room']); ?></span>
+                                    <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-lavender">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label">AC Units</p>
+                                        <p class="stat-num-lg"><?php echo e($totalAc); ?></p>
+                                        <p class="stat-meta">Across all rooms</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-mint">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label">Ac Active</p>
+                                        <p class="stat-num-lg"><?php echo e($activeAc); ?></p>
+                                        <p class="stat-meta">Currently powered on</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label">Ac Idle</p>
+                                        <p class="stat-num-lg"><?php echo e($inactiveAc); ?></p>
+                                        <p class="stat-meta">Powered off</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-regular fa-circle"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div>
+                                    <p class="eyebrow"><i class="fa-solid fa-chart-line"></i> <span
+                                            id="trendRangeLabel">Trend 1 jam terakhir</span></p>
+                                    <h2 class="panel-title">Room Temperatures</h2>
+                                </div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <select id="trendRange" class="trend-filter-select" title="Pilih range waktu">
+                                        <option value="1h">1 Jam</option>
+                                        <option value="3h">3 Jam</option>
+                                        <option value="6h">6 Jam</option>
+                                        <option value="24h">24 Jam</option>
+                                    </select>
+                                    <select id="trendLimit" class="trend-filter-select" title="Pilih jumlah ruangan">
+                                        <option value="5">Top 5</option>
+                                        <option value="10">Top 10</option>
+                                        <option value="0">Semua</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="height:300px;position:relative;">
+                                <canvas id="tempChart"></canvas>
+                                <div id="tempChartEmpty" class="empty-state"
+                                    style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;">
+                                    <div style="text-align:center;">
+                                        <div class="empty-icon"><i class="fa-solid fa-temperature-empty"></i></div>
+                                        <p class="empty-sub">Belum ada data suhu dalam 1 jam terakhir</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p id="trendInfo" class="panel-meta"
+                                style="margin-top:8px;font-size:11px;color:var(--ink-4);"></p>
+                        </div>
+
+                        
+                        <div class="dashboard-bottom-row">
+                            
+                            <section class="panel dashboard-rooms-panel">
+                                <div class="panel-header">
+                                    <div>
+                                        <h2 class="dashboard-rooms-title">Server Rooms</h2>
+                                        <p class="dashboard-rooms-subtitle"><?php echo e($totalRooms); ?> ruangan terdaftar</p>
+                                    </div>
+                                    <a href="<?php echo e(route('rooms.overview')); ?>" class="dashboard-rooms-action"
+                                        aria-label="Lihat semua server rooms">
+                                        <span>Lihat<br>semua</span>
+                                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                    </a>
+                                </div>
+
+                                <?php
+                                    $previewRooms = $rooms->take(4);
+                                ?>
+
+                                <?php if($previewRooms->isNotEmpty()): ?>
+                                    <div class="dashboard-room-list">
+                                        <?php $__currentLoopData = $previewRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php
+                                                $temperature = $room->temperature;
+                                                $status = $room->device_status === 'online' ? 'online' : 'offline';
+                                            ?>
+                                            <a href="<?php echo e(route('rooms.overview')); ?>" class="dashboard-room-row"
+                                                data-dashboard-room-id="<?php echo e($room->id); ?>">
+                                                <div class="dashboard-room-main">
+                                                    <h3 class="dashboard-room-name"><?php echo e($room->name); ?></h3>
+                                                    <p class="dashboard-room-meta">
+                                                        <?php echo e($room->acUnits->count()); ?> unit &middot;
+                                                        <?php echo e($room->device_id ?: '-'); ?>
+
+                                                    </p>
+                                                </div>
+                                                <div id="dashboard-room-temp-<?php echo e($room->id); ?>"
+                                                    class="dashboard-room-temp">
+                                                    <?php if($temperature !== null): ?>
+                                                        <?php echo e(number_format((float) $temperature, 1)); ?>&deg;C
+                                                    <?php else: ?>
+                                                        -- &deg;C
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="dashboard-room-status <?php echo e($status); ?>">
+                                                    <?php echo e(strtoupper($status)); ?>
+
+                                                </div>
+                                            </a>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="empty-state" style="padding:28px 12px;">
+                                        <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
+                                        <p class="empty-title">Belum ada ruangan</p>
+                                        <p class="empty-sub">Tambahkan ruangan untuk mulai monitoring</p>
+                                    </div>
+                                <?php endif; ?>
+                            </section>
+
+                            
+                            <section class="panel dashboard-activity-panel">
+                                <div class="activity-header">
+                                    <h2 class="activity-title">Aktivitas Terkini</h2>
+                                    <span class="activity-title-icon"><i class="fa-solid fa-bolt"></i></span>
+                                </div>
+
+                                <div class="activity-list" id="activityList">
+                                    <?php $__empty_1 = true; $__currentLoopData = $recentActivities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <div class="activity-item tone-<?php echo e($log['tone']); ?>">
+                                            <div class="activity-rail"></div>
+                                            <div class="activity-avatar-wrap">
+                                                <?php if(!empty($log['user_avatar'])): ?>
+                                                    <img src="<?php echo e($log['user_avatar']); ?>"
+                                                        alt="<?php echo e($log['user_name']); ?>" class="activity-avatar-img">
+                                                <?php else: ?>
+                                                    <div class="activity-avatar-fallback"><?php echo e($log['user_initial']); ?>
+
+                                                    </div>
                                                 <?php endif; ?>
-                                                <?php if($log['ac']): ?>
-                                                    <span class="chip"><i class="fa-solid fa-snowflake"></i><?php echo e($log['ac']); ?></span>
+                                                <span class="activity-icon-badge"><i
+                                                        class="<?php echo e($log['icon']); ?>"></i></span>
+                                            </div>
+                                            <div class="activity-body">
+                                                <div class="activity-line">
+                                                    <span class="activity-user"><?php echo e($log['user_name']); ?></span>
+                                                    <span class="activity-time"><?php echo e($log['time']); ?></span>
+                                                </div>
+                                                <p class="activity-desc"><?php echo e($log['description']); ?></p>
+                                                <?php if($log['room'] || $log['ac']): ?>
+                                                    <div class="activity-chips">
+                                                        <?php if($log['room']): ?>
+                                                            <span class="chip"><i
+                                                                    class="fa-solid fa-door-open"></i><?php echo e($log['room']); ?></span>
+                                                        <?php endif; ?>
+                                                        <?php if($log['ac']): ?>
+                                                            <span class="chip"><i
+                                                                    class="fa-solid fa-snowflake"></i><?php echo e($log['ac']); ?></span>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 <?php endif; ?>
                                             </div>
-                                        <?php endif; ?>
-                                    </div>
+                                        </div>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <div class="empty-state" style="padding:24px 12px;">
+                                            <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i>
+                                            </div>
+                                            <p class="empty-title">Belum ada aktivitas</p>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                <div class="empty-state" style="padding:24px 12px;">
-                                    <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                                    <p class="empty-title">Belum ada aktivitas</p>
-                                </div>
-                            <?php endif; ?>
+                            </section>
                         </div>
-                    </section>
-                    </div>
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-<script>
-function tempColor(t) {
-    if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.55)';
-    if (t > 30) return 'rgba(251,113,133,0.85)';   // coral
-    if (t > 25) return 'rgba(251,191,36,0.85)';    // amber
-    return 'rgba(77,212,255,0.85)';                // cyan
-}
+    <script>
+        function tempColor(t) {
+            if (t === null || isNaN(Number(t))) return 'rgba(100,116,139,0.55)';
+            if (t > 30) return 'rgba(251,113,133,0.85)'; // coral
+            if (t > 25) return 'rgba(251,191,36,0.85)'; // amber
+            return 'rgba(77,212,255,0.85)'; // cyan
+        }
 
-/* ===== NOTIFICATIONS ===== */
-let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
-const notifCooldown = {};
+        // ===== Helpers (hex -> rgba) =====
+        function hexToRgba(hex, a = 1) {
+            if (!hex) return `rgba(255,255,255,${a})`;
+            const h = hex.replace('#', '').trim();
+            const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+            const r = parseInt(full.slice(0, 2), 16);
+            const g = parseInt(full.slice(2, 4), 16);
+            const b = parseInt(full.slice(4, 6), 16);
+            return `rgba(${r},${g},${b},${a})`;
+        }
 
-function updateNotifButton() {
-    const btn = document.getElementById('notifBtn');
-    if (!btn) return;
-    const i = btn.querySelector('i');
-    if (notifEnabled && Notification.permission === 'granted') {
-        btn.style.color = 'var(--amber)';
-        btn.style.background = 'var(--amber-soft)';
-        btn.style.borderColor = 'var(--amber-soft-2)';
-        i.className = 'fa-solid fa-bell text-xs';
-        btn.title = 'Notifications enabled — click to disable';
-    } else {
-        btn.style.color = '';
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        i.className = 'fa-regular fa-bell text-xs';
-        btn.title = 'Enable critical temperature notifications';
-    }
-}
+        function makeAreaGradient(chart, hex) {
+            const {
+                ctx,
+                chartArea
+            } = chart;
+            if (!chartArea) return hexToRgba(hex, 0.12);
 
-function toggleNotifications() {
-    if (!('Notification' in window)) { window.smToast('Browser tidak mendukung notifikasi', 'error'); return; }
-    if (notifEnabled) {
-        notifEnabled = false;
-        localStorage.setItem('notifEnabled', 'false');
-        updateNotifButton();
-        return;
-    }
-    Notification.requestPermission().then(perm => {
-        notifEnabled = perm === 'granted';
-        localStorage.setItem('notifEnabled', notifEnabled ? 'true' : 'false');
-        updateNotifButton();
-        if (perm === 'denied') window.smToast('Izin notifikasi ditolak', 'error');
-    });
-}
+            const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            g.addColorStop(0, hexToRgba(hex, 0.40));
+            g.addColorStop(0.6, hexToRgba(hex, 0.16));
+            g.addColorStop(1, hexToRgba(hex, 0.0));
+            return g;
+        }
 
-let tempChart;
-function initChart() {
-    const ctx = document.getElementById('tempChart');
-    if (!ctx) return;
-    tempChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: {
-            maintainAspectRatio: false,
-            responsive: true,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    align: 'end',
-                    labels: {
-                        color: '#94a3b8',
-                        font: { family: 'Inter', size: 11 },
-                        boxWidth: 10,
-                        boxHeight: 10,
-                        usePointStyle: true,
-                        padding: 12,
-                        generateLabels: function(chart) {
-                            const original = Chart.defaults.plugins.legend.labels.generateLabels;
-                            const labels = original.call(this, chart);
-                            labels.forEach((label, i) => {
-                                const ds = chart.data.datasets[i];
-                                if (ds && ds._isOffline) {
-                                    // Warna text memudar utk room offline
-                                    label.fontColor = '#64748b';
-                                }
-                            });
-                            return labels;
-                        }
+        // ===== Crosshair plugin (garis vertikal + glow point) =====
+        const crosshairGlowPlugin = {
+            id: 'crosshairGlow',
+            afterDatasetsDraw(chart) {
+                const tooltip = chart.tooltip;
+                if (!tooltip || !tooltip.getActiveElements || tooltip.getActiveElements().length === 0) return;
+
+                const {
+                    ctx,
+                    chartArea: {
+                        top,
+                        bottom
                     }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(7,16,31,0.96)',
-                    titleColor: '#f5f7fb',
-                    bodyColor: '#cbd5e1',
-                    borderColor: 'rgba(77,212,255,0.35)',
-                    borderWidth: 1,
-                    padding: 10,
-                    cornerRadius: 10,
-                    callbacks: {
-                        label: c => {
-                            const v = c.parsed.y;
-                            const valStr = v === null || isNaN(v) ? '—' : v + '°C';
-                            return ` ${c.dataset.label}: ${valStr}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { color: '#64748b', maxRotation: 0, font: { size: 10 } },
-                    grid: { display: false }
-                },
-                y: {
-                    suggestedMin: 20,
-                    suggestedMax: 35,
-                    ticks: { color: '#64748b', font: { size: 10 }, callback: v => v + '°C' },
-                    grid: { color: 'rgba(255,255,255,0.04)' }
-                }
+                } = chart;
+                const active = tooltip.getActiveElements()[0];
+                const x = active.element.x;
+                const y = active.element.y;
+
+                // vertical line
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(x, top);
+                ctx.lineTo(x, bottom);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(103,232,249,0.25)';
+                ctx.stroke();
+
+                // glow point
+                ctx.shadowBlur = 16;
+                ctx.shadowColor = 'rgba(255,255,255,0.25)';
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.beginPath();
+                ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        };
+
+        /* ===== NOTIFICATIONS ===== */
+        let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
+        const notifCooldown = {};
+
+        function updateNotifButton() {
+            const btn = document.getElementById('notifBtn');
+            if (!btn) return;
+            const i = btn.querySelector('i');
+            if (notifEnabled && Notification.permission === 'granted') {
+                btn.style.color = 'var(--amber)';
+                btn.style.background = 'var(--amber-soft)';
+                btn.style.borderColor = 'var(--amber-soft-2)';
+                i.className = 'fa-solid fa-bell text-xs';
+                btn.title = 'Notifications enabled — click to disable';
+            } else {
+                btn.style.color = '';
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                i.className = 'fa-regular fa-bell text-xs';
+                btn.title = 'Enable critical temperature notifications';
             }
         }
-    });
-}
 
-function refreshTemperature() {
-    fetch('/temperature')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!data) return;
-            data.forEach(room => {
-                const tempEl = document.getElementById(`dashboard-room-temp-${room.id}`);
-                if (!tempEl) return;
-                const temp = parseFloat(room.temp);
-                tempEl.textContent = isNaN(temp) ? '-- \u00b0C' : `${temp.toFixed(1)}\u00b0C`;
+        function toggleNotifications() {
+            if (!('Notification' in window)) {
+                window.smToast('Browser tidak mendukung notifikasi', 'error');
+                return;
+            }
+            if (notifEnabled) {
+                notifEnabled = false;
+                localStorage.setItem('notifEnabled', 'false');
+                updateNotifButton();
+                return;
+            }
+            Notification.requestPermission().then(perm => {
+                notifEnabled = perm === 'granted';
+                localStorage.setItem('notifEnabled', notifEnabled ? 'true' : 'false');
+                updateNotifButton();
+                if (perm === 'denied') window.smToast('Izin notifikasi ditolak', 'error');
             });
-        })
-        .catch(() => {});
-}
+        }
 
-function getTrendLimit() {
-    const saved = localStorage.getItem('trendLimit');
-    return saved !== null ? saved : '5';
-}
+        let tempChart;
 
-function getTrendRange() {
-    const saved = localStorage.getItem('trendRange');
-    return saved !== null ? saved : '1h';
-}
+        function initChart() {
+            const canvas = document.getElementById('tempChart');
+            if (!canvas) return;
 
-const RANGE_LABELS = {
-    '1h':  'Trend 1 jam terakhir',
-    '3h':  'Trend 3 jam terakhir',
-    '6h':  'Trend 6 jam terakhir',
-    '24h': 'Trend 24 jam terakhir',
-};
+            tempChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                plugins: [crosshairGlowPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false,
+                        axis: 'x'
+                    },
 
-function refreshTrendChart() {
-    if (!tempChart) return;
-    const limit = getTrendLimit();
-    const range = getTrendRange();
+                    animation: {
+                        duration: 450
+                    },
 
-    const labelEl = document.getElementById('trendRangeLabel');
-    if (labelEl) labelEl.textContent = RANGE_LABELS[range] || RANGE_LABELS['1h'];
+                    elements: {
+                        line: {
+                            tension: 0.48,
+                            borderWidth: 2.5,
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round',
+                        },
+                        point: {
+                            radius: 0,
+                            hitRadius: 12,
+                            hoverRadius: 5
+                        }
+                    },
 
-    fetch(`/temperature/trend?limit=${encodeURIComponent(limit)}&range=${encodeURIComponent(range)}`)
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!data || !tempChart) return;
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    family: 'Inter',
+                                    size: 11
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                padding: 12,
+                            }
+                        },
 
-            const hasAnyData = (data.datasets || []).some(ds =>
-                (ds.data || []).some(v => v !== null && !isNaN(v))
-            );
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false,
+                            backgroundColor: 'rgba(7,16,31,0.95)',
+                            borderColor: 'rgba(255,255,255,0.12)',
+                            borderWidth: 1,
+                            padding: 10,
+                            cornerRadius: 10,
+                            mode: 'nearest',
+                            intersect: false,
+                            caretSize: 6,
+                            caretPadding: 8,
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#f8fafc',
+                            titleFont: {
+                                family: 'Inter',
+                                size: 11,
+                                weight: '700'
+                            },
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 12,
+                                weight: '800'
+                            },
+                            callbacks: {
+                                title: (items) => items?.[0]?.label ?? '',
+                                label: (item) => {
+                                    const v = item.parsed.y;
+                                    if (v === null || Number.isNaN(v)) return `${item.dataset.label}: —`;
+                                    return `${item.dataset.label}: ${v.toFixed(1)}°C`;
+                                }
+                            }
+                        }
+                    },
 
-            const emptyEl = document.getElementById('tempChartEmpty');
-            const canvasEl = document.getElementById('tempChart');
-            if (emptyEl && canvasEl) {
-                emptyEl.style.display = hasAnyData ? 'none' : 'flex';
-                canvasEl.style.display = hasAnyData ? 'block' : 'none';
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#64748b',
+                                maxRotation: 0,
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            suggestedMin: 20,
+                            suggestedMax: 35,
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    size: 10
+                                },
+                                callback: v => v + '°C'
+                            },
+                            grid: {
+                                color: 'rgba(103,232,249,0.12)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshTemperature() {
+            fetch('/temperature')
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    data.forEach(room => {
+                        const tempEl = document.getElementById(`dashboard-room-temp-${room.id}`);
+                        if (!tempEl) return;
+                        const temp = parseFloat(room.temp);
+                        tempEl.textContent = isNaN(temp) ? '-- \u00b0C' : `${temp.toFixed(1)}\u00b0C`;
+                    });
+                })
+                .catch(() => {});
+        }
+
+        function getTrendLimit() {
+            const saved = localStorage.getItem('trendLimit');
+            return saved !== null ? saved : '5';
+        }
+
+        function getTrendRange() {
+            const saved = localStorage.getItem('trendRange');
+            return saved !== null ? saved : '1h';
+        }
+
+        const RANGE_LABELS = {
+            '1h': 'Trend 1 jam terakhir',
+            '3h': 'Trend 3 jam terakhir',
+            '6h': 'Trend 6 jam terakhir',
+            '24h': 'Trend 24 jam terakhir',
+        };
+
+        function refreshTrendChart() {
+            if (!tempChart) return;
+
+            const limit = getTrendLimit();
+            const range = getTrendRange();
+
+            const labelEl = document.getElementById('trendRangeLabel');
+            if (labelEl) labelEl.textContent = RANGE_LABELS[range] || RANGE_LABELS['1h'];
+
+            fetch(`/temperature/trend?limit=${encodeURIComponent(limit)}&range=${encodeURIComponent(range)}`)
+                .then(r => (r.ok ? r.json() : null))
+                .then(data => {
+                    if (!data || !tempChart) return;
+
+                    const hasAnyData = (data.datasets || []).some(ds =>
+                        (ds.data || []).some(v => v !== null && !isNaN(v))
+                    );
+
+                    const emptyEl = document.getElementById('tempChartEmpty');
+                    const canvasEl = document.getElementById('tempChart');
+                    if (emptyEl && canvasEl) {
+                        emptyEl.style.display = hasAnyData ? 'none' : 'flex';
+                        canvasEl.style.display = hasAnyData ? 'block' : 'none';
+                    }
+
+                    tempChart.data.labels = data.labels || [];
+
+                    tempChart.data.datasets = (data.datasets || []).map(ds => {
+                        const tempStr = ds.current_temp !== null && ds.current_temp !== undefined ?
+                            `${Number(ds.current_temp).toFixed(1)}°C` :
+                            '—';
+
+                        const lineColor = ds.is_offline ?
+                            'rgba(148,163,184,0.45)' :
+                            '#67e8f9';
+
+                        return {
+                            label: `${ds.room} (${tempStr})`,
+                            data: ds.data,
+
+                            borderColor: lineColor,
+                            borderWidth: ds.is_offline ? 1.8 : 3.2,
+
+                            tension: 0.48,
+                            cubicInterpolationMode: 'monotone',
+
+                            pointRadius: 2,
+                            pointHitRadius: 40,
+                            pointHoverRadius: 5,
+                            pointBackgroundColor: '#67e8f9',
+                            pointBorderWidth: 0,
+
+                            fill: true,
+                            backgroundColor: (ctx) => {
+                                const chart = ctx.chart;
+                                const base = ds.is_offline ? (ds.color || '#64748b') : (ds.color ||
+                                    '#22d3ee');
+                                return makeAreaGradient(chart, base);
+                            },
+
+                            spanGaps: true,
+                            _isOffline: ds.is_offline,
+                            _offlineSince: ds.offline_since,
+                        };
+                    });
+
+                    tempChart.update();
+
+                    const infoEl = document.getElementById('trendInfo');
+                    if (infoEl) {
+                        if ((data.total_rooms || 0) > (data.shown || 0)) {
+                            infoEl.textContent =
+                                `Menampilkan ${data.shown} dari ${data.total_rooms} ruangan (urutkan: suhu tertinggi). Klik nama ruangan di legenda untuk show/hide.`;
+                        } else {
+                            infoEl.textContent =
+                                `Menampilkan ${data.shown || (data.datasets || []).length} ruangan. Klik nama ruangan di legenda untuk show/hide.`;
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        setInterval(refreshTemperature, 5000);
+        setInterval(refreshTrendChart, 30000);
+
+        function refreshDashboardRoomStatuses() {
+            fetch('/device-status', {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    cache: 'no-store'
+                })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!Array.isArray(data)) return;
+
+                    data.forEach(device => {
+                        const row = document.querySelector(
+                            `[data-dashboard-room-id="${device.room_id}"]`);
+                        const statusEl = row?.querySelector('.dashboard-room-status');
+                        if (!statusEl) return;
+
+                        const isOnline = device.is_online === true || device.status === 'online';
+                        statusEl.classList.toggle('online', isOnline);
+                        statusEl.classList.toggle('offline', !isOnline);
+                        statusEl.textContent = isOnline ? 'ONLINE' : 'OFFLINE';
+                    });
+                })
+                .catch(() => {});
+        }
+
+        setInterval(refreshDashboardRoomStatuses, 5000);
+
+        function setSystemStatus(online) {
+            const el = document.getElementById('systemStatus');
+            if (!el) return;
+            el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
+            el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
+        }
+        window.addEventListener('online', () => setSystemStatus(true));
+        window.addEventListener('offline', () =>
+            setSystemStatus(false));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            setSystemStatus(navigator.onLine);
+            updateNotifButton();
+
+            // Real-time via Reverb: trigger refresh segera saat event masuk
+            if (window.Echo) {
+                window.Echo.channel('device-status')
+                    .listen('.DeviceStatusUpdated', () => {
+                        refreshDashboardRoomStatuses();
+                        refreshTemperature();
+                    })
+                    .listen('.RoomTemperatureUpdated', () => {
+                        refreshTemperature();
+                    })
+                    .listen('.AcStatusUpdated', () => {
+                        // AC power/mode/temp berubah dari user/tab lain → refresh trend & status
+                        refreshTrendChart();
+                        refreshDashboardRoomStatuses();
+                    })
+                    .listen('.UserLogCreated', () => {
+                        if (typeof refreshRecentActivities === 'function') {
+                            refreshRecentActivities();
+                        }
+                    })
+                    .listen('.NotificationCreated', () => {
+                        if (typeof updateNotifButton === 'function') {
+                            updateNotifButton();
+                        }
+                    });
             }
 
-            tempChart.data.labels = data.labels || [];
-            tempChart.data.datasets = (data.datasets || []).map(ds => {
-                const tempStr = ds.current_temp !== null && ds.current_temp !== undefined
-                    ? `${Number(ds.current_temp).toFixed(1)}°C`
-                    : '—';
-                // Warna memudar untuk room offline (alpha ~35%)
-                const lineColor = ds.is_offline ? ds.color + '55' : ds.color;
-                const fillColor = ds.is_offline ? ds.color + '11' : ds.color + '22';
-                return {
-                    label: `${ds.room} (${tempStr})`,
-                    data: ds.data,
-                    borderColor: lineColor,
-                    backgroundColor: fillColor,
-                    tension: 0.35,
-                    borderWidth: ds.is_offline ? 1.5 : 2,
-                    pointRadius: ds.is_offline ? 2 : 3,
-                    pointHoverRadius: 5,
-                    pointBackgroundColor: lineColor,
-                    spanGaps: true,
-                    fill: false,
-                    _isOffline: ds.is_offline,
-                    _offlineSince: ds.offline_since,
-                };
-            });
-            tempChart.update();
-
-            const infoEl = document.getElementById('trendInfo');
-            if (infoEl) {
-                if (data.total_rooms > data.shown) {
-                    infoEl.textContent = `Menampilkan ${data.shown} dari ${data.total_rooms} ruangan (urutkan: suhu tertinggi). Klik nama ruangan di legenda untuk show/hide.`;
-                } else {
-                    infoEl.textContent = `Menampilkan ${data.shown} ruangan. Klik nama ruangan di legenda untuk show/hide.`;
-                }
+            // Setup trend filter dropdowns
+            const trendSelect = document.getElementById('trendLimit');
+            if (trendSelect) {
+                trendSelect.value = getTrendLimit();
+                trendSelect.addEventListener('change', (e) => {
+                    localStorage.setItem('trendLimit', e.target.value);
+                    refreshTrendChart();
+                });
             }
-        })
-        .catch(() => {});
-}
+            const rangeSelect = document.getElementById('trendRange');
+            if (rangeSelect) {
+                rangeSelect.value = getTrendRange();
+                rangeSelect.addEventListener('change', (e) => {
+                    localStorage.setItem('trendRange', e.target.value);
+                    refreshTrendChart();
+                });
+            }
 
-setInterval(refreshTemperature, 5000);
-setInterval(refreshTrendChart, 30000);
+            setTimeout(refreshTemperature, 400);
+            setTimeout(refreshTrendChart, 500);
+            setTimeout(refreshDashboardRoomStatuses, 600);
 
-function refreshDashboardRoomStatuses() {
-    fetch('/device-status', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!Array.isArray(data)) return;
+            // Recent Activity live polling
+            const activityList = document.getElementById('activityList');
+            const liveBadge = document.getElementById('activityLiveBadge');
+            const allowedTones = ['cyan', 'mint', 'lavender', 'coral', 'amber', 'sky', 'slate'];
+            const allowedIconPrefix = /^fa-(solid|regular|brands)\s+fa-[a-z0-9-]+$/i;
 
-            data.forEach(device => {
-                const row = document.querySelector(`[data-dashboard-room-id="${device.room_id}"]`);
-                const statusEl = row?.querySelector('.dashboard-room-status');
-                if (!statusEl) return;
+            function escapeHtml(str) {
+                return String(str ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
 
-                const isOnline = device.is_online === true || device.status === 'online';
-                statusEl.classList.toggle('online', isOnline);
-                statusEl.classList.toggle('offline', !isOnline);
-                statusEl.textContent = isOnline ? 'ONLINE' : 'OFFLINE';
-            });
-        })
-        .catch(() => {});
-}
+            function safeIcon(icon) {
+                const v = String(icon || '').trim();
+                return allowedIconPrefix.test(v) ? v : 'fa-solid fa-circle-info';
+            }
 
-setInterval(refreshDashboardRoomStatuses, 5000);
+            function safeTone(tone) {
+                return allowedTones.includes(tone) ? tone : 'slate';
+            }
 
-function setSystemStatus(online) {
-    const el = document.getElementById('systemStatus');
-    if (!el) return;
-    el.className = 'pill ' + (online ? 'pill-online' : 'pill-offline');
-    el.innerHTML = `<span class="dot"></span><span>${online ? 'Online' : 'Offline'}</span>`;
-}
-window.addEventListener('online',  () => setSystemStatus(true));
-window.addEventListener('offline', () => setSystemStatus(false));
+            function renderActivity(item) {
+                const tone = safeTone(item.tone);
+                const icon = safeIcon(item.icon);
+                const name = escapeHtml(item.user_name || 'System');
+                const initial = escapeHtml(item.user_initial || (item.user_name || '?').charAt(0)
+                    .toUpperCase());
+                const desc = escapeHtml(item.description || item.raw_activity || '');
+                const time = escapeHtml(item.time || '');
+                const room = item.room ?
+                    `<span class="chip"><i class="fa-solid fa-door-open"></i>${escapeHtml(item.room)}</span>` :
+                    '';
+                const ac = item.ac ?
+                    `<span class="chip"><i class="fa-solid fa-snowflake"></i>${escapeHtml(item.ac)}</span>` :
+                    '';
+                const chips = (room || ac) ? `<div class="activity-chips">${room}${ac}</div>` : '';
 
-document.addEventListener('DOMContentLoaded', () => {
-    initChart();
-    setSystemStatus(navigator.onLine);
-    updateNotifButton();
+                const avatar = item.user_avatar ?
+                    `<img src="${escapeHtml(item.user_avatar)}" alt="${name}" class="activity-avatar-img">` :
+                    `<div class="activity-avatar-fallback">${initial}</div>`;
 
-    // Real-time via Reverb: trigger refresh segera saat event masuk
-    if (window.Echo) {
-        window.Echo.channel('device-status')
-            .listen('.DeviceStatusUpdated', () => {
-                refreshDashboardRoomStatuses();
-                refreshTemperature();
-            })
-            .listen('.RoomTemperatureUpdated', () => {
-                refreshTemperature();
-            })
-            .listen('.AcStatusUpdated', () => {
-                // AC power/mode/temp berubah dari user/tab lain → refresh trend & status
-                refreshTrendChart();
-                refreshDashboardRoomStatuses();
-            })
-            .listen('.UserLogCreated', () => {
-                if (typeof refreshRecentActivities === 'function') {
-                    refreshRecentActivities();
-                }
-            })
-            .listen('.NotificationCreated', () => {
-                if (typeof updateNotifButton === 'function') {
-                    updateNotifButton();
-                }
-            });
-    }
-
-    // Setup trend filter dropdowns
-    const trendSelect = document.getElementById('trendLimit');
-    if (trendSelect) {
-        trendSelect.value = getTrendLimit();
-        trendSelect.addEventListener('change', (e) => {
-            localStorage.setItem('trendLimit', e.target.value);
-            refreshTrendChart();
-        });
-    }
-    const rangeSelect = document.getElementById('trendRange');
-    if (rangeSelect) {
-        rangeSelect.value = getTrendRange();
-        rangeSelect.addEventListener('change', (e) => {
-            localStorage.setItem('trendRange', e.target.value);
-            refreshTrendChart();
-        });
-    }
-
-    setTimeout(refreshTemperature, 400);
-    setTimeout(refreshTrendChart, 500);
-    setTimeout(refreshDashboardRoomStatuses, 600);
-
-    // Recent Activity live polling
-    const activityList = document.getElementById('activityList');
-    const liveBadge = document.getElementById('activityLiveBadge');
-    const allowedTones = ['cyan', 'mint', 'lavender', 'coral', 'amber', 'sky', 'slate'];
-    const allowedIconPrefix = /^fa-(solid|regular|brands)\s+fa-[a-z0-9-]+$/i;
-
-    function escapeHtml(str) {
-        return String(str ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
-    function safeIcon(icon) {
-        const v = String(icon || '').trim();
-        return allowedIconPrefix.test(v) ? v : 'fa-solid fa-circle-info';
-    }
-
-    function safeTone(tone) {
-        return allowedTones.includes(tone) ? tone : 'slate';
-    }
-
-    function renderActivity(item) {
-        const tone = safeTone(item.tone);
-        const icon = safeIcon(item.icon);
-        const name = escapeHtml(item.user_name || 'System');
-        const initial = escapeHtml(item.user_initial || (item.user_name || '?').charAt(0).toUpperCase());
-        const desc = escapeHtml(item.description || item.raw_activity || '');
-        const time = escapeHtml(item.time || '');
-        const room = item.room ? `<span class="chip"><i class="fa-solid fa-door-open"></i>${escapeHtml(item.room)}</span>` : '';
-        const ac = item.ac ? `<span class="chip"><i class="fa-solid fa-snowflake"></i>${escapeHtml(item.ac)}</span>` : '';
-        const chips = (room || ac) ? `<div class="activity-chips">${room}${ac}</div>` : '';
-
-        const avatar = item.user_avatar
-            ? `<img src="${escapeHtml(item.user_avatar)}" alt="${name}" class="activity-avatar-img">`
-            : `<div class="activity-avatar-fallback">${initial}</div>`;
-
-        return `
+                return `
             <div class="activity-item tone-${tone}" data-id="${item.id}">
                 <div class="activity-rail"></div>
                 <div class="activity-avatar-wrap">
@@ -1568,26 +1778,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
-    }
+            }
 
-    async function refreshRecentActivities() {
-        if (!activityList) return;
-        try {
-            const res = await fetch('/dashboard/recent-activities', { headers: { 'Accept': 'application/json' } });
-            if (!res.ok) throw new Error('fetch failed');
-            const data = await res.json();
-            if (!Array.isArray(data) || data.length === 0) return;
-            activityList.innerHTML = data.map(renderActivity).join('');
-            if (liveBadge) liveBadge.style.opacity = '1';
-        } catch (e) {
-            if (liveBadge) liveBadge.style.opacity = '0.5';
-        }
-    }
+            async function refreshRecentActivities() {
+                if (!activityList) return;
+                try {
+                    const res = await fetch('/dashboard/recent-activities', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (!res.ok) throw new Error('fetch failed');
+                    const data = await res.json();
+                    if (!Array.isArray(data) || data.length === 0) return;
+                    activityList.innerHTML = data.map(renderActivity).join('');
+                    if (liveBadge) liveBadge.style.opacity = '1';
+                } catch (e) {
+                    if (liveBadge) liveBadge.style.opacity = '0.5';
+                }
+            }
 
-    setInterval(refreshRecentActivities, 12000);
-});
-</script>
-<?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            setInterval(refreshRecentActivities, 12000);
+        });
+    </script>
+    <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
+
 </html>
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/dashboard/dashboard.blade.php ENDPATH**/ ?>

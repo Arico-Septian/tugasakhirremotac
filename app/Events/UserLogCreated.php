@@ -4,9 +4,9 @@ namespace App\Events;
 
 use App\Models\UserLog;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class UserLogCreated implements ShouldBroadcast
+class UserLogCreated implements ShouldBroadcastNow
 {
     public array $payload;
 

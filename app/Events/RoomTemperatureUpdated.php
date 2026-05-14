@@ -3,9 +3,9 @@
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class RoomTemperatureUpdated implements ShouldBroadcast
+class RoomTemperatureUpdated implements ShouldBroadcastNow
 {
     public $room;
 

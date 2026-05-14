@@ -4,9 +4,9 @@ namespace App\Events;
 
 use App\Models\AcStatus;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class AcStatusUpdated implements ShouldBroadcast
+class AcStatusUpdated implements ShouldBroadcastNow
 {
     public array $payload;
 

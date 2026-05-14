@@ -3,9 +3,9 @@
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class DeviceStatusUpdated implements ShouldBroadcast
+class DeviceStatusUpdated implements ShouldBroadcastNow
 {
     public $deviceId;
     public $status;
