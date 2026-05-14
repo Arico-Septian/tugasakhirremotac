@@ -369,7 +369,7 @@
             }
 
             .activity-list {
-                max-height: 300px;
+                max-height: 420px;
             }
 
             .activity-item {
@@ -521,6 +521,38 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .dashboard-room-last {
+            margin-top: 3px;
+            font-size: 11px;
+            color: var(--ink-4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dashboard-room-last .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #67e8f9;
+            box-shadow: 0 0 0 0 rgba(103, 232, 249, .55);
+            animation: lastPulse 1.8s ease-out infinite;
+        }
+
+        @keyframes lastPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(103, 232, 249, .55);
+            }
+
+            70% {
+                box-shadow: 0 0 0 7px rgba(103, 232, 249, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(103, 232, 249, 0);
+            }
         }
 
         .dashboard-room-temp {
@@ -813,6 +845,24 @@
                 font-size: 13px;
             }
 
+            .dashboard-room-last {
+                margin-top: 3px;
+                font-size: 11px;
+                color: var(--ink-4);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .dashboard-room-last .live-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 999px;
+                background: #67e8f9;
+                box-shadow: 0 0 0 0 rgba(103, 232, 249, .55);
+                animation: livePulse 1.8s ease-out infinite;
+            }
+
             .dashboard-room-status {
                 font-size: 10px;
                 padding: 4px 8px;
@@ -1031,13 +1081,13 @@
 </head>
 
 <body>
-    <div class="custom-bg"></div>
-    <div id="overlay"></div>
+    <div class="app-layout">
+    <div class="app-bg"></div>
 
     <div class="layout">
         @include('components.sidebar')
 
-        <div class="main-content">
+        <div class="app-main">
             {{-- HEADER --}}
             <header class="main-header">
                 <div class="flex items-center gap-3">
@@ -1181,6 +1231,10 @@
                                                         {{ $room->acUnits->count() }} unit &middot;
                                                         {{ $room->device_id ?: '-' }}
                                                     </p>
+                                                    <p class="dashboard-room-last"
+                                                        id="dashboard-room-last-{{ $room->id }}">
+                                                        Last update: —
+                                                    </p>
                                                 </div>
                                                 <div id="dashboard-room-temp-{{ $room->id }}"
                                                     class="dashboard-room-temp">
@@ -1293,8 +1347,8 @@
             if (!chartArea) return hexToRgba(hex, 0.12);
 
             const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            g.addColorStop(0, hexToRgba(hex, 0.40));
-            g.addColorStop(0.6, hexToRgba(hex, 0.16));
+            g.addColorStop(0, hexToRgba(hex, 0.55));
+            g.addColorStop(0.6, hexToRgba(hex, 0.22));
             g.addColorStop(1, hexToRgba(hex, 0.0));
             return g;
         }
@@ -1335,6 +1389,21 @@
                 ctx.fill();
 
                 ctx.restore();
+            }
+        };
+
+        const glowLinePlugin = {
+            id: 'glowLine',
+            beforeDatasetsDraw(chart) {
+                const {
+                    ctx
+                } = chart;
+                ctx.save();
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = 'rgba(103,232,249,0.35)';
+            },
+            afterDatasetsDraw(chart) {
+                chart.ctx.restore();
             }
         };
 
@@ -1382,6 +1451,51 @@
 
         let tempChart;
 
+        const roomLastUpdate = {};
+
+        function setRoomLastUpdate(roomId) {
+
+            if (!roomId) return;
+
+            roomLastUpdate[roomId] = Date.now();
+
+            const el = document.getElementById(`dashboard-room-last-${roomId}`);
+
+            if (el) {
+                el.innerHTML =
+                    `<span class="live-dot"></span> Last update: baru saja`;
+            }
+        }
+
+        function tickRoomLastUpdate() {
+
+            const now = Date.now();
+
+            for (const [roomId, ts] of Object.entries(roomLastUpdate)) {
+
+                const el = document.getElementById(
+                    `dashboard-room-last-${roomId}`
+                );
+
+                if (!el) continue;
+
+                const sec = Math.floor((now - ts) / 1000);
+
+                let text = 'baru saja';
+
+                if (sec >= 60) {
+                    text = `${Math.floor(sec / 60)} menit lalu`;
+                } else if (sec >= 5) {
+                    text = `${sec} detik lalu`;
+                }
+
+                el.innerHTML =
+                    `<span class="live-dot"></span> Last update: ${text}`;
+            }
+        }
+
+        setInterval(tickRoomLastUpdate, 1000);
+
         function initChart() {
             const canvas = document.getElementById('tempChart');
             if (!canvas) return;
@@ -1392,7 +1506,7 @@
                     labels: [],
                     datasets: []
                 },
-                plugins: [crosshairGlowPlugin],
+                plugins: [glowLinePlugin, crosshairGlowPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1515,6 +1629,8 @@
                         if (!tempEl) return;
                         const temp = parseFloat(room.temp);
                         tempEl.textContent = isNaN(temp) ? '-- \u00b0C' : `${temp.toFixed(1)}\u00b0C`;
+
+                        setRoomLastUpdate(room.id);
                     });
                 })
                 .catch(() => {});
@@ -1620,7 +1736,7 @@
         }
 
         setInterval(refreshTemperature, 5000);
-        setInterval(refreshTrendChart, 30000);
+        setInterval(refreshTrendChart, 5000);
 
         function refreshDashboardRoomStatuses() {
             fetch('/device-status', {
@@ -1650,18 +1766,26 @@
 
         setInterval(refreshDashboardRoomStatuses, 5000);
 
-function refreshDashboardStats() {
-    fetch('/dashboard/stats', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!data) return;
-            const set = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined && v !== null) el.textContent = v; };
-            set('statTotalAc', data.total_ac);
-            set('statActiveAc', data.active_ac);
-            set('statInactiveAc', data.inactive_ac);
-        })
-        .catch(() => {});
-}
+        function refreshDashboardStats() {
+            fetch('/dashboard/stats', {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    cache: 'no-store'
+                })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    const set = (id, v) => {
+                        const el = document.getElementById(id);
+                        if (el && v !== undefined && v !== null) el.textContent = v;
+                    };
+                    set('statTotalAc', data.total_ac);
+                    set('statActiveAc', data.active_ac);
+                    set('statInactiveAc', data.inactive_ac);
+                })
+                .catch(() => {});
+        }
 
         function setSystemStatus(online) {
             const el = document.getElementById('systemStatus');
@@ -1687,6 +1811,7 @@ function refreshDashboardStats() {
                     })
                     .listen('.RoomTemperatureUpdated', () => {
                         refreshTemperature();
+                        refreshTrendChart();
                     })
                     .listen('.AcStatusUpdated', () => {
                         // AC power/mode/temp berubah dari user/tab lain → refresh trend, status, counter

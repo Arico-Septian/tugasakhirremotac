@@ -124,7 +124,7 @@
             <div class="page-body">
                 <div class="app-content">
                     <div class="app-content-inner space-y-4">
-                        <div class="tbl-wrap">
+                        <div class="tbl-wrap" id="notifListWrap">
                             @forelse ($notifications as $n)
                                 @php
                                     $iconMap = [
@@ -276,17 +276,91 @@
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
 
-            // Real-time: muat notifikasi baru ke daftar tanpa reload
+            // Real-time: prepend notifikasi baru tanpa reload
+            function escapeHtml(s) {
+                return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            }
+            const iconMap = {
+                device_offline: 'fa-plug-circle-exclamation',
+                temp_alert: 'fa-temperature-three-quarters',
+                schedule_run: 'fa-calendar-check',
+                system: 'fa-gear',
+            };
+            const validSeverity = ['info', 'warning', 'error', 'success'];
+
+            function prependNotif(payload) {
+                const wrap = document.getElementById('notifListWrap');
+                if (!wrap) return;
+
+                // Skip kalau di halaman pagination selain pertama
+                const url = new URL(window.location.href);
+                const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
+                if (!onFirstPage) return;
+
+                // Hapus empty state kalau ada
+                wrap.querySelector('.empty-state')?.remove();
+
+                const id = Number(payload.id);
+                if (!id) return;
+
+                // Skip kalau already ada (anti-duplikat dari multi-tab)
+                if (wrap.querySelector(`.nlist-item[data-id="${id}"]`)) return;
+
+                const icon = iconMap[payload.type] || 'fa-bell';
+                const severity = validSeverity.includes(payload.severity) ? payload.severity : 'info';
+                const title = escapeHtml(payload.title || '');
+                const message = payload.message ? escapeHtml(payload.message) : '';
+                const timeAgo = escapeHtml(payload.time_ago || 'Baru saja');
+                const now = new Date();
+                const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+                const dateStr = `${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                const linkHtml = payload.link
+                    ? `<span>·</span><a href="${escapeHtml(payload.link)}" onclick="markNotifReadInline(event, ${id}, '${escapeHtml(payload.link)}')" style="color:var(--cyan);">Buka detail →</a>`
+                    : '';
+                const deleteBtn = payload.user_id
+                    ? `<button onclick="deleteNotif(${id})" class="btn-icon danger" title="Hapus"><i class="fa-solid fa-trash text-[11px]"></i></button>`
+                    : '';
+
+                const item = document.createElement('div');
+                item.className = 'nlist-item unread';
+                item.dataset.id = id;
+                item.innerHTML = `
+                    <span class="nlist-icon ${severity}">
+                        <i class="fa-solid ${icon}"></i>
+                    </span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span style="width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);"></span>
+                            <p class="text-sm font-semibold" style="color:var(--ink-0);margin:0;">${title}</p>
+                        </div>
+                        ${message ? `<p class="text-xs mt-1" style="color:var(--ink-2);line-height:1.5;">${message}</p>` : ''}
+                        <div class="flex items-center gap-3 mt-2 text-mono" style="font-size:10.5px;color:var(--ink-4);">
+                            <span><i class="fa-regular fa-clock text-[9px]"></i> ${timeAgo}</span>
+                            <span>·</span>
+                            <span>${dateStr}</span>
+                            ${linkHtml}
+                        </div>
+                    </div>
+                    <div class="nlist-actions">
+                        <button onclick="markNotifReadInline(event, ${id}, null)" class="btn-icon" title="Tandai dibaca">
+                            <i class="fa-solid fa-check text-[11px]"></i>
+                        </button>
+                        ${deleteBtn}
+                    </div>`;
+
+                // Sisipkan di paling atas list (sebelum item lama atau footer pagination)
+                const firstItem = wrap.querySelector('.nlist-item');
+                if (firstItem) firstItem.before(item);
+                else {
+                    const footer = wrap.querySelector('.tbl-footer');
+                    if (footer) footer.before(item);
+                    else wrap.appendChild(item);
+                }
+            }
+
             if (window.Echo) {
-                let pendingTimer = null;
-                const refreshList = () => {
-                    if (pendingTimer) clearTimeout(pendingTimer);
-                    pendingTimer = setTimeout(() => {
-                        if (!document.hidden) location.reload();
-                    }, 1500);
-                };
                 window.Echo.channel('device-status')
-                    .listen('.NotificationCreated', refreshList);
+                    .listen('.NotificationCreated', (e) => prependNotif(e));
             }
         });
     </script>

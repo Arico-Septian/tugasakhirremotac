@@ -18,7 +18,7 @@ class CheckDeviceStatus extends Command
 
     const STATUS_OFFLINE = 'offline';
 
-    const OFFLINE_THRESHOLD = 10;
+    const OFFLINE_THRESHOLD = 90;
 
     const STATUS_TTL = 300;
 

@@ -141,6 +141,7 @@ public function destroyAll(Request $request)
         }
 
         UserLog::truncate();
+        event(new \App\Events\UserLogsCleared());
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Semua log berhasil dihapus']);

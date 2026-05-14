@@ -8,6 +8,7 @@
     <title>Activity Log — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .toolbar-row {
@@ -652,7 +653,7 @@
 
                         {{-- Log table --}}
                             {{-- Mobile cards --}}
-                            <div class="md:hidden">
+                            <div class="md:hidden" id="logsMobile">
                                 @forelse ($logs as $log)
                                     <div style="padding:12px 16px;border-bottom:1px solid var(--line-soft);">
                                         <div class="flex items-center justify-between gap-2 mb-1.5">
@@ -746,7 +747,7 @@
                                             <th style="width:14%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="logsTbody">
                                         @forelse ($logs as $log)
                                             <tr>
                                                 <td>
@@ -923,19 +924,152 @@
             setSystemStatus(navigator.onLine);
             initializeSortIndicators();
 
-            // Real-time: refresh saat ada log baru (debounce untuk hindari spam reload)
+            // Real-time: prepend log baru ke tabel tanpa reload
+            function escapeHtml(s) {
+                return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            }
+            function activityBadgeJs(activity) {
+                const a = String(activity || '');
+                if (a.startsWith('set_temp_')) return [`TEMP ${a.replace('set_temp_', '')}°C`, 'act-amber'];
+                if (a.startsWith('mode_'))     return [`MODE ${a.replace('mode_', '').toUpperCase()}`, 'act-cyan'];
+                if (a.startsWith('fan_speed_'))return [`FAN ${a.replace('fan_speed_', '').toUpperCase()}`, 'act-cyan'];
+                if (a.startsWith('swing_'))    return [`SWING ${a.replace('swing_', '').toUpperCase()}`, 'act-lavender'];
+                const map = {
+                    login: ['LOGIN', 'act-mint'], logout: ['LOGOUT', 'act-slate'],
+                    on: ['POWER ON', 'act-mint'], off: ['POWER OFF', 'act-coral'],
+                    bulk_on: ['ALL ON', 'act-mint'], bulk_off: ['ALL OFF', 'act-coral'],
+                    set_timer: ['SET TIMER', 'act-amber'], timer_on: ['TIMER ON', 'act-mint'],
+                    timer_off: ['TIMER OFF', 'act-amber'], control_ac: ['CONTROL AC', 'act-lavender'],
+                    add_room: ['ADD ROOM', 'act-cyan'], delete_room: ['DELETE ROOM', 'act-coral'],
+                    add_ac: ['ADD AC', 'act-cyan'], delete_ac: ['DELETE AC', 'act-coral'],
+                    add_user: ['ADD USER', 'act-lavender'], delete_user: ['DELETE USER', 'act-coral'],
+                    update_role: ['UPDATE ROLE', 'act-lavender'],
+                    activate_user: ['ACTIVATE', 'act-mint'], deactivate_user: ['DEACTIVATE', 'act-coral'],
+                    change_password: ['CHG PASSWORD', 'act-amber'],
+                };
+                return map[a] || [a.toUpperCase(), 'act-lavender'];
+            }
+
+            function prependLogRow(payload) {
+                // Skip kalau user di halaman lain (paginasi)
+                const url = new URL(window.location.href);
+                const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
+                if (!onFirstPage) return;
+
+                const name = escapeHtml(payload.user_name || '—');
+                const initial = escapeHtml(payload.user_initial || (payload.user_name || '?').charAt(0).toUpperCase());
+                const isEmpty = (v) => v == null || v === '' || v === '-' || v === '—';
+                const [badgeLabel, badgeClass] = activityBadgeJs(payload.activity);
+                const safeAvatar = payload.user_avatar ? escapeHtml(payload.user_avatar) : null;
+
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+                const dateStr = `${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+                // === DESKTOP TABLE ===
+                const tbody = document.getElementById('logsTbody');
+                if (tbody) {
+                    const empty = tbody.querySelector('.empty-state');
+                    if (empty) empty.closest('tr')?.remove();
+
+                    const roomHtml = isEmpty(payload.room)
+                        ? '<span class="log-empty">—</span>'
+                        : `<span class="log-room">${escapeHtml(payload.room)}</span>`;
+                    const acHtml = isEmpty(payload.ac)
+                        ? '<span class="log-empty">—</span>'
+                        : `<span class="log-detail" title="${escapeHtml(payload.ac)}">${escapeHtml(payload.ac)}</span>`;
+                    const avatarHtml = safeAvatar
+                        ? `<img src="${safeAvatar}" alt="${name}" class="avatar" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">`
+                        : `<span class="avatar" style="width:28px;height:28px;font-size:11px;border-radius:8px;flex-shrink:0;">${initial}</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="log-user">
+                                ${avatarHtml}
+                                <span class="name">${name}</span>
+                            </div>
+                        </td>
+                        <td>${roomHtml}</td>
+                        <td>${acHtml}</td>
+                        <td><span class="act-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span></td>
+                        <td>
+                            <div class="log-time">
+                                <span class="t">${hh}:${mm}</span>
+                                <span class="d">${dateStr}</span>
+                            </div>
+                        </td>`;
+                    tbody.insertBefore(tr, tbody.firstChild);
+
+                    const maxRows = 50;
+                    while (tbody.children.length > maxRows) tbody.removeChild(tbody.lastChild);
+                }
+
+                // === MOBILE CARDS ===
+                const mobile = document.getElementById('logsMobile');
+                if (mobile) {
+                    const empty = mobile.querySelector('.empty-state');
+                    if (empty) empty.remove();
+
+                    const mobileAvatar = safeAvatar
+                        ? `<img src="${safeAvatar}" alt="${name}" class="avatar" style="width:26px;height:26px;border-radius:7px;object-fit:cover;">`
+                        : `<span class="avatar" style="width:26px;height:26px;font-size:10.5px;border-radius:7px;">${initial}</span>`;
+
+                    const card = document.createElement('div');
+                    card.style.cssText = 'padding:12px 16px;border-bottom:1px solid var(--line-soft);';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <div class="log-user">
+                                ${mobileAvatar}
+                                <span class="name">${name}</span>
+                            </div>
+                            <span class="act-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span>
+                        </div>
+                        <div class="text-xs space-y-0.5" style="color:var(--ink-3);">
+                            ${!isEmpty(payload.room) ? `<p><i class="fa-solid fa-server mr-1.5 text-[10px]" style="color:var(--ink-4);"></i>${escapeHtml(payload.room)}</p>` : ''}
+                            ${!isEmpty(payload.ac) ? `<p><i class="fa-solid fa-snowflake mr-1.5 text-[10px]" style="color:var(--ink-4);"></i>${escapeHtml(payload.ac)}</p>` : ''}
+                        </div>
+                        <p class="text-mono text-xs mt-1.5" style="color:var(--ink-4);">
+                            ${hh}:${mm} <span style="opacity:0.7;">· ${dateStr}</span>
+                        </p>`;
+                    mobile.insertBefore(card, mobile.firstChild);
+
+                    const maxCards = 50;
+                    while (mobile.children.length > maxCards) mobile.removeChild(mobile.lastChild);
+                }
+            }
+
+            function clearAllLogs() {
+                const tbody = document.getElementById('logsTbody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                                    <p class="empty-title">No activities found</p>
+                                    <p class="empty-sub"><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
+                                </div>
+                            </td>
+                        </tr>`;
+                }
+                const mobile = document.getElementById('logsMobile');
+                if (mobile) {
+                    mobile.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <p class="empty-title">No activities found</p>
+                            <p class="empty-sub"><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
+                        </div>`;
+                }
+            }
+
             if (window.Echo) {
-                let logReloadTimer = null;
                 window.Echo.channel('device-status')
-                    .listen('.UserLogCreated', () => {
-                        if (logReloadTimer) clearTimeout(logReloadTimer);
-                        logReloadTimer = setTimeout(() => {
-                            // Skip kalau user lagi cari/filter atau di halaman selain pertama
-                            const url = new URL(window.location.href);
-                            const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
-                            if (!document.hidden && onFirstPage) location.reload();
-                        }, 1500);
-                    });
+                    .listen('.UserLogCreated', (e) => prependLogRow(e))
+                    .listen('.UserLogsCleared', () => clearAllLogs());
             }
         });
 

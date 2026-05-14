@@ -111,18 +111,8 @@ class UserController extends Controller
             ], 403);
         }
 
-        $oldRole = $user->role;
         $user->role = $request->role;
         $user->save();
-
-        if ($oldRole !== $user->role) {
-            UserLog::create([
-                'user_id' => Auth::id(),
-                'room' => $user->name,
-                'ac' => "{$oldRole} -> {$user->role}",
-                'activity' => 'update_role'
-            ]);
-        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true]);
@@ -183,13 +173,6 @@ class UserController extends Controller
         $user->avatar = $path;
         $user->save();
 
-        UserLog::create([
-            'user_id' => $user->id,
-            'room' => $user->name,
-            'ac' => '-',
-            'activity' => 'update_avatar',
-        ]);
-
         return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 
@@ -205,13 +188,6 @@ class UserController extends Controller
         $user->avatar = null;
         $user->save();
 
-        UserLog::create([
-            'user_id' => $user->id,
-            'room' => $user->name,
-            'ac' => '-',
-            'activity' => 'remove_avatar',
-        ]);
-
         return back()->with('success', 'Foto profil dihapus.');
     }
 
@@ -225,13 +201,6 @@ class UserController extends Controller
         $user = Auth::user();
         $user->password = Hash::make($request->password);
         $user->save();
-
-        UserLog::create([
-            'user_id' => $user->id,
-            'room' => $user->name,
-            'ac' => '-',
-            'activity' => 'change_password'
-        ]);
 
         return back()->with('success', 'Password berhasil diubah');
     }
@@ -253,13 +222,6 @@ class UserController extends Controller
         }
 
         $user->save();
-
-        UserLog::create([
-            'user_id' => Auth::id(),
-            'room' => $user->name,
-            'ac' => $user->role,
-            'activity' => $user->is_active ? 'activate_user' : 'deactivate_user'
-        ]);
 
         return back()->with('success', $user->is_active
             ? 'User berhasil diaktifkan'

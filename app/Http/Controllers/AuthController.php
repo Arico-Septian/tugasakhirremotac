@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\UserLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -69,13 +68,6 @@ class AuthController extends Controller
 
         $user->save();
 
-        UserLog::create([
-            'user_id' => $user->id,
-            'room' => null,
-            'ac' => null,
-            'activity' => 'login'
-        ]);
-
         $intended = $request->session()->pull('url.intended');
         if ($intended && $this->isPageUrl($intended)) {
             return redirect($intended);
@@ -112,13 +104,6 @@ class AuthController extends Controller
             $user->last_activity = null;
 
             $user->save();
-
-            UserLog::create([
-                'user_id' => $user->id,
-                'room' => null,
-                'ac' => null,
-                'activity' => 'logout'
-            ]);
         }
 
         Auth::logout();

@@ -1099,9 +1099,25 @@
                     .catch(() => {});
             }
 
+            // Debounced reload saat ada aksi CRUD user dari admin lain
+            let crudReloadTimer = null;
+            const crudActivities = ['add_user', 'delete_user', 'update_role', 'activate_user', 'deactivate_user', 'change_password'];
+            function scheduleCrudReload() {
+                if (crudReloadTimer) clearTimeout(crudReloadTimer);
+                crudReloadTimer = setTimeout(() => {
+                    const modalOpen = document.querySelector('.is-open, .modal.is-open');
+                    const activeTag = document.activeElement?.tagName;
+                    if (modalOpen || activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.hidden) return;
+                    location.reload();
+                }, 1000);
+            }
+
             if (window.Echo) {
                 window.Echo.channel('device-status')
-                    .listen('.UserLogCreated', () => refreshUsersOnline());
+                    .listen('.UserLogCreated', (e) => {
+                        refreshUsersOnline();
+                        if (e && crudActivities.includes(e.activity)) scheduleCrudReload();
+                    });
             }
 
             // Poll juga tiap 30s sebagai fallback (kalau WS putus)

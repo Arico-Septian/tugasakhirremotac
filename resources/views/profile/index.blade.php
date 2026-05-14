@@ -7,6 +7,7 @@
     <title>My Profile — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite('resources/js/app.js')
 
     {{-- Apply theme before any paint to avoid flash of dark/light --}}
     <script>
