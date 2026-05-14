@@ -1470,6 +1470,21 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .listen('.RoomTemperatureUpdated', () => {
                 refreshTemperature();
+            })
+            .listen('.AcStatusUpdated', () => {
+                // AC power/mode/temp berubah dari user/tab lain → refresh trend & status
+                refreshTrendChart();
+                refreshDashboardRoomStatuses();
+            })
+            .listen('.UserLogCreated', () => {
+                if (typeof refreshRecentActivities === 'function') {
+                    refreshRecentActivities();
+                }
+            })
+            .listen('.NotificationCreated', () => {
+                if (typeof updateNotifButton === 'function') {
+                    updateNotifButton();
+                }
             });
     }
 

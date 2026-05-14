@@ -169,6 +169,12 @@ function pollSidebarNotifBadge() {
 document.addEventListener('DOMContentLoaded', () => {
     pollSidebarNotifBadge();
     setInterval(() => { if (!document.hidden) pollSidebarNotifBadge(); }, 30000);
+
+    // Real-time: notif baru langsung update badge sidebar
+    if (window.Echo) {
+        window.Echo.channel('device-status')
+            .listen('.NotificationCreated', () => pollSidebarNotifBadge());
+    }
 });
 
 document.getElementById('overlay')?.addEventListener('click', function () {

@@ -330,6 +330,13 @@ window.addEventListener('offline', () => setSystemStatus(false));
 document.addEventListener('DOMContentLoaded', () => {
     loadStatus();
     setSystemStatus(navigator.onLine);
+
+    // Real-time via Reverb: refresh segera saat AC/device berubah dari user/tab lain
+    if (window.Echo) {
+        window.Echo.channel('device-status')
+            .listen('.AcStatusUpdated', () => loadStatus())
+            .listen('.DeviceStatusUpdated', () => loadStatus());
+    }
 });
 </script>
 @include('components.sidebar-scripts')

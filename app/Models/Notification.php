@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\NotificationCreated;
 use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
@@ -25,6 +26,13 @@ class Notification extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Notification $notification) {
+            event(new NotificationCreated($notification));
+        });
     }
 
     public function scopeUnread($query)

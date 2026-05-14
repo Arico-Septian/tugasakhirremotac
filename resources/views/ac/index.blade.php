@@ -1500,6 +1500,12 @@
             updateEspStatus();
             setInterval(updateEspStatus, 5000);
 
+            // Real-time: ESP status push via Reverb
+            if (window.Echo) {
+                window.Echo.channel('device-status')
+                    .listen('.DeviceStatusUpdated', () => updateEspStatus());
+            }
+
             @if (session('new_ac_id'))
                 const id = "{{ session('new_ac_id') }}";
                 localStorage.setItem('selectedAC', id);

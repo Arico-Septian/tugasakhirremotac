@@ -269,6 +269,18 @@ function pollUnreadCount() {
 document.addEventListener('DOMContentLoaded', () => {
     pollUnreadCount();
     notifPollInterval = setInterval(() => { if (!document.hidden) pollUnreadCount(); }, 30000);
+
+    // Real-time: push notif baru langsung tanpa nunggu polling 30s
+    if (window.Echo) {
+        window.Echo.channel('device-status')
+            .listen('.NotificationCreated', () => {
+                pollUnreadCount();
+                const panel = document.getElementById('notifPanel');
+                if (panel && panel.classList.contains('open') && typeof loadNotifPanel === 'function') {
+                    loadNotifPanel();
+                }
+            });
+    }
 });
 
 window.addEventListener('beforeunload', () => { if (notifPollInterval) clearInterval(notifPollInterval); });
