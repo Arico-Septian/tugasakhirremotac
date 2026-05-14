@@ -169,6 +169,12 @@
         getSuhu();
         setInterval(getSuhu, 3000);
 
+        // Real-time: Raspi suhu push via Reverb tanpa nunggu polling 3s
+        if (window.Echo) {
+            window.Echo.channel('device-status')
+                .listen('.RaspiTemperatureUpdated', () => getSuhu());
+        }
+
         function setSystemStatus(online) {
             const el = document.getElementById('systemStatus');
             if (!el) return;

@@ -1083,6 +1083,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             startActivityPing();
             setSystemStatus(navigator.onLine);
+
+            // Real-time: refresh halaman saat user lain login/logout (NotificationCreated saat login dll)
+            // atau saat user log activity tercatat (UserLogCreated)
+            if (window.Echo) {
+                let reloadTimer = null;
+                const debounceReload = () => {
+                    if (reloadTimer) clearTimeout(reloadTimer);
+                    reloadTimer = setTimeout(() => {
+                        if (!document.hidden) location.reload();
+                    }, 2000);
+                };
+                window.Echo.channel('device-status')
+                    .listen('.UserLogCreated', debounceReload);
+            }
             @if (session('success'))
                 window.smToast("{{ session('success') }}", 'success');
             @endif

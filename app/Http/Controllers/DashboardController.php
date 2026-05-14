@@ -76,6 +76,39 @@ class DashboardController extends Controller
         return response()->json($logs);
     }
 
+    public function stats()
+    {
+        $rooms = Room::with(['acUnits.status'])->get();
+
+        $onlineRooms = 0;
+        $offlineRooms = 0;
+        foreach ($rooms as $room) {
+            $deviceId = strtolower(trim((string) $room->device_id));
+            $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+                ?? $this->lastSeenFrom($room->last_seen);
+
+            $isOnline = ($status === 'online' || $status === 'available')
+                && $lastSeen
+                && now()->diffInSeconds($lastSeen, true) <= 25;
+
+            $isOnline ? $onlineRooms++ : $offlineRooms++;
+        }
+
+        $allAcUnits = $rooms->flatMap->acUnits;
+        $totalAc = $allAcUnits->count();
+        $activeAc = $allAcUnits->filter(fn ($ac) => optional($ac->status)->power === 'ON')->count();
+
+        return response()->json([
+            'total_rooms' => $rooms->count(),
+            'online_rooms' => $onlineRooms,
+            'offline_rooms' => $offlineRooms,
+            'total_ac' => $totalAc,
+            'active_ac' => $activeAc,
+            'inactive_ac' => $totalAc - $activeAc,
+        ]);
+    }
+
     private function formatLog(UserLog $log): array
     {
         $name = $log->user->name ?? 'System';

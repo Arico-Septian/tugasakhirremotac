@@ -1080,7 +1080,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label">AC Units</p>
-                                        <p class="stat-num-lg">{{ $totalAc }}</p>
+                                        <p class="stat-num-lg" id="statTotalAc">{{ $totalAc }}</p>
                                         <p class="stat-meta">Across all rooms</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
@@ -1091,7 +1091,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label">Ac Active</p>
-                                        <p class="stat-num-lg">{{ $activeAc }}</p>
+                                        <p class="stat-num-lg" id="statActiveAc">{{ $activeAc }}</p>
                                         <p class="stat-meta">Currently powered on</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
@@ -1102,7 +1102,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label">Ac Idle</p>
-                                        <p class="stat-num-lg">{{ $inactiveAc }}</p>
+                                        <p class="stat-num-lg" id="statInactiveAc">{{ $inactiveAc }}</p>
                                         <p class="stat-meta">Powered off</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-regular fa-circle"></i></div>
@@ -1650,6 +1650,19 @@
 
         setInterval(refreshDashboardRoomStatuses, 5000);
 
+function refreshDashboardStats() {
+    fetch('/dashboard/stats', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data) return;
+            const set = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined && v !== null) el.textContent = v; };
+            set('statTotalAc', data.total_ac);
+            set('statActiveAc', data.active_ac);
+            set('statInactiveAc', data.inactive_ac);
+        })
+        .catch(() => {});
+}
+
         function setSystemStatus(online) {
             const el = document.getElementById('systemStatus');
             if (!el) return;
@@ -1676,9 +1689,10 @@
                         refreshTemperature();
                     })
                     .listen('.AcStatusUpdated', () => {
-                        // AC power/mode/temp berubah dari user/tab lain → refresh trend & status
+                        // AC power/mode/temp berubah dari user/tab lain → refresh trend, status, counter
                         refreshTrendChart();
                         refreshDashboardRoomStatuses();
+                        refreshDashboardStats();
                     })
                     .listen('.UserLogCreated', () => {
                         if (typeof refreshRecentActivities === 'function') {
@@ -1713,6 +1727,7 @@
             setTimeout(refreshTemperature, 400);
             setTimeout(refreshTrendChart, 500);
             setTimeout(refreshDashboardRoomStatuses, 600);
+            setTimeout(refreshDashboardStats, 700);
 
             // Recent Activity live polling
             const activityList = document.getElementById('activityList');

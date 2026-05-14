@@ -665,6 +665,29 @@
             applyRoomFilter();
             refreshRoomStatuses();
 
+            // Real-time via Reverb: refresh segera saat device/suhu berubah
+            if (window.Echo) {
+                window.Echo.channel('device-status')
+                    .listen('.DeviceStatusUpdated', () => refreshRoomStatuses())
+                    .listen('.RoomTemperatureUpdated', () => {
+                        // Trigger refresh suhu (gunakan logic interval di atas)
+                        fetch('/temperature', { headers: { 'Accept': 'application/json' } })
+                            .then(r => r.ok ? r.json() : null)
+                            .then(data => {
+                                if (!Array.isArray(data)) return;
+                                data.forEach(r => {
+                                    const el = document.getElementById(`temp-${r.id}`);
+                                    const t = parseFloat(r.temp);
+                                    if (el && !isNaN(t)) {
+                                        const badge = el.querySelector('.temp-offline-badge');
+                                        el.textContent = t + '°C';
+                                        if (badge) el.appendChild(badge);
+                                    }
+                                });
+                            }).catch(() => {});
+                    });
+            }
+
             @if (session('success'))
                 window.smToast("{{ session('success') }}", 'success');
             @endif
