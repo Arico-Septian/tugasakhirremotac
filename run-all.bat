@@ -55,7 +55,7 @@ echo Cache cleared.
 echo.
 
 if not exist "%PROJECT_DIR%public\build\manifest.json" (
-    echo Asset Vite belum di-build. Menjalankan "npm run build"...
+    echo Asset Vite belum di-build. Menjalankan "npm run build" pertama kali...
     call npm run build
     echo.
 )
@@ -65,8 +65,7 @@ call :start_service "SmartAC MQTT Subscriber" "mqtt"
 
 timeout /t 1 /nobreak >nul
 
-echo [2/4] Menjalankan queue worker dan scheduler...
-call :start_service "SmartAC Queue Worker" "queue"
+echo [2/4] Menjalankan Scheduler (AC timer otomatis tiap menit)...
 call :start_service "SmartAC Scheduler" "scheduler"
 
 echo.
@@ -76,16 +75,22 @@ call :start_service "SmartAC Reverb Server" "reverb"
 timeout /t 1 /nobreak >nul
 
 echo.
-echo [4/4] Memulai Laravel web server...
+echo [4/4] Menjalankan Vite dev server (hot reload JS/CSS)...
+call :start_service "SmartAC Vite Dev" "vite"
+
+timeout /t 1 /nobreak >nul
+
+echo.
+echo [5/5] Memulai Laravel web server...
 echo.
 echo ========================================
 echo   SEMUA SERVICE BERJALAN
 echo ========================================
 echo Log service :
 echo   - storage\logs\mqtt-subscriber.log
-echo   - storage\logs\queue.log
 echo   - storage\logs\scheduler.log
 echo   - storage\logs\reverb.log
+echo   - storage\logs\vite.log
 echo.
 
 timeout /t 2 /nobreak >nul
@@ -131,12 +136,12 @@ if /i "%SERVICE%"=="mqtt" (
     goto :run_mqtt
 )
 
-if /i "%SERVICE%"=="queue" (
-    title SmartAC Queue Worker
-    set "SERVICE_NAME=Queue Worker"
-    set "SERVICE_LOG=%LOG_DIR%\queue.log"
-    set "SERVICE_COMMAND=%PHP% %ARTISAN% queue:work --sleep=3 --tries=3"
-    goto :run_queue
+if /i "%SERVICE%"=="vite" (
+    title SmartAC Vite Dev
+    set "SERVICE_NAME=Vite Dev Server"
+    set "SERVICE_LOG=%LOG_DIR%\vite.log"
+    set "SERVICE_COMMAND=npm run dev"
+    goto :run_vite
 )
 
 if /i "%SERVICE%"=="scheduler" (
@@ -181,12 +186,12 @@ echo.
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === MQTT subscriber start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'mqtt:subscribe' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! MQTT subscriber exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
-:run_queue
+:run_vite
 call :print_service_header
-echo Queue worker akan otomatis restart kalau crash (delay 5 detik).
-echo Tekan Ctrl+C dua kali untuk benar-benar berhenti.
+echo Vite dev server - hot reload otomatis saat blade/JS/CSS berubah.
+echo Auto-restart kalau crash (delay 5 detik). Ctrl+C 2x untuk berhenti.
 echo.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $php='%PHP%'; $artisan='%ARTISAN%'; $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Queue worker start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & $php $artisan 'queue:work' '--sleep=3' '--tries=3' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Queue worker exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $log='%SERVICE_LOG%'; while ($true) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $startMsg = \"[$ts] === Vite dev start ===\"; Write-Host $startMsg -ForegroundColor Cyan; Add-Content -LiteralPath $log -Value $startMsg -Encoding UTF8; try { & cmd /c 'npm run dev' 2>&1 | ForEach-Object { $_; Add-Content -LiteralPath $log -Value $_ -Encoding UTF8 } } catch { $errMsg = \"[$ts] EXCEPTION: $_\"; Write-Host $errMsg -ForegroundColor Red; Add-Content -LiteralPath $log -Value $errMsg -Encoding UTF8 } $exitTs = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'; $exitMsg = \"[$exitTs] !!! Vite dev exited (code $LASTEXITCODE) - restart dalam 5 detik...\"; Write-Host $exitMsg -ForegroundColor Yellow; Add-Content -LiteralPath $log -Value $exitMsg -Encoding UTF8; Start-Sleep -Seconds 5 } }"
 goto :service_stopped
 
 :run_scheduler
