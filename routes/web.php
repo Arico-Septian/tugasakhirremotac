@@ -513,7 +513,6 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     })->name('monitoring');
-    Route::get('/temperature', [\App\Http\Controllers\TemperatureController::class, 'index']);
 
     Route::post(
         '/rooms/{id}/ac/fuzzy/apply',

@@ -290,7 +290,7 @@ class AcUnitController extends Controller
 
         $isOnline = ($status === 'online' || $status === 'available')
             && $lastSeen
-            && now()->diffInSeconds($lastSeen, true) <= 60;
+            && now()->diffInSeconds($lastSeen, true) <= 25;
 
         $room->device_status = $isOnline ? 'online' : 'offline';
     }

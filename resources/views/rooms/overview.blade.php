@@ -9,6 +9,7 @@
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
+    @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
         .room-card {
@@ -714,6 +715,18 @@
         window.addEventListener('offline', () => setSystemStatus(false));
         document.addEventListener('DOMContentLoaded', () => {
             setSystemStatus(navigator.onLine);
+
+            // Real-time via Reverb: trigger refresh segera saat event masuk
+            if (window.Echo) {
+                window.Echo.channel('device-status')
+                    .listen('.DeviceStatusUpdated', () => {
+                        refreshRoomStatuses();
+                        refreshTemps();
+                    })
+                    .listen('.RoomTemperatureUpdated', () => {
+                        refreshTemps();
+                    });
+            }
         });
     </script>
     @include('components.sidebar-scripts')

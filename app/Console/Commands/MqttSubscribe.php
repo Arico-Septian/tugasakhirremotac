@@ -30,7 +30,13 @@ class MqttSubscribe extends Command
                 $mqtt->subscribeMultiple([
 
                     /* === DEVICE ONLINE === */
-                    'device/+/online' => function ($topic, $message) use ($mqtt) {
+                    'device/+/online' => function ($topic, $message, $qos = 0, $retained = false) use ($mqtt) {
+
+                        // Skip retained "online" — stale snapshot dari sesi lama
+                        if ($retained) {
+                            $this->warn("ONLINE retained di-skip ({$topic})");
+                            return;
+                        }
 
                         $data = json_decode($message, true);
 
@@ -52,7 +58,11 @@ class MqttSubscribe extends Command
                     },
 
                     /* === PING === */
-                    'device/+/ping' => function ($topic) {
+                    'device/+/ping' => function ($topic, $message = '', $qos = 0, $retained = false) {
+
+                        if ($retained) {
+                            return;
+                        }
 
                         $deviceId = $this->extractDeviceId($topic, 'ping');
                         if (! $deviceId) {
@@ -67,7 +77,7 @@ class MqttSubscribe extends Command
                     },
 
                     /* === STATUS (LWT) === */
-                    'device/+/status' => function ($topic, $message) {
+                    'device/+/status' => function ($topic, $message, $qos = 0, $retained = false) {
 
                         $deviceId = $this->extractDeviceId($topic, 'status');
                         if (! $deviceId) {
@@ -95,6 +105,12 @@ class MqttSubscribe extends Command
 
                             Log::info('Device marked OFFLINE via LWT', ['device' => $deviceId]);
                         } elseif ($message === 'online') {
+
+                            // Skip retained "online" — stale snapshot dari sesi lama
+                            if ($retained) {
+                                $this->warn("STATUS online retained di-skip ({$deviceId})");
+                                return;
+                            }
 
                             $this->info("STATUS ONLINE: {$deviceId}");
 
