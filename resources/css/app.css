@@ -222,10 +222,14 @@ body { min-height: 100vh; }
   flex-shrink: 0 !important;
 }
 
-/* Dashboard layout: only .app-content scrolls, not .page-body */
+/* Dashboard layout: page-body must be flex container so .app-content can scroll */
 .app-main .page-body {
-  overflow-y: visible !important;
-  overflow-x: hidden;
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
 }
 
 /* Mobile sidebar */
