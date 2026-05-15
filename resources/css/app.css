@@ -217,6 +217,11 @@ body { min-height: 100vh; }
 .app-content-inner { max-width: 1280px; margin: 0 auto; }
 @media (max-width: 768px) { .app-content { padding: 16px; } }
 
+/* Dashboard layout: ensure main-header doesn't shrink */
+.app-main .main-header {
+  flex-shrink: 0 !important;
+}
+
 /* Dashboard layout: only .app-content scrolls, not .page-body */
 .app-main .page-body {
   overflow-y: visible !important;
