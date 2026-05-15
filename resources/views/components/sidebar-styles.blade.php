@@ -11,24 +11,39 @@
         height: 0;
     }
 
-    /* Wallpaper — gradient overlay di atas gambar dalam satu deklarasi background */
+    /* Modern 2026 Wallpaper — sophisticated layered gradients with image backdrop */
     html, body { height: 100%; overflow: hidden; }
     body {
         background:
-            linear-gradient(rgba(7,16,31,0.46), rgba(7,16,31,0.46)),
+            /* Subtle radial glow from top-left (cyan accent) */
+            radial-gradient(600px 400px at 10% -20%, rgba(94, 208, 255, 0.12), transparent 50%),
+            /* Subtle radial glow from bottom-right (lavender accent) */
+            radial-gradient(500px 350px at 85% 110%, rgba(180, 163, 255, 0.10), transparent 50%),
+            /* Primary dark gradient overlay — sophisticated tone mapping */
+            linear-gradient(135deg,
+                rgba(5, 12, 25, 0.58) 0%,
+                rgba(8, 16, 32, 0.54) 25%,
+                rgba(10, 20, 40, 0.50) 50%,
+                rgba(7, 14, 28, 0.56) 75%,
+                rgba(6, 12, 24, 0.60) 100%
+            ),
+            /* Wallpaper image — texture underneath */
             url('/images/wallpaper.jpeg') center/cover no-repeat fixed !important;
+        background-blend-mode: multiply;
     }
 
-    /* Override panel vars agar tidak transparan di atas wallpaper */
+    /* Modern color system with enhanced contrast and depth */
     :root {
-        --panel-1: rgba(10, 20, 44, 0.88) !important;
-        --panel-2: rgba(13, 26, 56, 0.92) !important;
-        --bg-1:    #0c1830 !important;
+        --panel-1: rgba(12, 22, 48, 0.92) !important;
+        --panel-2: rgba(14, 28, 60, 0.94) !important;
+        --bg-1:    #0a1428 !important;
     }
 
-    /* Area konten utama diberi tint tipis — sedikit lebih terang agar wallpaper terlihat */
+    /* Main content area with refined overlay — more transparent to show wallpaper depth */
     .main-content {
-        background: rgba(7, 16, 31, 0.36);
+        background:
+            radial-gradient(500px 250px at 50% 50%, rgba(94, 208, 255, 0.04), transparent 70%),
+            rgba(6, 12, 24, 0.28);
     }
 
     /* Backwards-compat aliases for legacy class names used across pages */
@@ -53,34 +68,34 @@
         height: 64px;
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 24px;
-        /* Match sidebar — radial glow + linear gradient identik dengan sidebar,
-           solid (alpha 1) supaya tint .main-content tidak bocor dan bikin terlihat lebih gelap */
+        /* Modern header with sophisticated gradient and glow effects */
         background:
-            radial-gradient(600px 200px at 50% 0%, rgba(94, 208, 255, 0.10), transparent 70%),
-            linear-gradient(180deg, rgb(16, 28, 54) 0%, rgb(12, 22, 44) 100%) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+            radial-gradient(800px 250px at 50% -30%, rgba(94, 208, 255, 0.14), transparent 60%),
+            linear-gradient(180deg, rgba(14, 26, 52, 0.98) 0%, rgba(10, 20, 42, 0.96) 100%) !important;
+        border-bottom: 1px solid rgba(94, 208, 255, 0.10) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(94, 208, 255, 0.08);
         color: var(--ink-0);
         position: sticky; top: 0;
         z-index: 30;
     }
-    /* Top accent line (mirrors sidebar's ::before) */
+    /* Top accent line — modern glow effect */
     .main-header::before {
         content: '';
         position: absolute;
         top: 0; left: 16%; right: 16%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.32), transparent);
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.40), transparent);
+        filter: blur(0.5px);
         pointer-events: none;
         z-index: 2;
     }
-    /* Subtle accent line under header (matches sidebar's brand::after style) */
+    /* Subtle accent line under header — modern minimalist */
     .main-header::after {
         content: '';
         position: absolute;
         left: 16%; right: 16%; bottom: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.28), transparent);
+        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.20), transparent);
         pointer-events: none;
     }
     @media (max-width: 1024px) { .main-header { padding: 0 16px; } }
@@ -106,40 +121,44 @@
         gap: 10px !important;
     }
 
-    /* Status pill polish */
+    /* Modern status pill with glassmorphism */
     .main-header .pill {
         padding: 6px 12px !important;
         border-radius: 999px !important;
         font-size: 11.5px !important;
         font-weight: 600;
         letter-spacing: 0.02em;
-        backdrop-filter: blur(8px);
+        background: rgba(94, 208, 255, 0.08) !important;
+        border: 1px solid rgba(94, 208, 255, 0.18) !important;
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
     }
     .main-header .pill .dot {
         width: 6px; height: 6px;
         margin-right: 2px;
     }
 
-    /* Notification bell — premium look */
+    /* Modern notification bell with enhanced interactivity */
     #notifBellBtn,
     .main-header .btn-icon {
         width: 38px !important;
         height: 38px !important;
         border-radius: 10px !important;
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(94, 208, 255, 0.12) !important;
         color: var(--ink-2) !important;
         transition: all 0.22s ease !important;
     }
     #notifBellBtn:hover,
     .main-header .btn-icon:hover {
-        background: rgba(94, 208, 255, 0.08) !important;
-        border-color: rgba(94, 208, 255, 0.24) !important;
+        background: rgba(94, 208, 255, 0.12) !important;
+        border-color: rgba(94, 208, 255, 0.32) !important;
         color: var(--cyan) !important;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px -2px rgba(94, 208, 255, 0.30);
     }
 
-    /* Notification badge — refined */
+    /* Modern notification badge with enhanced glow */
     #notifBadge,
     .notif-badge {
         background: linear-gradient(135deg, #fb7185, #f43f5e) !important;
@@ -149,8 +168,8 @@
         min-width: 18px;
         height: 18px !important;
         border-radius: 999px !important;
-        border: 2px solid rgba(10, 18, 36, 0.95) !important;
-        box-shadow: 0 4px 12px -2px rgba(251, 113, 133, 0.5) !important;
+        border: 2px solid rgba(10, 18, 36, 0.96) !important;
+        box-shadow: 0 6px 16px -2px rgba(251, 113, 133, 0.60) !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -177,57 +196,60 @@
         .sidebar-toggle.desktop-only { display: none !important; }
     }
 
-    /* Backdrop */
+    /* Modern backdrop with glassmorphism effect */
     #overlay {
         position: fixed; inset: 0; z-index: 40;
-        background: rgba(0, 0, 0, 0.55);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
+        background: rgba(0, 0, 0, 0.60);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
         opacity: 0; pointer-events: none;
         transition: opacity .25s cubic-bezier(.4,0,.2,1);
     }
     #overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* .custom-bg tidak lagi dibutuhkan — wallpaper sudah ada di body */
     .custom-bg { display: none; }
 
-    /* ====================================================
-       SIDEBAR ENHANCEMENT — premium polish
-    ==================================================== */
+    /* Modern sidebar with sophisticated gradients and depth */
     .app-sidebar {
         background:
-            radial-gradient(420px 280px at 50% 0%, rgba(94, 208, 255, 0.08), transparent 70%),
-            linear-gradient(180deg, rgba(12, 22, 44, 0.96), rgba(7, 14, 28, 0.98)) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+            /* Glow from top */
+            radial-gradient(500px 350px at 50% -20%, rgba(94, 208, 255, 0.10), transparent 60%),
+            /* Glow from bottom-left */
+            radial-gradient(400px 300px at 20% 120%, rgba(180, 163, 255, 0.08), transparent 60%),
+            /* Primary gradient */
+            linear-gradient(180deg, rgba(12, 24, 48, 0.98), rgba(8, 16, 32, 0.99)) !important;
+        border-right: 1px solid rgba(94, 208, 255, 0.12) !important;
+        box-shadow: 0 0 32px rgba(0, 0, 0, 0.40), inset -1px 0 0 rgba(94, 208, 255, 0.06);
     }
 
-    /* Subtle top accent line */
+    /* Modern top accent line with glow */
     .app-sidebar::before {
         content: '';
         position: absolute;
         top: 0; left: 16%; right: 16%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.32), transparent);
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.40), transparent);
+        filter: blur(0.5px);
         pointer-events: none;
         z-index: 2;
     }
 
-    /* ===== BRAND ===== */
+    /* Modern brand with enhanced visual hierarchy */
     .brand {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-bottom: 1px solid rgba(94, 208, 255, 0.10) !important;
         position: relative;
+        background: linear-gradient(180deg, rgba(20, 32, 56, 0.5), transparent);
     }
     .brand::after {
         content: '';
         position: absolute;
         left: 18px; right: 18px; bottom: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.18), transparent);
+        background: linear-gradient(90deg, transparent, rgba(94, 208, 255, 0.24), transparent);
     }
     .brand-logo {
         background: conic-gradient(from 220deg, #5ed0ff, #b4a3ff, #fb7185, #fbbf24, #6ee7b7, #5ed0ff) !important;
-        box-shadow: 0 8px 22px -8px rgba(94, 208, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 12px 32px -8px rgba(94, 208, 255, 0.50), inset 0 1px 0 rgba(255, 255, 255, 0.30) !important;
         position: relative;
     }
     .brand-logo::after {
@@ -235,7 +257,7 @@
         position: absolute;
         inset: 3px;
         border-radius: 8px;
-        background: rgba(7, 16, 31, 0.92);
+        background: rgba(7, 16, 31, 0.94);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -244,6 +266,7 @@
         position: relative;
         z-index: 2;
         color: var(--cyan);
+        filter: drop-shadow(0 0 6px rgba(94, 208, 255, 0.4));
     }
     .brand-text .sub {
         background: linear-gradient(90deg, var(--cyan), var(--lavender));
@@ -253,7 +276,7 @@
         font-weight: 700 !important;
     }
 
-    /* ===== NAV SECTION LABELS ===== */
+    /* Modern nav section labels with refined accents */
     .nav-section-label {
         font-size: 9.5px !important;
         letter-spacing: 0.16em !important;
@@ -268,11 +291,11 @@
         content: '';
         width: 14px;
         height: 1px;
-        background: linear-gradient(90deg, rgba(94, 208, 255, 0.4), transparent);
+        background: linear-gradient(90deg, rgba(94, 208, 255, 0.5), transparent);
         flex-shrink: 0;
     }
 
-    /* ===== NAV LINKS ===== */
+    /* Modern nav links with smooth interactions */
     .nav-list { gap: 3px !important; }
     .nav-link {
         padding: 10px 12px !important;
@@ -284,8 +307,8 @@
     .nav-link i {
         width: 28px !important; height: 28px !important;
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.025);
-        border: 1px solid transparent;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(94, 208, 255, 0.0);
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
@@ -296,28 +319,28 @@
     }
 
     .nav-link:hover {
-        background: rgba(255, 255, 255, 0.035) !important;
+        background: rgba(94, 208, 255, 0.06) !important;
         color: var(--ink-0) !important;
         transform: translateX(2px);
     }
     .nav-link:hover i {
-        background: rgba(94, 208, 255, 0.10);
-        border-color: rgba(94, 208, 255, 0.20);
+        background: rgba(94, 208, 255, 0.14);
+        border-color: rgba(94, 208, 255, 0.28);
         color: var(--cyan) !important;
     }
 
     .nav-link.active {
         background:
-            linear-gradient(90deg, rgba(94, 208, 255, 0.14) 0%, rgba(94, 208, 255, 0.02) 100%) !important;
+            linear-gradient(90deg, rgba(94, 208, 255, 0.16) 0%, rgba(94, 208, 255, 0.04) 100%) !important;
         color: var(--ink-0) !important;
         font-weight: 600 !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 1px 0 rgba(94, 208, 255, 0.10);
     }
     .nav-link.active i {
-        background: linear-gradient(135deg, rgba(94, 208, 255, 0.20), rgba(180, 163, 255, 0.14));
-        border-color: rgba(94, 208, 255, 0.36);
+        background: linear-gradient(135deg, rgba(94, 208, 255, 0.24), rgba(180, 163, 255, 0.18));
+        border-color: rgba(94, 208, 255, 0.44);
         color: var(--cyan) !important;
-        box-shadow: 0 0 14px -3px rgba(94, 208, 255, 0.4);
+        box-shadow: 0 0 16px -2px rgba(94, 208, 255, 0.45);
     }
     .nav-link.active::before {
         width: 3px !important;
@@ -325,24 +348,24 @@
         top: 10px !important;
         bottom: 10px !important;
         border-radius: 0 3px 3px 0 !important;
-        box-shadow: 0 0 12px rgba(94, 208, 255, 0.5);
+        box-shadow: 0 0 14px rgba(94, 208, 255, 0.55);
     }
 
     /* Collapsed sidebar — icon-only state */
     .app-sidebar.collapsed .nav-link i { margin: 0 auto; }
 
-    /* ===== SIDEBAR FOOTER (Profile) ===== */
+    /* Modern sidebar footer with refined styling */
     .sidebar-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-top: 1px solid rgba(94, 208, 255, 0.10) !important;
         position: relative;
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.20) 100%);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.25) 100%);
     }
     .sidebar-footer::before {
         content: '';
         position: absolute;
         left: 18px; right: 18px; top: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(180, 163, 255, 0.18), transparent);
+        background: linear-gradient(90deg, transparent, rgba(180, 163, 255, 0.24), transparent);
     }
 
     .profile-full {
@@ -351,14 +374,14 @@
         transition: all 0.22s ease !important;
     }
     .profile-full:hover {
-        background: rgba(255, 255, 255, 0.04) !important;
+        background: rgba(94, 208, 255, 0.06) !important;
     }
     .profile-full .avatar {
         transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
     .profile-full:hover .avatar {
-        transform: scale(1.05);
-        box-shadow: 0 4px 16px -4px rgba(94, 208, 255, 0.5);
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px -4px rgba(94, 208, 255, 0.55);
     }
     .profile-info .role {
         font-size: 10px !important;
@@ -369,15 +392,15 @@
         margin-top: 2px;
     }
     .icon-btn.danger {
-        background: rgba(251, 113, 133, 0.08) !important;
-        border: 1px solid rgba(251, 113, 133, 0.20) !important;
+        background: rgba(251, 113, 133, 0.10) !important;
+        border: 1px solid rgba(251, 113, 133, 0.24) !important;
         color: var(--coral) !important;
         border-radius: 8px !important;
         transition: all 0.22s ease;
     }
     .icon-btn.danger:hover {
-        background: rgba(251, 113, 133, 0.16) !important;
-        border-color: rgba(251, 113, 133, 0.36) !important;
+        background: rgba(251, 113, 133, 0.18) !important;
+        border-color: rgba(251, 113, 133, 0.40) !important;
         transform: translateY(-1px);
     }
 </style>
