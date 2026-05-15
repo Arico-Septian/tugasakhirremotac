@@ -171,16 +171,15 @@ class RoomController extends Controller
                 Rule::unique('rooms', 'device_id'),
             ],
             'floor' => [
-                'required',
+                'nullable',
                 'string',
                 'max:50',
-                'regex:/^[a-z0-9_]+$/',
+                'regex:/^[a-z0-9_]*$/',
             ],
         ], [
             'name.regex' => 'Nama ruangan hanya boleh berisi huruf kecil, angka, dan underscore.',
             'device_id.regex' => 'ESP ID hanya boleh berisi huruf kecil, angka, underscore, dan strip.',
             'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf kecil, angka, dan underscore.',
-            'floor.required' => 'Lantai/Zone harus diisi.',
         ]);
 
         $deviceId = $request->device_id;

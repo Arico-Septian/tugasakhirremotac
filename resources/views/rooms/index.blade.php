@@ -526,9 +526,8 @@
                             </div>
                             <div class="field">
                                 <label class="field-label">Lantai / Zona <span
-                                        style="color:var(--coral);font-weight:600;">*</span></label>
-                                <input class="input text-mono" type="text" name="floor" placeholder="lantai_1, zona_a"
-                                    required>
+                                        style="color:var(--ink-4);font-weight:400;">(opsional)</span></label>
+                                <input class="input text-mono" type="text" name="floor" placeholder="lantai_1, zona_a">
                                 <p class="field-help">Hanya huruf kecil, angka, dan underscore. Digunakan untuk pengelompokan</p>
                             </div>
                         </div>
