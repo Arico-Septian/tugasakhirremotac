@@ -11,21 +11,21 @@
         height: 0;
     }
 
-    /* 2025 Modern Wallpaper — clean, harmonious color palette */
+    /* 2025 Modern Wallpaper — clean, harmonious color palette with darker background */
     html, body { height: 100%; overflow: hidden; }
     body {
         background:
             /* Subtle cyan glow from top — primary accent */
-            radial-gradient(800px 400px at 50% -20%, rgba(78, 215, 255, 0.12), transparent 60%),
+            radial-gradient(800px 400px at 50% -20%, rgba(78, 215, 255, 0.10), transparent 60%),
             /* Complementary indigo glow from bottom-right — secondary accent */
-            radial-gradient(600px 350px at 85% 110%, rgba(139, 162, 255, 0.08), transparent 65%),
-            /* Clean dark gradient with balanced tones */
+            radial-gradient(600px 350px at 85% 110%, rgba(139, 162, 255, 0.06), transparent 65%),
+            /* Darker gradient overlay for better visibility */
             linear-gradient(135deg,
-                rgba(9, 14, 30, 0.65) 0%,
-                rgba(12, 19, 42, 0.62) 25%,
-                rgba(13, 22, 48, 0.60) 50%,
-                rgba(10, 16, 38, 0.63) 75%,
-                rgba(8, 12, 28, 0.66) 100%
+                rgba(6, 10, 22, 0.72) 0%,
+                rgba(9, 15, 36, 0.70) 25%,
+                rgba(10, 18, 42, 0.68) 50%,
+                rgba(8, 13, 34, 0.71) 75%,
+                rgba(6, 10, 26, 0.74) 100%
             ),
             /* Wallpaper image — texture underneath */
             url('/images/wallpaper.jpeg') center/cover no-repeat fixed !important;
@@ -39,11 +39,11 @@
         --bg-1:    #0d1530 !important;
     }
 
-    /* Main content area with clean, subtle glow */
+    /* Main content area with darker overlay */
     .main-content {
         background:
-            radial-gradient(700px 280px at 50% 50%, rgba(78, 215, 255, 0.04), transparent 70%),
-            rgba(8, 12, 26, 0.30);
+            radial-gradient(700px 280px at 50% 50%, rgba(78, 215, 255, 0.03), transparent 70%),
+            rgba(6, 10, 22, 0.38);
     }
 
     /* Backwards-compat aliases for legacy class names used across pages */
