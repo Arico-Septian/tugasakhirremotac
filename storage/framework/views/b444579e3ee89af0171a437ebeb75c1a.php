@@ -68,35 +68,36 @@
         height: 64px;
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 24px;
-        /* Clean modern header with subtle glow */
+        /* 2026 modern header with vibrant accents */
         background:
-            /* Subtle cyan glow */
-            radial-gradient(900px 300px at 50% -40%, rgba(78, 215, 255, 0.10), transparent 65%),
-            /* Clean gradient — dark blue base */
-            linear-gradient(180deg, rgba(13, 22, 46, 0.98) 0%, rgba(11, 18, 38, 0.96) 100%) !important;
-        border-bottom: 1px solid rgba(78, 215, 255, 0.10) !important;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(78, 215, 255, 0.08);
+            /* Vibrant cyan glow */
+            radial-gradient(950px 320px at 50% -40%, rgba(61, 227, 255, 0.14), transparent 65%),
+            /* Enhanced gradient with subtle blue tint */
+            linear-gradient(180deg, rgba(15, 25, 50, 0.98) 0%, rgba(12, 20, 42, 0.96) 100%) !important;
+        border-bottom: 1px solid rgba(61, 227, 255, 0.16) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(61, 227, 255, 0.12), inset 0 -1px 0 rgba(139, 162, 255, 0.06);
         color: var(--ink-0);
         position: sticky; top: 0;
         z-index: 30;
     }
-    /* Top accent line — subtle, elegant */
+    /* Top accent line — vibrant cyan glow */
     .main-header::before {
         content: '';
         position: absolute;
         top: 0; left: 16%; right: 16%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(78, 215, 255, 0.30), transparent);
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(61, 227, 255, 0.45), transparent);
+        filter: blur(0.8px);
         pointer-events: none;
         z-index: 2;
     }
-    /* Bottom accent line — complementary indigo */
+    /* Bottom accent line — complementary indigo glow */
     .main-header::after {
         content: '';
         position: absolute;
         left: 16%; right: 16%; bottom: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(139, 162, 255, 0.14), transparent);
+        background: linear-gradient(90deg, transparent, rgba(150, 170, 255, 0.20), transparent);
         pointer-events: none;
     }
     @media (max-width: 1024px) { .main-header { padding: 0 16px; } }
@@ -122,56 +123,56 @@
         gap: 10px !important;
     }
 
-    /* Clean modern status pill with glassmorphism */
+    /* 2026 modern status pill with vibrant glassmorphism */
     .main-header .pill {
         padding: 6px 12px !important;
         border-radius: 999px !important;
         font-size: 11.5px !important;
         font-weight: 600;
         letter-spacing: 0.02em;
-        background: rgba(78, 215, 255, 0.09) !important;
-        border: 1px solid rgba(78, 215, 255, 0.18) !important;
-        -webkit-backdrop-filter: blur(12px);
-        backdrop-filter: blur(12px);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        background: rgba(61, 227, 255, 0.12) !important;
+        border: 1px solid rgba(61, 227, 255, 0.24) !important;
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px -2px rgba(61, 227, 255, 0.15);
     }
     .main-header .pill .dot {
         width: 6px; height: 6px;
         margin-right: 2px;
     }
 
-    /* Clean modern notification bell */
+    /* 2026 modern notification bell with vibrant interactions */
     #notifBellBtn,
     .main-header .btn-icon {
         width: 38px !important;
         height: 38px !important;
         border-radius: 10px !important;
-        background: rgba(78, 215, 255, 0.06) !important;
-        border: 1px solid rgba(78, 215, 255, 0.12) !important;
-        color: #7a94b8 !important;
+        background: rgba(61, 227, 255, 0.08) !important;
+        border: 1px solid rgba(61, 227, 255, 0.16) !important;
+        color: #7fa0c8 !important;
         transition: all 0.22s ease !important;
     }
     #notifBellBtn:hover,
     .main-header .btn-icon:hover {
-        background: rgba(78, 215, 255, 0.12) !important;
-        border-color: rgba(78, 215, 255, 0.30) !important;
-        color: #4ed9ff !important;
+        background: rgba(61, 227, 255, 0.15) !important;
+        border-color: rgba(61, 227, 255, 0.38) !important;
+        color: #3de3ff !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px -2px rgba(78, 215, 255, 0.30);
+        box-shadow: 0 6px 20px -2px rgba(61, 227, 255, 0.40);
     }
 
-    /* Clean notification badge */
+    /* 2026 vibrant notification badge */
     #notifBadge,
     .notif-badge {
-        background: linear-gradient(135deg, #ff6b7a, #ff5566) !important;
+        background: linear-gradient(135deg, #ff5577, #ff3355) !important;
         color: #fff !important;
         font-size: 9.5px !important;
         font-weight: 700 !important;
         min-width: 18px;
         height: 18px !important;
         border-radius: 999px !important;
-        border: 2px solid rgba(10, 14, 28, 0.96) !important;
-        box-shadow: 0 4px 12px -2px rgba(255, 107, 122, 0.50) !important;
+        border: 2px solid rgba(8, 12, 28, 0.97) !important;
+        box-shadow: 0 6px 16px -2px rgba(255, 85, 119, 0.60) !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -198,14 +199,14 @@
         .sidebar-toggle.desktop-only { display: none !important; }
     }
 
-    /* Clean modern backdrop with glassmorphism */
+    /* 2026 modern backdrop with vibrant glassmorphism */
     #overlay {
         position: fixed; inset: 0; z-index: 40;
         background:
-            radial-gradient(500px 350px at 50% 50%, rgba(78, 215, 255, 0.02), transparent 70%),
-            rgba(0, 0, 0, 0.62);
-        -webkit-backdrop-filter: blur(5px);
-        backdrop-filter: blur(5px);
+            radial-gradient(500px 350px at 50% 50%, rgba(61, 227, 255, 0.03), transparent 70%),
+            rgba(0, 0, 0, 0.64);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
         opacity: 0; pointer-events: none;
         transition: opacity .25s cubic-bezier(.4,0,.2,1);
     }
@@ -213,46 +214,47 @@
 
     .custom-bg { display: none; }
 
-    /* Clean modern sidebar with harmonious colors */
+    /* 2026 modern sidebar with vibrant accents */
     .app-sidebar {
         background:
-            /* Subtle cyan glow from top */
-            radial-gradient(550px 380px at 50% -25%, rgba(78, 215, 255, 0.10), transparent 65%),
-            /* Subtle indigo glow from bottom */
-            radial-gradient(450px 300px at 15% 125%, rgba(139, 162, 255, 0.06), transparent 65%),
-            /* Clean dark blue gradient */
-            linear-gradient(180deg, rgba(12, 20, 42, 0.98), rgba(10, 16, 36, 0.99)) !important;
-        border-right: 1px solid rgba(78, 215, 255, 0.10) !important;
-        box-shadow: 0 0 28px rgba(0, 0, 0, 0.35), inset -1px 0 0 rgba(78, 215, 255, 0.06);
+            /* Vibrant cyan glow from top */
+            radial-gradient(600px 400px at 50% -25%, rgba(61, 227, 255, 0.12), transparent 65%),
+            /* Vibrant indigo glow from bottom */
+            radial-gradient(480px 320px at 15% 125%, rgba(150, 170, 255, 0.08), transparent 65%),
+            /* Enhanced dark blue gradient */
+            linear-gradient(180deg, rgba(13, 22, 46, 0.98), rgba(10, 17, 38, 0.99)) !important;
+        border-right: 1px solid rgba(61, 227, 255, 0.12) !important;
+        box-shadow: 0 0 32px rgba(0, 0, 0, 0.40), inset -1px 0 0 rgba(61, 227, 255, 0.08);
     }
 
-    /* Top accent line — subtle and clean */
+    /* Top accent line — vibrant and modern */
     .app-sidebar::before {
         content: '';
         position: absolute;
         top: 0; left: 16%; right: 16%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(78, 215, 255, 0.28), transparent);
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(61, 227, 255, 0.40), transparent);
+        filter: blur(0.8px);
         pointer-events: none;
         z-index: 2;
     }
 
-    /* Clean, harmonious brand section */
+    /* 2026 brand with vibrant, modern aesthetic */
     .brand {
-        border-bottom: 1px solid rgba(78, 215, 255, 0.10) !important;
+        border-bottom: 1px solid rgba(61, 227, 255, 0.14) !important;
         position: relative;
-        background: linear-gradient(180deg, rgba(18, 28, 56, 0.5), rgba(12, 18, 40, 0.15));
+        background: linear-gradient(180deg, rgba(20, 32, 60, 0.6), rgba(14, 22, 46, 0.20));
     }
     .brand::after {
         content: '';
         position: absolute;
         left: 18px; right: 18px; bottom: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(78, 215, 255, 0.20), rgba(139, 162, 255, 0.10), transparent);
+        background: linear-gradient(90deg, transparent, rgba(61, 227, 255, 0.28), rgba(150, 170, 255, 0.14), transparent);
     }
     .brand-logo {
-        background: conic-gradient(from 220deg, #4ed9ff, #8ba2ff, #6ee7b7, #4ed9ff) !important;
-        box-shadow: 0 10px 32px -8px rgba(78, 215, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30) !important;
+        background: conic-gradient(from 220deg, #3de3ff, #96aaff, #70f5d0, #3de3ff) !important;
+        box-shadow: 0 12px 40px -6px rgba(61, 227, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
         position: relative;
     }
     .brand-logo::after {
@@ -260,7 +262,7 @@
         position: absolute;
         inset: 3px;
         border-radius: 8px;
-        background: rgba(8, 14, 32, 0.95);
+        background: rgba(7, 12, 30, 0.96);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -268,39 +270,39 @@
     .brand-logo i {
         position: relative;
         z-index: 2;
-        color: #4ed9ff;
-        filter: drop-shadow(0 0 6px rgba(78, 215, 255, 0.50));
+        color: #3de3ff;
+        filter: drop-shadow(0 0 8px rgba(61, 227, 255, 0.65));
     }
     .brand-text .sub {
-        background: linear-gradient(90deg, #4ed9ff, #8ba2ff);
+        background: linear-gradient(90deg, #3de3ff, #96aaff);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
         font-weight: 700 !important;
     }
 
-    /* Clean nav section labels */
+    /* 2026 nav section labels with vibrant accents */
     .nav-section-label {
         font-size: 9.5px !important;
         letter-spacing: 0.16em !important;
-        color: #7a94b8 !important;
+        color: #85a0cc !important;
         padding: 14px 12px 8px !important;
         margin-top: 8px !important;
         display: flex;
         align-items: center;
         gap: 8px;
         text-transform: uppercase;
-        font-weight: 500;
+        font-weight: 600;
     }
     .nav-section-label::before {
         content: '';
         width: 14px;
         height: 1px;
-        background: linear-gradient(90deg, rgba(78, 215, 255, 0.40), transparent);
+        background: linear-gradient(90deg, rgba(61, 227, 255, 0.50), transparent);
         flex-shrink: 0;
     }
 
-    /* Clean nav links with subtle, modern interactions */
+    /* 2026 nav links with vibrant, modern interactions */
     .nav-list { gap: 3px !important; }
     .nav-link {
         padding: 10px 12px !important;
@@ -312,65 +314,65 @@
     .nav-link i {
         width: 28px !important; height: 28px !important;
         border-radius: 8px;
-        background: rgba(78, 215, 255, 0.04);
-        border: 1px solid rgba(78, 215, 255, 0.06);
+        background: rgba(61, 227, 255, 0.06);
+        border: 1px solid rgba(61, 227, 255, 0.10);
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
         font-size: 12px !important;
-        color: #7a94b8 !important;
+        color: #7fa0c8 !important;
         transition: all 0.22s ease !important;
         flex-shrink: 0;
     }
 
     .nav-link:hover {
-        background: rgba(78, 215, 255, 0.08) !important;
+        background: rgba(61, 227, 255, 0.10) !important;
         color: var(--ink-0) !important;
         transform: translateX(2px);
     }
     .nav-link:hover i {
-        background: linear-gradient(135deg, rgba(78, 215, 255, 0.14), rgba(139, 162, 255, 0.08));
-        border-color: rgba(78, 215, 255, 0.28);
-        color: #4ed9ff !important;
+        background: linear-gradient(135deg, rgba(61, 227, 255, 0.18), rgba(150, 170, 255, 0.10));
+        border-color: rgba(61, 227, 255, 0.35);
+        color: #3de3ff !important;
     }
 
     .nav-link.active {
         background:
-            linear-gradient(90deg, rgba(78, 215, 255, 0.12) 0%, rgba(78, 215, 255, 0.04) 100%) !important;
+            linear-gradient(90deg, rgba(61, 227, 255, 0.14) 0%, rgba(61, 227, 255, 0.06) 100%) !important;
         color: var(--ink-0) !important;
         font-weight: 600 !important;
-        box-shadow: inset 0 1px 0 rgba(78, 215, 255, 0.10);
+        box-shadow: inset 0 1px 0 rgba(61, 227, 255, 0.12);
     }
     .nav-link.active i {
-        background: linear-gradient(135deg, rgba(78, 215, 255, 0.20), rgba(139, 162, 255, 0.14));
-        border-color: rgba(78, 215, 255, 0.38);
-        color: #4ed9ff !important;
-        box-shadow: 0 0 14px -2px rgba(78, 215, 255, 0.40);
+        background: linear-gradient(135deg, rgba(61, 227, 255, 0.24), rgba(150, 170, 255, 0.16));
+        border-color: rgba(61, 227, 255, 0.45);
+        color: #3de3ff !important;
+        box-shadow: 0 0 16px -2px rgba(61, 227, 255, 0.50);
     }
     .nav-link.active::before {
         width: 3px !important;
-        background: linear-gradient(180deg, #4ed9ff, #8ba2ff) !important;
+        background: linear-gradient(180deg, #3de3ff, #96aaff) !important;
         top: 10px !important;
         bottom: 10px !important;
         border-radius: 0 3px 3px 0 !important;
-        box-shadow: 0 0 12px rgba(78, 215, 255, 0.45);
+        box-shadow: 0 0 14px rgba(61, 227, 255, 0.55);
     }
 
     /* Collapsed sidebar — icon-only state */
     .app-sidebar.collapsed .nav-link i { margin: 0 auto; }
 
-    /* Clean modern sidebar footer */
+    /* 2026 modern sidebar footer with vibrant accents */
     .sidebar-footer {
-        border-top: 1px solid rgba(78, 215, 255, 0.10) !important;
+        border-top: 1px solid rgba(61, 227, 255, 0.12) !important;
         position: relative;
-        background: linear-gradient(180deg, rgba(12, 20, 42, 0.06) 0%, rgba(0, 0, 0, 0.20) 100%);
+        background: linear-gradient(180deg, rgba(13, 22, 46, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
     }
     .sidebar-footer::before {
         content: '';
         position: absolute;
         left: 18px; right: 18px; top: -1px;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(78, 215, 255, 0.16), rgba(139, 162, 255, 0.08), transparent);
+        background: linear-gradient(90deg, transparent, rgba(61, 227, 255, 0.22), rgba(150, 170, 255, 0.12), transparent);
     }
 
     .profile-full {
@@ -379,33 +381,33 @@
         transition: all 0.22s ease !important;
     }
     .profile-full:hover {
-        background: rgba(78, 215, 255, 0.08) !important;
+        background: rgba(61, 227, 255, 0.10) !important;
     }
     .profile-full .avatar {
         transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
     .profile-full:hover .avatar {
-        transform: scale(1.08);
-        box-shadow: 0 6px 18px -4px rgba(78, 215, 255, 0.40);
+        transform: scale(1.10);
+        box-shadow: 0 8px 24px -4px rgba(61, 227, 255, 0.50);
     }
     .profile-info .role {
         font-size: 10px !important;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #7a94b8 !important;
+        color: #85a0cc !important;
         font-weight: 600;
         margin-top: 2px;
     }
     .icon-btn.danger {
-        background: rgba(255, 107, 122, 0.10) !important;
-        border: 1px solid rgba(255, 107, 122, 0.20) !important;
-        color: #ff6b7a !important;
+        background: rgba(255, 85, 119, 0.12) !important;
+        border: 1px solid rgba(255, 85, 119, 0.24) !important;
+        color: #ff5577 !important;
         border-radius: 8px !important;
         transition: all 0.22s ease;
     }
     .icon-btn.danger:hover {
-        background: rgba(255, 107, 122, 0.16) !important;
-        border-color: rgba(255, 107, 122, 0.35) !important;
+        background: rgba(255, 85, 119, 0.18) !important;
+        border-color: rgba(255, 85, 119, 0.40) !important;
         transform: translateY(-1px);
     }
 </style>
