@@ -83,31 +83,6 @@
 
         .filter-tag button:hover { opacity: 1; }
 
-        .adv-filter {
-            background: var(--panel-1);
-            border: 1px solid var(--line-soft);
-            border-top: none;
-        }
-
-        .adv-filter-body {
-            padding: 14px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .adv-filter-body {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .adv-filter-body {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-
         /* Toolbar responsiveness for very small screens */
         @media (max-width: 768px) {
             .tbl-toolbar {
@@ -227,15 +202,6 @@
                 pointer-events: none;
             }
         }
-
-        /* Advanced filter landscape mode */
-        @media (max-width: 896px) and (orientation: landscape) {
-            .adv-filter-body {
-                grid-template-columns: repeat(3, 1fr) !important;
-            }
-        }
-
-        .adv-filter-body .field { margin: 0; }
 
         .tbl tbody tr { transition: background 0.12s ease; }
         .tbl tbody tr:hover { background: var(--panel-2); }
@@ -586,65 +552,6 @@
                                 </div>
                             </div>
 
-                            {{-- Advanced (custom date / specific user / specific room) --}}
-                            <div class="adv-filter">
-                                <div class="adv-filter-body">
-                                    <div class="field">
-                                        <label class="field-label">User</label>
-                                        <select class="input" name="user_id" onchange="this.form.submit()">
-                                            <option value="">Semua User</option>
-                                            @foreach ($users as $u)
-                                                <option value="{{ $u->id }}"
-                                                    {{ request('user_id') == $u->id ? 'selected' : '' }}>
-                                                    {{ $u->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="field">
-                                        <label class="field-label">Room</label>
-                                        <select class="input" name="room" onchange="this.form.submit()">
-                                            <option value="">Semua Room</option>
-                                            @foreach ($rooms as $r)
-                                                <option value="{{ $r }}"
-                                                    {{ request('room') === $r ? 'selected' : '' }}>
-                                                    {{ $r }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="field">
-                                        <label class="field-label">Aksi spesifik</label>
-                                        <select class="input" name="activity" onchange="this.form.submit()">
-                                            <option value="">Semua Aksi</option>
-                                            @foreach ($activityOptions as $val => $label)
-                                                <option value="{{ $val }}"
-                                                    {{ request('activity') === $val ? 'selected' : '' }}>
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="field">
-                                        <label class="field-label"><i class="fa-regular fa-calendar text-[10px]" style="margin-right:4px;"></i>Dari Tanggal</label>
-                                        <input class="input" type="date" name="date_from"
-                                            value="{{ request('date_from') }}" onchange="this.form.submit()" style="cursor:pointer;">
-                                    </div>
-                                    <div class="field">
-                                        <label class="field-label"><i class="fa-regular fa-calendar text-[10px]" style="margin-right:4px;"></i>Sampai Tanggal</label>
-                                        <input class="input" type="date" name="date_to"
-                                            value="{{ request('date_to') }}" onchange="this.form.submit()" style="cursor:pointer;">
-                                    </div>
-                                    @if (count($activeFilters))
-                                        <div class="field" style="align-self:end;display:flex;gap:8px;">
-                                            <a href="/logs" class="btn btn-sm"
-                                                style="background:var(--panel-2);border-color:var(--line);">
-                                                <i class="fa-solid fa-xmark text-[10px]"></i> Reset
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
                         </form>
 
                         @php

@@ -11,21 +11,32 @@
     @vite('resources/js/app.js')
     @include('components.sidebar-styles')
     <style>
-        /* ===== Temperature color scheme (match fuzzy graph) =====
-           - cool (dingin)   â†’ biru
-           - warm (stabil)   â†’ hijau
-           - hot  (panas)    â†’ orange */
-        .temp-chip.cool {
-            background: rgba(94, 208, 255, 0.14) !important;
+        /* ===== Temperature chip — colored bg + matching text ===== */
+        .room-card .temp-chip {
+            display: flex !important;
+            border-radius: var(--r-md) !important;
+            padding: 9px 14px !important;
+            font-size: 12px !important;
+        }
+        .room-card .temp-chip.cool {
+            background: rgba(94, 208, 255, 0.15) !important;
             color: #5ed0ff !important;
+            border: 1px solid rgba(94, 208, 255, 0.35) !important;
         }
-        .temp-chip.warm {
-            background: rgba(110, 231, 183, 0.14) !important;
+        .room-card .temp-chip.warm {
+            background: rgba(110, 231, 183, 0.15) !important;
             color: #6ee7b7 !important;
+            border: 1px solid rgba(110, 231, 183, 0.35) !important;
         }
-        .temp-chip.hot {
-            background: rgba(251, 146, 60, 0.18) !important;
-            color: #fb923c !important;
+        .room-card .temp-chip.hot {
+            background: rgba(248, 113, 113, 0.15) !important;
+            color: #f87171 !important;
+            border: 1px solid rgba(248, 113, 113, 0.4) !important;
+        }
+        .room-card .temp-chip.idle {
+            background: var(--panel-2) !important;
+            color: var(--ink-3) !important;
+            border: 1px solid var(--line-soft) !important;
         }
 
         /* Keputusan text color follows action */
@@ -104,18 +115,6 @@
             font-size: 10px;
             color: var(--ink-4);
             white-space: nowrap;
-        }
-
-        .temp-offline-badge {
-            display: inline-block;
-            margin-left: 4px;
-            padding: 2px 6px;
-            background-color: var(--coral);
-            color: white;
-            font-size: 9px;
-            font-weight: 600;
-            border-radius: 3px;
-            letter-spacing: 0.05em;
         }
 
         /* Responsive search and filters */
@@ -352,77 +351,65 @@
                                                             style="color:var(--ink-4);margin-top:3px;"></i>
                                                     </div>
 
-                                                    {{-- BAR SUHU (tetap ada span suhu untuk realtime JS) --}}
-                                                    <div class="temp-chip {{ $tcls }}"
+                                                    {{-- BAR SUHU --}}
+                                                    <div class="temp-chip {{ $room->temperature_is_offline ? 'idle' : $tcls }}"
                                                         style="justify-content:space-between;width:100%;">
-                                                        <span
-                                                            style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
+                                                        <span style="display:inline-flex;align-items:center;gap:6px;font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
-
-                                                        <span id=”temp-{{ $room->id }}” class=”text-mono” data-offline=”{{ $room->temperature_is_offline ? 'true' : 'false' }}”>
-                                                            {{ $temp ?? '–' }}°C
-                                                            @if ($room->temperature_is_offline)
-                                                                <span class="temp-offline-badge">OFFLINE</span>
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;">
+                                                            @if($room->temperature_is_offline)
+                                                                <i class="fa-solid fa-wifi-slash" style="font-size:11px;color:var(--coral);"></i>
                                                             @endif
+                                                            <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
+                                                                {{ $temp ?? '–' }}°C
+                                                            </span>
                                                         </span>
                                                     </div>
 
                                                     {{-- FUZZY OUTPUT (taruh DI BAWAH BAR SUHU) --}}
-                                                    @if (!is_null($room->temperature))
+                                                    @if ($room->temperature !== null)
                                                         <div class="mt-2"
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:8px 10px;">
                                                             <div class="flex items-center justify-between"
                                                                 style="font-size:12px;color:var(--ink-3);">
-                                                                <span>Î”T</span>
+                                                                <span>ΔT</span>
                                                                 <span
                                                                     class="text-mono">{{ $room->delta_t ?? 0 }}</span>
                                                             </div>
 
                                                             @if (!empty($room->fuzzy))
                                                                 <div class="flex items-center justify-between mt-1"
-                                                                    style="font-size:12px;">
-                                                                    <span
-                                                                        style="color:var(--ink-3);">Pendinginan</span>
+                                                                    style="font-size:11px;">
+                                                                    <span style="color:var(--ink-3);flex-shrink:0;">Pendinginan</span>
                                                                     <span class="text-mono"
-                                                                        style="font-weight:700;color:var(--mint);">
+                                                                        style="font-weight:700;color:var(--mint);white-space:nowrap;margin-left:6px;">
                                                                         {{ $room->fuzzy['status_pendinginan'] ?? '-' }}
                                                                     </span>
                                                                 </div>
 
                                                                 {{-- KEPUTUSAN FUZZY --}}
                                                                 @if (!empty($room->decision))
-                                                                    <div class="mt-2"
-                                                                        style="font-size:11px;color:var(--ink-3);">
-
-                                                                        @php
-                                                                            $action = strtoupper($room->decision['action'] ?? 'DIAM');
-                                                                            $keputusanClass = match($action) {
-                                                                                'TURUNKAN' => 'keputusan-yellow',
-                                                                                'NAIKKAN'  => 'keputusan-cool',
-                                                                                'DIAM'     => 'keputusan-warm',
-                                                                                default    => 'keputusan-idle',
-                                                                            };
-                                                                        @endphp
+                                                                    @php
+                                                                        $action = strtoupper($room->decision['action'] ?? 'DIAM');
+                                                                        $keputusanClass = match($action) {
+                                                                            'TURUNKAN' => 'keputusan-yellow',
+                                                                            'NAIKKAN'  => 'keputusan-cool',
+                                                                            'DIAM'     => 'keputusan-warm',
+                                                                            default    => 'keputusan-idle',
+                                                                        };
+                                                                        $spBefore = is_array($room->decision) ? ($room->decision['setpoint_before'] ?? '-') : '-';
+                                                                        $spAfter  = is_array($room->decision) ? ($room->decision['setpoint_after']  ?? '-') : '-';
+                                                                    @endphp
+                                                                    <div style="font-size:11px;color:var(--ink-3);margin-top:4px;">
                                                                         <div class="flex items-center justify-between">
-                                                                            <span>Keputusan</span>
-
+                                                                            <span style="flex-shrink:0;">Keputusan</span>
                                                                             <span class="text-mono {{ $keputusanClass }}"
-                                                                                style="font-weight:700;">
-                                                                                {{ $action }}
-                                                                            </span>
+                                                                                style="font-weight:700;white-space:nowrap;margin-left:6px;">{{ $action }}</span>
                                                                         </div>
-
-                                                                        <div class="flex items-center justify-between mt-1"
-                                                                            style="font-size:11px;color:var(--ink-4);">
-
-                                                                            <span>Setpoint</span>
-
-                                                                            <span class="text-mono">
-                                                                                {{ $room->decision['setpoint_before'] ?? '-' }}
-                                                                                â†’
-                                                                                {{ $room->decision['setpoint_after'] ?? '-' }}
-                                                                            </span>
+                                                                        <div class="flex items-center justify-between" style="margin-top:2px;color:var(--ink-4);">
+                                                                            <span style="flex-shrink:0;">Setpoint</span>
+                                                                            <span class="text-mono" style="white-space:nowrap;margin-left:6px;">{{ $spBefore }} &rarr; {{ $spAfter }}</span>
                                                                         </div>
                                                                     </div>
                                                                 @endif
@@ -624,9 +611,8 @@
                         const el = document.getElementById(`temp-${r.id}`);
                         const t = parseFloat(r.temp);
                         if (el && !isNaN(t)) {
-                            const badge = el.querySelector('.temp-offline-badge');
                             el.textContent = t + '°C';
-                            if (badge) el.appendChild(badge);
+                            el.classList.remove('temp-offline-strike');
                         }
                     });
                 }).catch(() => {});
