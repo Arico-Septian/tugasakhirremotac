@@ -166,7 +166,7 @@
         scroll-behavior: smooth;
         padding-bottom: 24px;
     }
-    @media (max-width: 1024px) { .page-body { padding-bottom: 88px; } }
+    @media (max-width: 1024px) { .page-body { padding-bottom: 64px; } }
 
     /* Mobile sidebar */
     @media (max-width: 1024px) {
