@@ -211,7 +211,7 @@ body { min-height: 100vh; }
   margin: 1px 0 0;
 }
 
-.app-content { flex: 1; padding: 24px; }
+.app-content { flex: 1; padding: 24px; overflow-y: auto; scroll-behavior: smooth; }
 .app-content-inner { max-width: 1280px; margin: 0 auto; }
 @media (max-width: 768px) { .app-content { padding: 16px; } }
 
@@ -221,7 +221,7 @@ body { min-height: 100vh; }
   .app-sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
   .app-main { margin-left: 0 !important; width: 100% !important; }
   .app-header { padding: 0 16px; }
-  .app-content { padding-bottom: 88px; }
+  .app-content { padding-bottom: 64px; }
   .sidebar-toggle.desktop-only { display: none !important; }
 }
 
