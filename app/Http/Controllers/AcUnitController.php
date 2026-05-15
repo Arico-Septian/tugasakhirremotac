@@ -118,7 +118,6 @@ class AcUnitController extends Controller
             'set_temperature' => 24,
             'fan_speed' => 'AUTO',
             'swing' => 'OFF',
-            'room_temperature' => 24,
         ]);
 
         (new MqttService)->resendConfig($room->device_id);
