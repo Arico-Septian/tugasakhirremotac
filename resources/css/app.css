@@ -177,9 +177,10 @@ body { min-height: 100vh; }
 .app-main {
   margin-left: 248px;
   width: calc(100% - 248px);
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   transition: margin-left var(--t-slow), width var(--t-slow);
 }
 .app-sidebar.collapsed ~ .app-main {
