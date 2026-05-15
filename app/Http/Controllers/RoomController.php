@@ -36,7 +36,7 @@ class RoomController extends Controller
 
         foreach ($rooms as $room) {
 
-            $deviceId = strtolower(trim((string) $room->device_id));
+            $deviceId = trim((string) $room->device_id);
 
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
 
@@ -177,9 +177,9 @@ class RoomController extends Controller
                 'regex:/^[a-zA-Z0-9_]*$/',
             ],
         ], [
-            'name.regex' => 'Nama ruangan hanya boleh berisi huruf, angka, dan underscore.',
-            'device_id.regex' => 'ESP ID hanya boleh berisi huruf, angka, underscore, dan strip.',
-            'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf, angka, dan underscore.',
+            'name.regex' => 'Nama ruangan hanya boleh berisi huruf, angka, dan underscore (tanpa spasi).',
+            'device_id.regex' => 'Device ID hanya boleh berisi huruf, angka, underscore, dan strip (tanpa spasi).',
+            'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf, angka, dan underscore (tanpa spasi).',
         ]);
 
         $deviceId = $request->device_id;
@@ -236,7 +236,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
-        $deviceId = strtolower(trim((string) $room->device_id));
+        $deviceId = trim((string) $room->device_id);
 
         $mqttPublished = true;
 
@@ -302,7 +302,7 @@ class RoomController extends Controller
                 $room->temperature_is_offline = true;
             }
 
-            $deviceId = strtolower(trim((string) $room->device_id));
+            $deviceId = trim((string) $room->device_id);
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
@@ -338,7 +338,7 @@ class RoomController extends Controller
             $room->temperature_is_offline = true;
         }
 
-        $deviceId = strtolower(trim((string) $room->device_id));
+        $deviceId = trim((string) $room->device_id);
         $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
         $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
             ?? $this->lastSeenFrom($room->last_seen);

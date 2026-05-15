@@ -27,7 +27,7 @@ class MqttService
 
     public static function roomToTopic(string $roomName): string
     {
-        return str_replace(' ', '_', strtolower(trim($roomName)));
+        return trim($roomName);
     }
 
     public function publish($topic, $message, $qos = 1, $retain = false)

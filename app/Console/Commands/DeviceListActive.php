@@ -25,7 +25,7 @@ class DeviceListActive extends Command
 
         $registered = Room::whereNotNull('device_id')
             ->get(['device_id', 'name'])
-            ->mapWithKeys(fn ($room) => [strtolower(trim($room->device_id)) => $room->name])
+            ->mapWithKeys(fn ($room) => [trim($room->device_id) => $room->name])
             ->all();
 
         $rows = [];

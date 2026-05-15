@@ -10,9 +10,7 @@ class RoomTemperature extends Model
 
     public static function normalizeRoomName($room): string
     {
-        $room = strtolower(trim((string) $room));
-        // Ganti spasi dengan underscore (cocok dengan MqttService::roomToTopic)
-        return str_replace(' ', '_', $room);
+        return trim((string) $room);
     }
 
     public static function latestByNormalizedRoom()

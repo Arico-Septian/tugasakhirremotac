@@ -32,7 +32,7 @@ class DashboardController extends Controller
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
 
-            $deviceId = strtolower(trim((string) $room->device_id));
+            $deviceId = trim((string) $room->device_id);
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
@@ -83,7 +83,7 @@ class DashboardController extends Controller
         $onlineRooms = 0;
         $offlineRooms = 0;
         foreach ($rooms as $room) {
-            $deviceId = strtolower(trim((string) $room->device_id));
+            $deviceId = trim((string) $room->device_id);
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);

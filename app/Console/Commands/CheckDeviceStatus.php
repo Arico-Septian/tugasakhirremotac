@@ -47,7 +47,7 @@ class CheckDeviceStatus extends Command
                     ->get();
 
                 foreach ($devices as $room) {
-                    $deviceId = strtolower(trim($room->device_id));
+                    $deviceId = trim($room->device_id);
 
                     $this->checkDeviceStatus($deviceId, $now);
                 }

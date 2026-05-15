@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     private function rateLimitKey(Request $request): string
     {
-        return 'login:' . strtolower($request->input('name', '')) . '|' . $request->ip();
+        return 'login:' . $request->input('name', '') . '|' . $request->ip();
     }
 
     public function login(Request $request)

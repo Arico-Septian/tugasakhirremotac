@@ -289,7 +289,7 @@ class AcUnitController extends Controller
 
     private function setCurrentDeviceStatus(Room $room): void
     {
-        $deviceId = strtolower(trim((string) $room->device_id));
+        $deviceId = trim((string) $room->device_id);
 
         if ($deviceId === '') {
             $room->device_status = 'offline';
