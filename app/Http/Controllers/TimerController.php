@@ -53,8 +53,7 @@ class TimerController extends Controller
             // PUBLISH TIMER INFO KE MQTT
             try {
                 $mqtt = new MqttService;
-                $roomName = strtolower(trim($ac->room->name));
-                $topic = "room/{$roomName}/ac/{$ac->ac_number}/timer";
+                $topic = 'room/' . MqttService::roomToTopic($ac->room->name) . "/ac/{$ac->ac_number}/timer";
 
                 $payload = [
                     'timer_on' => $newTimerOn,

@@ -325,9 +325,9 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
 
         $publishAcControl = function ($room, $id, array $changes) {
-            $roomName = strtolower(trim((string) $room));
+            $roomName = MqttService::roomToTopic((string) $room);
             $acNumber = (int) $id;
-            $roomModel = Room::whereRaw('LOWER(name) = ?', [$roomName])->first();
+            $roomModel = Room::whereRaw('REPLACE(LOWER(name), " ", "_") = ?', [$roomName])->first();
             $ac = $roomModel
                 ? AcUnit::where('room_id', $roomModel->id)->where('ac_number', $acNumber)->first()
                 : null;

@@ -68,7 +68,7 @@ class MqttService
 
             if (!$status) continue;
 
-            $topic = "room/" . strtolower($room->name) . "/ac/{$ac->ac_number}/control";
+            $topic = "room/" . self::roomToTopic($room->name) . "/ac/{$ac->ac_number}/control";
 
             $this->publish(
                 $topic,

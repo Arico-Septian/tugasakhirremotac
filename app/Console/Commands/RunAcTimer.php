@@ -62,7 +62,8 @@ class RunAcTimer extends Command
             }
 
             $version = Cache::get("timer_version_{$ac->id}", 1);
-            $topic = 'room/' . \App\Services\MqttService::roomToTopic($ac->room->name) . "/ac/{$ac->ac_number}/control";
+            $roomName = $ac->room->name;
+            $topic = 'room/' . \App\Services\MqttService::roomToTopic($roomName) . "/ac/{$ac->ac_number}/control";
             $status = $ac->status ?: AcStatus::firstOrCreate(
                 ['ac_unit_id' => $ac->id],
                 [
