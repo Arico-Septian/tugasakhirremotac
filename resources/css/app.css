@@ -189,9 +189,10 @@ body { min-height: 100vh; }
 }
 
 .app-header {
+  flex-shrink: 0;
   position: sticky;
   top: 0; z-index: 30;
-  height: 60px;
+  height: 64px;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px;
   background: rgba(7, 16, 31, 0.72);
@@ -212,7 +213,7 @@ body { min-height: 100vh; }
   margin: 1px 0 0;
 }
 
-.app-content { flex: 1; padding: 24px; overflow-y: auto; scroll-behavior: smooth; }
+.app-content { flex: 1; padding: 24px; overflow-y: auto; scroll-behavior: smooth; min-height: 0; }
 .app-content-inner { max-width: 1280px; margin: 0 auto; }
 @media (max-width: 768px) { .app-content { padding: 16px; } }
 

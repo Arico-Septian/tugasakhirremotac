@@ -165,6 +165,7 @@
         overflow-y: auto;
         scroll-behavior: smooth;
         padding-bottom: 24px;
+        min-height: 0;
     }
     @media (max-width: 1024px) { .page-body { padding-bottom: 64px; } }
 
