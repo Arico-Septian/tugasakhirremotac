@@ -122,10 +122,13 @@
 
 <script>
 /* ===== SIDEBAR TOGGLE ===== */
-function toggleSidebar() {
+window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-    if (!sidebar) return;
+    if (!sidebar) {
+        console.warn('[Sidebar] #sidebar element not found');
+        return;
+    }
 
     if (window.innerWidth <= 1024) {
         const isOpen = sidebar.classList.toggle('open');
@@ -138,7 +141,8 @@ function toggleSidebar() {
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
         } catch (e) {}
     }
-}
+};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
@@ -194,11 +198,12 @@ document.getElementById('overlay')?.addEventListener('click', closeMobileSidebar
 document.addEventListener('click', function (e) {
     if (window.innerWidth <= 1024) {
         const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.querySelector('.sidebar-toggle');
+        // Find ALL toggle buttons (sidebar-toggle class OR onclick=toggleSidebar)
+        const isToggleBtn = e.target.closest('button[onclick*="toggleSidebar"], .sidebar-toggle');
 
         if (sidebar?.classList.contains('open') &&
             !sidebar?.contains(e.target) &&
-            !toggleBtn?.contains(e.target)) {
+            !isToggleBtn) {
             closeMobileSidebar();
         }
     }

@@ -151,6 +151,12 @@
         border: 1px solid rgba(14, 165, 233, 0.16) !important;
         color: #7fa0c8 !important;
         transition: all 0.22s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        font-size: 14px !important;
+        line-height: 1 !important;
     }
     #notifBellBtn:hover,
     .main-header .btn-icon:hover {
@@ -159,6 +165,9 @@
         color: #0ea5e9 !important;
         transform: translateY(-2px);
         box-shadow: 0 6px 20px -2px rgba(14, 165, 233, 0.40);
+    }
+    .main-header .btn-icon i {
+        font-size: 14px !important;
     }
 
     /* 2026 vibrant notification badge */

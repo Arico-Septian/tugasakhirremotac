@@ -743,7 +743,7 @@ select.input option, select option { background: var(--bg-2); color: var(--ink-0
 .search-input { position: relative; }
 .search-input input {
   width: 100%;
-  padding: 10px 14px 10px 40px;
+  padding: 10px 14px 10px 50px;
   background: var(--panel-1);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
@@ -755,7 +755,7 @@ select.input option, select option { background: var(--bg-2); color: var(--ink-0
 .search-input input::placeholder { color: var(--ink-4); }
 .search-input input:focus { border-color: var(--cyan); background: var(--panel-2); box-shadow: 0 0 0 3px var(--cyan-soft); }
 .search-input > i {
-  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
   color: var(--ink-3);
   pointer-events: none;
   font-size: 13px;
@@ -796,6 +796,33 @@ select.input option, select option { background: var(--bg-2); color: var(--ink-0
   background: var(--panel-3);
   color: var(--ink-0);
   box-shadow: var(--inset-hi);
+}
+
+@media (max-width: 768px) {
+  .flex.flex-row.items-center {
+    gap: 6px;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 0;
+  }
+  .segmented {
+    gap: 1px;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .segmented .seg {
+    padding: 5px 8px;
+    font-size: 10.5px;
+  }
+  .search-input input {
+    padding: 6px 10px 6px 36px;
+    font-size: 11px;
+  }
+  .search-input i {
+    font-size: 12px;
+    left: 10px;
+  }
 }
 
 .filter-pill {

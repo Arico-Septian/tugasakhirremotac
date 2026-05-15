@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title>Manajemen Ruangan — SmartAC</title>
+    <title>Manajemen Ruangan â€” SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
     <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         /* ===== Temperature color scheme (match fuzzy graph) =====
-           - cool (dingin)   → biru
-           - warm (stabil)   → hijau
-           - hot  (panas)    → orange */
+           - cool (dingin)   â†’ biru
+           - warm (stabil)   â†’ hijau
+           - hot  (panas)    â†’ orange */
         .temp-chip.cool {
             background: rgba(94, 208, 255, 0.14) !important;
             color: #5ed0ff !important;
@@ -120,37 +120,41 @@
 
         /* Responsive search and filters */
         @media (max-width: 768px) {
+            .flex.items-center.gap-2 {
+                gap: 6px;
+            }
+
             .flex.items-center.gap-2 > form {
                 flex: 1;
-                min-width: 160px;
-                max-width: 400px;
+                min-width: 0;
                 transition: flex 0.2s ease;
             }
 
             .flex.items-center.gap-2 > div {
                 display: inline-flex;
-                gap: 8px;
-                flex-wrap: wrap;
+                gap: 1px;
+                flex-wrap: nowrap;
                 flex-shrink: 0;
             }
 
             .segmented {
                 display: inline-flex;
-                gap: 3px;
+                gap: 1px;
             }
 
             .segmented .seg {
-                font-size: 11px;
-                padding: 6px 10px;
+                font-size: 10.5px;
+                padding: 5px 8px;
             }
 
             .search-input input {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 6px 10px 6px 36px;
             }
 
             .search-input i {
-                font-size: 13px;
+                font-size: 12px;
+                left: 10px;
             }
         }
 
@@ -240,7 +244,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>Rooms &amp; AC Units</h1>
@@ -356,8 +360,8 @@
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
 
-                                                        <span id="temp-<?php echo e($room->id); ?>" class="text-mono" data-offline="<?php echo e($room->temperature_is_offline ? 'true' : 'false'); ?>">
-                                                            <?php echo e($temp ?? '—'); ?>°C
+                                                        <span id=”temp-<?php echo e($room->id); ?>” class=”text-mono” data-offline=”<?php echo e($room->temperature_is_offline ? 'true' : 'false'); ?>”>
+                                                            <?php echo e($temp ?? '–'); ?>°C
                                                             <?php if($room->temperature_is_offline): ?>
                                                                 <span class="temp-offline-badge">OFFLINE</span>
                                                             <?php endif; ?>
@@ -370,7 +374,7 @@
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:8px 10px;">
                                                             <div class="flex items-center justify-between"
                                                                 style="font-size:12px;color:var(--ink-3);">
-                                                                <span>ΔT</span>
+                                                                <span>Î”T</span>
                                                                 <span
                                                                     class="text-mono"><?php echo e($room->delta_t ?? 0); ?></span>
                                                             </div>
@@ -419,7 +423,7 @@
                                                                             <span class="text-mono">
                                                                                 <?php echo e($room->decision['setpoint_before'] ?? '-'); ?>
 
-                                                                                →
+                                                                                â†’
                                                                                 <?php echo e($room->decision['setpoint_after'] ?? '-'); ?>
 
                                                                             </span>
@@ -748,4 +752,7 @@
 </body>
 
 </html>
+
+
+
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/rooms/index.blade.php ENDPATH**/ ?>

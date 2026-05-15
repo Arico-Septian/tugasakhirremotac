@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>My Profile — SmartAC</title>
+    <title>My Profile â€” SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @vite('resources/js/app.js')
@@ -24,7 +24,7 @@
         <header class="main-header">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                    <i class="fa-solid fa-bars text-xs"></i>
+                    <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="app-header-title">
                     <h1>My Profile</h1>
@@ -127,9 +127,9 @@
                                             {{ $activity->activity }}
                                         </p>
                                         <p style="font-size:12px;color:var(--ink-3);margin:4px 0 0 0;">
-                                            <span style="display:inline-block;margin-right:8px;">🏠 {{ $activity->room ?? '-' }}</span>
+                                            <span style="display:inline-block;margin-right:8px;">ðŸ  {{ $activity->room ?? '-' }}</span>
                                             @if ($activity->ac)
-                                            <span style="display:inline-block;">❄️ AC {{ $activity->ac }}</span>
+                                            <span style="display:inline-block;">â„ï¸ AC {{ $activity->ac }}</span>
                                             @endif
                                         </p>
                                     </div>
@@ -204,3 +204,4 @@ function handleAvatarSelect(input) {
 @include('components.sidebar-scripts')
 </body>
 </html>
+

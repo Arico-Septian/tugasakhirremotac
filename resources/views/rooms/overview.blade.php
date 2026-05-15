@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Rooms — SmartAC</title>
+    <title>Server Rooms – SmartAC</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -128,34 +128,34 @@
         /* Toolbar responsiveness for small screens */
         @media (max-width: 768px) {
             .flex.flex-row.items-center {
-                gap: 8px;
+                gap: 6px;
             }
 
             .flex.flex-row.items-center > label {
                 flex: 1;
-                min-width: 160px;
-                max-width: 400px;
+                min-width: 0;
                 transition: flex 0.2s ease;
             }
 
             .flex.flex-row.items-center > .segmented {
                 display: inline-flex;
-                gap: 3px;
+                gap: 1px;
                 flex-shrink: 0;
             }
 
             .segmented .seg {
-                font-size: 11px;
-                padding: 6px 10px;
+                font-size: 10.5px;
+                padding: 5px 8px;
             }
 
             .search-input input {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 6px 10px 6px 36px;
             }
 
             .search-input i {
-                font-size: 13px;
+                font-size: 12px;
+                left: 10px;
             }
         }
 
@@ -298,11 +298,8 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                    <a href="{{ route('dashboard') }}" class="hidden lg:inline-flex btn-icon" title="Back">
-                        <i class="fa-solid fa-arrow-left text-xs"></i>
-                    </a>
                     <div class="app-header-title">
                         <h1>Server Rooms</h1>
                         <p>{{ $rooms->count() }} ruangan · live AC monitoring</p>
@@ -398,7 +395,7 @@
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
                                                         <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
-                                                            {{ $temp ?? '—' }}°C
+                                                            {{ $temp ?? '–' }}°C
                                                             @if ($room->temperature_is_offline)
                                                                 <span class="temp-offline-badge">OFFLINE</span>
                                                             @endif
@@ -700,7 +697,7 @@
                     if (!el) return;
                     const t = parseFloat(room.temp);
                     const badge = el.querySelector('.temp-offline-badge');
-                    el.textContent = isNaN(t) ? '—' : `${t}°C`;
+                    el.textContent = isNaN(t) ? '–' : `${t}°C`;
                     if (badge) el.appendChild(badge);
                 });
             }).catch(() => {});
@@ -759,3 +756,5 @@
 </body>
 
 </html>
+
+

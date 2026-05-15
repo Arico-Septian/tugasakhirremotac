@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Status AC â€” {{ $room->name }}</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title>Status AC â€” <?php echo e($room->name); ?></title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
-    @vite('resources/js/app.js')
-    @include('components.sidebar-styles')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
+    <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         .ac-card {
             background: var(--panel-1);
@@ -179,7 +179,7 @@
 <div id="overlay"></div>
 
 <div class="layout">
-    @include('components.sidebar')
+    <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="main-content">
         <header class="main-header">
@@ -188,12 +188,12 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="app-header-title">
-                    <h1>{{ $room->name }}</h1>
+                    <h1><?php echo e($room->name); ?></h1>
                     <p>AC status snapshot</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                @include('components.notification-bell')
+                <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                 <span id="systemStatus" class="pill pill-offline">
                     <span class="dot"></span><span>Offline</span>
                 </span>
@@ -204,14 +204,14 @@
             <div class="app-content">
                 <div class="app-content-inner space-y-4">
 
-                    @if ($acs->count() > 0)
+                    <?php if($acs->count() > 0): ?>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
-                            @foreach ($acs as $ac)
+                            <?php $__currentLoopData = $acs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ac): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="ac-card">
                                     <div class="flex items-start justify-between gap-2">
                                         <div>
-                                            <p class="label-tag">AC {{ $ac->ac_number }}</p>
-                                            <p class="text-sm font-semibold mt-0.5" style="color:var(--ink-0);">{{ $ac->name ?: $ac->brand }}</p>
+                                            <p class="label-tag">AC <?php echo e($ac->ac_number); ?></p>
+                                            <p class="text-sm font-semibold mt-0.5" style="color:var(--ink-0);"><?php echo e($ac->name ?: $ac->brand); ?></p>
                                         </div>
                                         <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
                                             <i class="fa-solid fa-snowflake text-[11px]"></i>
@@ -220,43 +220,43 @@
 
                                     <div class="ac-stat ic-power">
                                         <span class="label"><i class="fa-solid fa-power-off"></i>Power</span>
-                                        <span id="power-{{ $ac->id }}" class="value" style="color:var(--mint);">{{ $ac->status?->power ?? 'OFF' }}</span>
+                                        <span id="power-<?php echo e($ac->id); ?>" class="value" style="color:var(--mint);"><?php echo e($ac->status?->power ?? 'OFF'); ?></span>
                                     </div>
                                     <div class="ac-stat ic-temp">
                                         <span class="label"><i class="fa-solid fa-temperature-half"></i>Temp</span>
-                                        <span id="temp-{{ $ac->id }}" class="value" style="color:var(--cyan);">{{ $ac->status?->set_temperature ?? 24 }}°C</span>
+                                        <span id="temp-<?php echo e($ac->id); ?>" class="value" style="color:var(--cyan);"><?php echo e($ac->status?->set_temperature ?? 24); ?>°C</span>
                                     </div>
                                     <div class="ac-stat ic-mode">
                                         <span class="label"><i class="fa-solid fa-fan"></i>Mode</span>
-                                        <span id="mode-{{ $ac->id }}" class="value" style="color:var(--lavender);">{{ strtoupper($ac->status?->mode ?? 'AUTO') }}</span>
+                                        <span id="mode-<?php echo e($ac->id); ?>" class="value" style="color:var(--lavender);"><?php echo e(strtoupper($ac->status?->mode ?? 'AUTO')); ?></span>
                                     </div>
                                     <div class="ac-stat ic-fan">
                                         <span class="label"><i class="fa-solid fa-wind"></i>Fan</span>
-                                        <span id="fan-{{ $ac->id }}" class="value" style="color:var(--cyan);">{{ strtoupper($ac->status?->fan_speed ?? 'AUTO') }}</span>
+                                        <span id="fan-<?php echo e($ac->id); ?>" class="value" style="color:var(--cyan);"><?php echo e(strtoupper($ac->status?->fan_speed ?? 'AUTO')); ?></span>
                                     </div>
                                     <div class="ac-stat ic-swing">
                                         <span class="label"><i class="fa-solid fa-arrows-up-down"></i>Swing</span>
-                                        <span id="swing-{{ $ac->id }}" class="value" style="color:var(--lavender);">{{ strtoupper($ac->status?->swing ?? 'OFF') }}</span>
+                                        <span id="swing-<?php echo e($ac->id); ?>" class="value" style="color:var(--lavender);"><?php echo e(strtoupper($ac->status?->swing ?? 'OFF')); ?></span>
                                     </div>
-                                    @if ($ac->timer_on || $ac->timer_off)
+                                    <?php if($ac->timer_on || $ac->timer_off): ?>
                                         <div class="ac-stat ic-timer">
                                             <span class="label"><i class="fa-solid fa-clock"></i>Timer</span>
-                                            <span id="timer-{{ $ac->id }}" class="value text-mono text-right" style="color:var(--amber);font-size:11px;line-height:1.3;">
-                                                @if ($ac->timer_on)<div>ON {{ \Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i') }}</div>@endif
-                                                @if ($ac->timer_off)<div>OFF {{ \Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i') }}</div>@endif
+                                            <span id="timer-<?php echo e($ac->id); ?>" class="value text-mono text-right" style="color:var(--amber);font-size:11px;line-height:1.3;">
+                                                <?php if($ac->timer_on): ?><div>ON <?php echo e(\Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i')); ?></div><?php endif; ?>
+                                                <?php if($ac->timer_off): ?><div>OFF <?php echo e(\Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i')); ?></div><?php endif; ?>
                                             </span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="empty-state">
                             <div class="empty-icon"><i class="fa-solid fa-snowflake"></i></div>
                             <p class="empty-title">Belum ada AC unit</p>
                             <p class="empty-sub">Tambahkan AC unit di halaman manajemen ruangan</p>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
 
                 </div>
@@ -265,7 +265,7 @@
     </div>
 </div>
 
-@include('components.bottom-nav')
+<?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
 function updateElement(id, val) {
@@ -335,8 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-@include('components.sidebar-scripts')
+<?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 
 
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/rooms/status.blade.php ENDPATH**/ ?>

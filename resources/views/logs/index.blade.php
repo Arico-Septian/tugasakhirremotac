@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Activity Log — SmartAC</title>
+    <title>Activity Log â€” SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @vite('resources/js/app.js')
@@ -111,47 +111,47 @@
         /* Toolbar responsiveness for very small screens */
         @media (max-width: 768px) {
             .tbl-toolbar {
-                gap: 8px;
-                padding: 10px 12px;
+                gap: 6px;
+                padding: 8px 10px;
             }
 
             .tbl-toolbar label.search-input {
                 flex: 1;
-                min-width: 160px;
-                max-width: 400px;
+                min-width: 0;
             }
 
             .tbl-toolbar > div {
                 display: inline-flex;
                 flex-wrap: nowrap;
-                gap: 6px;
+                gap: 1px;
                 align-items: center;
                 flex-shrink: 0;
             }
 
             .segmented {
                 display: inline-flex;
-                gap: 3px;
+                gap: 1px;
             }
 
             .segmented .seg {
-                font-size: 11px;
-                padding: 6px 10px;
+                font-size: 10.5px;
+                padding: 5px 8px;
             }
 
             .btn.btn-danger {
-                padding: 6px 10px;
-                font-size: 11px;
+                padding: 5px 8px;
+                font-size: 10.5px;
                 white-space: nowrap;
             }
 
             .search-input input {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 6px 10px 6px 36px;
             }
 
             .search-input i {
-                font-size: 13px;
+                font-size: 12px;
+                left: 10px;
             }
         }
 
@@ -404,7 +404,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>Activity Log</h1>
@@ -504,7 +504,7 @@
                             $currentCat = in_array(request('activity'), ['auth', 'ac', 'room', 'user']) ? request('activity') : '';
                         @endphp
 
-                        {{-- Stats — 4 kartu sesuai mockup --}}
+                        {{-- Stats â€” 4 kartu sesuai mockup --}}
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
@@ -648,7 +648,7 @@
                         </form>
 
                         @php
-                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
+                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === 'â€”';
                         @endphp
 
                         {{-- Log table --}}
@@ -668,7 +668,7 @@
                                                         {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
                                                     </span>
                                                 @endif
-                                                <span class="name">{{ $log->user->name ?? '—' }}</span>
+                                                <span class="name">{{ $log->user->name ?? 'â€”' }}</span>
                                             </div>
                                             @php [$label, $class] = activityBadge($log->activity); @endphp
                                             <span class="act-badge {{ $class }}">{{ $label }}</span>
@@ -762,19 +762,19 @@
                                                                 {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
                                                             </span>
                                                         @endif
-                                                        <span class="name">{{ $log->user->name ?? '—' }}</span>
+                                                        <span class="name">{{ $log->user->name ?? 'â€”' }}</span>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     @if ($isEmpty($log->room))
-                                                        <span class="log-empty">—</span>
+                                                        <span class="log-empty">â€”</span>
                                                     @else
                                                         <span class="log-room">{{ $log->room }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if ($isEmpty($log->ac))
-                                                        <span class="log-empty">—</span>
+                                                        <span class="log-empty">â€”</span>
                                                     @else
                                                         <span class="log-detail" title="{{ $log->ac }}">{{ $log->ac }}</span>
                                                     @endif
@@ -809,7 +809,7 @@
                             <div class="tbl-footer">
                                 <p>
                                     Menampilkan <span class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }}</span>
+                                        style="color:var(--ink-1);">{{ $logs->firstItem() ?? 0 }}â€“{{ $logs->lastItem() ?? 0 }}</span>
                                     dari <span class="text-mono"
                                         style="color:var(--ink-1);">{{ $logs->total() }}</span> aktivitas
                                 </p>
@@ -865,7 +865,7 @@
     @include('components.sidebar-scripts')
 
     <script>
-        // Quick category buttons → set activity = auth/ac/room/user
+        // Quick category buttons â†’ set activity = auth/ac/room/user
         document.querySelectorAll('[data-quick]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const val = btn.getAttribute('data-quick');
@@ -956,9 +956,9 @@
                 const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
                 if (!onFirstPage) return;
 
-                const name = escapeHtml(payload.user_name || '—');
+                const name = escapeHtml(payload.user_name || 'â€”');
                 const initial = escapeHtml(payload.user_initial || (payload.user_name || '?').charAt(0).toUpperCase());
-                const isEmpty = (v) => v == null || v === '' || v === '-' || v === '—';
+                const isEmpty = (v) => v == null || v === '' || v === '-' || v === 'â€”';
                 const [badgeLabel, badgeClass] = activityBadgeJs(payload.activity);
                 const safeAvatar = payload.user_avatar ? escapeHtml(payload.user_avatar) : null;
 
@@ -975,10 +975,10 @@
                     if (empty) empty.closest('tr')?.remove();
 
                     const roomHtml = isEmpty(payload.room)
-                        ? '<span class="log-empty">—</span>'
+                        ? '<span class="log-empty">â€”</span>'
                         : `<span class="log-room">${escapeHtml(payload.room)}</span>`;
                     const acHtml = isEmpty(payload.ac)
-                        ? '<span class="log-empty">—</span>'
+                        ? '<span class="log-empty">â€”</span>'
                         : `<span class="log-detail" title="${escapeHtml(payload.ac)}">${escapeHtml(payload.ac)}</span>`;
                     const avatarHtml = safeAvatar
                         ? `<img src="${safeAvatar}" alt="${name}" class="avatar" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">`
@@ -1106,3 +1106,6 @@
 </body>
 
 </html>
+
+
+

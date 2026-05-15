@@ -1083,6 +1083,7 @@
 <body>
     <div class="app-layout">
     <div class="app-bg"></div>
+    <div id="overlay"></div>
 
     <div class="layout">
         <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -1092,7 +1093,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>Dashboard</h1>

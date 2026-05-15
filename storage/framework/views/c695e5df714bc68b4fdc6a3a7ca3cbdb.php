@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title>Activity Log — SmartAC</title>
+    <title>Activity Log â€” SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
@@ -111,47 +111,47 @@
         /* Toolbar responsiveness for very small screens */
         @media (max-width: 768px) {
             .tbl-toolbar {
-                gap: 8px;
-                padding: 10px 12px;
+                gap: 6px;
+                padding: 8px 10px;
             }
 
             .tbl-toolbar label.search-input {
                 flex: 1;
-                min-width: 160px;
-                max-width: 400px;
+                min-width: 0;
             }
 
             .tbl-toolbar > div {
                 display: inline-flex;
                 flex-wrap: nowrap;
-                gap: 6px;
+                gap: 1px;
                 align-items: center;
                 flex-shrink: 0;
             }
 
             .segmented {
                 display: inline-flex;
-                gap: 3px;
+                gap: 1px;
             }
 
             .segmented .seg {
-                font-size: 11px;
-                padding: 6px 10px;
+                font-size: 10.5px;
+                padding: 5px 8px;
             }
 
             .btn.btn-danger {
-                padding: 6px 10px;
-                font-size: 11px;
+                padding: 5px 8px;
+                font-size: 10.5px;
                 white-space: nowrap;
             }
 
             .search-input input {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 6px 10px 6px 36px;
             }
 
             .search-input i {
-                font-size: 13px;
+                font-size: 12px;
+                left: 10px;
             }
         }
 
@@ -404,7 +404,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>Activity Log</h1>
@@ -651,7 +651,7 @@
                         </form>
 
                         <?php
-                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
+                            $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === 'â€”';
                         ?>
 
                         
@@ -672,7 +672,7 @@
 
                                                     </span>
                                                 <?php endif; ?>
-                                                <span class="name"><?php echo e($log->user->name ?? '—'); ?></span>
+                                                <span class="name"><?php echo e($log->user->name ?? 'â€”'); ?></span>
                                             </div>
                                             <?php [$label, $class] = activityBadge($log->activity); ?>
                                             <span class="act-badge <?php echo e($class); ?>"><?php echo e($label); ?></span>
@@ -771,19 +771,19 @@
 
                                                             </span>
                                                         <?php endif; ?>
-                                                        <span class="name"><?php echo e($log->user->name ?? '—'); ?></span>
+                                                        <span class="name"><?php echo e($log->user->name ?? 'â€”'); ?></span>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <?php if($isEmpty($log->room)): ?>
-                                                        <span class="log-empty">—</span>
+                                                        <span class="log-empty">â€”</span>
                                                     <?php else: ?>
                                                         <span class="log-room"><?php echo e($log->room); ?></span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <?php if($isEmpty($log->ac)): ?>
-                                                        <span class="log-empty">—</span>
+                                                        <span class="log-empty">â€”</span>
                                                     <?php else: ?>
                                                         <span class="log-detail" title="<?php echo e($log->ac); ?>"><?php echo e($log->ac); ?></span>
                                                     <?php endif; ?>
@@ -818,7 +818,7 @@
                             <div class="tbl-footer">
                                 <p>
                                     Menampilkan <span class="text-mono"
-                                        style="color:var(--ink-1);"><?php echo e($logs->firstItem() ?? 0); ?>–<?php echo e($logs->lastItem() ?? 0); ?></span>
+                                        style="color:var(--ink-1);"><?php echo e($logs->firstItem() ?? 0); ?>â€“<?php echo e($logs->lastItem() ?? 0); ?></span>
                                     dari <span class="text-mono"
                                         style="color:var(--ink-1);"><?php echo e($logs->total()); ?></span> aktivitas
                                 </p>
@@ -874,7 +874,7 @@
     <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <script>
-        // Quick category buttons → set activity = auth/ac/room/user
+        // Quick category buttons â†’ set activity = auth/ac/room/user
         document.querySelectorAll('[data-quick]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const val = btn.getAttribute('data-quick');
@@ -965,9 +965,9 @@
                 const onFirstPage = !url.searchParams.get('page') || url.searchParams.get('page') === '1';
                 if (!onFirstPage) return;
 
-                const name = escapeHtml(payload.user_name || '—');
+                const name = escapeHtml(payload.user_name || 'â€”');
                 const initial = escapeHtml(payload.user_initial || (payload.user_name || '?').charAt(0).toUpperCase());
-                const isEmpty = (v) => v == null || v === '' || v === '-' || v === '—';
+                const isEmpty = (v) => v == null || v === '' || v === '-' || v === 'â€”';
                 const [badgeLabel, badgeClass] = activityBadgeJs(payload.activity);
                 const safeAvatar = payload.user_avatar ? escapeHtml(payload.user_avatar) : null;
 
@@ -984,10 +984,10 @@
                     if (empty) empty.closest('tr')?.remove();
 
                     const roomHtml = isEmpty(payload.room)
-                        ? '<span class="log-empty">—</span>'
+                        ? '<span class="log-empty">â€”</span>'
                         : `<span class="log-room">${escapeHtml(payload.room)}</span>`;
                     const acHtml = isEmpty(payload.ac)
-                        ? '<span class="log-empty">—</span>'
+                        ? '<span class="log-empty">â€”</span>'
                         : `<span class="log-detail" title="${escapeHtml(payload.ac)}">${escapeHtml(payload.ac)}</span>`;
                     const avatarHtml = safeAvatar
                         ? `<img src="${safeAvatar}" alt="${name}" class="avatar" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">`
@@ -1115,4 +1115,7 @@
 </body>
 
 </html>
+
+
+
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/logs/index.blade.php ENDPATH**/ ?>

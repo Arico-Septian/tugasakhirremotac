@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Monitoring Raspberry Pi — SmartAC</title>
+    <title>Monitoring Raspberry Pi – SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
@@ -93,7 +93,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>Monitoring Raspberry Pi</h1>
@@ -191,4 +191,6 @@
 </body>
 
 </html>
+
+
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/server/monitoring.blade.php ENDPATH**/ ?>

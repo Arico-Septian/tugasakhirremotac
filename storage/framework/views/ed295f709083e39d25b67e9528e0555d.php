@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -66,6 +66,8 @@
         tbody tr {
             border-bottom: 1px solid var(--line-soft);
             transition: background var(--t-fast);
+            height: auto;
+            min-height: 56px;
         }
 
         tbody tr:hover {
@@ -86,6 +88,7 @@
             align-items: center;
             gap: 12px;
             min-width: 0;
+            height: 100%;
         }
 
         .user-info {
@@ -118,12 +121,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            height: 28px;
+            min-width: 90px;
+            white-space: nowrap;
+            vertical-align: middle;
         }
 
         .badge-role.admin {
@@ -158,11 +165,15 @@
         }
 
         .status-cell {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             font-size: 13px;
+            line-height: 1;
             color: var(--ink-2);
+            min-width: 80px;
+            justify-content: flex-start;
+            vertical-align: middle;
         }
 
         .status-dot {
@@ -171,6 +182,8 @@
             border-radius: 50%;
             flex-shrink: 0;
             background: var(--ink-3);
+            margin: 0;
+            padding: 0;
         }
 
         .status-dot.online {
@@ -182,16 +195,48 @@
         }
 
         .actions-cell {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             justify-content: flex-end;
+            vertical-align: middle;
+        }
+
+        /* Table column alignment */
+        .user-table th:nth-child(2),
+        .user-table td:nth-child(2) {
+            text-align: center;
+            vertical-align: middle;
+            padding: 14px 12px;
+        }
+
+        .user-table th:nth-child(3),
+        .user-table td:nth-child(3) {
+            text-align: center;
+            vertical-align: middle;
+            padding: 14px 12px;
+        }
+
+        .user-table th:nth-child(4),
+        .user-table td:nth-child(4) {
+            text-align: right;
+            vertical-align: middle;
+            padding: 14px 24px 14px 12px;
+        }
+
+        .user-table th {
+            padding-top: 12px;
+            padding-bottom: 12px;
         }
 
         @media (max-width: 720px) {
             th, td {
                 padding: 10px 12px;
                 font-size: 12px;
+            }
+
+            .user-table td:nth-child(4) {
+                padding-right: 12px;
             }
 
             .user-avatar-sm {
@@ -204,47 +249,47 @@
         /* Toolbar responsiveness for tablet and below */
         @media (max-width: 768px) {
             .tbl-toolbar {
-                gap: 8px;
-                padding: 10px 12px;
+                gap: 6px;
+                padding: 8px 10px;
             }
 
             .tbl-toolbar > form {
                 flex: 1;
-                min-width: 160px;
-                max-width: 400px;
+                min-width: 0;
             }
 
             .tbl-toolbar > div {
                 display: inline-flex;
                 flex-wrap: nowrap;
-                gap: 6px;
+                gap: 1px;
                 align-items: center;
                 flex-shrink: 0;
             }
 
             .segmented {
                 display: inline-flex;
-                gap: 3px;
+                gap: 1px;
             }
 
             .segmented .seg {
-                font-size: 11px;
-                padding: 6px 10px;
+                font-size: 10.5px;
+                padding: 5px 8px;
             }
 
             .tbl-toolbar .btn {
-                padding: 6px 10px;
-                font-size: 11px;
+                padding: 5px 8px;
+                font-size: 10.5px;
                 white-space: nowrap;
             }
 
             .search-input input {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 6px 10px 6px 36px;
             }
 
             .search-input i {
-                font-size: 13px;
+                font-size: 12px;
+                left: 10px;
             }
         }
 
@@ -452,14 +497,16 @@
             opacity: 1;
         }
 
-        /* Mobile cards view */
+        /* Mobile cards view - only for very small screens */
         .user-cards {
             display: none;
         }
 
-        @media (max-width: 767px) {
+        @media (max-width: 640px) {
             .user-cards {
-                display: block;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
             }
 
             .user-card {
@@ -468,6 +515,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                width: 100%;
             }
 
             .user-card-header {
@@ -546,7 +594,7 @@
             <header class="main-header">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="lg:hidden btn-icon" title="Menu">
-                        <i class="fa-solid fa-bars text-xs"></i>
+                        <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="app-header-title">
                         <h1>User Management</h1>
@@ -670,7 +718,7 @@
                                         $colorIndex = ($user->id - 1) % 4;
                                         $colorName = $colors[$colorIndex];
                                         $roleLabel = match($user->role) {
-                                            'admin' => 'ADMINISTRATOR',
+                                            'admin' => 'ADMIN',
                                             'operator' => 'OPERATOR',
                                             default => 'USER'
                                         };
@@ -695,7 +743,7 @@
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <span class="badge-role <?php echo e($user->role); ?>" style="font-size:10px;padding:4px 8px;"><?php echo e(substr($roleLabel, 0, 3)); ?></span>
+                                            <span class="badge-role <?php echo e($user->role); ?>" style="font-size:10px;padding:4px 8px;"><?php echo e($roleLabel); ?></span>
                                         </div>
                                         <div style="display:flex;gap:10px;font-size:12px;color:var(--ink-3);">
                                             <div class="user-card-status">
@@ -773,7 +821,7 @@
                                             <td>
                                                 <span class="badge-role <?php echo e($user->role); ?>">
                                                     <?php if($user->role == 'admin'): ?>
-                                                        ADMINISTRATOR
+                                                        ADMIN
                                                     <?php elseif($user->role == 'operator'): ?>
                                                         OPERATOR
                                                     <?php else: ?>
@@ -1132,4 +1180,6 @@
 </body>
 
 </html>
+
+
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/users/index.blade.php ENDPATH**/ ?>
