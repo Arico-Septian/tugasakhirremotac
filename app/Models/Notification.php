@@ -100,7 +100,7 @@ class Notification extends Model
             return null;
         }
 
-        cache()->put($stateKey, 'online', now()->addDays(7));
+        cache()->forget($stateKey);  // Clear state so next offline notif will trigger
 
         return self::notify('device_online', "ESP {$roomName} online", [
             'severity' => 'info',

@@ -10,11 +10,20 @@ use Illuminate\Support\Facades\Log;
 use PhpMqtt\Client\ConnectionSettings;
 use PhpMqtt\Client\MqttClient;
 
+/**
+ * @deprecated Use MqttSubscribe instead (mqtt:subscribe command)
+ *
+ * This command is a legacy sensor listener. The MqttSubscribe command now
+ * handles all MQTT subscriptions including room/+/sensor, making this
+ * command redundant and causing duplicate sensor data if both run.
+ *
+ * Keep this for backwards compatibility only. Do not run with mqtt:subscribe.
+ */
 class MqttListener extends Command
 {
     protected $signature = 'app:mqtt-listener';
 
-    protected $description = 'MQTT Listener for temperature data';
+    protected $description = '[DEPRECATED] Use mqtt:subscribe instead. MQTT Listener for temperature data';
 
     public function handle()
     {

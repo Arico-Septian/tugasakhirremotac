@@ -87,7 +87,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
                 if ($lastSeen) {
                     $lastSeenAt = $lastSeen instanceof Carbon ? $lastSeen : Carbon::parse($lastSeen);
-                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 25;
+                    $isOnline = $status === 'online' && now()->diffInSeconds($lastSeenAt, true) <= 30;
                 }
 
                 // State-based notifications: only notify on state CHANGE
@@ -315,14 +315,17 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
         Route::post('/rooms/{id}/ac/bulk-power', [AcControlController::class, 'bulkPower']);
 
-        Route::get('/ac/{id}/on', [AcControlController::class, 'powerOn']);
-        Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
-        Route::post('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
-        Route::post('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
-        Route::post('/ac/{id}/fan-speed/{speed}', [AcControlController::class, 'setFanSpeed']);
-        Route::post('/ac/{id}/swing/{swing}', [AcControlController::class, 'setSwing']);
-        Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
-        Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
+        // AC control endpoints with rate limiting (30 req/min per user)
+        Route::middleware('throttle:30,1')->group(function () {
+            Route::get('/ac/{id}/on', [AcControlController::class, 'powerOn']);
+            Route::get('/ac/{id}/off', [AcControlController::class, 'powerOff']);
+            Route::post('/ac/{id}/temp/{value}', [AcControlController::class, 'setTemp']);
+            Route::post('/ac/{id}/mode/{mode}', [AcControlController::class, 'setMode']);
+            Route::post('/ac/{id}/fan-speed/{speed}', [AcControlController::class, 'setFanSpeed']);
+            Route::post('/ac/{id}/swing/{swing}', [AcControlController::class, 'setSwing']);
+            Route::post('/ac/{id}/toggle', [AcControlController::class, 'togglePower']);
+            Route::post('/ac/{id}/schedule', [TimerController::class, 'schedule']);
+        });
 
         $publishAcControl = function ($room, $id, array $changes) {
             $roomName = MqttService::roomToTopic((string) $room);

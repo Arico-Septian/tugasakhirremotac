@@ -89,8 +89,8 @@ class UserController extends Controller
 
         UserLog::create([
             'user_id' => Auth::id(),
-            'room' => $user->name,
-            'ac' => $user->role,
+            'room' => '-',
+            'ac' => '-',
             'activity' => 'add_user'
         ]);
 
