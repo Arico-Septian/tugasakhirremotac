@@ -150,8 +150,8 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'name' => strtolower(trim((string) $request->name)),
-            'device_id' => strtolower(trim((string) $request->device_id)),
+            'name' => trim((string) $request->name),
+            'device_id' => trim((string) $request->device_id),
             'floor' => trim((string) $request->floor),
         ]);
 
@@ -160,26 +160,26 @@ class RoomController extends Controller
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[a-z0-9_]+$/',
+                'regex:/^[a-zA-Z0-9_]+$/',
                 Rule::unique('rooms', 'name'),
             ],
             'device_id' => [
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[a-z0-9_-]+$/',
+                'regex:/^[a-zA-Z0-9_-]+$/',
                 Rule::unique('rooms', 'device_id'),
             ],
             'floor' => [
                 'nullable',
                 'string',
                 'max:50',
-                'regex:/^[a-z0-9_]*$/',
+                'regex:/^[a-zA-Z0-9_]*$/',
             ],
         ], [
-            'name.regex' => 'Nama ruangan hanya boleh berisi huruf kecil, angka, dan underscore.',
-            'device_id.regex' => 'ESP ID hanya boleh berisi huruf kecil, angka, underscore, dan strip.',
-            'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf kecil, angka, dan underscore.',
+            'name.regex' => 'Nama ruangan hanya boleh berisi huruf, angka, dan underscore.',
+            'device_id.regex' => 'ESP ID hanya boleh berisi huruf, angka, underscore, dan strip.',
+            'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf, angka, dan underscore.',
         ]);
 
         $deviceId = $request->device_id;
