@@ -85,6 +85,10 @@ class AuthController extends Controller
             '/dashboard/recent-activities',
             '/session/ping',
             '/logout',
+            '/suhu-raspi',
+            '/raspi-monitor',
+            '/cek-driver',
+            '/test-cache',
         ];
         foreach ($apiPaths as $p) {
             if (str_starts_with($path, $p)) return false;
