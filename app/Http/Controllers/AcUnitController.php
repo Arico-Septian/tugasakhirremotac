@@ -42,15 +42,8 @@ class AcUnitController extends Controller
 
         $currentTemp = $tempHistory->first()?->temperature;
 
-        $previousTemp = $tempHistory->count() > 1
-            ? $tempHistory[1]->temperature
-            : $currentTemp;
-
-        $deltaT = ($currentTemp !== null && $previousTemp !== null)
-            ? ($currentTemp - $previousTemp)
-            : 0;
-
         if ($currentTemp !== null) {
+            $deltaT = $this->calculateDeltaT($tempHistory);
 
             $room->temperature = round($currentTemp, 1);
 
@@ -206,17 +199,11 @@ class AcUnitController extends Controller
 
         $currentTemp = $tempHistory->first()?->temperature;
 
-        $previousTemp = $tempHistory->count() > 1
-            ? $tempHistory[1]->temperature
-            : $currentTemp;
-
-        $deltaT = ($currentTemp !== null && $previousTemp !== null)
-            ? ($currentTemp - $previousTemp)
-            : 0;
-
         if ($currentTemp === null) {
             return back()->with('error', 'Data suhu belum tersedia');
         }
+
+        $deltaT = $this->calculateDeltaT($tempHistory);
 
         $fuzzyResult = $fuzzyService->calculate(
             $currentTemp,
@@ -271,6 +258,33 @@ class AcUnitController extends Controller
             'success',
             'Fuzzy berhasil diterapkan ke semua AC'
         );
+    }
+
+    private function calculateDeltaT($tempHistory): float
+    {
+        if ($tempHistory->count() < 2) {
+            return 0;
+        }
+
+        $currentTemp = $tempHistory->first()?->temperature;
+        $previousTemp = $tempHistory[1]->temperature;
+
+        if ($currentTemp === null || $previousTemp === null) {
+            return 0;
+        }
+
+        $currentCreatedAt = $tempHistory->first()->created_at;
+        $previousCreatedAt = $tempHistory[1]->created_at;
+
+        $timeDiffSeconds = max(1, $currentCreatedAt->diffInSeconds($previousCreatedAt));
+        $tempDiff = $currentTemp - $previousTemp;
+
+        // Jika jarak waktu > 5 menit, sensor mungkin offline kemudian online
+        if ($timeDiffSeconds > 300) {
+            return 0;
+        }
+
+        return $tempDiff / $timeDiffSeconds;
     }
 
     private function setCurrentDeviceStatus(Room $room): void
