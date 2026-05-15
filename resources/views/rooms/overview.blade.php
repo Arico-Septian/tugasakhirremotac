@@ -113,16 +113,32 @@
             white-space: nowrap;
         }
 
-        .temp-offline-badge {
-            display: inline-block;
-            margin-left: 4px;
-            padding: 2px 6px;
-            background-color: var(--coral);
-            color: white;
-            font-size: 9px;
-            font-weight: 600;
-            border-radius: 3px;
-            letter-spacing: 0.05em;
+        /* ===== Temperature chip — colored bg + matching text ===== */
+        .room-card .temp-chip {
+            display: flex !important;
+            border-radius: var(--r-md) !important;
+            padding: 9px 14px !important;
+            font-size: 12px !important;
+        }
+        .room-card .temp-chip.cool {
+            background: rgba(94, 208, 255, 0.15) !important;
+            color: #5ed0ff !important;
+            border: 1px solid rgba(94, 208, 255, 0.35) !important;
+        }
+        .room-card .temp-chip.warm {
+            background: rgba(110, 231, 183, 0.15) !important;
+            color: #6ee7b7 !important;
+            border: 1px solid rgba(110, 231, 183, 0.35) !important;
+        }
+        .room-card .temp-chip.hot {
+            background: rgba(248, 113, 113, 0.15) !important;
+            color: #f87171 !important;
+            border: 1px solid rgba(248, 113, 113, 0.4) !important;
+        }
+        .room-card .temp-chip.idle {
+            background: var(--panel-2) !important;
+            color: var(--ink-3) !important;
+            border: 1px solid var(--line-soft) !important;
         }
 
         /* Toolbar responsiveness for small screens */
@@ -388,17 +404,18 @@
                                                         </span>
                                                     </div>
 
-                                                    <div class="temp-chip {{ $tempClass }}"
+                                                    <div class="temp-chip {{ $room->temperature_is_offline ? 'idle' : $tempClass }}"
                                                         style="justify-content:space-between;width:100%;">
-                                                        <span
-                                                            style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:500;">
+                                                        <span style="display:inline-flex;align-items:center;gap:6px;font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
-                                                        <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
-                                                            {{ $temp ?? '–' }}°C
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;">
                                                             @if ($room->temperature_is_offline)
-                                                                <span class="temp-offline-badge">OFFLINE</span>
+                                                                <i class="fa-solid fa-wifi-slash" style="font-size:11px;color:var(--coral);"></i>
                                                             @endif
+                                                            <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
+                                                                {{ $temp ?? '–' }}°C
+                                                            </span>
                                                         </span>
                                                     </div>
 
@@ -696,9 +713,10 @@
                     const el = document.getElementById(`temp-${room.id}`);
                     if (!el) return;
                     const t = parseFloat(room.temp);
-                    const badge = el.querySelector('.temp-offline-badge');
-                    el.textContent = isNaN(t) ? '–' : `${t}°C`;
-                    if (badge) el.appendChild(badge);
+                    // Hanya update kalau ada data valid — biarkan suhu terakhir saat sensor offline
+                    if (!isNaN(t)) {
+                        el.textContent = `${t}°C`;
+                    }
                 });
             }).catch(() => {});
         }
