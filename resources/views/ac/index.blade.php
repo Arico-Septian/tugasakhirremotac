@@ -947,7 +947,7 @@
                                         $swingLabel = match ($curSwing) {
                                             'off' => 'Diam',
                                             'full' => 'Full',
-                                            'half' => 'Â½',
+                                            'half' => '½',
                                             'down' => 'Bawah',
                                             default => ucfirst($curSwing),
                                         };
@@ -1042,7 +1042,7 @@
                                         <div class="panel">
                                             <p class="eyebrow" style="margin-bottom:12px;">Swing</p>
                                             <div class="grid grid-cols-4 gap-2">
-                                                @foreach (['off' => ['fa-ban', 'Diam'], 'full' => ['fa-arrows-up-down', 'Full'], 'half' => ['fa-equals', 'Â½'], 'down' => ['fa-arrow-down', 'Bawah']] as $sw => [$icon, $lbl])
+                                                @foreach (['off' => ['fa-ban', 'Diam'], 'full' => ['fa-arrows-up-down', 'Full'], 'half' => ['fa-equals', '½'], 'down' => ['fa-arrow-down', 'Bawah']] as $sw => [$icon, $lbl])
                                                     <form action="/ac/{{ $ac->id }}/swing/{{ $sw }}"
                                                         method="POST" class="control-form">
                                                         @csrf
@@ -1499,7 +1499,7 @@
             if (window.Echo) {
                 const currentRoomId = Number(document.getElementById('espStatusPill')?.dataset.roomId);
 
-                const swingLabelMap = { off: 'Diam', full: 'Full', half: 'Â½', down: 'Bawah' };
+                const swingLabelMap = { off: 'Diam', full: 'Full', half: '½', down: 'Bawah' };
                 const ucfirst = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
 
                 function updateAcPanel(payload) {

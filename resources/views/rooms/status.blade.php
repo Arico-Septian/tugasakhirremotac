@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Status AC â€” {{ $room->name }}</title>
+    <title>Status AC — {{ $room->name }}</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/js/chart.umd.js"></script>
@@ -51,8 +51,8 @@
             white-space: nowrap;
         }
 
-        /* Grid optimization â€” order matters: broader â†’ narrower */
-        /* Small phones / portrait phones (â‰¤600px) â€” 2 columns */
+        /* Grid optimization — order matters: broader → narrower */
+        /* Small phones / portrait phones (≤600px) — 2 columns */
         @media (max-width: 600px) {
             .grid[class*="grid-cols"] {
                 grid-template-columns: repeat(2, 1fr) !important;
@@ -64,7 +64,7 @@
             }
         }
 
-        /* Very small phones (â‰¤480px) â€” keep 2 col but tighter; switch to 1 col under 360px */
+        /* Very small phones (≤480px) — keep 2 col but tighter; switch to 1 col under 360px */
         @media (max-width: 480px) {
             .grid[class*="grid-cols"] {
                 gap: 6px !important;
@@ -87,14 +87,14 @@
             }
         }
 
-        /* Tiny phones (â‰¤360px) â€” single column */
+        /* Tiny phones (≤360px) — single column */
         @media (max-width: 360px) {
             .grid[class*="grid-cols"] {
                 grid-template-columns: 1fr !important;
             }
         }
 
-        /* Tablet portrait (769-1023px) â€” 3 columns instead of cramped 4 */
+        /* Tablet portrait (769-1023px) — 3 columns instead of cramped 4 */
         @media (min-width: 769px) and (max-width: 1023px) {
             .grid[class*="grid-cols"] {
                 grid-template-columns: repeat(3, 1fr) !important;
@@ -130,7 +130,7 @@
             }
         }
 
-        /* Header right cluster â€” wrap & shrink on tiny screens */
+        /* Header right cluster — wrap & shrink on tiny screens */
         .main-header {
             gap: 8px;
             flex-wrap: wrap;
@@ -158,7 +158,7 @@
             }
         }
 
-        /* Ultra-wide (>1600px) â€” cap content width */
+        /* Ultra-wide (>1600px) — cap content width */
         @media (min-width: 1600px) {
             .app-content-inner {
                 max-width: 1480px;

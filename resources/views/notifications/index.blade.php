@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Notifikasi â€” SmartAC</title>
+    <title>Notifikasi — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @vite('resources/js/app.js')
@@ -157,13 +157,13 @@
                                             style="font-size:10.5px;color:var(--ink-4);">
                                             <span><i class="fa-regular fa-clock text-[9px]"></i>
                                                 {{ $n->created_at->diffForHumans() }}</span>
-                                            <span>Â·</span>
+                                            <span>·</span>
                                             <span>{{ $n->created_at->format('d M Y H:i') }}</span>
                                             @if ($n->link)
-                                                <span>Â·</span>
+                                                <span>·</span>
                                                 <a href="{{ $n->link }}"
                                                     onclick="markNotifReadInline(event, {{ $n->id }}, '{{ $n->link }}')"
-                                                    style="color:var(--cyan);">Buka detail â†’</a>
+                                                    style="color:var(--cyan);">Buka detail →</a>
                                             @endif
                                         </div>
                                     </div>
@@ -315,7 +315,7 @@
                 const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
                 const dateStr = `${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
                 const linkHtml = payload.link
-                    ? `<span>Â·</span><a href="${escapeHtml(payload.link)}" onclick="markNotifReadInline(event, ${id}, '${escapeHtml(payload.link)}')" style="color:var(--cyan);">Buka detail â†’</a>`
+                    ? `<span>·</span><a href="${escapeHtml(payload.link)}" onclick="markNotifReadInline(event, ${id}, '${escapeHtml(payload.link)}')" style="color:var(--cyan);">Buka detail →</a>`
                     : '';
                 const deleteBtn = payload.user_id
                     ? `<button onclick="deleteNotif(${id})" class="btn-icon danger" title="Hapus"><i class="fa-solid fa-trash text-[11px]"></i></button>`
@@ -336,7 +336,7 @@
                         ${message ? `<p class="text-xs mt-1" style="color:var(--ink-2);line-height:1.5;">${message}</p>` : ''}
                         <div class="flex items-center gap-3 mt-2 text-mono" style="font-size:10.5px;color:var(--ink-4);">
                             <span><i class="fa-regular fa-clock text-[9px]"></i> ${timeAgo}</span>
-                            <span>Â·</span>
+                            <span>·</span>
                             <span>${dateStr}</span>
                             ${linkHtml}
                         </div>
