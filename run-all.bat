@@ -116,7 +116,7 @@ echo ============================================
 echo   SEMUA SERVICE BERJALAN
 echo ============================================
 echo   URL          : http://127.0.0.1:8000
-echo   MQTT Sub     : device/+/online, device/+/ping, room/+/ac/+/status, room/+/sensor
+echo   MQTT Sub     : device/+/online, device/+/ping, device/+/status, room/+/ac/+/status, room/+/temperature
 echo   Reverb       : ws://127.0.0.1:8000/app/xgcozjostzdx6hslysp4 (port 8080)
 echo   Scheduler    : ac:run-timer, device:check-status (every min), logs:clean (07:00)
 echo   Queue        : database driver (sync in local)
