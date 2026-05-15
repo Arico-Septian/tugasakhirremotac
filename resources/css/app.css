@@ -217,6 +217,12 @@ body { min-height: 100vh; }
 .app-content-inner { max-width: 1280px; margin: 0 auto; }
 @media (max-width: 768px) { .app-content { padding: 16px; } }
 
+/* Dashboard layout: only .app-content scrolls, not .page-body */
+.app-main .page-body {
+  overflow-y: visible !important;
+  overflow-x: hidden;
+}
+
 /* Mobile sidebar */
 @media (max-width: 1024px) {
   .app-sidebar { transform: translateX(-100%); width: 280px !important; }
