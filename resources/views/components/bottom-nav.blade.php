@@ -1,6 +1,6 @@
-{{-- Mobile Bottom Navigation --}}
+{{-- Mobile Bottom Navigation - DISABLED, using sidebar toggle instead --}}
 @php $role = Auth::user()->role; @endphp
-<nav class="bottom-nav">
+<nav class="bottom-nav" style="display: none !important;">
     <a href="{{ route('dashboard') }}"
        class="bnav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
         <i class="fa-solid fa-gauge-high"></i>

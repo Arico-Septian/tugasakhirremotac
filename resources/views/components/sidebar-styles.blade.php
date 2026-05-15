@@ -189,14 +189,19 @@
         padding-bottom: 24px;
         min-height: 0;
     }
-    @media (max-width: 1024px) { .page-body { padding-bottom: 64px; } }
 
     /* Mobile sidebar */
     @media (max-width: 1024px) {
         .main-content   { margin-left: 0 !important; width: 100% !important; }
-        .app-sidebar    { transform: translateX(-100%); width: 280px !important; }
+        .app-sidebar    { position: fixed; left: 0; top: 0; height: 100vh; transform: translateX(-100%); width: 280px !important; z-index: 50; transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
         .app-sidebar.open { transform: translateX(0); box-shadow: 0 24px 48px rgba(0,0,0,.40); }
         .sidebar-toggle.desktop-only { display: none !important; }
+    }
+
+    /* Show toggle button on mobile - override app.css lg:hidden */
+    @media (max-width: 1024px) {
+        .main-header .lg\:hidden { display: inline-flex !important; visibility: visible !important; }
+        button[onclick*="toggleSidebar"] { display: inline-flex !important; }
     }
 
     /* 2026 modern backdrop with vibrant glassmorphism */

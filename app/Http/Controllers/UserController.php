@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::select('id', 'name', 'avatar', 'role', 'is_active', 'last_activity')
+        $query = User::select('id', 'name', 'avatar', 'role', 'last_activity')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
@@ -28,7 +28,7 @@ class UserController extends Controller
         $sort = $request->input('sort', 'created_at');
         $order = $request->input('order', 'desc');
 
-        if (!in_array($sort, ['name', 'role', 'last_activity', 'is_active', 'created_at'])) {
+        if (!in_array($sort, ['name', 'role', 'last_activity', 'created_at'])) {
             $sort = 'created_at';
         }
         if (!in_array($order, ['asc', 'desc'])) {
@@ -166,7 +166,6 @@ class UserController extends Controller
             $stats['total_users'] = User::count();
             $stats['total_rooms'] = Room::count();
             $stats['total_ac_units'] = AcUnit::count();
-            $stats['active_users'] = User::where('is_active', true)->count();
         } elseif ($user->isOperator()) {
             $stats['total_activities'] = UserLog::where('user_id', $user->id)->count();
             $stats['unique_rooms'] = UserLog::where('user_id', $user->id)

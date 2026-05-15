@@ -16,16 +16,6 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        if (!$user->is_active) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()
-                ->route('login')
-                ->with('error', 'User tidak aktif');
-        }
-
         if (!in_array($user->role, $roles, true)) {
             abort(403, 'Akses ditolak');
         }

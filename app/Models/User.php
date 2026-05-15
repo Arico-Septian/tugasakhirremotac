@@ -11,7 +11,6 @@ class User extends Authenticatable
         'avatar',
         'password',
         'role',
-        'is_active',
         'is_online',
         'last_activity',
         'last_login_at',
@@ -27,7 +26,6 @@ class User extends Authenticatable
         'last_activity' => 'datetime',
         'last_login_at' => 'datetime',
         'last_logout_at' => 'datetime',
-        'is_active' => 'boolean',
         'is_online' => 'boolean',
     ];
 

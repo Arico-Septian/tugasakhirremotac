@@ -58,13 +58,6 @@
                             <h2 style="font-size:18px;font-weight:600;color:var(--ink-0);margin:0;letter-spacing:-0.01em;">{{ $user->name }}</h2>
                             <div class="flex items-center gap-2 mt-1.5 flex-wrap">
                                 <span class="badge-role {{ $user->role }}" style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;text-transform:uppercase;">{{ $user->role }}</span>
-                                <span style="color:var(--ink-3);font-size:12px;">
-                                    @if ($user->is_active)
-                                        <span style="color:#10b981;">● Active</span>
-                                    @else
-                                        <span style="color:#ef4444;">● Inactive</span>
-                                    @endif
-                                </span>
                             </div>
                             @if ($user->avatar)
                                 <form method="POST" action="{{ route('profile.avatar.delete') }}" style="margin-top:8px;display:inline-block;"
@@ -112,16 +105,6 @@
                                 <p style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:6px;">Join Date</p>
                                 <p style="font-size:14px;color:var(--ink-0);margin:0;">
                                     {{ $user->created_at->format('M d, Y') }}
-                                </p>
-                            </div>
-                            <div>
-                                <p style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:6px;">Status</p>
-                                <p style="font-size:14px;margin:0;">
-                                    @if ($user->is_active)
-                                        <span style="color:#10b981;font-weight:600;">✓ Active</span>
-                                    @else
-                                        <span style="color:#ef4444;font-weight:600;">✗ Inactive</span>
-                                    @endif
                                 </p>
                             </div>
                         </div>

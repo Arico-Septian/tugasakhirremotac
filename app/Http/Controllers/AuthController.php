@@ -51,18 +51,11 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['name' => $msg]);
         }
 
-        if (!$user->is_active) {
-            return back()
-                ->withInput($request->only('name'))
-                ->with('error', 'User tidak aktif');
-        }
-
         RateLimiter::clear($key);
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        $user->is_online = true;
         $user->last_login_at = now();
         $user->last_activity = now();
 
@@ -103,7 +96,6 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            $user->is_online = false;
             $user->last_logout_at = now();
             $user->last_activity = null;
 

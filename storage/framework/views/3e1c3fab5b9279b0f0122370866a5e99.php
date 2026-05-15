@@ -1,6 +1,6 @@
 
 <?php $role = Auth::user()->role; ?>
-<nav class="bottom-nav">
+<nav class="bottom-nav" style="display: none !important;">
     <a href="<?php echo e(route('dashboard')); ?>"
        class="bnav-item <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>">
         <i class="fa-solid fa-gauge-high"></i>
