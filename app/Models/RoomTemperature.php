@@ -10,7 +10,7 @@ class RoomTemperature extends Model
 
     public static function normalizeRoomName($room): string
     {
-        return trim((string) $room);
+        return strtolower(trim((string) $room));
     }
 
     public static function latestByNormalizedRoom()

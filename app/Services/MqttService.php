@@ -27,7 +27,7 @@ class MqttService
 
     public static function roomToTopic(string $roomName): string
     {
-        return trim($roomName);
+        return strtolower(trim($roomName));
     }
 
     public function publish($topic, $message, $qos = 1, $retain = false)
