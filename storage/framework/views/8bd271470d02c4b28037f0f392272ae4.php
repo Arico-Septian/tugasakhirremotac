@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>My Profile — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    @vite('resources/js/app.js')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
 
 
-    @include('components.sidebar-styles')
+    <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 </head>
 <body>
@@ -18,7 +18,7 @@
 <div id="overlay"></div>
 
 <div class="layout">
-    @include('components.sidebar')
+    <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="main-content">
         <header class="main-header">
@@ -37,57 +37,58 @@
             <div class="app-content">
                 <div class="app-content-inner" style="max-width:640px;margin:0 auto;">
 
-                    {{-- Identity card --}}
+                    
                     <div class="panel panel-lg" style="display:flex;align-items:center;gap:18px;">
                         <div class="avatar-wrap" style="position:relative;flex-shrink:0;">
-                            @if ($user->avatar_url)
-                                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                            <?php if($user->avatar_url): ?>
+                                <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
                                      class="avatar avatar-xl"
                                      style="object-fit:cover;width:64px;height:64px;border-radius:999px;">
-                            @else
-                                <div class="avatar avatar-xl">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                            @endif
+                            <?php else: ?>
+                                <div class="avatar avatar-xl"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
+                            <?php endif; ?>
                             <button type="button" id="avatarBtn"
-                                    title="{{ $user->avatar ? 'Ubah foto' : 'Tambah foto' }}"
+                                    title="<?php echo e($user->avatar ? 'Ubah foto' : 'Tambah foto'); ?>"
                                     onclick="document.getElementById('avatarInput').click()"
                                     style="position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:999px;background:var(--cyan);border:2px solid var(--panel-1);color:#0b1220;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.25);">
                                 <i class="fa-solid fa-camera text-[10px]"></i>
                             </button>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h2 style="font-size:18px;font-weight:600;color:var(--ink-0);margin:0;letter-spacing:-0.01em;">{{ $user->name }}</h2>
+                            <h2 style="font-size:18px;font-weight:600;color:var(--ink-0);margin:0;letter-spacing:-0.01em;"><?php echo e($user->name); ?></h2>
                             <div class="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span class="badge-role {{ $user->role }}">{{ strtoupper($user->role) }}</span>
-                                @if ($user->last_activity)
+                                <span class="badge-role <?php echo e($user->role); ?>"><?php echo e(strtoupper($user->role)); ?></span>
+                                <?php if($user->last_activity): ?>
                                     <span class="text-xs" style="color:var(--ink-3);">
-                                        Last active {{ $user->last_activity->diffForHumans() }}
+                                        Last active <?php echo e($user->last_activity->diffForHumans()); ?>
+
                                     </span>
-                                @endif
+                                <?php endif; ?>
                             </div>
-                            @if ($user->avatar)
-                                <form method="POST" action="{{ route('profile.avatar.delete') }}" style="margin-top:8px;display:inline-block;"
+                            <?php if($user->avatar): ?>
+                                <form method="POST" action="<?php echo e(route('profile.avatar.delete')); ?>" style="margin-top:8px;display:inline-block;"
                                       onsubmit="return confirm('Hapus foto profil?');">
-                                    @csrf
-                                    @method('DELETE')
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
                                     <button type="submit"
                                             style="background:transparent;border:none;color:var(--coral);font-size:11px;font-weight:600;cursor:pointer;padding:0;">
                                         <i class="fa-solid fa-trash text-[9px]"></i> Hapus foto
                                     </button>
                                 </form>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    {{-- Hidden avatar upload form (auto-submits on file select) --}}
-                    <form id="avatarForm" method="POST" action="{{ route('profile.avatar.upload') }}"
+                    
+                    <form id="avatarForm" method="POST" action="<?php echo e(route('profile.avatar.upload')); ?>"
                           enctype="multipart/form-data" style="display:none;">
-                        @csrf
+                        <?php echo csrf_field(); ?>
                         <input type="file" id="avatarInput" name="avatar"
                                accept="image/jpeg,image/png,image/webp"
                                onchange="handleAvatarSelect(this)">
                     </form>
 
-                    {{-- Change password --}}
+                    
                     <div class="panel panel-lg mt-4">
                         <div class="panel-header" style="margin-bottom:16px;">
                             <div>
@@ -97,22 +98,22 @@
                             </div>
                         </div>
 
-                        @if (session('success'))
+                        <?php if(session('success')): ?>
                             <div class="alert alert-success mb-4">
                                 <i class="fa-solid fa-circle-check alert-icon"></i>
-                                <div class="alert-body">{{ session('success') }}</div>
+                                <div class="alert-body"><?php echo e(session('success')); ?></div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        @if ($errors->any())
+                        <?php if($errors->any()): ?>
                             <div class="alert alert-error mb-4">
                                 <i class="fa-solid fa-circle-exclamation alert-icon"></i>
-                                <div class="alert-body">{{ $errors->first() }}</div>
+                                <div class="alert-body"><?php echo e($errors->first()); ?></div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <form method="POST" action="/change-password" id="pwForm" class="space-y-4">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                             <div class="field">
                                 <label class="field-label">New password</label>
                                 <div class="input-icon-wrap">
@@ -149,7 +150,7 @@
     </div>
 </div>
 
-@include('components.bottom-nav')
+<?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
 function handleAvatarSelect(input) {
@@ -190,6 +191,7 @@ document.getElementById('pwForm')?.addEventListener('submit', function (e) {
     }
 });
 </script>
-@include('components.sidebar-scripts')
+<?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/profile/index.blade.php ENDPATH**/ ?>
