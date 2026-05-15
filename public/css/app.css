@@ -2344,9 +2344,10 @@ body { min-height: 100vh; }
 .app-main {
   margin-left: 248px;
   width: calc(100% - 248px);
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   transition: margin-left var(--t-slow), width var(--t-slow);
 }
 .app-sidebar.collapsed ~ .app-main {
@@ -2355,9 +2356,10 @@ body { min-height: 100vh; }
 }
 
 .app-header {
+  flex-shrink: 0;
   position: sticky;
   top: 0; z-index: 30;
-  height: 60px;
+  height: 64px;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px;
   background: rgba(7, 16, 31, 0.72);
@@ -2378,9 +2380,24 @@ body { min-height: 100vh; }
   margin: 1px 0 0;
 }
 
-.app-content { flex: 1; padding: 24px; }
+.app-content { flex: 1; padding: 24px; overflow-y: auto; scroll-behavior: smooth; min-height: 0; }
 .app-content-inner { max-width: 1280px; margin: 0 auto; }
 @media (max-width: 768px) { .app-content { padding: 16px; } }
+
+/* Dashboard layout: ensure main-header doesn't shrink */
+.app-main .main-header {
+  flex-shrink: 0 !important;
+}
+
+/* Dashboard layout: page-body must be flex container so .app-content can scroll */
+.app-main .page-body {
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
 
 /* Mobile sidebar */
 @media (max-width: 1024px) {
@@ -2388,7 +2405,7 @@ body { min-height: 100vh; }
   .app-sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
   .app-main { margin-left: 0 !important; width: 100% !important; }
   .app-header { padding: 0 16px; }
-  .app-content { padding-bottom: 88px; }
+  .app-content { padding-bottom: 64px; }
   .sidebar-toggle.desktop-only { display: none !important; }
 }
 
