@@ -478,15 +478,13 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-        Route::post('/users/status/{id}', [UserController::class, 'changeStatus']);
 
         Route::get('/logs', [UserLogController::class, 'index']);
         Route::delete('/logs/delete-all', [UserLogController::class, 'destroyAll']);
 
         Route::get('/users-online', function () {
             $total = User::count();
-            $online = User::where('is_active', true)
-                ->where('last_activity', '>=', now()->subMinutes(2))
+            $online = User::where('last_activity', '>=', now()->subMinutes(2))
                 ->count();
 
             return response()->json([

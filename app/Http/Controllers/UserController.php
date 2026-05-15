@@ -41,11 +41,9 @@ class UserController extends Controller
 
         $totalUsers = User::count();
 
-        $onlineUsers = User::where('is_active', true)
-            ->where('last_activity', '>=', now()->subMinutes(2))
+        $onlineUsers = User::where('last_activity', '>=', now()->subMinutes(2))
             ->count();
         $adminUsers = User::where('role', 'admin')->count();
-        $inactiveUsers = User::where('is_active', false)->count();
 
         $onlinePercentage = $totalUsers > 0 ? round(($onlineUsers / $totalUsers) * 100) : 0;
 
@@ -56,7 +54,6 @@ class UserController extends Controller
             'totalUsers',
             'onlineUsers',
             'adminUsers',
-            'inactiveUsers',
             'onlinePercentage',
             'newUsersThisWeek'
         ));
@@ -239,26 +236,4 @@ class UserController extends Controller
         return back()->with('success', 'Password berhasil diubah');
     }
 
-    public function changeStatus($id)
-    {
-        $user = User::findOrFail($id);
-
-        if ($id == Auth::id()) {
-            return back()->with('error', 'Tidak bisa menonaktifkan akun sendiri');
-        }
-
-        $user->is_active = !$user->is_active;
-
-        if (!$user->is_active) {
-            $user->is_online = false;
-            $user->last_activity = null;
-            $user->last_logout_at = now();
-        }
-
-        $user->save();
-
-        return back()->with('success', $user->is_active
-            ? 'User berhasil diaktifkan'
-            : 'User berhasil dinonaktifkan');
-    }
 }

@@ -113,15 +113,6 @@
             margin: 2px 0 0;
         }
 
-        /* Deactivated user styling */
-        tbody tr.inactive {
-            opacity: 0.55;
-        }
-
-        tbody tr.inactive:hover {
-            opacity: 0.7;
-        }
-
         /* Role color badges */
         .badge-role {
             display: inline-flex;
@@ -610,17 +601,6 @@
                                     <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
                                 </div>
                             </div>
-                            <div class="stat-card acc-coral">
-                                <span class="accent-bar"></span>
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p class="stat-label-sm">Inactive</p>
-                                        <p class="stat-num-lg"><?php echo e($inactiveUsers ?? 0); ?></p>
-                                        <p class="stat-sub">User dinonaktifkan</p>
-                                    </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-user-slash"></i></div>
-                                </div>
-                            </div>
                         </div>
 
                         
@@ -684,7 +664,6 @@
                                 <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <?php
                                         $isOnline = $user->isOnline ?? false;
-                                        $isActive = $user->is_active ?? true;
                                         $initials = strtoupper(substr($user->name, 0, 1));
                                         $handle = '@' . strtolower(str_replace(' ', '', $user->name));
                                         $colors = ['cyan', 'mint', 'lavender', 'coral'];
@@ -724,25 +703,9 @@
                                                 <?php echo e($isOnline ? 'Online' : 'Offline'); ?>
 
                                             </div>
-                                            <div class="user-card-status">
-                                                <span class="status-dot <?php echo e($isActive ? 'active' : ''); ?>"></span>
-                                                <?php echo e($isActive ? 'Active' : 'Inactive'); ?>
-
-                                            </div>
                                         </div>
                                         <?php if($user->id !== Auth::user()->id): ?>
                                             <div class="user-card-actions">
-                                                <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
-                                                    class="inline"
-                                                    onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
-                                                    <?php echo csrf_field(); ?>
-                                                    <button type="submit"
-                                                        class="btn-icon"
-                                                        style="<?php echo e($isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
-                                                        title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
-                                                        <i class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[10px]"></i>
-                                                    </button>
-                                                </form>
                                                 <button
                                                     onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
                                                     type="button" class="btn-icon lavender" title="Edit role">
@@ -769,21 +732,19 @@
                                 <thead>
                                     <tr>
                                         <th style="width:30%;" class="sortable" data-sort="name" onclick="handleSort('name')">USER</th>
-                                        <th style="width:15%;" class="sortable" data-sort="role" onclick="handleSort('role')">ROLE</th>
-                                        <th style="width:15%;" class="sortable" data-sort="last_activity" onclick="handleSort('last_activity')">STATUS</th>
-                                        <th style="width:15%;" class="sortable" data-sort="is_active" onclick="handleSort('is_active')">ACTIVE</th>
-                                        <th style="width:25%;text-align:right;padding-right:24px;">ACTIONS</th>
+                                        <th style="width:20%;" class="sortable" data-sort="role" onclick="handleSort('role')">ROLE</th>
+                                        <th style="width:20%;" class="sortable" data-sort="last_activity" onclick="handleSort('last_activity')">STATUS</th>
+                                        <th style="width:30%;text-align:right;padding-right:24px;">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                         <?php
                                             $isOnline = $user->isOnline ?? false;
-                                            $isActive = $user->is_active ?? true;
                                             $initials = strtoupper(substr($user->name, 0, 1));
                                             $handle = '@' . strtolower(str_replace(' ', '', $user->name));
                                         ?>
-                                        <tr class="<?php echo e(!$isActive ? 'inactive' : ''); ?>">
+                                        <tr>
                                             <td>
                                                 <div class="user-cell">
                                                     <?php
@@ -828,27 +789,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="status-cell">
-                                                    <span class="status-dot <?php echo e($isActive ? 'active' : ''); ?>"></span>
-                                                    <?php echo e($isActive ? 'Active' : 'Inactive'); ?>
-
-                                                </div>
-                                            </td>
-                                            <td>
                                                 <div class="actions-cell">
                                                     <?php if($user->id !== Auth::user()->id): ?>
-                                                        <form action="/users/status/<?php echo e($user->id); ?>" method="POST"
-                                                            class="inline"
-                                                            onsubmit="return confirm('<?php echo e($isActive ? 'Nonaktifkan' : 'Aktifkan'); ?> user ini?')">
-                                                            <?php echo csrf_field(); ?>
-                                                            <button type="submit"
-                                                                class="btn-icon"
-                                                                style="<?php echo e($isActive ? 'color:var(--coral);background:var(--coral-soft);border-color:var(--coral-soft-2);' : 'color:var(--mint);background:var(--mint-soft);border-color:var(--mint-soft-2);'); ?>"
-                                                                title="<?php echo e($isActive ? 'Deactivate user' : 'Activate user'); ?>">
-                                                                <i
-                                                                    class="fa-solid <?php echo e($isActive ? 'fa-user-slash' : 'fa-user-check'); ?> text-[10px]"></i>
-                                                            </button>
-                                                        </form>
                                                         <button
                                                             onclick="editRole(<?php echo e($user->id); ?>, '<?php echo e($user->role); ?>')"
                                                             type="button" class="btn-icon lavender" title="Edit role">
