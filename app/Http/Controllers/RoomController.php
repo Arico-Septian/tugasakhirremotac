@@ -84,17 +84,22 @@ class RoomController extends Controller
 
             $currentTemp = $tempHistory->first()?->temperature;
 
-            $previousTemp = $tempHistory->count() > 1
-                ? $tempHistory[1]->temperature
-                : $currentTemp;
-
             // =========================
-            // HITUNG DELTA T
+            // HITUNG DELTA T (dengan timestamp)
             // =========================
 
-            $deltaT = ($currentTemp !== null && $previousTemp !== null)
-                ? ($currentTemp - $previousTemp)
-                : 0;
+            $deltaT = 0;
+            if ($currentTemp !== null && $tempHistory->count() > 1) {
+                $previousTemp = $tempHistory[1]->temperature;
+                $currentCreatedAt = $tempHistory->first()->created_at;
+                $previousCreatedAt = $tempHistory[1]->created_at;
+                $timeDiffSeconds = max(1, $currentCreatedAt->diffInSeconds($previousCreatedAt));
+                $tempDiff = $currentTemp - $previousTemp;
+
+                if ($timeDiffSeconds <= 300) {
+                    $deltaT = $tempDiff / $timeDiffSeconds;
+                }
+            }
 
             // =========================
             // FUZZY CALCULATION
@@ -147,6 +152,7 @@ class RoomController extends Controller
         $request->merge([
             'name' => strtolower(trim((string) $request->name)),
             'device_id' => strtolower(trim((string) $request->device_id)),
+            'floor' => trim((string) $request->floor),
         ]);
 
         $request->validate([
@@ -154,6 +160,7 @@ class RoomController extends Controller
                 'required',
                 'string',
                 'max:100',
+                'regex:/^[a-z0-9_]+$/',
                 Rule::unique('rooms', 'name'),
             ],
             'device_id' => [
@@ -163,8 +170,17 @@ class RoomController extends Controller
                 'regex:/^[a-z0-9_-]+$/',
                 Rule::unique('rooms', 'device_id'),
             ],
+            'floor' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[a-z0-9_]+$/',
+            ],
         ], [
+            'name.regex' => 'Nama ruangan hanya boleh berisi huruf kecil, angka, dan underscore.',
             'device_id.regex' => 'ESP ID hanya boleh berisi huruf kecil, angka, underscore, dan strip.',
+            'floor.regex' => 'Lantai/Zone hanya boleh berisi huruf kecil, angka, dan underscore.',
+            'floor.required' => 'Lantai/Zone harus diisi.',
         ]);
 
         $deviceId = $request->device_id;

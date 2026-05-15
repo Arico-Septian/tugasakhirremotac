@@ -514,20 +514,22 @@
                         <div class="modal-body space-y-3">
                             <div class="field">
                                 <label class="field-label">Nama Ruangan</label>
-                                <input class="input" type="text" name="name" placeholder="Server Room 1"
+                                <input class="input text-mono" type="text" name="name" placeholder="server_room_1"
                                     required>
+                                <p class="field-help">Hanya huruf kecil, angka, dan underscore (tidak boleh spasi)</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">ESP Device ID</label>
                                 <input class="input text-mono" type="text" name="device_id" placeholder="esp32_01"
                                     required>
-                                <p class="field-help">Identifier unik dari device ESP</p>
+                                <p class="field-help">Hanya huruf kecil, angka, underscore, dan strip</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">Lantai / Zona <span
-                                        style="color:var(--ink-4);font-weight:400;">(opsional)</span></label>
-                                <input class="input" type="text" name="floor" placeholder="cth: Lantai 1, Zona A">
-                                <p class="field-help">Digunakan untuk pengelompokan di Room Overview</p>
+                                        style="color:var(--coral);font-weight:600;">*</span></label>
+                                <input class="input text-mono" type="text" name="floor" placeholder="lantai_1, zona_a"
+                                    required>
+                                <p class="field-help">Hanya huruf kecil, angka, dan underscore. Digunakan untuk pengelompokan</p>
                             </div>
                         </div>
                         <div class="modal-footer">
