@@ -88,61 +88,6 @@
                                onchange="handleAvatarSelect(this)">
                     </form>
 
-                    
-                    <div class="panel panel-lg mt-4">
-                        <div class="panel-header" style="margin-bottom:16px;">
-                            <div>
-                                <p class="eyebrow"><i class="fa-solid fa-key"></i> Security</p>
-                                <h3 class="panel-title">Change password</h3>
-                                <p class="panel-subtitle">Pilih password baru yang kuat dan tidak mudah ditebak</p>
-                            </div>
-                        </div>
-
-                        <?php if(session('success')): ?>
-                            <div class="alert alert-success mb-4">
-                                <i class="fa-solid fa-circle-check alert-icon"></i>
-                                <div class="alert-body"><?php echo e(session('success')); ?></div>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if($errors->any()): ?>
-                            <div class="alert alert-error mb-4">
-                                <i class="fa-solid fa-circle-exclamation alert-icon"></i>
-                                <div class="alert-body"><?php echo e($errors->first()); ?></div>
-                            </div>
-                        <?php endif; ?>
-
-                        <form method="POST" action="/change-password" id="pwForm" class="space-y-4">
-                            <?php echo csrf_field(); ?>
-                            <div class="field">
-                                <label class="field-label">New password</label>
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-lock"></i>
-                                    <input class="input" type="password" name="password" id="pwInput"
-                                           placeholder="Min. 6 characters" required minlength="6" style="padding-right:42px;">
-                                    <button type="button" onclick="togglePw('pwInput', this)"
-                                            class="btn-icon" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;background:transparent;border-color:transparent;">
-                                        <i class="fa-solid fa-eye text-[11px]"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="field-label">Confirm new password</label>
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-lock"></i>
-                                    <input class="input" type="password" name="password_confirmation" id="pwConfirm"
-                                           placeholder="Ulangi password baru" required style="padding-right:42px;">
-                                    <button type="button" onclick="togglePw('pwConfirm', this)"
-                                            class="btn-icon" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;background:transparent;border-color:transparent;">
-                                        <i class="fa-solid fa-eye text-[11px]"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block" id="pwBtn">
-                                Update password
-                            </button>
-                        </form>
-                    </div>
 
                 </div>
             </div>
@@ -170,26 +115,6 @@ function handleAvatarSelect(input) {
     document.getElementById('avatarForm').submit();
 }
 
-function togglePw(inputId, btn) {
-    const input = document.getElementById(inputId);
-    const icon = btn.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-}
-
-document.getElementById('pwForm')?.addEventListener('submit', function (e) {
-    const pw  = document.getElementById('pwInput').value;
-    const pw2 = document.getElementById('pwConfirm').value;
-    if (pw !== pw2) {
-        e.preventDefault();
-        window.smToast('Password dan konfirmasi tidak cocok', 'error');
-    }
-});
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
