@@ -149,11 +149,17 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->get()
             ->map(function ($room) use ($latestTemperatures) {
                 $record = $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name));
-                $temperature = $record?->temperature;
+                $lastTemperature = $record?->temperature;
+                $temperature = $lastTemperature;
+                $isOffline = true;
 
                 // Stale check: kalau record terakhir > 60s, anggap sensor mati → null
-                if ($record && now()->diffInSeconds($record->created_at, true) > 60) {
-                    $temperature = null;
+                if ($record && $record->created_at) {
+                    $isOffline = now()->diffInSeconds($record->created_at, true) > 60;
+
+                    if ($isOffline) {
+                        $temperature = null;
+                    }
                 }
 
                 return [
@@ -161,6 +167,9 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                     'name' => $room->name,
                     'temp' => $temperature,
                     'temperature' => $temperature,
+                    'last_temp' => $lastTemperature,
+                    'is_offline' => $isOffline,
+                    'last_seen' => optional($record?->created_at)->toDateTimeString(),
                 ];
             })
             ->values();
@@ -179,11 +188,11 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             ->get();
 
         $grouped = $rows
-            ->groupBy(fn($t) => $t->created_at->format('H:00'))
-            ->map(fn($g) => round($g->avg('temperature'), 1));
+            ->groupBy(fn ($t) => $t->created_at->format('H:00'))
+            ->map(fn ($g) => round($g->avg('temperature'), 1));
 
         return response()->json(
-            $grouped->map(fn($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
+            $grouped->map(fn ($temp, $hour) => ['time' => $hour, 'temp' => $temp])->values()
         );
     });
 
@@ -193,9 +202,9 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
 
         // Konfigurasi range: total jam, interval menit, label format
         $rangeConfig = [
-            '1h'  => ['hours' => 1,  'interval' => 5,  'slots' => 12, 'label' => 'H:i'],
-            '3h'  => ['hours' => 3,  'interval' => 10, 'slots' => 18, 'label' => 'H:i'],
-            '6h'  => ['hours' => 6,  'interval' => 15, 'slots' => 24, 'label' => 'H:i'],
+            '1h' => ['hours' => 1,  'interval' => 5,  'slots' => 12, 'label' => 'H:i'],
+            '3h' => ['hours' => 3,  'interval' => 10, 'slots' => 18, 'label' => 'H:i'],
+            '6h' => ['hours' => 6,  'interval' => 15, 'slots' => 24, 'label' => 'H:i'],
             '24h' => ['hours' => 24, 'interval' => 60, 'slots' => 24, 'label' => 'H:00'],
         ];
         $cfg = $rangeConfig[$range] ?? $rangeConfig['1h'];
@@ -212,6 +221,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             $temp = optional(
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
+
             return $temp ?? -999;
         })->values();
 
@@ -227,6 +237,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                 return $time->copy()->startOfHour()->format('Y-m-d H');
             }
             $minute = floor($time->minute / $interval) * $interval;
+
             return $time->copy()->setMinute($minute)->setSecond(0)->format('Y-m-d H:i');
         };
 
@@ -245,7 +256,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             }
         }
 
-        $labels = $slots->map(fn($t) => $t->format($labelFormat));
+        $labels = $slots->map(fn ($t) => $t->format($labelFormat));
 
         $palette = [
             '#fb7185', '#fbbf24', '#4dd4ff', '#a78bfa',
@@ -261,10 +272,10 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
                 ->orderBy('created_at')
                 ->get();
 
-            $grouped = $rows->groupBy(fn($t) => $slotKeyFor($t->created_at))
-                ->map(fn($g) => round($g->avg('temperature'), 1));
+            $grouped = $rows->groupBy(fn ($t) => $slotKeyFor($t->created_at))
+                ->map(fn ($g) => round($g->avg('temperature'), 1));
 
-            $data = $slots->map(fn($t) => $grouped->get($slotKeyFor($t)));
+            $data = $slots->map(fn ($t) => $grouped->get($slotKeyFor($t)));
 
             $lastRecord = $latestTemperatures->get($normalized);
             $currentTemp = optional($lastRecord)->temperature;
@@ -510,7 +521,7 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
         $temp = Cache::get('raspi_temperature');
 
         return response()->json([
-            'suhu' => $temp !== null ? $temp . ' °C' : null,
+            'suhu' => $temp !== null ? $temp.' °C' : null,
             'value' => $temp,
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     });

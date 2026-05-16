@@ -32,14 +32,14 @@ class DashboardController extends Controller
                 $latestTemperatures->get(RoomTemperature::normalizeRoomName($room->name))
             )->temperature;
 
-            $deviceId = trim((string) $room->device_id);
+            $deviceId = strtolower(trim((string) $room->device_id));
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen, true) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 300;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
 
@@ -83,14 +83,14 @@ class DashboardController extends Controller
         $onlineRooms = 0;
         $offlineRooms = 0;
         foreach ($rooms as $room) {
-            $deviceId = trim((string) $room->device_id);
+            $deviceId = strtolower(trim((string) $room->device_id));
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen, true) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 300;
 
             $isOnline ? $onlineRooms++ : $offlineRooms++;
         }
@@ -144,18 +144,22 @@ class DashboardController extends Controller
         }
         if (str_starts_with($a, 'set_temp_')) {
             $v = substr($a, 9);
+
             return ['description' => "Set suhu {$v}°C", 'icon' => 'fa-solid fa-temperature-half', 'tone' => 'cyan'];
         }
         if (str_starts_with($a, 'mode_')) {
             $v = ucfirst(substr($a, 5));
+
             return ['description' => "Ubah mode → {$v}", 'icon' => 'fa-solid fa-sliders', 'tone' => 'lavender'];
         }
         if (str_starts_with($a, 'fan_speed_')) {
             $v = ucfirst(substr($a, 10));
+
             return ['description' => "Kecepatan fan → {$v}", 'icon' => 'fa-solid fa-fan', 'tone' => 'sky'];
         }
         if (str_starts_with($a, 'swing_')) {
             $v = ucfirst(substr($a, 6));
+
             return ['description' => "Swing → {$v}", 'icon' => 'fa-solid fa-arrows-left-right', 'tone' => 'lavender'];
         }
         if ($a === 'login') {

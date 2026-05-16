@@ -73,7 +73,7 @@ class CheckDeviceStatus extends Command
     private function checkDeviceStatus($deviceId, $now)
     {
         $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
-            ?? $this->lastSeenFrom(Room::where('device_id', $deviceId)->value('last_seen'));
+            ?? $this->lastSeenFrom(Room::whereRaw('LOWER(TRIM(device_id)) = ?', [$deviceId])->value('last_seen'));
         $statusKey = "device_status_{$deviceId}";
         $unknownKey = "device_unknown_{$deviceId}";
 

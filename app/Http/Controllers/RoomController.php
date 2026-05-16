@@ -6,6 +6,7 @@ use App\Models\AcUnit;
 use App\Models\Room;
 use App\Models\RoomTemperature;
 use App\Models\UserLog;
+use App\Services\FuzzyMamdaniService;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-use App\Services\FuzzyMamdaniService;
 
 class RoomController extends Controller
 {
@@ -21,7 +21,7 @@ class RoomController extends Controller
     {
         $rooms = Room::with(['acUnits.status'])
             ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%');
             })
             ->orderBy('floor')
             ->orderBy('name')
@@ -32,11 +32,11 @@ class RoomController extends Controller
         // =========================
         // FUZZY SERVICE
         // =========================
-        $fuzzyService = new FuzzyMamdaniService();
+        $fuzzyService = new FuzzyMamdaniService;
 
         foreach ($rooms as $room) {
 
-            $deviceId = trim((string) $room->device_id);
+            $deviceId = strtolower(trim((string) $room->device_id));
 
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
 
@@ -47,7 +47,7 @@ class RoomController extends Controller
             $isOnline =
                 ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen, true) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 300;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
 
@@ -66,7 +66,7 @@ class RoomController extends Controller
             if ($lastTempRecord && $lastTempRecord->created_at) {
                 $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
                 $room->temperature_is_offline = $secondsSinceLastTemp > 60;
-            } elseif (!$lastTempRecord) {
+            } elseif (! $lastTempRecord) {
                 $room->temperature_is_offline = true;
             }
 
@@ -140,7 +140,7 @@ class RoomController extends Controller
         }
 
         $roomsByFloor = $rooms->groupBy(
-            fn($room) => $room->floor ?: 'Lainnya'
+            fn ($room) => $room->floor ?: 'Lainnya'
         );
 
         return view('rooms.index', compact('rooms', 'roomsByFloor'));
@@ -236,7 +236,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
-        $deviceId = trim((string) $room->device_id);
+        $deviceId = strtolower(trim((string) $room->device_id));
 
         $mqttPublished = true;
 
@@ -298,25 +298,25 @@ class RoomController extends Controller
             if ($lastTempRecord && $lastTempRecord->created_at) {
                 $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
                 $room->temperature_is_offline = $secondsSinceLastTemp > 60;
-            } elseif (!$lastTempRecord) {
+            } elseif (! $lastTempRecord) {
                 $room->temperature_is_offline = true;
             }
 
-            $deviceId = trim((string) $room->device_id);
+            $deviceId = strtolower(trim((string) $room->device_id));
             $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
             $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
                 ?? $this->lastSeenFrom($room->last_seen);
 
             $isOnline = ($status === 'online' || $status === 'available')
                 && $lastSeen
-                && now()->diffInSeconds($lastSeen, true) <= 30;
+                && now()->diffInSeconds($lastSeen, true) <= 300;
 
             $room->device_status = $isOnline ? 'online' : 'offline';
 
             $isOnline ? $onlineRooms++ : $offlineRooms++;
         }
 
-        $roomsByFloor = $rooms->groupBy(fn($r) => $r->floor ?: 'Lainnya');
+        $roomsByFloor = $rooms->groupBy(fn ($r) => $r->floor ?: 'Lainnya');
 
         return view('rooms.overview', compact('rooms', 'roomsByFloor'));
     }
@@ -334,11 +334,11 @@ class RoomController extends Controller
         if ($lastTempRecord && $lastTempRecord->created_at) {
             $secondsSinceLastTemp = now()->diffInSeconds($lastTempRecord->created_at, true);
             $room->temperature_is_offline = $secondsSinceLastTemp > 60;
-        } elseif (!$lastTempRecord) {
+        } elseif (! $lastTempRecord) {
             $room->temperature_is_offline = true;
         }
 
-        $deviceId = trim((string) $room->device_id);
+        $deviceId = strtolower(trim((string) $room->device_id));
         $status = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
         $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
             ?? $this->lastSeenFrom($room->last_seen);

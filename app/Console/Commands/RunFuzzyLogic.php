@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomTemperature;
 use App\Services\FuzzyMamdaniService;
+use Carbon\Carbon;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -22,6 +23,7 @@ class RunFuzzyLogic extends Command
 
         if ($rooms->isEmpty()) {
             $this->info('No rooms found');
+
             return Command::SUCCESS;
         }
 
@@ -29,14 +31,15 @@ class RunFuzzyLogic extends Command
         $skipped = 0;
 
         foreach ($rooms as $room) {
-            $cooldownKey = 'fuzzy_room_' . $room->id;
+            $cooldownKey = 'fuzzy_room_'.$room->id;
 
             if (Cache::has($cooldownKey)) {
                 $skipped++;
+
                 continue;
             }
 
-            $fuzzyService = new FuzzyMamdaniService();
+            $fuzzyService = new FuzzyMamdaniService;
             $normalized = RoomTemperature::normalizeRoomName($room->name);
 
             $tempHistory = RoomTemperature::where('room', $normalized)
@@ -44,22 +47,34 @@ class RunFuzzyLogic extends Command
                 ->take(2)
                 ->get();
 
-            $isDeviceOnline = $room->device_status === 'online';
-            $isTempAvailable = !$tempHistory->isEmpty();
+            $deviceId = strtolower(trim((string) $room->device_id));
+            $deviceStatus = Cache::get("device_status_{$deviceId}", $room->device_status ?? 'offline');
+            $lastSeen = $this->lastSeenFrom(Cache::get("device_{$deviceId}_last_seen"))
+                ?? $this->lastSeenFrom($room->last_seen);
 
-            if (!$isTempAvailable) {
+            $isDeviceOnline = $deviceStatus === 'online'
+                && $lastSeen
+                && now()->diffInSeconds($lastSeen, true) <= 300;
+            $latestTemp = $tempHistory->first();
+            $isTempAvailable = $latestTemp
+                && $latestTemp->created_at
+                && now()->diffInSeconds($latestTemp->created_at, true) <= 60;
+
+            if (! $isTempAvailable) {
                 Notification::fuzzyWarning($room->name, 'temperature_offline');
+
                 continue;
             }
 
-            if (!$isDeviceOnline) {
+            if (! $isDeviceOnline) {
                 Notification::fuzzyWarning($room->name, 'device_offline');
+
                 continue;
             }
 
             Notification::fuzzyRecovery($room->name);
 
-            $currentTemp = $tempHistory->first()->temperature;
+            $currentTemp = $latestTemp->temperature;
             $previousTemp = $tempHistory->count() > 1
                 ? $tempHistory[1]->temperature
                 : $currentTemp;
@@ -72,7 +87,7 @@ class RunFuzzyLogic extends Command
 
             $currentSetpoint = (int) round(
                 $room->acUnits
-                    ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                    ->map(fn ($ac) => $ac->status?->set_temperature ?? 24)
                     ->avg()
             );
 
@@ -91,7 +106,7 @@ class RunFuzzyLogic extends Command
 
             Cache::put($cooldownKey, true, 60);
 
-            $acController = new AcControlController();
+            $acController = new AcControlController;
 
             foreach ($room->acUnits as $ac) {
                 $acController->fuzzySetTemp(
@@ -108,5 +123,22 @@ class RunFuzzyLogic extends Command
         $this->info("Fuzzy logic applied to {$processed} room(s), {$skipped} skipped (cooldown)");
 
         return Command::SUCCESS;
+    }
+
+    private function lastSeenFrom(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if (! is_string($value) && ! is_int($value)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

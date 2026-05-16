@@ -24,18 +24,17 @@ class MqttSubscribe extends Command
     {
         while (true) {
             try {
-                $mqtt = new MqttService;
+                // Client ID khusus subscriber agar tidak konflik dengan publisher (controller)
+                $mqtt = new MqttService('subscriber');
 
                 $this->info('MQTT LISTENER STARTED');
 
                 $mqtt->subscribeMultiple([
 
                     /* === DEVICE ONLINE === */
-                    'device/+/online' => function ($topic, $message, $qos = 0, $retained = false) use ($mqtt) {
+                    'device/+/online' => function ($topic, $message, $retained = false, $matchedWildcards = []) use ($mqtt) {
 
-                        // Skip retained "online" — stale snapshot dari sesi lama
-                        if ($retained) {
-                            $this->warn("ONLINE retained di-skip ({$topic})");
+                        if ($this->skipRetainedMessage($retained, 'ONLINE', $topic)) {
                             return;
                         }
 
@@ -54,14 +53,15 @@ class MqttSubscribe extends Command
                         $this->setOnline($deviceId);
 
                         $mqtt->resendConfig($deviceId);
+                        Cache::put("device_{$deviceId}_config_sent", true, 300);
 
                         event(new DeviceStatusUpdated($deviceId, 'online'));
                     },
 
                     /* === PING === */
-                    'device/+/ping' => function ($topic, $message = '', $qos = 0, $retained = false) {
+                    'device/+/ping' => function ($topic, $message = '', $retained = false, $matchedWildcards = []) use ($mqtt) {
 
-                        if ($retained) {
+                        if ($this->skipRetainedMessage($retained, 'PING', $topic)) {
                             return;
                         }
 
@@ -74,12 +74,20 @@ class MqttSubscribe extends Command
 
                         $this->line("PING: {$deviceId}");
 
+                        // Kirim config jika belum pernah dikirim sejak mqtt:subscribe start
+                        // Ini menangani kasus: mqtt:subscribe restart saat ESP sudah online
+                        // sehingga pesan 'online' tidak diterima (retained di-skip)
+                        if (! Cache::get("device_{$deviceId}_config_sent")) {
+                            $mqtt->resendConfig($deviceId);
+                            Cache::put("device_{$deviceId}_config_sent", true, 300);
+                            $this->info("CONFIG resent via ping -> {$deviceId}");
+                        }
+
                         event(new DeviceStatusUpdated($deviceId, 'online'));
                     },
 
                     /* === STATUS (LWT) === */
-                    'device/+/status' => function ($topic, $message, $qos = 0, $retained = false) {
-
+                    'device/+/status' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
                         $deviceId = $this->extractDeviceId($topic, 'status');
                         if (! $deviceId) {
                             return;
@@ -92,6 +100,7 @@ class MqttSubscribe extends Command
                             Cache::forget("device_{$deviceId}_last_seen");
                             Cache::put("device_status_{$deviceId}", 'offline', 300);
                             Cache::forget("device_unknown_{$deviceId}");
+                            Cache::forget("device_{$deviceId}_config_sent");
 
                             AcStatus::whereHas('acUnit.room', function ($q) use ($deviceId) {
                                 $q->where('device_id', $deviceId);
@@ -107,9 +116,7 @@ class MqttSubscribe extends Command
                             Log::info('Device marked OFFLINE via LWT', ['device' => $deviceId]);
                         } elseif ($message === 'online') {
 
-                            // Skip retained "online" — stale snapshot dari sesi lama
-                            if ($retained) {
-                                $this->warn("STATUS online retained di-skip ({$deviceId})");
+                            if ($this->skipRetainedMessage($retained, 'STATUS ONLINE', $topic)) {
                                 return;
                             }
 
@@ -121,7 +128,11 @@ class MqttSubscribe extends Command
                         }
                     },
 
-                    'room/+/ac/+/control' => function ($topic, $message) {
+                    'room/+/ac/+/control' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
+
+                        if ($this->skipRetainedMessage($retained, 'CONTROL', $topic)) {
+                            return;
+                        }
 
                         $data = json_decode($message, true);
 
@@ -175,9 +186,13 @@ class MqttSubscribe extends Command
                         $this->info("AC {$acId} di {$roomName} diupdate");
                     },
 
-                    'room/+/ac/+/status' => function ($topic, $message) {
+                    'room/+/ac/+/status' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
 
                         try {
+
+                            if ($this->skipRetainedMessage($retained, 'AC STATUS', $topic)) {
+                                return;
+                            }
 
                             $data = json_decode($message, true);
 
@@ -287,10 +302,15 @@ class MqttSubscribe extends Command
                     },
 
                     /* === ROOM SENSOR (DHT from ESP32 per ruangan) === */
-                    'room/+/sensor' => function ($topic, $message) {
+                    'room/+/sensor' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
+                        if ($this->skipRetainedMessage($retained, 'ROOM SENSOR', $topic)) {
+                            return;
+                        }
+
                         $data = json_decode($message, true);
                         if (! is_array($data)) {
                             $this->error("ROOM SENSOR: payload bukan JSON valid → {$message}");
+
                             return;
                         }
 
@@ -304,7 +324,8 @@ class MqttSubscribe extends Command
                         }
 
                         if (! $room || $temp === null) {
-                            $this->error("ROOM SENSOR: room atau suhu kosong");
+                            $this->error('ROOM SENSOR: room atau suhu kosong');
+
                             return;
                         }
 
@@ -313,6 +334,7 @@ class MqttSubscribe extends Command
 
                         if ($temp <= 0 || $temp > 100) {
                             $this->error("ROOM SENSOR {$room}: suhu out of range ({$temp})");
+
                             return;
                         }
 
@@ -324,6 +346,7 @@ class MqttSubscribe extends Command
 
                         if (! \in_array($room, $knownRooms, true)) {
                             $this->warn("ROOM SENSOR [{$room}]: room tidak terdaftar di DB, di-drop");
+
                             return;
                         }
 
@@ -340,7 +363,11 @@ class MqttSubscribe extends Command
                     },
 
                     /* === HEARTBEAT === */
-                    'device/+/heartbeat' => function ($topic) {
+                    'device/+/heartbeat' => function ($topic, $message = '', $retained = false, $matchedWildcards = []) {
+
+                        if ($this->skipRetainedMessage($retained, 'HEARTBEAT', $topic)) {
+                            return;
+                        }
 
                         $deviceId = $this->extractDeviceId($topic, 'heartbeat');
                         if (! $deviceId) {
@@ -350,8 +377,63 @@ class MqttSubscribe extends Command
                         $this->setOnline($deviceId);
                     },
 
+                    /* === DEVICE SENSOR (DHT per device, fallback kalau config belum diterima) === */
+                    'device/+/sensor' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
+                        if ($this->skipRetainedMessage($retained, 'DEVICE SENSOR', $topic)) {
+                            return;
+                        }
+
+                        $data = json_decode($message, true);
+                        if (! is_array($data)) {
+                            return;
+                        }
+
+                        $deviceId = $this->extractDeviceId($topic, 'sensor');
+                        if (! $deviceId) {
+                            return;
+                        }
+
+                        $temp = $data['suhu'] ?? $data['temperature'] ?? null;
+                        if ($temp === null) {
+                            return;
+                        }
+
+                        $temp = (float) $temp;
+                        if ($temp <= 0 || $temp > 100) {
+                            return;
+                        }
+
+                        // Cari room berdasarkan device_id
+                        $room = Room::whereRaw('LOWER(TRIM(device_id)) = ?', [$deviceId])->first();
+                        if (! $room) {
+                            $this->warn("DEVICE SENSOR [{$deviceId}]: tidak ada room dengan device_id ini");
+
+                            return;
+                        }
+
+                        $roomName = RoomTemperature::normalizeRoomName($room->name);
+
+                        RoomTemperature::create([
+                            'room' => $roomName,
+                            'temperature' => $temp,
+                        ]);
+
+                        Cache::put("room_temp_{$roomName}", $temp, 300);
+
+                        // Sensor masuk = device pasti online (sekalian update last_seen)
+                        $this->setOnline($deviceId);
+
+                        $this->line("DEVICE SENSOR [{$deviceId}/{$roomName}]: {$temp}°C");
+
+                        event(new RoomTemperatureUpdated($roomName, $temp));
+                    },
+
                     /* === ADD AC === */
-                    'room/+/ac/add' => function ($topic, $message) {
+                    'room/+/ac/add' => function ($topic, $message, $retained = false, $matchedWildcards = []) {
+
+                        if ($this->skipRetainedMessage($retained, 'AC ADD', $topic)) {
+                            return;
+                        }
 
                         $data = json_decode($message, true);
 
@@ -426,8 +508,8 @@ class MqttSubscribe extends Command
         $deviceId = $this->normalize($deviceId);
         $now = now();
 
-        Cache::put("device_{$deviceId}_last_seen", $now->toDateTimeString(), 30);
-        Cache::put("device_status_{$deviceId}", 'online', 30);
+        Cache::put("device_{$deviceId}_last_seen", $now->toDateTimeString(), 300);
+        Cache::put("device_status_{$deviceId}", 'online', 120);
         Cache::forget("device_unknown_{$deviceId}");
 
         // Track semua device yang pernah ping (untuk `device:list-active`)
@@ -437,10 +519,26 @@ class MqttSubscribe extends Command
             Cache::put('seen_device_ids', $seen, 3600);
         }
 
-        Room::where('device_id', $deviceId)->update([
+        $updated = Room::whereRaw(
+            'LOWER(TRIM(device_id)) = ?',
+            [strtolower(trim($deviceId))]
+        )->update([
             'device_status' => 'online',
             'last_seen' => $now,
         ]);
+
+        $this->info("PING {$deviceId} -> DB updated rows: {$updated}");
+    }
+
+    private function skipRetainedMessage(bool $retained, string $label, string $topic): bool
+    {
+        if (! $retained) {
+            return false;
+        }
+
+        $this->warn("{$label} retained di-skip ({$topic})");
+
+        return true;
     }
 
     /* === HELPER: EXTRACT DEVICE ID === */

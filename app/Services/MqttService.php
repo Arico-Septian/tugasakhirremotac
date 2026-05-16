@@ -2,26 +2,43 @@
 
 namespace App\Services;
 
-use PhpMqtt\Client\MqttClient;
+use App\Models\AcStatus;
+use App\Models\AcUnit;
+use App\Models\Room;
 use PhpMqtt\Client\ConnectionSettings;
+use PhpMqtt\Client\MqttClient;
 
 class MqttService
 {
     private $mqtt;
 
-    public function __construct()
+    public function __construct(?string $clientIdSuffix = null)
     {
-        $server   = env('MQTT_HOST', 'broker.hivemq.com');
-        $port     = (int) env('MQTT_PORT', 1883);
-        $clientId = 'laravel_' . uniqid();
+        $server = env('MQTT_HOST', 'broker.hivemq.com');
+        $port = (int) env('MQTT_PORT', 1883);
+
+        // Client ID TETAP per role agar reconnect menggantikan koneksi lama
+        // (bukan menambah koneksi baru — HiveMQ Cloud free tier batasi jumlah koneksi)
+        $clientId = 'laravel_'.($clientIdSuffix ?? 'default');
+
+        $useTls = (int) env('MQTT_PORT', 1883) === 8883;
 
         $connectionSettings = (new ConnectionSettings)
             ->setUsername(env('MQTT_USERNAME'))
             ->setPassword(env('MQTT_PASSWORD'))
-            ->setUseTls(env('MQTT_PORT', 1883) == 8883)
-            ->setTlsSelfSignedAllowed(false);
+            ->setUseTls($useTls)
+            ->setTlsSelfSignedAllowed(true)
+            ->setTlsVerifyPeer(false)
+            ->setTlsVerifyPeerName(false)
+            ->setKeepAliveInterval(15)        // ping broker tiap 15 detik (lebih agresif)
+            ->setConnectTimeout(15)
+            ->setSocketTimeout(20)
+            ->setResendTimeout(10);
 
         $this->mqtt = new MqttClient($server, $port, $clientId);
+
+        // Clean session prevents the broker from replaying old queued messages
+        // after reconnect. The subscriber always registers its topics again.
         $this->mqtt->connect($connectionSettings, true);
     }
 
@@ -43,20 +60,23 @@ class MqttService
 
     public function resendConfig($deviceId)
     {
-        $room = \App\Models\Room::where('device_id', $deviceId)->first();
+        $deviceId = strtolower(trim($deviceId));
+        $room = Room::whereRaw('LOWER(TRIM(device_id)) = ?', [$deviceId])->first();
 
-        if (!$room) return;
+        if (! $room) {
+            return;
+        }
 
-        $acs = \App\Models\AcUnit::where('room_id', $room->id)->get();
+        $acs = AcUnit::where('room_id', $room->id)->get();
 
         $this->publish(
             "device/{$deviceId}/config",
             json_encode([
-                "room" => $room->name,
-                "acs" => $acs->map(fn($ac) => [
-                    "id" => (int)$ac->ac_number,
-                    "brand" => $ac->brand
-                ])
+                'room' => $room->name,
+                'acs' => $acs->map(fn ($ac) => [
+                    'id' => (int) $ac->ac_number,
+                    'brand' => $ac->brand,
+                ]),
             ]),
             1,
             true
@@ -64,20 +84,22 @@ class MqttService
 
         foreach ($acs as $ac) {
 
-            $status = \App\Models\AcStatus::where('ac_unit_id', $ac->id)->first();
+            $status = AcStatus::where('ac_unit_id', $ac->id)->first();
 
-            if (!$status) continue;
+            if (! $status) {
+                continue;
+            }
 
-            $topic = "room/" . self::roomToTopic($room->name) . "/ac/{$ac->ac_number}/control";
+            $topic = 'room/'.self::roomToTopic($room->name)."/ac/{$ac->ac_number}/control";
 
             $this->publish(
                 $topic,
                 json_encode([
-                    "power" => $status->power,
-                    "mode"  => $status->mode,
-                    "temp"  => (int)($status->set_temperature ?? 24),
-                    "fan_speed" => $status->fan_speed ?? 'AUTO',
-                    "swing" => $status->swing ?? 'OFF',
+                    'power' => $status->power,
+                    'mode' => $status->mode,
+                    'temp' => (int) ($status->set_temperature ?? 24),
+                    'fan_speed' => $status->fan_speed ?? 'AUTO',
+                    'swing' => $status->swing ?? 'OFF',
                 ]),
                 1,
                 true
@@ -87,12 +109,31 @@ class MqttService
         echo "CONFIG + STATUS DIKIRIM KE {$deviceId}\n";
     }
 
-    public function subscribeMultiple(array $topics)
+    public function subscribeMultiple(array $topics, int $idleTimeoutSeconds = 60)
     {
+        $lastMessageTime = time();
+
+        // Wrap setiap callback untuk track waktu pesan terakhir
         foreach ($topics as $topic => $callback) {
-            $this->mqtt->subscribe($topic, $callback);
+            $this->mqtt->subscribe($topic, function (...$args) use ($callback, &$lastMessageTime) {
+                $lastMessageTime = time();
+                $callback(...$args);
+            });
         }
 
-        $this->mqtt->loop(true);
+        // Loop non-blocking — bisa deteksi idle/stuck connection
+        while ($this->mqtt->isConnected()) {
+            $this->mqtt->loopOnce(microtime(true), true);
+
+            // Watchdog: kalau tidak ada pesan masuk dalam X detik, anggap koneksi stuck
+            // dan trigger reconnect via exception (caught di MqttSubscribe::handle())
+            if (time() - $lastMessageTime > $idleTimeoutSeconds) {
+                throw new \RuntimeException(
+                    "MQTT idle timeout ({$idleTimeoutSeconds}s) - reconnecting"
+                );
+            }
+        }
+
+        throw new \RuntimeException('MQTT connection lost');
     }
 }

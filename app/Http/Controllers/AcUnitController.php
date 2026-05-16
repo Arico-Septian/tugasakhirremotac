@@ -6,8 +6,8 @@ use App\Models\AcStatus;
 use App\Models\AcUnit;
 use App\Models\Room;
 use App\Models\RoomTemperature;
-use App\Services\FuzzyMamdaniService;
 use App\Models\UserLog;
+use App\Services\FuzzyMamdaniService;
 use App\Services\MqttService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -31,7 +31,7 @@ class AcUnitController extends Controller
         // FUZZY LOGIC
         // =========================
 
-        $fuzzyService = new FuzzyMamdaniService();
+        $fuzzyService = new FuzzyMamdaniService;
 
         $normalized = RoomTemperature::normalizeRoomName($room->name);
 
@@ -58,7 +58,7 @@ class AcUnitController extends Controller
 
             $currentSetpoint = (int) round(
                 $room->acUnits
-                    ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                    ->map(fn ($ac) => $ac->status?->set_temperature ?? 24)
                     ->avg()
             );
 
@@ -93,7 +93,7 @@ class AcUnitController extends Controller
                 'integer',
                 'min:1',
                 'max:15',
-                Rule::unique('ac_units')->where(fn($q) => $q->where('room_id', $roomId)),
+                Rule::unique('ac_units')->where(fn ($q) => $q->where('room_id', $roomId)),
             ],
         ]);
 
@@ -118,7 +118,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC ' . $ac->ac_number,
+            'ac' => 'AC '.$ac->ac_number,
             'activity' => 'add_ac',
         ]);
 
@@ -139,7 +139,7 @@ class AcUnitController extends Controller
                 'min:1',
                 'max:15',
                 Rule::unique('ac_units')
-                    ->where(fn($q) => $q->where('room_id', $ac->room_id))
+                    ->where(fn ($q) => $q->where('room_id', $ac->room_id))
                     ->ignore($ac->id),
             ],
         ]);
@@ -153,7 +153,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC ' . $ac->ac_number . ($ac->name ? ' ' . $ac->name : ''),
+            'ac' => 'AC '.$ac->ac_number.($ac->name ? ' '.$ac->name : ''),
             'activity' => 'edit_ac',
         ]);
 
@@ -169,7 +169,7 @@ class AcUnitController extends Controller
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => $room->name,
-            'ac' => 'AC ' . $ac->ac_number,
+            'ac' => 'AC '.$ac->ac_number,
             'activity' => 'delete_ac',
         ]);
 
@@ -181,14 +181,14 @@ class AcUnitController extends Controller
 
         $mqtt->resendConfig($room->device_id);
 
-        return redirect('/rooms/' . $room_id . '/ac');
+        return redirect('/rooms/'.$room_id.'/ac');
     }
 
     public function applyFuzzy($id)
     {
         $room = Room::with(['acUnits.status'])->findOrFail($id);
 
-        $fuzzyService = new FuzzyMamdaniService();
+        $fuzzyService = new FuzzyMamdaniService;
 
         $normalized = RoomTemperature::normalizeRoomName($room->name);
 
@@ -212,7 +212,7 @@ class AcUnitController extends Controller
 
         $currentSetpoint = (int) round(
             $room->acUnits
-                ->map(fn($ac) => $ac->status?->set_temperature ?? 24)
+                ->map(fn ($ac) => $ac->status?->set_temperature ?? 24)
                 ->avg()
         );
 
@@ -229,7 +229,7 @@ class AcUnitController extends Controller
         // COOLDOWN
         // =========================
 
-        $cooldownKey = 'fuzzy_room_' . $room->id;
+        $cooldownKey = 'fuzzy_room_'.$room->id;
 
         if (Cache::has($cooldownKey)) {
             return back()->with(
@@ -244,7 +244,7 @@ class AcUnitController extends Controller
         // APPLY KE SEMUA AC
         // =========================
 
-        $acController = new AcControlController();
+        $acController = new AcControlController;
 
         foreach ($room->acUnits as $ac) {
 
@@ -289,7 +289,7 @@ class AcUnitController extends Controller
 
     private function setCurrentDeviceStatus(Room $room): void
     {
-        $deviceId = trim((string) $room->device_id);
+        $deviceId = strtolower(trim((string) $room->device_id));
 
         if ($deviceId === '') {
             $room->device_status = 'offline';
@@ -303,7 +303,7 @@ class AcUnitController extends Controller
 
         $isOnline = ($status === 'online' || $status === 'available')
             && $lastSeen
-            && now()->diffInSeconds($lastSeen, true) <= 30;
+            && now()->diffInSeconds($lastSeen, true) <= 300;
 
         $room->device_status = $isOnline ? 'online' : 'offline';
     }

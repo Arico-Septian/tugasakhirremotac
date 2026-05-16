@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
+    private const STATE_TTL_DAYS = 30;
+
     protected $fillable = [
         'user_id',
         'type',
@@ -75,50 +77,62 @@ class Notification extends Model
 
     public static function deviceOffline(string $roomName, ?string $deviceId = null): ?self
     {
-        $stateKey = "device_state:{$roomName}";
+        $roomKey = self::roomKey($roomName);
+        $stateKey = "notification_state:device:{$roomKey}";
         $prevState = cache()->get($stateKey);
 
         if ($prevState === 'offline') {
             return null;
         }
 
-        cache()->put($stateKey, 'offline', now()->addDays(7));
+        cache()->put($stateKey, 'offline', now()->addDays(self::STATE_TTL_DAYS));
 
         return self::notify('device_offline', "ESP {$roomName} offline", [
             'severity' => 'error',
-            'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " tidak terhubung. Cek koneksi WiFi atau power.",
+            'message' => "Device {$deviceId} di ruangan ".ucwords($roomName).' tidak terhubung. Cek koneksi WiFi atau power.',
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
         ]);
     }
 
     public static function deviceOnline(string $roomName, ?string $deviceId = null): ?self
     {
-        $stateKey = "device_state:{$roomName}";
+        $roomKey = self::roomKey($roomName);
+        $stateKey = "notification_state:device:{$roomKey}";
         $prevState = cache()->get($stateKey);
 
         if ($prevState === 'online') {
             return null;
         }
 
-        cache()->forget($stateKey);  // Clear state so next offline notif will trigger
+        cache()->put($stateKey, 'online', now()->addDays(self::STATE_TTL_DAYS));
+
+        if ($prevState !== 'offline') {
+            return null;
+        }
 
         return self::notify('device_online', "ESP {$roomName} online", [
             'severity' => 'info',
-            'message' => "Device {$deviceId} di ruangan " . ucwords($roomName) . " terhubung kembali.",
+            'message' => "Device {$deviceId} di ruangan ".ucwords($roomName).' terhubung kembali.',
             'meta' => ['room' => $roomName, 'device_id' => $deviceId],
         ]);
     }
 
     public static function fuzzyAction(string $roomName, string $action, int $setpointBefore, int $setpointAfter): ?self
     {
-        $stateKey = "fuzzy_action:{$roomName}";
+        $roomKey = self::roomKey($roomName);
+        $stateKey = "notification_state:fuzzy_action:{$roomKey}";
         $prevAction = cache()->get($stateKey);
+        $currentAction = [
+            'action' => $action,
+            'setpoint_before' => $setpointBefore,
+            'setpoint_after' => $setpointAfter,
+        ];
 
-        if ($prevAction === $action) {
+        if ($prevAction === $currentAction) {
             return null;
         }
 
-        cache()->put($stateKey, $action, now()->addDays(7));
+        cache()->put($stateKey, $currentAction, now()->addDays(self::STATE_TTL_DAYS));
 
         $title = "Fuzzy Logic: {$roomName}";
         $message = self::buildFuzzyMessage($roomName, $action, $setpointBefore, $setpointAfter);
@@ -149,7 +163,8 @@ class Notification extends Model
 
     public static function fuzzyWarning(string $roomName, string $reason = 'temperature_offline'): ?self
     {
-        $stateKey = "fuzzy_warning:{$roomName}:{$reason}";
+        $roomKey = self::roomKey($roomName);
+        $stateKey = "notification_state:fuzzy_warning:{$roomKey}:{$reason}";
         $lastWarning = cache()->get($stateKey);
 
         // Sudah pernah notif untuk reason ini → skip sampai recovery
@@ -158,11 +173,11 @@ class Notification extends Model
         }
 
         // TTL panjang (7 hari) — tidak expire selama belum recovery
-        cache()->put($stateKey, 'warned', now()->addDays(7));
+        cache()->put($stateKey, 'warned', now()->addDays(self::STATE_TTL_DAYS));
 
         $message = match ($reason) {
-            'device_offline' => "ESP ruangan " . ucwords($roomName) . " offline — Fuzzy logic tidak berjalan. Periksa koneksi device.",
-            default => "Sensor suhu ruangan " . ucwords($roomName) . " offline — Fuzzy logic tidak berjalan. Periksa koneksi sensor.",
+            'device_offline' => 'ESP ruangan '.ucwords($roomName).' offline — Fuzzy logic tidak berjalan. Periksa koneksi device.',
+            default => 'Sensor suhu ruangan '.ucwords($roomName).' offline — Fuzzy logic tidak berjalan. Periksa koneksi sensor.',
         };
 
         return self::notify('fuzzy_warning', "Fuzzy Logic: {$roomName}", [
@@ -180,7 +195,8 @@ class Notification extends Model
         $recoveredReason = null;
 
         foreach ($reasons as $reason) {
-            $key = "fuzzy_warning:{$roomName}:{$reason}";
+            $roomKey = self::roomKey($roomName);
+            $key = "notification_state:fuzzy_warning:{$roomKey}:{$reason}";
             if (cache()->has($key)) {
                 $wasWarned = true;
                 $recoveredReason = $reason;
@@ -189,18 +205,23 @@ class Notification extends Model
         }
 
         // Tidak ada warning sebelumnya → tidak perlu notif recovery
-        if (!$wasWarned) {
+        if (! $wasWarned) {
             return null;
         }
 
         $message = $recoveredReason === 'device_offline'
-            ? "ESP ruangan " . ucwords($roomName) . " online — Fuzzy logic aktif kembali."
-            : "Sensor suhu ruangan " . ucwords($roomName) . " online — Fuzzy logic aktif kembali.";
+            ? 'ESP ruangan '.ucwords($roomName).' online — Fuzzy logic aktif kembali.'
+            : 'Sensor suhu ruangan '.ucwords($roomName).' online — Fuzzy logic aktif kembali.';
 
         return self::notify('fuzzy_recovery', "Fuzzy Logic: {$roomName}", [
             'severity' => 'info',
             'message' => $message,
             'meta' => ['room' => $roomName, 'reason' => 'recovered'],
         ]);
+    }
+
+    private static function roomKey(string $roomName): string
+    {
+        return strtolower(trim($roomName));
     }
 }

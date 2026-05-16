@@ -411,7 +411,7 @@
                                                         </span>
                                                         <span style="display:inline-flex;align-items:center;gap:5px;">
                                                             @if ($room->temperature_is_offline)
-                                                                <i class="fa-solid fa-wifi-slash" style="font-size:11px;color:var(--coral);"></i>
+                                                                <i class="fa-solid fa-wifi-slash temp-offline-icon" style="font-size:11px;color:var(--coral);"></i>
                                                             @endif
                                                             <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
                                                                 {{ $temp ?? '–' }}°C
@@ -706,18 +706,50 @@
         });
 
         /* ===== LIVE TEMP ===== */
+        function classForTemperature(temp) {
+            if (temp === null || Number.isNaN(temp)) return 'idle';
+            if (temp > 30) return 'hot';
+            if (temp > 25) return 'warm';
+            return 'cool';
+        }
+
+        function updateRoomTemperature(room) {
+            const el = document.getElementById(`temp-${room.id}`);
+            if (!el) return;
+
+            const liveTemp = parseFloat(room.temp);
+            const lastTemp = parseFloat(room.last_temp ?? room.temperature);
+            const displayTemp = Number.isNaN(liveTemp) ? lastTemp : liveTemp;
+            const isOffline = room.is_offline === true;
+            const chip = el.closest('.temp-chip');
+
+            if (!Number.isNaN(displayTemp)) {
+                el.textContent = `${displayTemp}°C`;
+            }
+
+            el.dataset.offline = isOffline ? 'true' : 'false';
+
+            if (chip) {
+                chip.classList.remove('cool', 'warm', 'hot', 'idle');
+                chip.classList.add(isOffline ? 'idle' : classForTemperature(displayTemp));
+
+                let icon = chip.querySelector('.temp-offline-icon');
+                if (isOffline && !icon) {
+                    icon = document.createElement('i');
+                    icon.className = 'fa-solid fa-wifi-slash temp-offline-icon';
+                    icon.style.fontSize = '11px';
+                    icon.style.color = 'var(--coral)';
+                    el.before(icon);
+                } else if (!isOffline && icon) {
+                    icon.remove();
+                }
+            }
+        }
+
         function refreshTemps() {
             fetch('/temperature').then(r => r.ok ? r.json() : null).then(data => {
                 if (!data) return;
-                data.forEach(room => {
-                    const el = document.getElementById(`temp-${room.id}`);
-                    if (!el) return;
-                    const t = parseFloat(room.temp);
-                    // Hanya update kalau ada data valid — biarkan suhu terakhir saat sensor offline
-                    if (!isNaN(t)) {
-                        el.textContent = `${t}°C`;
-                    }
-                });
+                data.forEach(updateRoomTemperature);
             }).catch(() => {});
         }
         setInterval(refreshTemps, 5000);
@@ -774,5 +806,4 @@
 </body>
 
 </html>
-
 
