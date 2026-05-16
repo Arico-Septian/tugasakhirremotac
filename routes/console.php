@@ -26,3 +26,6 @@ Schedule::command('fuzzy:run')
 
 Schedule::command('notification:cleanup')
     ->dailyAt('00:00');
+
+Schedule::command('temperature:cleanup --days=7')
+    ->dailyAt('00:10');
