@@ -174,11 +174,15 @@ class AcUnitController extends Controller
         ]);
 
         $room_id = $ac->room_id;
+        $acNumber = $ac->ac_number;
+        $roomTopic = MqttService::roomToTopic($room->name);
 
         $ac->delete();
 
         $mqtt = new MqttService;
 
+        $mqtt->clearRetained("room/{$roomTopic}/ac/{$acNumber}/control");
+        $mqtt->clearRetained("room/{$roomTopic}/ac/{$acNumber}/status");
         $mqtt->resendConfig($room->device_id);
 
         return redirect('/rooms/'.$room_id.'/ac');

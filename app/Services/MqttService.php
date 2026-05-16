@@ -52,6 +52,11 @@ class MqttService
         $this->mqtt->publish($topic, $message, $qos, $retain);
     }
 
+    public function clearRetained(string $topic, int $qos = 1): void
+    {
+        $this->publish($topic, '', $qos, true);
+    }
+
     public function subscribe($topic, $callback)
     {
         $this->mqtt->subscribe($topic, $callback);

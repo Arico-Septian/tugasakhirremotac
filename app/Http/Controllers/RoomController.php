@@ -234,7 +234,7 @@ class RoomController extends Controller
     /* === DELETE ROOM === */
     public function destroy($id)
     {
-        $room = Room::findOrFail($id);
+        $room = Room::with('acUnits:id,room_id,ac_number')->findOrFail($id);
 
         $deviceId = strtolower(trim((string) $room->device_id));
 
@@ -247,8 +247,12 @@ class RoomController extends Controller
                 "device/{$deviceId}/clear",
                 json_encode(new \stdClass),
                 1,
-                true
+                false
             );
+
+            foreach ($this->retainedTopicsForDeletedRoom($room, $deviceId) as $topic) {
+                $mqtt->clearRetained($topic);
+            }
         } catch (\Throwable $e) {
             $mqttPublished = false;
 
@@ -276,6 +280,44 @@ class RoomController extends Controller
             : 'Room berhasil dihapus, tetapi perintah clear ke MQTT gagal dikirim';
 
         return redirect('/rooms')->with('success', $message);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function retainedTopicsForDeletedRoom(Room $room, string $deviceId): array
+    {
+        $topics = [
+            "device/{$deviceId}/config",
+            "device/{$deviceId}/clear",
+            "device/{$deviceId}/sensor",
+            "device/{$deviceId}/status",
+        ];
+
+        foreach ($this->roomTopicAliases($room->name) as $roomTopic) {
+            $topics[] = "room/{$roomTopic}/sensor";
+
+            foreach ($room->acUnits as $ac) {
+                $topics[] = "room/{$roomTopic}/ac/{$ac->ac_number}/control";
+                $topics[] = "room/{$roomTopic}/ac/{$ac->ac_number}/status";
+            }
+        }
+
+        return array_values(array_unique($topics));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function roomTopicAliases(string $roomName): array
+    {
+        $topic = MqttService::roomToTopic($roomName);
+
+        return array_values(array_unique(array_filter([
+            $topic,
+            str_replace(' ', '_', $topic),
+            str_replace(' ', '-', $topic),
+        ])));
     }
 
     /* === OVERVIEW ALL ROOMS === */
