@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>Manajemen Ruangan — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    @vite('resources/js/app.js')
-    @include('components.sidebar-styles')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
+    <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         /* ===== Temperature chip — colored bg + matching text ===== */
         .room-card .temp-chip {
@@ -237,7 +237,7 @@
     <div id="overlay"></div>
 
     <div class="layout">
-        @include('components.sidebar')
+        <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <div class="main-content">
             <header class="main-header">
@@ -251,7 +251,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    @include('components.notification-bell')
+                    <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                     <span id="systemStatus" class="pill pill-online">
                         <span class="dot"></span>
                         <span>Online</span>
@@ -264,15 +264,15 @@
                     <div class="app-content-inner space-y-4">
 
                         <div class="flex items-center gap-2">
-                            <form method="GET" action="{{ route('rooms.index') }}" class="flex-1 min-w-0">
+                            <form method="GET" action="<?php echo e(route('rooms.index')); ?>" class="flex-1 min-w-0">
                                 <label class="search-input">
                                     <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input name="search" value="{{ request('search') }}" type="text"
+                                    <input name="search" value="<?php echo e(request('search')); ?>" type="text"
                                         placeholder="Cari ruangan…" autocomplete="off">
-                                    @if (request('search'))
-                                        <a href="{{ route('rooms.index') }}" class="clear" title="Clear"><i
+                                    <?php if(request('search')): ?>
+                                        <a href="<?php echo e(route('rooms.index')); ?>" class="clear" title="Clear"><i
                                                 class="fa-solid fa-xmark text-[10px]"></i></a>
-                                    @endif
+                                    <?php endif; ?>
                                 </label>
                             </form>
 
@@ -286,35 +286,35 @@
                                         Offline
                                     </button>
                                 </div>
-                                @auth
-                                    @if (in_array(Auth::user()->role, ['admin', 'operator']))
+                                <?php if(auth()->guard()->check()): ?>
+                                    <?php if(in_array(Auth::user()->role, ['admin', 'operator'])): ?>
                                         <button onclick="openModal()" class="btn btn-primary btn-sm" type="button">
                                             <i class="fa-solid fa-plus text-[10px]"></i>
                                             <span>Add Room</span>
                                         </button>
-                                    @endif
-                                @endauth
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
 
                         <p id="roomCount" class="text-mono text-xs" style="color:var(--ink-3);"></p>
 
-                        @if ($rooms->count() > 0)
+                        <?php if($rooms->count() > 0): ?>
                             <div class="space-y-2">
-                                @foreach ($roomsByFloor as $floorName => $floorRooms)
+                                <?php $__currentLoopData = $roomsByFloor; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $floorName => $floorRooms): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <section class="floor-section">
                                         <div class="floor-section-header">
                                             <i class="fa-solid fa-layer-group text-[10px]"
                                                 style="color:var(--lavender);"></i>
-                                            <span class="floor-label">{{ $floorName }}</span>
+                                            <span class="floor-label"><?php echo e($floorName); ?></span>
                                             <div class="floor-divider"></div>
-                                            <span class="floor-count">{{ $floorRooms->count() }} ruangan</span>
+                                            <span class="floor-count"><?php echo e($floorRooms->count()); ?> ruangan</span>
                                         </div>
 
                                         <div
                                             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-6">
-                                            @foreach ($floorRooms as $room)
-                                                @php
+                                            <?php $__currentLoopData = $floorRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $online = ($room->device_status ?? 'offline') === 'online';
                                                     $temp = $room->temperature ?? null;
                                                     $tcls =
@@ -331,58 +331,59 @@
                                                     $idleAcs = $room->acUnits
                                                         ->filter(fn($ac) => !$ac->status || $ac->status->power !== 'ON')
                                                         ->count();
-                                                @endphp
-                                                <div class="room-card" data-room-id="{{ $room->id }}"
-                                                    data-status="{{ $online ? 'online' : 'offline' }}">
+                                                ?>
+                                                <div class="room-card" data-room-id="<?php echo e($room->id); ?>"
+                                                    data-status="<?php echo e($online ? 'online' : 'offline'); ?>">
                                                     <div class="flex items-start justify-between gap-2">
                                                         <h2 class="font-semibold text-tight truncate"
-                                                            style="color:var(--ink-0);font-size:16px;line-height:1.25;">{{ $room->name }}</h2>
-                                                        <span class="pill room-status-pill {{ $online ? 'pill-online' : 'pill-offline' }}"
+                                                            style="color:var(--ink-0);font-size:16px;line-height:1.25;"><?php echo e($room->name); ?></h2>
+                                                        <span class="pill room-status-pill <?php echo e($online ? 'pill-online' : 'pill-offline'); ?>"
                                                             style="padding:3px 8px;font-size:10px;flex-shrink:0;">
-                                                            <span class="dot"></span><span class="room-status-text">{{ $online ? 'Online' : 'Offline' }}</span>
+                                                            <span class="dot"></span><span class="room-status-text"><?php echo e($online ? 'Online' : 'Offline'); ?></span>
                                                         </span>
                                                     </div>
 
-                                                    {{-- BAR SUHU --}}
-                                                    <div class="temp-chip {{ $room->temperature_is_offline ? 'idle' : $tcls }}"
+                                                    
+                                                    <div class="temp-chip <?php echo e($room->temperature_is_offline ? 'idle' : $tcls); ?>"
                                                         style="justify-content:space-between;width:100%;">
                                                         <span style="display:inline-flex;align-items:center;gap:6px;font-weight:500;">
                                                             <i class="fa-solid fa-temperature-half text-[10px]"></i>Suhu
                                                         </span>
                                                         <span style="display:inline-flex;align-items:center;gap:5px;">
-                                                            @if($room->temperature_is_offline)
+                                                            <?php if($room->temperature_is_offline): ?>
                                                                 <i class="fa-solid fa-wifi-slash" style="font-size:11px;color:var(--coral);"></i>
-                                                            @endif
-                                                            <span id="temp-{{ $room->id }}" class="text-mono" data-offline="{{ $room->temperature_is_offline ? 'true' : 'false' }}">
-                                                                {{ $temp ?? '–' }}°C
+                                                            <?php endif; ?>
+                                                            <span id="temp-<?php echo e($room->id); ?>" class="text-mono" data-offline="<?php echo e($room->temperature_is_offline ? 'true' : 'false'); ?>">
+                                                                <?php echo e($temp ?? '–'); ?>°C
                                                             </span>
                                                         </span>
                                                     </div>
 
-                                                    {{-- FUZZY OUTPUT (taruh DI BAWAH BAR SUHU) --}}
-                                                    @if ($room->temperature !== null)
+                                                    
+                                                    <?php if($room->temperature !== null): ?>
                                                         <div class="mt-2"
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:8px 10px;">
                                                             <div class="flex items-center justify-between"
                                                                 style="font-size:12px;color:var(--ink-3);">
                                                                 <span>ΔT</span>
                                                                 <span
-                                                                    class="text-mono">{{ $room->delta_t ?? 0 }}</span>
+                                                                    class="text-mono"><?php echo e($room->delta_t ?? 0); ?></span>
                                                             </div>
 
-                                                            @if (!empty($room->fuzzy))
+                                                            <?php if(!empty($room->fuzzy)): ?>
                                                                 <div class="flex items-center justify-between mt-1"
                                                                     style="font-size:11px;">
                                                                     <span style="color:var(--ink-3);flex-shrink:0;">Pendinginan</span>
                                                                     <span class="text-mono"
                                                                         style="font-weight:700;color:var(--mint);white-space:nowrap;margin-left:6px;">
-                                                                        {{ $room->fuzzy['status_pendinginan'] ?? '-' }}
+                                                                        <?php echo e($room->fuzzy['status_pendinginan'] ?? '-'); ?>
+
                                                                     </span>
                                                                 </div>
 
-                                                                {{-- KEPUTUSAN FUZZY --}}
-                                                                @if (!empty($room->decision))
-                                                                    @php
+                                                                
+                                                                <?php if(!empty($room->decision)): ?>
+                                                                    <?php
                                                                         $action = strtoupper($room->decision['action'] ?? 'DIAM');
                                                                         $keputusanClass = match($action) {
                                                                             'TURUNKAN' => 'keputusan-yellow',
@@ -392,29 +393,29 @@
                                                                         };
                                                                         $spBefore = is_array($room->decision) ? ($room->decision['setpoint_before'] ?? '-') : '-';
                                                                         $spAfter  = is_array($room->decision) ? ($room->decision['setpoint_after']  ?? '-') : '-';
-                                                                    @endphp
+                                                                    ?>
                                                                     <div style="font-size:11px;color:var(--ink-3);margin-top:4px;">
                                                                         <div class="flex items-center justify-between">
                                                                             <span style="flex-shrink:0;">Keputusan</span>
-                                                                            <span class="text-mono {{ $keputusanClass }}"
-                                                                                style="font-weight:700;white-space:nowrap;margin-left:6px;">{{ $action }}</span>
+                                                                            <span class="text-mono <?php echo e($keputusanClass); ?>"
+                                                                                style="font-weight:700;white-space:nowrap;margin-left:6px;"><?php echo e($action); ?></span>
                                                                         </div>
                                                                         <div class="flex items-center justify-between" style="margin-top:2px;color:var(--ink-4);">
                                                                             <span style="flex-shrink:0;">Setpoint</span>
-                                                                            <span class="text-mono" style="white-space:nowrap;margin-left:6px;">{{ $spBefore }} &rarr; {{ $spAfter }}</span>
+                                                                            <span class="text-mono" style="white-space:nowrap;margin-left:6px;"><?php echo e($spBefore); ?> &rarr; <?php echo e($spAfter); ?></span>
                                                                         </div>
                                                                     </div>
-                                                                @endif
-                                                            @endif
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
                                                         </div>
-                                                    @endif
+                                                    <?php endif; ?>
                                                     <div class="grid grid-cols-2 gap-1.5">
                                                         <div
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">
                                                             <p class="text-mono text-base font-bold"
                                                                 style="color:var(--mint);line-height:1;"
-                                                                id="active-{{ $room->id }}">
-                                                                {{ $activeAcs }}</p>
+                                                                id="active-<?php echo e($room->id); ?>">
+                                                                <?php echo e($activeAcs); ?></p>
                                                             <p class="label-tag mt-1" style="font-size:9.5px;">Active
                                                             </p>
                                                         </div>
@@ -422,53 +423,53 @@
                                                             style="background:var(--panel-1);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:6px 8px;text-align:center;">
                                                             <p class="text-mono text-base font-bold"
                                                                 style="color:var(--ink-2);line-height:1;"
-                                                                id="idle-{{ $room->id }}">
-                                                                {{ $idleAcs }}</p>
+                                                                id="idle-<?php echo e($room->id); ?>">
+                                                                <?php echo e($idleAcs); ?></p>
                                                             <p class="label-tag mt-1" style="font-size:9.5px;">Idle
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <p class="text-xs text-center"
                                                         style="color:var(--ink-4);margin-top:-2px;">
-                                                        {{ $room->acUnits->count() }} unit total</p>
+                                                        <?php echo e($room->acUnits->count()); ?> unit total</p>
 
                                                     <div class="flex flex-col gap-1.5 mt-auto">
-                                                        <a href="/rooms/{{ $room->id }}/ac"
+                                                        <a href="/rooms/<?php echo e($room->id); ?>/ac"
                                                             class="btn btn-primary btn-sm">
                                                             <i class="fa-solid fa-sliders text-[10px]"></i>Control AC
                                                         </a>
-                                                        @auth
-                                                            @if (in_array(Auth::user()->role, ['admin', 'operator']))
-                                                                <form action="/rooms/{{ $room->id }}" method="POST"
+                                                        <?php if(auth()->guard()->check()): ?>
+                                                            <?php if(in_array(Auth::user()->role, ['admin', 'operator'])): ?>
+                                                                <form action="/rooms/<?php echo e($room->id); ?>" method="POST"
                                                                     onsubmit="return confirmDelete(event)">
-                                                                    @csrf
-                                                                    @method('DELETE')
+                                                                    <?php echo csrf_field(); ?>
+                                                                    <?php echo method_field('DELETE'); ?>
                                                                     <button type="submit"
                                                                         class="btn btn-danger btn-sm btn-block">
                                                                         <i class="fa-solid fa-trash text-[10px]"></i>Hapus
                                                                     </button>
                                                                 </form>
-                                                            @endif
-                                                        @endauth
+                                                            <?php endif; ?>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </section>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                             <div id="roomFilterEmpty" class="empty-state" hidden>
                                 <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
                                 <p class="empty-title">Tidak ditemukan</p>
                                 <p class="empty-sub">Coba filter status lain</p>
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="fa-solid fa-server"></i></div>
                                 <p class="empty-title">Belum ada ruangan</p>
                                 <p class="empty-sub">Tambahkan ruangan untuk memulai</p>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                     </div>
                 </div>
@@ -476,11 +477,11 @@
         </div>
     </div>
 
-    @include('components.bottom-nav')
+    <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Modal: Add Room --}}
-    @auth
-        @if (in_array(Auth::user()->role, ['admin', 'operator']))
+    
+    <?php if(auth()->guard()->check()): ?>
+        <?php if(in_array(Auth::user()->role, ['admin', 'operator'])): ?>
             <div id="modal" class="modal-backdrop">
                 <div class="modal">
                     <div class="modal-header">
@@ -493,7 +494,7 @@
                                 class="fa-solid fa-xmark"></i></button>
                     </div>
                     <form id="addRoomForm" method="POST" action="/rooms">
-                        @csrf
+                        <?php echo csrf_field(); ?>
                         <div class="modal-body space-y-3">
                             <div class="field">
                                 <label class="field-label">Nama Ruangan</label>
@@ -521,8 +522,8 @@
                     </form>
                 </div>
             </div>
-        @endif
-    @endauth
+        <?php endif; ?>
+    <?php endif; ?>
 
     <script>
         function openModal() {
@@ -699,15 +700,15 @@
                     .listen('.AcStatusUpdated', () => refreshAcCounters());
             }
 
-            @if (session('success'))
-                window.smToast("{{ session('success') }}", 'success');
-            @endif
-            @if (session('error'))
-                window.smToast("{{ session('error') }}", 'error');
-            @endif
-            @if ($errors->any())
-                window.smToast("{{ $errors->first() }}", 'error');
-            @endif
+            <?php if(session('success')): ?>
+                window.smToast("<?php echo e(session('success')); ?>", 'success');
+            <?php endif; ?>
+            <?php if(session('error')): ?>
+                window.smToast("<?php echo e(session('error')); ?>", 'error');
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
+                window.smToast("<?php echo e($errors->first()); ?>", 'error');
+            <?php endif; ?>
         });
 
         function setSystemStatus(online) {
@@ -722,10 +723,11 @@
             setSystemStatus(navigator.onLine);
         });
     </script>
-    @include('components.sidebar-scripts')
+    <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 
 </html>
 
 
 
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/rooms/index.blade.php ENDPATH**/ ?>

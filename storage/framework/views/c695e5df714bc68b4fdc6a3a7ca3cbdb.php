@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>Activity Log — SmartAC</title>
     <link href="/css/app.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    @vite('resources/js/app.js')
-    @include('components.sidebar-styles')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
+    <?php echo $__env->make('components.sidebar-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         .toolbar-row {
             display: flex;
@@ -365,7 +365,7 @@
     <div id="overlay"></div>
 
     <div class="layout">
-        @include('components.sidebar')
+        <?php echo $__env->make('components.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <div class="main-content">
             <header class="main-header">
@@ -379,7 +379,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    @include('components.notification-bell')
+                    <?php echo $__env->make('components.notification-bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                     <span id="systemStatus" class="pill pill-online">
                         <span class="dot"></span>
                         <span>Online</span>
@@ -391,7 +391,7 @@
                 <div class="app-content">
                     <div class="app-content-inner space-y-4">
 
-                        @php
+                        <?php
                             function activityBadge($activity)
                             {
                                 if (str_starts_with($activity, 'set_temp_')) {
@@ -469,17 +469,17 @@
                                 'user' => 'User',
                             ];
                             $currentCat = in_array(request('activity'), ['auth', 'ac', 'room', 'user']) ? request('activity') : '';
-                        @endphp
+                        ?>
 
-                        {{-- Stats — 4 kartu sesuai mockup --}}
+                        
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                             <div class="stat-card acc-cyan">
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Total Aktivitas</p>
-                                        <p class="stat-num-lg">{{ $stats['total'] }}</p>
-                                        <p class="stat-sub">Halaman {{ $logs->currentPage() }} / {{ $logs->lastPage() }}</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['total']); ?></p>
+                                        <p class="stat-sub">Halaman <?php echo e($logs->currentPage()); ?> / <?php echo e($logs->lastPage()); ?></p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
                                 </div>
@@ -489,8 +489,8 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Login Events</p>
-                                        <p class="stat-num-lg">{{ $stats['auth'] }}</p>
-                                        <p class="stat-sub">+{{ $stats['auth24'] }} dalam 24 jam</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['auth']); ?></p>
+                                        <p class="stat-sub">+<?php echo e($stats['auth24']); ?> dalam 24 jam</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
                                 </div>
@@ -500,7 +500,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Kontrol AC</p>
-                                        <p class="stat-num-lg">{{ $stats['ac'] }}</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['ac']); ?></p>
                                         <p class="stat-sub">on/off · mode · suhu</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-snowflake"></i></div>
@@ -511,7 +511,7 @@
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="stat-label-sm">Destructive</p>
-                                        <p class="stat-num-lg">{{ $stats['destructive'] }}</p>
+                                        <p class="stat-num-lg"><?php echo e($stats['destructive']); ?></p>
                                         <p class="stat-sub">delete user · room</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-trash"></i></div>
@@ -519,51 +519,51 @@
                             </div>
                         </div>
 
-                        {{-- Toolbar + Table wrapper (no space-y between them) --}}
+                        
                         <div class="tbl-wrap">
-                        {{-- Toolbar: search + quick category + date range --}}
+                        
                         <form method="GET" action="/logs" id="filterForm">
                             <div class="tbl-toolbar">
                                 <label class="search-input" style="flex:1;max-width:none;">
                                     <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input name="search" value="{{ request('search') }}" type="text"
+                                    <input name="search" value="<?php echo e(request('search')); ?>" type="text"
                                         placeholder="Cari user / ruangan / aktivitas…" autocomplete="off">
-                                    @if (request('search'))
+                                    <?php if(request('search')): ?>
                                         <button type="button" class="clear" title="Clear"
                                             onclick="removeFilter('search')"><i
                                                 class="fa-solid fa-xmark text-[10px]"></i></button>
-                                    @endif
+                                    <?php endif; ?>
                                 </label>
 
                                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                                     <div class="segmented">
-                                        @foreach ($quickCats as $val => $label)
+                                        <?php $__currentLoopData = $quickCats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <button type="button"
-                                                class="seg {{ $currentCat === $val ? 'active' : '' }}"
-                                                data-quick="{{ $val }}">{{ $label }}</button>
-                                        @endforeach
+                                                class="seg <?php echo e($currentCat === $val ? 'active' : ''); ?>"
+                                                data-quick="<?php echo e($val); ?>"><?php echo e($label); ?></button>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
 
-                                    @if (Auth::user()->role == 'admin')
+                                    <?php if(Auth::user()->role == 'admin'): ?>
                                         <button type="button" onclick="deleteAllLogs()"
                                             class="btn btn-danger btn-sm" title="Delete Activity">
                                             <i class="fa-solid fa-trash text-[10px]"></i>
                                         </button>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                         </form>
 
-                        @php
+                        <?php
                             $isEmpty = fn ($v) => $v === null || $v === '' || $v === '-' || $v === '—';
-                        @endphp
+                        ?>
 
-                        {{-- Log table --}}
-                            {{-- Mobile cards --}}
+                        
+                            
                             <div class="md:hidden" id="logsMobile">
-                                @forelse ($logs as $log)
-                                    @php
+                                <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <?php
                                         [$label, $class] = activityBadge($log->activity);
                                         $roomAcText = collect([
                                             $isEmpty($log->room) ? null : $log->room,
@@ -571,79 +571,83 @@
                                         ])->filter()->implode(' · ');
                                         $avatarColors = ['cyan', 'mint', 'lavender', 'coral'];
                                         $avatarColor = $avatarColors[(($log->user_id ?? 0) - 1) % 4 < 0 ? 0 : (($log->user_id ?? 0) - 1) % 4];
-                                    @endphp
+                                    ?>
                                     <div style="padding:14px 16px;border-bottom:1px solid rgba(255, 255, 255, 0.15);">
                                         <div class="flex items-center gap-3">
-                                            @if ($log->user && $log->user->avatar_url)
-                                                <img src="{{ $log->user->avatar_url }}" alt="{{ $log->user->name }}"
+                                            <?php if($log->user && $log->user->avatar_url): ?>
+                                                <img src="<?php echo e($log->user->avatar_url); ?>" alt="<?php echo e($log->user->name); ?>"
                                                      style="width:38px;height:38px;border-radius:9px;object-fit:cover;flex-shrink:0;">
-                                            @else
-                                                <div style="width:38px;height:38px;border-radius:9px;background:var(--{{ $avatarColor }});color:#0c1726;font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                                    {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
+                                            <?php else: ?>
+                                                <div style="width:38px;height:38px;border-radius:9px;background:var(--<?php echo e($avatarColor); ?>);color:#0c1726;font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                    <?php echo e(strtoupper(substr($log->user->name ?? '?', 0, 1))); ?>
+
                                                 </div>
-                                            @endif
+                                            <?php endif; ?>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center justify-between gap-2">
                                                     <div class="flex items-center gap-2 min-w-0">
-                                                        <span class="truncate" style="font-size:15px;font-weight:600;color:var(--ink-0);">{{ $log->user->name ?? '—' }}</span>
-                                                        <span class="act-badge {{ $class }}" style="flex-shrink:0;">{{ $label }}</span>
+                                                        <span class="truncate" style="font-size:15px;font-weight:600;color:var(--ink-0);"><?php echo e($log->user->name ?? '—'); ?></span>
+                                                        <span class="act-badge <?php echo e($class); ?>" style="flex-shrink:0;"><?php echo e($label); ?></span>
                                                     </div>
-                                                    <span class="text-mono" style="font-size:12.5px;color:var(--ink-2);white-space:nowrap;flex-shrink:0;font-weight:600;">{{ $log->created_at->format('H:i') }}</span>
+                                                    <span class="text-mono" style="font-size:12.5px;color:var(--ink-2);white-space:nowrap;flex-shrink:0;font-weight:600;"><?php echo e($log->created_at->format('H:i')); ?></span>
                                                 </div>
                                                 <div class="flex items-center justify-between gap-2" style="margin-top:5px;">
-                                                    <span class="truncate" style="font-size:13px;color:var(--ink-3);">{{ $roomAcText ?: '—' }}</span>
-                                                    <span class="text-mono" style="font-size:11.5px;color:var(--ink-4);white-space:nowrap;flex-shrink:0;">{{ $log->created_at->format('d M Y') }}</span>
+                                                    <span class="truncate" style="font-size:13px;color:var(--ink-3);"><?php echo e($roomAcText ?: '—'); ?></span>
+                                                    <span class="text-mono" style="font-size:11.5px;color:var(--ink-4);white-space:nowrap;flex-shrink:0;"><?php echo e($log->created_at->format('d M Y')); ?></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                @empty
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <div class="empty-state">
                                         <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
                                         <p class="empty-title">No activities found</p>
-                                        <p class="empty-sub">{{ count($activeFilters) ? 'Try adjusting your filters or ' : '' }}<a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
+                                        <p class="empty-sub"><?php echo e(count($activeFilters) ? 'Try adjusting your filters or ' : ''); ?><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
                                     </div>
-                                @endforelse
+                                <?php endif; ?>
                             </div>
 
-                            {{-- Active filter chips --}}
-                            @if (count($activeFilters))
+                            
+                            <?php if(count($activeFilters)): ?>
                                 <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;align-items:center;border-bottom:1px solid var(--line-soft);">
                                     <span style="font-size:12px;color:var(--ink-3);font-weight:500;">Filters:</span>
-                                    @if (request('search'))
+                                    <?php if(request('search')): ?>
                                         <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
                                             <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                                            "{{ request('search') }}"
+                                            "<?php echo e(request('search')); ?>"
                                             <button onclick="removeFilter('search')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
                                         </span>
-                                    @endif
-                                    @if (request('activity'))
-                                        @php $actLabel = $activityOptions[request('activity')] ?? request('activity'); @endphp
+                                    <?php endif; ?>
+                                    <?php if(request('activity')): ?>
+                                        <?php $actLabel = $activityOptions[request('activity')] ?? request('activity'); ?>
                                         <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
                                             <i class="fa-solid fa-filter text-[9px]"></i>
-                                            {{ $actLabel }}
+                                            <?php echo e($actLabel); ?>
+
                                             <button onclick="removeFilter('activity')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
                                         </span>
-                                    @endif
-                                    @if (request('user_id'))
-                                        @php $userName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); @endphp
+                                    <?php endif; ?>
+                                    <?php if(request('user_id')): ?>
+                                        <?php $userName = $users->firstWhere('id', request('user_id'))?->name ?? request('user_id'); ?>
                                         <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
                                             <i class="fa-solid fa-user text-[9px]"></i>
-                                            {{ $userName }}
+                                            <?php echo e($userName); ?>
+
                                             <button onclick="removeFilter('user_id')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
                                         </span>
-                                    @endif
-                                    @if (request('room'))
+                                    <?php endif; ?>
+                                    <?php if(request('room')): ?>
                                         <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(77,212,255,0.1);border:1px solid rgba(77,212,255,0.25);border-radius:999px;font-size:12px;color:var(--cyan);">
                                             <i class="fa-solid fa-server text-[9px]"></i>
-                                            {{ request('room') }}
+                                            <?php echo e(request('room')); ?>
+
                                             <button onclick="removeFilter('room')" style="background:none;border:none;color:var(--cyan);cursor:pointer;padding:0;font-size:10px;"><i class="fa-solid fa-xmark"></i></button>
                                         </span>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
-                            {{-- Desktop table --}}
+                            
                             <div class="hidden md:block" style="overflow-x:auto;">
                                 <table class="tbl tbl-log">
                                     <thead>
@@ -656,60 +660,61 @@
                                         </tr>
                                     </thead>
                                     <tbody id="logsTbody">
-                                        @forelse ($logs as $log)
+                                        <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <tr>
                                                 <td>
                                                     <div class="log-user">
-                                                        @if ($log->user && $log->user->avatar_url)
-                                                            <img src="{{ $log->user->avatar_url }}" alt="{{ $log->user->name }}"
+                                                        <?php if($log->user && $log->user->avatar_url): ?>
+                                                            <img src="<?php echo e($log->user->avatar_url); ?>" alt="<?php echo e($log->user->name); ?>"
                                                                  class="avatar"
                                                                  style="width:34px;height:34px;border-radius:9px;flex-shrink:0;object-fit:cover;">
-                                                        @else
+                                                        <?php else: ?>
                                                             <span class="avatar"
                                                                 style="width:34px;height:34px;font-size:13px;border-radius:9px;flex-shrink:0;">
-                                                                {{ strtoupper(substr($log->user->name ?? '?', 0, 1)) }}
+                                                                <?php echo e(strtoupper(substr($log->user->name ?? '?', 0, 1))); ?>
+
                                                             </span>
-                                                        @endif
-                                                        <span class="name">{{ $log->user->name ?? '—' }}</span>
+                                                        <?php endif; ?>
+                                                        <span class="name"><?php echo e($log->user->name ?? '—'); ?></span>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    @if ($isEmpty($log->room))
+                                                    <?php if($isEmpty($log->room)): ?>
                                                         <span class="log-empty">—</span>
-                                                    @else
-                                                        <span class="log-room">{{ $log->room }}</span>
-                                                    @endif
+                                                    <?php else: ?>
+                                                        <span class="log-room"><?php echo e($log->room); ?></span>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td>
-                                                    @if ($isEmpty($log->ac))
+                                                    <?php if($isEmpty($log->ac)): ?>
                                                         <span class="log-empty">—</span>
-                                                    @else
-                                                        <span class="log-detail" title="{{ $log->ac }}">{{ $log->ac }}</span>
-                                                    @endif
+                                                    <?php else: ?>
+                                                        <span class="log-detail" title="<?php echo e($log->ac); ?>"><?php echo e($log->ac); ?></span>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td>
-                                                    @php [$label, $class] = activityBadge($log->activity); @endphp
-                                                    <span class="act-badge {{ $class }}">{{ $label }}</span>
+                                                    <?php [$label, $class] = activityBadge($log->activity); ?>
+                                                    <span class="act-badge <?php echo e($class); ?>"><?php echo e($label); ?></span>
                                                 </td>
                                                 <td>
                                                     <div class="log-time">
-                                                        <span class="t">{{ $log->created_at->format('H:i') }}</span>
-                                                        <span class="d">{{ $log->created_at->format('d M Y') }}</span>
+                                                        <span class="t"><?php echo e($log->created_at->format('H:i')); ?></span>
+                                                        <span class="d"><?php echo e($log->created_at->format('d M Y')); ?></span>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @empty
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                             <tr>
                                                 <td colspan="5">
                                                     <div class="empty-state">
                                                         <div class="empty-icon"><i
                                                                 class="fa-solid fa-magnifying-glass"></i></div>
                                                         <p class="empty-title">No activities found</p>
-                                                        <p class="empty-sub">{{ count($activeFilters) ? 'Try adjusting your filters or ' : '' }}<a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
+                                                        <p class="empty-sub"><?php echo e(count($activeFilters) ? 'Try adjusting your filters or ' : ''); ?><a href="/logs" style="color:var(--cyan);text-decoration:underline;cursor:pointer;">reset all filters</a></p>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @endforelse
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -717,12 +722,12 @@
                             <div class="tbl-footer">
                                 <p>
                                     Menampilkan <span class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }}</span>
+                                        style="color:var(--ink-1);"><?php echo e($logs->firstItem() ?? 0); ?>–<?php echo e($logs->lastItem() ?? 0); ?></span>
                                     dari <span class="text-mono"
-                                        style="color:var(--ink-1);">{{ $logs->total() }}</span> aktivitas
+                                        style="color:var(--ink-1);"><?php echo e($logs->total()); ?></span> aktivitas
                                 </p>
                                 <div class="pager">
-                                    @php
+                                    <?php
                                         $current = $logs->currentPage();
                                         $last = $logs->lastPage();
                                         $pages = [];
@@ -735,29 +740,29 @@
                                             if ($current < $last - 2) $pages[] = '...';
                                             $pages[] = $last;
                                         }
-                                    @endphp
+                                    ?>
 
-                                    @if ($logs->onFirstPage())
+                                    <?php if($logs->onFirstPage()): ?>
                                         <span class="disabled"><i class="fa-solid fa-chevron-left text-[9px]"></i></span>
-                                    @else
-                                        <a href="{{ $logs->previousPageUrl() }}"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
-                                    @endif
+                                    <?php else: ?>
+                                        <a href="<?php echo e($logs->previousPageUrl()); ?>"><i class="fa-solid fa-chevron-left text-[9px]"></i></a>
+                                    <?php endif; ?>
 
-                                    @foreach ($pages as $p)
-                                        @if ($p === '...')
+                                    <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($p === '...'): ?>
                                             <span class="disabled">…</span>
-                                        @elseif ($p == $current)
-                                            <span class="active text-mono">{{ $p }}</span>
-                                        @else
-                                            <a class="text-mono" href="{{ $logs->url($p) }}">{{ $p }}</a>
-                                        @endif
-                                    @endforeach
+                                        <?php elseif($p == $current): ?>
+                                            <span class="active text-mono"><?php echo e($p); ?></span>
+                                        <?php else: ?>
+                                            <a class="text-mono" href="<?php echo e($logs->url($p)); ?>"><?php echo e($p); ?></a>
+                                        <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                    @if ($logs->hasMorePages())
-                                        <a href="{{ $logs->nextPageUrl() }}"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
-                                    @else
+                                    <?php if($logs->hasMorePages()): ?>
+                                        <a href="<?php echo e($logs->nextPageUrl()); ?>"><i class="fa-solid fa-chevron-right text-[9px]"></i></a>
+                                    <?php else: ?>
                                         <span class="disabled"><i class="fa-solid fa-chevron-right text-[9px]"></i></span>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -769,8 +774,8 @@
         </div>
     </div>
 
-    @include('components.bottom-nav')
-    @include('components.sidebar-scripts')
+    <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <script>
         // Quick category buttons â†' set activity = auth/ac/room/user
@@ -1028,3 +1033,4 @@
 
 
 
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/logs/index.blade.php ENDPATH**/ ?>

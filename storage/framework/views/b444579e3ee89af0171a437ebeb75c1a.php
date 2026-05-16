@@ -1,4 +1,4 @@
-{{-- Layout shim: sidebar/header behavior. Most styling lives in app.css. --}}
+
 <style>
     /* Hide all visual scrollbars (scroll wheel/touch tetap berfungsi) */
     * {
@@ -442,3 +442,4 @@
         transform: translateY(-1px);
     }
 </style>
+<?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/components/sidebar-styles.blade.php ENDPATH**/ ?>
