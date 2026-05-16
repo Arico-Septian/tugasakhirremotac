@@ -536,6 +536,10 @@ class MqttSubscribe extends Command
             return false;
         }
 
+        if ($label === 'CONTROL') {
+            return true;
+        }
+
         $this->warn("{$label} retained di-skip ({$topic})");
 
         return true;

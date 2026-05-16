@@ -116,10 +116,10 @@ echo ============================================
 echo   SEMUA SERVICE BERJALAN
 echo ============================================
 echo   URL          : http://127.0.0.1:8000
-echo   MQTT Sub     : device/+/online, device/+/ping, device/+/status, room/+/ac/+/status, room/+/temperature
-echo   Reverb       : ws://127.0.0.1:8000/app/xgcozjostzdx6hslysp4 (port 8080)
-echo   Scheduler    : ac:run-timer, device:check-status (every min), logs:clean (07:00)
-echo   Queue        : database driver (sync in local)
+echo   MQTT Sub     : device status/ping/sensor, room sensor, AC status/control
+echo   Reverb       : ws://localhost:8080/app/xgcozjostzdx6hslysp4
+echo   Scheduler    : device check, AC timer, fuzzy, log/notif/temp cleanup
+echo   Queue        : database driver via queue:listen
 echo   Vite Hot     : auto-reload on file change
 echo.
 echo   Tutup window ini (web server) untuk mematikan semua.
