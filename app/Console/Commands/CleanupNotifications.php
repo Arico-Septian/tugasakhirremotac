@@ -8,12 +8,12 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('notification:cleanup')]
-#[Description('Delete notifications older than 30 days')]
+#[Description('Delete notifications older than 3 days')]
 class CleanupNotifications extends Command
 {
     public function handle()
     {
-        $deleted = Notification::where('created_at', '<', now()->subDays(30))->delete();
+        $deleted = Notification::where('created_at', '<', now()->subDays(3))->delete();
 
         if ($deleted > 0) {
             $this->info("Deleted {$deleted} old notification(s)");
