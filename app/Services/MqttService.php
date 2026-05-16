@@ -109,7 +109,7 @@ class MqttService
         echo "CONFIG + STATUS DIKIRIM KE {$deviceId}\n";
     }
 
-    public function subscribeMultiple(array $topics, int $idleTimeoutSeconds = 60)
+    public function subscribeMultiple(array $topics, int $idleTimeoutSeconds = 180)
     {
         $lastMessageTime = time();
 
