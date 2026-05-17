@@ -43,9 +43,11 @@ class UserController extends Controller
 
         $onlineUsers = User::where('last_activity', '>=', now()->subMinutes(2))
             ->count();
+        $offlineUsers = $totalUsers - $onlineUsers;
         $adminUsers = User::where('role', 'admin')->count();
 
         $onlinePercentage = $totalUsers > 0 ? round(($onlineUsers / $totalUsers) * 100) : 0;
+        $offlinePercentage = $totalUsers > 0 ? round(($offlineUsers / $totalUsers) * 100) : 0;
 
         $newUsersThisWeek = User::where('created_at', '>=', now()->subWeek())->count();
 
@@ -53,8 +55,10 @@ class UserController extends Controller
             'users',
             'totalUsers',
             'onlineUsers',
+            'offlineUsers',
             'adminUsers',
             'onlinePercentage',
+            'offlinePercentage',
             'newUsersThisWeek'
         ));
     }

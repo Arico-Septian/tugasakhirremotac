@@ -1063,6 +1063,23 @@
             }
         }
 
+        /* Header keep on one row across breakpoints */
+        .main-header { flex-wrap: nowrap; }
+        .main-header > .flex.items-center.gap-3 { min-width: 0; flex: 1; }
+        .main-header > .flex.items-center.gap-2 { flex-shrink: 0; }
+
+        /* Mobile S (≤ 360 px): shrink header so title fits in one row */
+        @media (max-width: 360px) {
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 9.5px; line-height: 1.2; }
+            .main-header #systemStatus span:not(.dot) { display: none; }
+            .main-header #systemStatus { padding: 4px 6px; }
+            .main-header .btn-icon { width: 32px; height: 32px; }
+        }
+
         /* Ultra-wide screens (>1600px) — cap content width for readability */
         @media (min-width: 1600px) {
             .app-content-inner {

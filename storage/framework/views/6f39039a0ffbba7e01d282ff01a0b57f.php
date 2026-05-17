@@ -228,22 +228,48 @@
             }
         }
 
-        /* Grid optimization for mobile */
-        @media (max-width: 480px) {
-            .floor-grid {
-                grid-template-columns: 1fr !important;
-                gap: 2px !important;
-                margin-bottom: 3px !important;
+        /* Tablet & desktop (≥ 481 px): unify search & segmented height to 40 px */
+        @media (min-width: 481px) {
+            .flex.flex-row.items-center.gap-2 > .search-input {
+                height: 40px;
+            }
+            .flex.flex-row.items-center.gap-2 > .search-input input {
+                height: 40px;
+                box-sizing: border-box;
+            }
+            .flex.flex-row.items-center.gap-2 > .segmented {
+                height: 40px;
+                box-sizing: border-box;
+                display: inline-flex;
+                align-items: center;
+            }
+            .flex.flex-row.items-center.gap-2 > .segmented .seg {
+                height: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
             }
         }
 
+        /* Auto-fit grid — works across all breakpoints, never stretches a lone card */
+        .floor-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 240px)) !important;
+            gap: 12px !important;
+            justify-content: start;
+        }
+
+        /* Phones (≤600px): tighter card, 2-col where space allows */
         @media (max-width: 600px) {
             .floor-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+                gap: 10px !important;
+                margin-bottom: 12px !important;
             }
 
             .room-card {
-                padding: 12px;
+                padding: 11px;
                 gap: 8px;
             }
 
@@ -251,17 +277,103 @@
                 font-size: 13px;
             }
 
-            .ac-mini > div {
-                padding: 6px 5px;
+            .room-card .room-status-pill {
+                padding: 2px 7px !important;
+                font-size: 9px !important;
             }
 
-            .ac-mini .num {
-                font-size: 14px;
+            .room-card .temp-chip {
+                padding: 6px 10px !important;
+                font-size: 10px !important;
             }
 
-            .ac-mini .lbl {
-                font-size: 8.5px;
+            .ac-mini { gap: 5px; }
+            .ac-mini > div { padding: 6px 5px; }
+            .ac-mini .num { font-size: 14px; }
+            .ac-mini .lbl { font-size: 8.5px; margin-top: 2px; }
+
+            .room-card .btn.btn-primary.btn-sm {
+                font-size: 11px;
+                padding: 7px 10px;
+                min-height: 34px;
             }
+            .room-card .btn-icon {
+                width: 34px;
+                height: 34px;
+            }
+        }
+
+        /* Header: keep on one row always */
+        .main-header { flex-wrap: nowrap; }
+        .main-header > .flex.items-center.gap-3 { min-width: 0; flex: 1; }
+        .main-header > .flex.items-center.gap-2 { flex-shrink: 0; }
+
+        /* Mobile M / L (≤ 480 px): subtitle moderately smaller so it fits 1 line */
+        @media (max-width: 480px) {
+            .main-header .app-header-title h1 { font-size: 16px; line-height: 1.2; }
+            .main-header .app-header-title p {
+                font-size: 11px;
+                line-height: 1.25;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        /* Tiny phones (≤360px): force 1-col so card stays legible */
+        @media (max-width: 360px) {
+            .floor-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Header: aggressive shrink so everything fits at 320 px */
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 9.5px; }
+            .main-header #systemStatus span:not(.dot) { display: none; }
+            .main-header #systemStatus {
+                width: 28px;
+                height: 28px;
+                padding: 0 !important;
+                gap: 0 !important;
+                border-radius: 50%;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0;
+                line-height: 0;
+                box-sizing: border-box;
+            }
+            .main-header #systemStatus .dot {
+                width: 8px !important;
+                height: 8px !important;
+                min-width: 8px;
+                min-height: 8px;
+                flex-shrink: 0;
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
+                margin: 0 !important;
+                position: relative;
+            }
+            /* Pulse halo: keep dead-center using transform instead of inset */
+            .main-header #systemStatus .dot::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100%;
+                height: 100%;
+                transform: translate(-50%, -50%);
+                transform-origin: center center;
+                border-radius: 50%;
+                background: var(--mint);
+                opacity: 0.4;
+                animation: pulse-dot 1.6s ease-out infinite;
+                inset: auto;
+            }
+            .main-header .btn-icon { width: 32px; height: 32px; }
         }
 
         /* Touch targets optimization */
@@ -318,7 +430,7 @@
                     </button>
                     <div class="app-header-title">
                         <h1>Server Rooms</h1>
-                        <p><?php echo e($rooms->count()); ?> ruangan · live AC monitoring</p>
+                        <p><?php echo e($rooms->count()); ?> ruangan · AC monitoring</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">

@@ -219,6 +219,62 @@
         }
     }
 
+    /* ===== Mobile S (≤ 360 px): circular status pill (dot only), shared across all pages ===== */
+    @media (max-width: 360px) {
+        .main-header .pill span:not(.dot) { display: none !important; }
+        .main-header .pill {
+            width: 28px !important;
+            height: 28px !important;
+            padding: 0 !important;
+            gap: 0 !important;
+            border-radius: 50% !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            line-height: 0 !important;
+            box-sizing: border-box !important;
+        }
+        .main-header .pill .dot {
+            width: 8px !important;
+            height: 8px !important;
+            min-width: 8px !important;
+            min-height: 8px !important;
+            flex-shrink: 0 !important;
+            border-radius: 50% !important;
+            aspect-ratio: 1 / 1 !important;
+            margin: 0 !important;
+            position: relative !important;
+        }
+        /* Pulse halo: keep app.css's pulse-dot animation, just re-center inset */
+        .main-header .pill.pill-online .dot {
+            box-shadow:
+                0 0 0 4px rgba(110, 231, 183, 0.35),
+                0 0 0 8px rgba(110, 231, 183, 0.18);
+            animation: pulse-ring 1.6s ease-out infinite;
+        }
+    }
+
+    @keyframes pulse-ring {
+        0% {
+            box-shadow:
+                0 0 0 2px rgba(110, 231, 183, 0.5),
+                0 0 0 4px rgba(110, 231, 183, 0.3);
+        }
+        100% {
+            box-shadow:
+                0 0 0 8px rgba(110, 231, 183, 0),
+                0 0 0 12px rgba(110, 231, 183, 0);
+        }
+    }
+
+    @media (max-width: 360px) {
+        /* Hide the original ::after pulse (we replaced with box-shadow ring) */
+        .main-header .pill.pill-online .dot::after {
+            display: none !important;
+        }
+    }
+
     /* 2026 modern backdrop with vibrant glassmorphism */
     #overlay {
         position: fixed; inset: 0; z-index: 40;

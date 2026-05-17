@@ -143,11 +143,13 @@
             }
         }
 
-        /* Header right cluster — wrap & shrink on tiny screens */
+        /* Header — keep on one row across breakpoints */
         .main-header {
             gap: 8px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
+        .main-header > .flex.items-center.gap-3 { min-width: 0; flex: 1; }
+        .main-header > .flex.items-center.gap-2 { flex-shrink: 0; }
 
         @media (max-width: 480px) {
             .main-header .pill {
@@ -162,13 +164,25 @@
         }
 
         @media (max-width: 360px) {
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; }
+
             .main-header .app-header-title h1 {
-                font-size: 15px;
+                font-size: 13px;
+                line-height: 1.2;
             }
 
             .main-header .app-header-title p {
-                font-size: 10px;
+                font-size: 9.5px;
+                line-height: 1.2;
             }
+
+            /* Shrink Online pill to dot-only — saves ~50px */
+            .main-header #systemStatus span:not(.dot) { display: none; }
+            .main-header #systemStatus { padding: 4px 6px; }
+
+            .main-header .btn-icon { width: 32px; height: 32px; }
         }
 
         /* Ultra-wide (>1600px) — cap content width */

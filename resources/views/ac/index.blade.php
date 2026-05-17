@@ -699,9 +699,10 @@
             }
 
             .selector-bar > div:first-child {
-                flex: 0 1 120px;
+                flex: 1 1 auto;
                 min-width: 0;
             }
+            .selector { width: 100%; }
 
             .selector {
                 padding: 6px 10px;
@@ -714,28 +715,34 @@
 
             .selector-bar > div:last-child {
                 display: inline-flex;
-                gap: 4px;
+                gap: 6px;
                 flex-shrink: 0;
             }
 
-            .btn.btn-sm {
-                padding: 6px 8px;
-                font-size: 10px;
+            .selector { min-height: 40px; }
+
+            .selector-bar .btn.btn-sm {
+                padding: 0 !important;
+                width: 40px !important;
+                height: 40px !important;
+                min-height: 40px !important;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
             }
 
-            .btn.btn-sm span {
-                display: none;
-            }
+            .selector-bar .btn.btn-sm span { display: none; }
 
-            .btn.btn-sm i {
+            .selector-bar .btn.btn-sm i {
                 margin: 0 !important;
-                font-size: 11px;
+                font-size: 14px !important;
             }
 
-            .btn-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 13px;
+            .selector-bar .btn-icon {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 14px;
             }
         }
 
@@ -751,18 +758,51 @@
             }
 
             .selector {
-                padding: 7px 11px;
-                font-size: 12px;
+                padding: 10px 14px;
+                font-size: 13px;
+                min-height: 42px;
             }
 
-            .btn.btn-sm {
-                padding: 7px 9px;
-                font-size: 11px;
+            .selector-bar .btn.btn-sm {
+                padding: 9px 14px;
+                font-size: 12.5px;
+                min-height: 42px;
             }
 
-            .btn.btn-sm span {
+            .selector-bar .btn.btn-sm i {
+                font-size: 13px;
+            }
+
+            .selector-bar .btn.btn-sm span {
                 display: inline;
             }
+
+            .selector-bar .btn-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 14px;
+            }
+        }
+
+        /* Laptop / desktop (≥ 769px): comfortable button sizes in selector bar */
+        @media (min-width: 769px) {
+            .selector-bar .btn.btn-sm {
+                padding: 10px 16px;
+                font-size: 13px;
+                min-height: 42px;
+            }
+            .selector-bar .btn.btn-sm i {
+                font-size: 13px;
+            }
+            .selector-bar .btn.btn-sm span {
+                display: inline !important;
+            }
+            .selector-bar .btn-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 14px;
+            }
+            .selector { min-height: 42px; padding: 9px 14px; }
         }
 
         /* #3 Mobile layout optimization */
@@ -805,6 +845,67 @@
                 padding: 9px 12px;
                 min-height: 40px;
             }
+        }
+
+        /* Always-on fix: Tailwind didn't ship .grid-cols-4 in compiled CSS, so supply it ourselves */
+        .panel > .grid.grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        /* Selector text: truncate instead of wrap (prevents "Panasonic" jumping to a new line) */
+        .selector { max-width: 100%; }
+        .selector > #selectedAC {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            flex: 1;
+        }
+
+        /* Mobile (≤ 480 px): 2-col mode/fan/swing — 4 buttons cramped at this width */
+        @media (max-width: 480px) {
+            .panel > .grid.grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 7px !important;
+            }
+            .mode-btn-h {
+                padding: 10px 8px !important;
+                font-size: 11.5px !important;
+                min-height: 40px !important;
+                gap: 5px;
+            }
+            .mode-btn-h i { font-size: 11px !important; }
+        }
+
+        /* Mobile S (≤ 360 px): tighter selector bar + header */
+        @media (max-width: 360px) {
+            .selector-bar { padding: 6px !important; gap: 6px !important; }
+            .selector { padding: 8px 10px !important; font-size: 11px !important; min-height: 38px; }
+            .selector-bar > div:first-child { flex: 1 1 auto !important; min-width: 0 !important; }
+            .selector-bar .btn.btn-sm {
+                padding: 0 !important;
+                width: 38px !important;
+                height: 38px !important;
+                min-height: 38px;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+            .selector-bar .btn.btn-sm i { font-size: 13px !important; margin: 0 !important; }
+            .selector-bar .btn-icon { width: 38px !important; height: 38px !important; font-size: 13px; }
+
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 9.5px; line-height: 1.2; }
+            .main-header > .flex.items-center.gap-2 #espStatusPill span:not(.dot) { display: none; }
+            .main-header > .flex.items-center.gap-2 #espStatusPill { padding: 4px 6px; }
+            .main-header > .flex.items-center.gap-2 .btn-icon { width: 32px; height: 32px; }
+
+            .temp-ring { width: 180px; height: 180px; }
+            .temp-value { font-size: 56px !important; }
+            .ctrl-btn { width: 42px !important; height: 42px !important; }
+            .power-btn { width: 54px !important; height: 54px !important; }
         }
 
         /* Landscape mode optimization */
@@ -893,28 +994,11 @@
                             @auth
                                 @if (in_array(Auth::user()->role, ['admin', 'operator']))
                                     <div class="flex items-center gap-1.5">
-                                        @if ($acs->count() > 0)
-                                            <button type="button" onclick="openBulkModal('ON')"
-                                                class="btn btn-mint btn-sm">
-                                                <i class="fa-solid fa-power-off text-[10px]"></i>
-                                                <span class="hidden sm:inline">All ON</span>
-                                            </button>
-                                            <button type="button" onclick="openBulkModal('OFF')"
-                                                class="btn btn-soft btn-sm">
-                                                <i class="fa-solid fa-power-off text-[10px]"></i>
-                                                <span class="hidden sm:inline">All OFF</span>
-                                            </button>
-                                        @endif
                                         <button type="button" {{ $acs->count() >= 15 ? 'disabled' : '' }}
                                             onclick="{{ $acs->count() >= 15 ? '' : 'openModal()' }}"
                                             class="btn btn-primary btn-sm {{ $acs->count() >= 15 ? 'disabled' : '' }}">
                                             <i class="fa-solid fa-plus text-[10px]"></i>
                                             <span class="hidden sm:inline">Add AC</span>
-                                        </button>
-                                        <button id="editAcBtn" type="button" onclick="openEditModal()"
-                                            {{ !$firstAc ? 'disabled' : '' }}
-                                            class="btn-icon lavender {{ !$firstAc ? 'disabled' : '' }}" title="Edit AC">
-                                            <i class="fa-solid fa-pen text-[10px]"></i>
                                         </button>
                                         <form id="deleteForm" method="POST" onsubmit="return confirmDelete(event)"
                                             action="{{ $firstAc ? '/ac/' . $firstAc->id : '#' }}">

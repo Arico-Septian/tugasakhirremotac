@@ -97,7 +97,7 @@
         }
 
         .user-name {
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 600;
             color: var(--ink-0);
             margin: 0;
@@ -105,15 +105,23 @@
         }
 
         .user-handle {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--ink-3);
-            margin: 3px 0 0;
+            margin: 2px 0 0;
+            line-height: 1.2;
         }
 
         .user-email {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--ink-4);
-            margin: 2px 0 0;
+            margin: 1px 0 0;
+            line-height: 1.2;
+        }
+
+        /* Unify user-table row padding with logs table (14 × 18) */
+        .user-table td {
+            padding: 14px 18px;
+            vertical-align: middle;
         }
 
         /* Role color badges */
@@ -152,13 +160,13 @@
         }
 
         .user-avatar-sm {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--bg-1);
             flex-shrink: 0;
@@ -225,8 +233,9 @@
         }
 
         .user-table th {
-            padding-top: 12px;
-            padding-bottom: 12px;
+            padding: 14px 18px;
+            font-size: 11.5px;
+            letter-spacing: 0.1em;
         }
 
         @media (max-width: 720px) {
@@ -240,9 +249,9 @@
             }
 
             .user-avatar-sm {
-                width: 32px;
-                height: 32px;
-                font-size: 12px;
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
             }
         }
 
@@ -293,76 +302,84 @@
             }
         }
 
-        /* Very small screens (< 480px) */
+        /* Very small screens (< 480px) — wrap toolbar to 2 rows: search full width, filters + Add on row 2 */
         @media (max-width: 480px) {
             .tbl-toolbar {
                 padding: 8px;
-                gap: 6px;
+                gap: 8px;
+                flex-wrap: wrap;
+                row-gap: 8px;
             }
 
             .tbl-toolbar > form {
-                flex: 0 1 120px;
+                flex: 1 1 100%;
                 min-width: 0;
-                transition: flex 0.2s ease;
-            }
-
-            .tbl-toolbar > form:focus-within {
-                flex: 1;
             }
 
             .tbl-toolbar > div {
-                display: inline-flex;
-                gap: 4px;
+                display: flex;
+                gap: 6px;
                 align-items: center;
+                flex: 1 1 100%;
+                justify-content: flex-start;
                 flex-shrink: 0;
             }
 
-            .segmented {
+            /* Unify height across search / segmented / Add User — 36 px */
+            .tbl-toolbar .search-input {
+                width: 100%;
+                height: 36px;
+            }
+
+            .tbl-toolbar .search-input input {
+                height: 36px;
+                padding: 0 12px 0 34px;
+                font-size: 12px;
+                box-sizing: border-box;
+            }
+
+            .tbl-toolbar .segmented {
+                flex: 1 1 auto;
+                display: flex;
+                height: 36px;
+                padding: 2px;
+                box-sizing: border-box;
+            }
+
+            .tbl-toolbar .segmented .seg {
+                flex: 1 1 0;
+                min-width: 0;
+                text-align: center;
+                height: 100%;
+                padding: 0 6px;
                 display: inline-flex;
-                gap: 2px;
-            }
-
-            .segmented .seg {
-                font-size: 10px;
-                padding: 5px 6px;
-                min-width: auto;
-            }
-
-            .tbl-toolbar .btn {
-                padding: 5px 8px;
-                font-size: 10px;
-            }
-
-            .tbl-toolbar .btn span {
-                display: none;
-            }
-
-            .tbl-toolbar .btn i {
-                margin: 0 !important;
+                align-items: center;
+                justify-content: center;
                 font-size: 11px;
             }
 
-            .search-input {
-                width: 100%;
+            .tbl-toolbar .btn {
+                flex-shrink: 0;
+                height: 36px;
+                min-height: 36px;
+                padding: 0 12px;
+                font-size: 11px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
             }
 
-            .search-input input {
-                font-size: 12px;
-                padding: 6px 8px;
-            }
+            .tbl-toolbar .btn span { display: inline; }
+            .tbl-toolbar .btn i { margin-right: 4px; font-size: 11px; }
 
             .search-input input::placeholder {
-                color: transparent;
+                color: var(--ink-3);
             }
 
             .search-input i {
                 font-size: 12px;
-                transition: opacity 0.2s ease;
-            }
-
-            .search-input:focus-within i {
-                opacity: 0;
-                pointer-events: none;
+                left: 12px;
             }
         }
 
@@ -510,7 +527,7 @@
             }
 
             .user-card {
-                padding: 12px 16px;
+                padding: 14px 16px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.15);
                 display: flex;
                 flex-direction: column;
@@ -544,13 +561,13 @@
             }
 
             .user-card-name-text {
-                font-size: 14px;
+                font-size: 15px;
                 font-weight: 600;
                 color: var(--ink-0);
             }
 
             .user-card-handle {
-                font-size: 11px;
+                font-size: 11.5px;
                 color: var(--ink-3);
             }
 
@@ -558,7 +575,7 @@
                 display: flex;
                 gap: 8px;
                 align-items: center;
-                font-size: 12px;
+                font-size: 13px;
                 color: var(--ink-2);
             }
 
@@ -582,6 +599,71 @@
         /* Page sections spacing */
         .app-content-inner > * + * {
             margin-top: 32px;
+        }
+
+        /* Tablet & desktop (≥ 481 px): unify search / segmented / Add User height to 40 px */
+        @media (min-width: 481px) {
+            .tbl-toolbar .search-input { height: 40px; }
+            .tbl-toolbar .search-input input { height: 40px; box-sizing: border-box; }
+            .tbl-toolbar .segmented {
+                height: 40px;
+                box-sizing: border-box;
+                display: inline-flex;
+                align-items: center;
+            }
+            .tbl-toolbar .segmented .seg {
+                height: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .tbl-toolbar .btn {
+                height: 40px;
+                min-height: 40px;
+                box-sizing: border-box;
+                padding: 0 16px;
+            }
+        }
+
+        /* Header keep on one row across breakpoints */
+        .main-header { flex-wrap: nowrap; }
+        .main-header > .flex.items-center.gap-3 { min-width: 0; flex: 1; }
+        .main-header > .flex.items-center.gap-2 { flex-shrink: 0; }
+
+        /* Mobile S (≤ 360 px): shrink header + toolbar so everything fits */
+        @media (max-width: 360px) {
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 9.5px; line-height: 1.2; }
+            .main-header #systemStatus span:not(.dot) { display: none; }
+            .main-header #systemStatus { padding: 4px 6px; }
+            .main-header .btn-icon { width: 32px; height: 32px; }
+
+            /* User card action buttons: compact at 320 */
+            .user-card-actions .btn-icon { width: 32px; height: 32px; font-size: 12px; }
+
+            /* Stats grid: keep 2-col but compact each card so text doesn't wrap */
+            .grid.grid-cols-2.lg\:grid-cols-4 { gap: 8px !important; }
+            .stat-card { padding: 12px !important; }
+            .stat-label-sm { font-size: 10px !important; letter-spacing: .04em !important; }
+            .stat-num-lg { font-size: 22px !important; line-height: 1.1 !important; }
+            .stat-sub { font-size: 9.5px !important; }
+            .stat-icon { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+
+            /* User card: tighter padding, fonts match log card */
+            .user-card { padding: 12px 14px; gap: 8px; }
+
+            /* Toolbar at 320 px: stack to 3 rows so segmented + Add User each get full width */
+            .tbl-toolbar > div {
+                flex-wrap: wrap;
+                row-gap: 6px;
+            }
+            .tbl-toolbar > div > .segmented { flex: 1 1 100%; }
+            .tbl-toolbar > div > .btn { flex: 1 1 100%; }
+            .tbl-toolbar .segmented .seg { font-size: 10px; padding: 0 4px; }
         }
     </style>
 </head>
@@ -639,6 +721,17 @@
                                         <p class="stat-sub"><span id="onlineUsersPct">{{ $onlinePercentage }}</span>% sedang aktif</p>
                                     </div>
                                     <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                                </div>
+                            </div>
+                            <div class="stat-card acc-coral">
+                                <span class="accent-bar"></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="stat-label-sm">Offline</p>
+                                        <p class="stat-num-lg" id="offlineUsersCount">{{ $offlineUsers }}</p>
+                                        <p class="stat-sub"><span id="offlineUsersPct">{{ $offlinePercentage }}</span>% tidak aktif</p>
+                                    </div>
+                                    <div class="stat-icon"><i class="fa-solid fa-user-slash"></i></div>
                                 </div>
                             </div>
                             <div class="stat-card acc-lavender">
@@ -1196,8 +1289,12 @@
                         if (!data) return;
                         const c = document.getElementById('onlineUsersCount');
                         const p = document.getElementById('onlineUsersPct');
+                        const oc = document.getElementById('offlineUsersCount');
+                        const op = document.getElementById('offlineUsersPct');
                         if (c && data.online !== undefined) c.textContent = data.online;
                         if (p && data.percentage !== undefined) p.textContent = data.percentage;
+                        if (oc && data.offline !== undefined) oc.textContent = data.offline;
+                        if (op && data.offlinePercentage !== undefined) op.textContent = data.offlinePercentage;
                     })
                     .catch(() => {});
             }

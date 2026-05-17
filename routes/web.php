@@ -497,12 +497,15 @@ Route::middleware(['auth', 'active', 'activity'])->group(function () {
             $total = User::count();
             $online = User::where('last_activity', '>=', now()->subMinutes(2))
                 ->count();
+            $offline = $total - $online;
 
             return response()->json([
                 'count' => $online,
                 'online' => $online,
+                'offline' => $offline,
                 'total' => $total,
                 'percentage' => $total > 0 ? (int) round(($online / $total) * 100) : 0,
+                'offlinePercentage' => $total > 0 ? (int) round(($offline / $total) * 100) : 0,
             ]);
         });
     });

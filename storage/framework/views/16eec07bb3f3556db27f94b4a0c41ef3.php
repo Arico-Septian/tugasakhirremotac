@@ -229,6 +229,152 @@
                 font-size: 11px;
             }
         }
+
+        /* Tablet & desktop (≥ 481 px): unify search / segmented / Add Room height to 40 px */
+        @media (min-width: 481px) {
+            .app-content-inner > .flex.items-center.gap-2:first-child .search-input {
+                height: 40px;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child .search-input input {
+                height: 40px;
+                box-sizing: border-box;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child .segmented {
+                height: 40px;
+                box-sizing: border-box;
+                display: inline-flex;
+                align-items: center;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child .segmented .seg {
+                height: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > button.btn-primary {
+                height: 40px;
+                box-sizing: border-box;
+            }
+        }
+
+        /* Tablet (481–768 px): slightly more breathing room between segmented and Add Room */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex.gap-2 {
+                gap: 10px !important;
+            }
+        }
+
+        /* ===== Auto-fit room grid (overrides Tailwind grid-cols on .floor-section) ===== */
+        .floor-section > .grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 260px)) !important;
+            gap: 12px !important;
+            justify-content: start;
+        }
+
+        /* Toolbar wraps to 2 rows on tiny phones so search field gets its full width */
+        @media (max-width: 480px) {
+            .app-content-inner > .flex.items-center.gap-2:first-child {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child > form { flex: 1 1 100%; }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex {
+                flex: 1 1 100%;
+                justify-content: flex-start;
+                gap: 6px;
+            }
+
+            /* Unify height across search / segmented / Add Room — 36 px */
+            .app-content-inner > .flex.items-center.gap-2:first-child .search-input {
+                height: 36px;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child .search-input input {
+                height: 36px;
+                padding: 0 12px 0 34px;
+                font-size: 12px;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child .search-input i {
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > .segmented {
+                flex: 1 1 auto;
+                display: flex;
+                height: 36px;
+                padding: 2px;
+                box-sizing: border-box;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > .segmented .seg {
+                flex: 1 1 0;
+                min-width: 0;
+                text-align: center;
+                height: 100%;
+                padding: 0 6px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+            }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > button.btn-primary {
+                flex-shrink: 0;
+                height: 36px;
+                min-height: 36px;
+                padding: 0 12px;
+                font-size: 11px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Mobile S (≤ 360 px): keep "Add Room" label visible, match 36 px unified height */
+        @media (max-width: 360px) {
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > button.btn-primary span { display: inline !important; font-size: 10px; }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > button.btn-primary i { margin-right: 4px; font-size: 10px; }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > button.btn-primary { padding: 0 10px; font-size: 10px; white-space: nowrap; }
+            .app-content-inner > .flex.items-center.gap-2:first-child > .flex > .segmented .seg { font-size: 10px; padding: 0 4px; }
+        }
+
+        /* Header title wraps less awkwardly on small screens */
+        @media (max-width: 480px) {
+            .main-header .app-header-title h1 { font-size: 16px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 11px; }
+        }
+        @media (max-width: 360px) {
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.15; }
+            .main-header .app-header-title p { font-size: 9.5px; line-height: 1.2; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; min-width: 0; flex: 1; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; flex-shrink: 0; }
+            /* Shrink the Online pill to just the dot on tiny screens */
+            .main-header > .flex.items-center.gap-2 #systemStatus span:not(.dot) { display: none; }
+            .main-header > .flex.items-center.gap-2 #systemStatus { padding: 4px 6px; }
+            .main-header > .flex.items-center.gap-2 .btn-icon { width: 32px; height: 32px; }
+        }
+
+        /* Phones (≤ 600 px): tighter card, stretch with 1fr so 2-col fills row */
+        @media (max-width: 600px) {
+            .floor-section > .grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+                gap: 10px !important;
+            }
+
+            .room-card { padding: 11px; gap: 8px; }
+            .room-card h2 { font-size: 13px; }
+            .room-card .room-status-pill { padding: 2px 7px !important; font-size: 9px !important; }
+            .room-card .temp-chip { padding: 6px 10px !important; font-size: 10px !important; }
+            .room-card .label-tag { font-size: 8.5px !important; margin-top: 2px !important; }
+        }
+
+        /* Tiny phones (≤ 360 px): 1-col so card stays legible */
+        @media (max-width: 360px) {
+            .floor-section > .grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 

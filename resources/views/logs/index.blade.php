@@ -130,76 +130,86 @@
             }
         }
 
-        /* Very small screens (< 480px) */
+        /* Very small screens (< 480px) — wrap toolbar to 2 rows */
         @media (max-width: 480px) {
             .tbl-toolbar {
                 padding: 8px;
-                gap: 6px;
+                gap: 8px;
+                flex-wrap: wrap;
+                row-gap: 8px;
             }
 
             .tbl-toolbar label.search-input {
-                flex: 0 1 120px;
+                flex: 1 1 100%;
                 min-width: 0;
-                transition: flex 0.2s ease;
-            }
-
-            .tbl-toolbar label.search-input:focus-within {
-                flex: 1;
-            }
-
-            .tbl-toolbar > div {
-                display: inline-flex;
-                gap: 4px;
-                align-items: center;
-                flex-shrink: 0;
-            }
-
-            .segmented {
-                display: inline-flex;
-                gap: 2px;
-            }
-
-            .segmented .seg {
-                font-size: 10px;
-                padding: 5px 6px;
-                min-width: auto;
-            }
-
-            .btn.btn-danger {
-                padding: 5px 8px;
-                font-size: 10px;
-            }
-
-            .btn.btn-danger span {
-                display: none;
-            }
-
-            .btn.btn-danger i {
-                margin: 0 !important;
-                font-size: 11px;
-            }
-
-            .search-input {
                 width: 100%;
             }
 
-            .search-input input {
+            .tbl-toolbar > div {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+                flex: 1 1 100%;
+                justify-content: flex-start;
+                flex-shrink: 0;
+            }
+
+            /* Unify height across search / segmented / btn — 36 px */
+            .tbl-toolbar .search-input {
+                height: 36px;
+            }
+
+            .tbl-toolbar .search-input input {
+                height: 36px;
+                padding: 0 12px 0 34px;
                 font-size: 12px;
-                padding: 6px 8px;
+                box-sizing: border-box;
+            }
+
+            .tbl-toolbar .segmented {
+                flex: 1 1 auto;
+                display: flex;
+                height: 36px;
+                padding: 2px;
+                box-sizing: border-box;
+            }
+
+            .tbl-toolbar .segmented .seg {
+                flex: 1 1 0;
+                min-width: 0;
+                text-align: center;
+                height: 100%;
+                padding: 0 6px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+            }
+
+            .tbl-toolbar .btn {
+                flex-shrink: 0;
+                height: 36px;
+                min-height: 36px;
+                padding: 0 12px;
+                font-size: 11px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+
+            .tbl-toolbar .btn.btn-danger i {
+                margin: 0 !important;
+                font-size: 13px;
             }
 
             .search-input input::placeholder {
-                color: transparent;
+                color: var(--ink-3);
             }
 
             .search-input i {
                 font-size: 12px;
-                transition: opacity 0.2s ease;
-            }
-
-            .search-input:focus-within i {
-                opacity: 0;
-                pointer-events: none;
+                left: 12px;
             }
         }
 
@@ -357,6 +367,55 @@
         .app-content-inner > * + * {
             margin-top: 32px;
         }
+
+        /* Tablet & desktop (≥ 481 px): unify search / segmented / button height to 40 px */
+        @media (min-width: 481px) {
+            .tbl-toolbar .search-input { height: 40px; }
+            .tbl-toolbar .search-input input { height: 40px; box-sizing: border-box; }
+            .tbl-toolbar .segmented {
+                height: 40px;
+                box-sizing: border-box;
+                display: inline-flex;
+                align-items: center;
+            }
+            .tbl-toolbar .segmented .seg {
+                height: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .tbl-toolbar .btn {
+                height: 40px;
+                min-height: 40px;
+                box-sizing: border-box;
+                padding: 0 14px;
+            }
+        }
+
+        /* Header keep on one row across breakpoints */
+        .main-header { flex-wrap: nowrap; }
+        .main-header > .flex.items-center.gap-3 { min-width: 0; flex: 1; }
+        .main-header > .flex.items-center.gap-2 { flex-shrink: 0; }
+
+        /* Mobile S (≤ 360 px): shrink header + compact stat cards */
+        @media (max-width: 360px) {
+            .main-header { gap: 6px; padding-left: 10px; padding-right: 10px; }
+            .main-header > .flex.items-center.gap-3 { gap: 6px; }
+            .main-header > .flex.items-center.gap-2 { gap: 4px; }
+            .main-header .app-header-title h1 { font-size: 13px; line-height: 1.2; }
+            .main-header .app-header-title p { font-size: 9.5px; line-height: 1.2; }
+            .main-header #systemStatus span:not(.dot) { display: none; }
+            .main-header #systemStatus { padding: 4px 6px; }
+            .main-header .btn-icon { width: 32px; height: 32px; }
+
+            /* Stat cards: keep 2-col, compact each card so labels/subs don't wrap awkwardly */
+            .stat-card { padding: 12px !important; }
+            .stat-label-sm { font-size: 10px !important; letter-spacing: .04em !important; }
+            .stat-num-lg { font-size: 22px !important; line-height: 1.1 !important; }
+            .stat-sub { font-size: 9.5px !important; }
+            .stat-icon { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+        }
     </style>
 </head>
 
@@ -488,11 +547,11 @@
                                 <span class="accent-bar"></span>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="stat-label-sm">Login Events</p>
-                                        <p class="stat-num-lg">{{ $stats['auth'] }}</p>
-                                        <p class="stat-sub">+{{ $stats['auth24'] }} dalam 24 jam</p>
+                                        <p class="stat-label-sm">Add Room</p>
+                                        <p class="stat-num-lg">{{ $stats['add_room'] }}</p>
+                                        <p class="stat-sub">+{{ $stats['add_room24'] }} dalam 24 jam</p>
                                     </div>
-                                    <div class="stat-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                                    <div class="stat-icon"><i class="fa-solid fa-square-plus"></i></div>
                                 </div>
                             </div>
                             <div class="stat-card acc-lavender">
@@ -648,11 +707,11 @@
                                 <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th style="width:22%;" class="sortable" data-sort="user_name" onclick="handleSort('user_name')">USER</th>
+                                            <th style="width:24%;" class="sortable" data-sort="user_name" onclick="handleSort('user_name')">USER</th>
                                             <th style="width:18%;" class="sortable" data-sort="room" onclick="handleSort('room')">ROOM</th>
-                                            <th>DETAIL</th>
-                                            <th style="width:16%;" class="sortable" data-sort="activity" onclick="handleSort('activity')">ACTIVITY</th>
-                                            <th style="width:14%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
+                                            <th style="width:20%;">DETAIL</th>
+                                            <th style="width:22%;" class="sortable" data-sort="activity" onclick="handleSort('activity')">ACTIVITY</th>
+                                            <th style="width:16%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
                                         </tr>
                                     </thead>
                                     <tbody id="logsTbody">

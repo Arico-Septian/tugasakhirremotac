@@ -115,11 +115,11 @@ class UserLogController extends Controller
         }
 
         $stats = [
-            'total'   => (clone $statsScope)->count(),
-            'auth'    => (clone $statsScope)->whereIn('activity', $authActs)->count(),
-            'auth24'  => (clone $statsScope)->whereIn('activity', $authActs)
-                          ->where('created_at', '>=', now()->subDay())->count(),
-            'ac'      => (clone $statsScope)->where(function ($qq) use ($acActs, $acLikes) {
+            'total'      => (clone $statsScope)->count(),
+            'add_room'   => (clone $statsScope)->where('activity', 'add_room')->count(),
+            'add_room24' => (clone $statsScope)->where('activity', 'add_room')
+                              ->where('created_at', '>=', now()->subDay())->count(),
+            'ac'         => (clone $statsScope)->where(function ($qq) use ($acActs, $acLikes) {
                               $qq->whereIn('activity', $acActs);
                               foreach ($acLikes as $like) {
                                   $qq->orWhere('activity', 'like', $like);
