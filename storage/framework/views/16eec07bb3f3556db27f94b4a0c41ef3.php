@@ -504,7 +504,7 @@
                                     pattern="[A-Za-z0-9_]+"
                                     title="Nama ruangan tidak boleh mengandung spasi"
                                     required>
-                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, dan underscore (tidak boleh spasi)</p>
+                                <p class="field-help">Huruf, angka, dan underscore (tidak boleh ada spasi)</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">ESP Device ID</label>
@@ -512,7 +512,7 @@
                                     pattern="[A-Za-z0-9_-]+"
                                     title="ESP Device ID tidak boleh mengandung spasi"
                                     required>
-                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, underscore, dan strip</p>
+                                <p class="field-help">Huruf, angka, underscore, dan strip (tidak boleh ada spasi)</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">Lantai / Zona <span
@@ -520,7 +520,7 @@
                                 <input class="input text-mono" type="text" name="floor" placeholder="lantai_1"
                                     pattern="[A-Za-z0-9_]*"
                                     title="Lantai atau zona tidak boleh mengandung spasi">
-                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, dan underscore. Digunakan untuk pengelompokan</p>
+                                <p class="field-help">Huruf, angka, dan underscore (tidak boleh ada spasi)</p>
                             </div>
                         </div>
                         <div class="modal-footer">

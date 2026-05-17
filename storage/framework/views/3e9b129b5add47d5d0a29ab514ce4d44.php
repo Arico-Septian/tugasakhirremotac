@@ -872,8 +872,8 @@
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 <div class="selector" onclick="toggleDropdown()">
                                     <i class="fa-solid fa-snowflake" style="color:var(--cyan);font-size:11px;"></i>
-                                    <span id="selectedAC">
-                                        <?php echo e($firstAc ? 'AC ' . $firstAc->ac_number . ' · ' . $firstAc->name : 'No AC'); ?>
+                                    <span id="selectedAC" style="text-transform:capitalize;">
+                                        <?php echo e($firstAc ? 'AC ' . $firstAc->ac_number . ' · ' . $firstAc->name . ($firstAc->brand ? ' · ' . $firstAc->brand : '') : 'No AC'); ?>
 
                                     </span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -881,9 +881,9 @@
                                     <div id="dropdownAC">
                                         <?php $__currentLoopData = $acs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ac): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div data-id="<?php echo e($ac->id); ?>"
-                                                onclick="selectAC(<?php echo e($ac->id); ?>, 'AC <?php echo e($ac->ac_number); ?> · <?php echo e($ac->name); ?>')">
+                                                onclick="selectAC(<?php echo e($ac->id); ?>, 'AC <?php echo e($ac->ac_number); ?> · <?php echo e($ac->name); ?><?php echo e($ac->brand ? ' · ' . $ac->brand : ''); ?>')">
                                                 <span class="num">#<?php echo e($ac->ac_number); ?></span>
-                                                <span><?php echo e($ac->name); ?></span>
+                                                <span style="text-transform:capitalize;"><?php echo e($ac->name); ?><?php if($ac->brand): ?> <span style="opacity:.65;font-size:11px;">· <?php echo e($ac->brand); ?></span><?php endif; ?></span>
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
@@ -969,7 +969,7 @@
                                                     <span class="temp-value"><?php echo e($curTemp); ?></span><span
                                                         class="unit">°C</span>
                                                 </div>
-                                                <p class="ring-summary"><?php echo e($curMode); ?> · <?php echo e($curFan); ?> ·
+                                                <p class="ring-summary" style="text-transform:capitalize;"><?php echo e($curMode); ?> · <?php echo e($curFan); ?> ·
                                                     <?php echo e($swingLabel); ?></p>
                                             </div>
                                         </div>

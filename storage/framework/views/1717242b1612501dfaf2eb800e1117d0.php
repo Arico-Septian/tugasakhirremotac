@@ -17,11 +17,24 @@
             border-radius: var(--r-xl);
             box-shadow: var(--inset-hi);
             padding: 14px;
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 0;
             transition: var(--t-base);
         }
         .ac-card:hover { background: var(--panel-2); border-color: var(--line); transform: translateY(-1px); box-shadow: var(--shadow); }
-        .ac-card .ac-stat .label i { color: var(--icon-color, var(--ink-3)); }
+        .ac-card > .ac-stat { padding: 9px 0; min-height: 32px; }
+        .ac-card > .ac-stat + .ac-stat { border-top: 1px solid rgba(255, 255, 255, 0.22); }
+        .ac-card > .ac-stat:last-child { padding-bottom: 2px; }
+        .ac-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 12px; margin-bottom: 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.22); }
+        .ac-card-head__text { min-width: 0; }
+        .ac-card-head__tag { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0; line-height: 1.2; }
+        .ac-card-head__name { font-size: 15px; font-weight: 700; color: var(--ink-0); margin: 3px 0 0; line-height: 1.25; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ac-card-head__icon { width: 32px; height: 32px; border-radius: 10px; background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-soft-2); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+        .ac-card .ac-stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; background: transparent; border-radius: 0; padding-left: 0; padding-right: 0; }
+        .ac-card .ac-stat .label { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-weight: 500; }
+        .ac-card .ac-stat .label i { color: var(--icon-color, var(--ink-3)); width: 14px; text-align: center; font-size: 12px; }
+        .ac-card .ac-stat .value { color: var(--icon-color, var(--ink-0)); font-weight: 700; letter-spacing: .02em; }
+        .ac-card .ac-stat.timer-empty .value { color: var(--ink-3); font-weight: 500; letter-spacing: 0; }
+        .ac-card .ac-stat .timer-times { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; line-height: 1.2; color: var(--amber); }
         .ic-power  { --icon-color: var(--mint); }
         .ic-temp   { --icon-color: var(--cyan); }
         .ic-mode   { --icon-color: var(--lavender); }
@@ -188,7 +201,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="app-header-title">
-                    <h1><?php echo e($room->name); ?></h1>
+                    <h1 style="text-transform:capitalize;"><?php echo e($room->name); ?></h1>
                     <p>AC status snapshot</p>
                 </div>
             </div>
@@ -208,45 +221,50 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                             <?php $__currentLoopData = $acs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ac): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="ac-card">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div>
-                                            <p class="label-tag">AC <?php echo e($ac->ac_number); ?></p>
-                                            <p class="text-sm font-semibold mt-0.5" style="color:var(--ink-0);"><?php echo e($ac->name ?: $ac->brand); ?></p>
+                                    <div class="ac-card-head">
+                                        <div class="ac-card-head__text">
+                                            <p class="ac-card-head__tag">AC <?php echo e($ac->ac_number); ?></p>
+                                            <p class="ac-card-head__name" title="<?php echo e($ac->name ?: $ac->brand); ?>"><?php echo e($ac->name ?: $ac->brand); ?></p>
                                         </div>
-                                        <div class="btn-icon" style="background:var(--cyan-soft);color:var(--cyan);border-color:var(--cyan-soft-2);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                            <i class="fa-solid fa-snowflake text-[11px]"></i>
+                                        <div class="ac-card-head__icon">
+                                            <i class="fa-solid fa-snowflake"></i>
                                         </div>
                                     </div>
 
                                     <div class="ac-stat ic-power">
                                         <span class="label"><i class="fa-solid fa-power-off"></i>Power</span>
-                                        <span id="power-<?php echo e($ac->id); ?>" class="value" style="color:var(--mint);"><?php echo e($ac->status?->power ?? 'OFF'); ?></span>
+                                        <span id="power-<?php echo e($ac->id); ?>" class="value"><?php echo e($ac->status?->power ?? 'OFF'); ?></span>
                                     </div>
                                     <div class="ac-stat ic-temp">
                                         <span class="label"><i class="fa-solid fa-temperature-half"></i>Temp</span>
-                                        <span id="temp-<?php echo e($ac->id); ?>" class="value" style="color:var(--cyan);"><?php echo e($ac->status?->set_temperature ?? 24); ?>°C</span>
+                                        <span id="temp-<?php echo e($ac->id); ?>" class="value"><?php echo e($ac->status?->set_temperature ?? 24); ?>°C</span>
                                     </div>
                                     <div class="ac-stat ic-mode">
                                         <span class="label"><i class="fa-solid fa-fan"></i>Mode</span>
-                                        <span id="mode-<?php echo e($ac->id); ?>" class="value" style="color:var(--lavender);"><?php echo e(strtoupper($ac->status?->mode ?? 'AUTO')); ?></span>
+                                        <span id="mode-<?php echo e($ac->id); ?>" class="value"><?php echo e(strtoupper($ac->status?->mode ?? 'AUTO')); ?></span>
                                     </div>
                                     <div class="ac-stat ic-fan">
                                         <span class="label"><i class="fa-solid fa-wind"></i>Fan</span>
-                                        <span id="fan-<?php echo e($ac->id); ?>" class="value" style="color:var(--cyan);"><?php echo e(strtoupper($ac->status?->fan_speed ?? 'AUTO')); ?></span>
+                                        <span id="fan-<?php echo e($ac->id); ?>" class="value"><?php echo e(strtoupper($ac->status?->fan_speed ?? 'AUTO')); ?></span>
                                     </div>
                                     <div class="ac-stat ic-swing">
                                         <span class="label"><i class="fa-solid fa-arrows-up-down"></i>Swing</span>
-                                        <span id="swing-<?php echo e($ac->id); ?>" class="value" style="color:var(--lavender);"><?php echo e(strtoupper($ac->status?->swing ?? 'OFF')); ?></span>
+                                        <span id="swing-<?php echo e($ac->id); ?>" class="value"><?php echo e(strtoupper($ac->status?->swing ?? 'OFF')); ?></span>
                                     </div>
-                                    <?php if($ac->timer_on || $ac->timer_off): ?>
-                                        <div class="ac-stat ic-timer">
-                                            <span class="label"><i class="fa-solid fa-clock"></i>Timer</span>
-                                            <span id="timer-<?php echo e($ac->id); ?>" class="value text-mono text-right" style="color:var(--amber);font-size:11px;line-height:1.3;">
-                                                <?php if($ac->timer_on): ?><div>ON <?php echo e(\Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i')); ?></div><?php endif; ?>
-                                                <?php if($ac->timer_off): ?><div>OFF <?php echo e(\Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i')); ?></div><?php endif; ?>
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
+                                    <?php $hasTimer = $ac->timer_on || $ac->timer_off; ?>
+                                    <div class="ac-stat ic-timer <?php echo e($hasTimer ? '' : 'timer-empty'); ?>">
+                                        <span class="label"><i class="fa-solid fa-clock"></i>Timer</span>
+                                        <span id="timer-<?php echo e($ac->id); ?>" class="value">
+                                            <?php if($hasTimer): ?>
+                                                <span class="timer-times">
+                                                    <?php if($ac->timer_on): ?><span>ON <?php echo e(\Carbon\Carbon::parse($ac->timer_on)->setTimezone('Asia/Jakarta')->format('H:i')); ?></span><?php endif; ?>
+                                                    <?php if($ac->timer_off): ?><span>OFF <?php echo e(\Carbon\Carbon::parse($ac->timer_off)->setTimezone('Asia/Jakarta')->format('H:i')); ?></span><?php endif; ?>
+                                                </span>
+                                            <?php else: ?>
+                                                OFF
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
@@ -280,9 +298,14 @@ function updateElement(id, val) {
     }
 }
 function formatTime(t) {
-    if (!t || t === '0000-00-00 00:00:00') return '';
+    if (!t || t === '0000-00-00 00:00:00' || t === '00:00:00') return '';
+    const s = String(t).trim();
+    const timeOnly = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if (timeOnly) {
+        return timeOnly[1].padStart(2, '0') + ':' + timeOnly[2];
+    }
     try {
-        const d = new Date(t.replace(/-/g, '/'));
+        const d = new Date(s.replace(/-/g, '/').replace('T', ' ').replace(/\..*$/, ''));
         return isNaN(d.getTime()) ? '' : d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
     } catch { return ''; }
 }
@@ -305,8 +328,16 @@ function loadStatus() {
                 if (timerEl && ac) {
                     const on  = formatTime(ac.timer_on);
                     const off = formatTime(ac.timer_off);
+                    const row = timerEl.closest('.ac-stat');
                     if (on || off) {
-                        timerEl.innerHTML = (on ? `<div>ON ${on}</div>` : '') + (off ? `<div>OFF ${off}</div>` : '');
+                        row?.classList.remove('timer-empty');
+                        timerEl.innerHTML = '<span class="timer-times">'
+                            + (on ? `<span>ON ${on}</span>` : '')
+                            + (off ? `<span>OFF ${off}</span>` : '')
+                            + '</span>';
+                    } else {
+                        row?.classList.add('timer-empty');
+                        timerEl.textContent = 'OFF';
                     }
                 }
             });

@@ -946,9 +946,9 @@
                         <label class="field-label">Username</label>
                         <input class="input" type="text" name="name" id="newUserName"
                             placeholder="username"
-                            pattern="[A-Za-z]\S*" title="Username tidak boleh ada spasi dan akan disimpan huruf kecil"
+                            pattern="[A-Za-z]\S*" title="Username tidak boleh ada spasi"
                             autocomplete="off" required>
-                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Disimpan huruf kecil, tanpa spasi</p>
+                        <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Huruf, angka, dan underscore (tidak boleh ada spasi)</p>
                     </div>
                     <div class="field">
                         <label class="field-label">Password</label>

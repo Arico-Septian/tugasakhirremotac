@@ -872,17 +872,17 @@
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 <div class="selector" onclick="toggleDropdown()">
                                     <i class="fa-solid fa-snowflake" style="color:var(--cyan);font-size:11px;"></i>
-                                    <span id="selectedAC">
-                                        {{ $firstAc ? 'AC ' . $firstAc->ac_number . ' · ' . $firstAc->name : 'No AC' }}
+                                    <span id="selectedAC" style="text-transform:capitalize;">
+                                        {{ $firstAc ? 'AC ' . $firstAc->ac_number . ' · ' . $firstAc->name . ($firstAc->brand ? ' · ' . $firstAc->brand : '') : 'No AC' }}
                                     </span>
                                     <i class="fa-solid fa-chevron-down"></i>
 
                                     <div id="dropdownAC">
                                         @foreach ($acs as $ac)
                                             <div data-id="{{ $ac->id }}"
-                                                onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }} · {{ $ac->name }}')">
+                                                onclick="selectAC({{ $ac->id }}, 'AC {{ $ac->ac_number }} · {{ $ac->name }}{{ $ac->brand ? ' · ' . $ac->brand : '' }}')">
                                                 <span class="num">#{{ $ac->ac_number }}</span>
-                                                <span>{{ $ac->name }}</span>
+                                                <span style="text-transform:capitalize;">{{ $ac->name }}@if ($ac->brand) <span style="opacity:.65;font-size:11px;">· {{ $ac->brand }}</span>@endif</span>
                                             </div>
                                         @endforeach
                                     </div>
@@ -965,7 +965,7 @@
                                                     <span class="temp-value">{{ $curTemp }}</span><span
                                                         class="unit">°C</span>
                                                 </div>
-                                                <p class="ring-summary">{{ $curMode }} · {{ $curFan }} ·
+                                                <p class="ring-summary" style="text-transform:capitalize;">{{ $curMode }} · {{ $curFan }} ·
                                                     {{ $swingLabel }}</p>
                                             </div>
                                         </div>

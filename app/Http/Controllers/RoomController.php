@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcUnit;
+use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomTemperature;
 use App\Models\UserLog;
@@ -265,6 +266,26 @@ class RoomController extends Controller
 
         Cache::forget("device_status_{$deviceId}");
         Cache::forget("device_{$deviceId}_last_seen");
+
+        $normalizedRoom = RoomTemperature::normalizeRoomName($room->name);
+
+        $deletedTemps = RoomTemperature::whereRaw('LOWER(TRIM(room)) = ?', [$normalizedRoom])->delete();
+        $deletedNotifs = Notification::where('meta->room', $room->name)
+            ->orWhere('meta->room', $normalizedRoom)
+            ->delete();
+
+        Cache::forget("notification_state:device:{$normalizedRoom}");
+        Cache::forget("notification_state:fuzzy_action:{$normalizedRoom}");
+        foreach (['temperature_offline', 'device_offline', 'recovered'] as $reason) {
+            Cache::forget("notification_state:fuzzy_warning:{$normalizedRoom}:{$reason}");
+        }
+        Cache::forget('known_room_names');
+
+        Log::info('Room cascade cleanup', [
+            'room' => $room->name,
+            'temperatures_deleted' => $deletedTemps,
+            'notifications_deleted' => $deletedNotifs,
+        ]);
 
         UserLog::create([
             'user_id' => Auth::id(),
