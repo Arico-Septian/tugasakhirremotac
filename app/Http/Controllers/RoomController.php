@@ -150,9 +150,9 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'name' => trim((string) $request->name),
-            'device_id' => trim((string) $request->device_id),
-            'floor' => trim((string) $request->floor),
+            'name' => strtolower(trim((string) $request->name)),
+            'device_id' => strtolower(trim((string) $request->device_id)),
+            'floor' => strtolower(trim((string) $request->floor)),
         ]);
 
         $request->validate([

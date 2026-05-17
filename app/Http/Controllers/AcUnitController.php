@@ -85,6 +85,11 @@ class AcUnitController extends Controller
             return back()->with('error', 'Maksimal 15 AC per ruangan');
         }
 
+        $request->merge([
+            'name' => strtolower(trim((string) $request->name)),
+            'brand' => strtolower(trim((string) $request->brand)),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:50',
             'brand' => 'required|string|max:50',
@@ -129,6 +134,11 @@ class AcUnitController extends Controller
     {
         $ac = AcUnit::findOrFail($id);
         $room = Room::findOrFail($ac->room_id);
+
+        $request->merge([
+            'name' => strtolower(trim((string) $request->name)),
+            'brand' => strtolower(trim((string) $request->brand)),
+        ]);
 
         $request->validate([
             'name' => 'required|string|max:50',

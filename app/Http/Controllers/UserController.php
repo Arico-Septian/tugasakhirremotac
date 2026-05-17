@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcUnit;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\UserLog;
-use App\Models\Room;
-use App\Models\AcUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +18,7 @@ class UserController extends Controller
     {
         $query = User::select('id', 'name', 'avatar', 'role', 'last_activity')
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+                $query->where('name', 'like', '%'.$request->search.'%');
             })
             ->when($request->filled('role'), function ($query) use ($request) {
                 $query->where('role', $request->role);
@@ -28,10 +28,10 @@ class UserController extends Controller
         $sort = $request->input('sort', 'created_at');
         $order = $request->input('order', 'desc');
 
-        if (!in_array($sort, ['name', 'role', 'last_activity', 'created_at'])) {
+        if (! in_array($sort, ['name', 'role', 'last_activity', 'created_at'])) {
             $sort = 'created_at';
         }
-        if (!in_array($order, ['asc', 'desc'])) {
+        if (! in_array($order, ['asc', 'desc'])) {
             $order = 'desc';
         }
 
@@ -62,7 +62,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'name' => trim((string) $request->name),
+            'name' => strtolower(trim((string) $request->name)),
+            'role' => strtolower(trim((string) $request->role)),
         ]);
 
         $request->validate([
@@ -70,27 +71,27 @@ class UserController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[A-Z]\S*$/',
+                'regex:/^[a-z]\S*$/',
                 Rule::unique('users', 'name'),
             ],
             'password' => 'required|string|min:8',
-            'role' => 'required|in:admin,operator,user'
+            'role' => 'required|in:admin,operator,user',
         ], [
-            'name.regex' => 'Huruf awal username harus kapital dan tidak boleh mengandung spasi.',
+            'name.regex' => 'Username akan disimpan huruf kecil dan tidak boleh mengandung spasi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'password' => Hash::make($request->password),
-            'role' => $request->role
+            'role' => $request->role,
         ]);
 
         UserLog::create([
             'user_id' => Auth::id(),
             'room' => '-',
             'ac' => '-',
-            'activity' => 'add_user'
+            'activity' => 'add_user',
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan');
@@ -98,15 +99,19 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'role' => strtolower(trim((string) $request->role)),
+        ]);
+
         $request->validate([
-            'role' => 'required|in:admin,operator,user'
+            'role' => 'required|in:admin,operator,user',
         ]);
 
         $user = User::findOrFail($id);
 
         if ($id == Auth::id()) {
             return response()->json([
-                'error' => 'Tidak bisa mengubah role sendiri'
+                'error' => 'Tidak bisa mengubah role sendiri',
             ], 403);
         }
 
@@ -124,7 +129,7 @@ class UserController extends Controller
     {
         if ($id == Auth::id()) {
             return response()->json([
-                'error' => 'Tidak bisa hapus diri sendiri'
+                'error' => 'Tidak bisa hapus diri sendiri',
             ], 403);
         }
 
@@ -134,13 +139,13 @@ class UserController extends Controller
             'user_id' => Auth::id(),
             'room' => '-',
             'ac' => '-',
-            'activity' => 'delete_user'
+            'activity' => 'delete_user',
         ]);
 
         $user->delete();
 
         return response()->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 
@@ -187,9 +192,9 @@ class UserController extends Controller
             'avatar' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
             'avatar.required' => 'Pilih file gambar dulu.',
-            'avatar.image'    => 'File harus berupa gambar.',
-            'avatar.mimes'    => 'Format yang didukung: JPG, PNG, WEBP.',
-            'avatar.max'      => 'Ukuran maksimal 2 MB.',
+            'avatar.image' => 'File harus berupa gambar.',
+            'avatar.mimes' => 'Format yang didukung: JPG, PNG, WEBP.',
+            'avatar.max' => 'Ukuran maksimal 2 MB.',
         ]);
 
         /** @var User $user */
@@ -234,5 +239,4 @@ class UserController extends Controller
 
         return back()->with('success', 'Password berhasil diubah');
     }
-
 }

@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     private function rateLimitKey(Request $request): string
     {
-        return 'login:' . $request->input('name', '') . '|' . $request->ip();
+        return 'login:'.strtolower(trim((string) $request->input('name', ''))).'|'.$request->ip();
     }
 
     public function login(Request $request)
@@ -22,11 +22,15 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
+        $request->merge([
+            'name' => strtolower(trim((string) $request->name)),
+        ]);
+
         $credentials = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'regex:/^[A-Z]\S*$/'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-z]\S*$/'],
             'password' => 'required|string|min:8',
         ], [
-            'name.regex' => 'Huruf awal username harus kapital dan tidak boleh mengandung spasi.',
+            'name.regex' => 'Username akan dibaca sebagai huruf kecil dan tidak boleh mengandung spasi.',
             'password.min' => 'Password minimal 8 karakter.',
         ]);
 
@@ -40,9 +44,9 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = User::where('name', $credentials['name'])->first();
+        $user = User::whereRaw('LOWER(name) = ?', [$credentials['name']])->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             RateLimiter::hit($key, 900); // 15 menit lockout
             $remaining = 5 - RateLimiter::attempts($key);
             $msg = $remaining > 0
@@ -65,6 +69,7 @@ class AuthController extends Controller
         if ($intended && $this->isPageUrl($intended)) {
             return redirect($intended);
         }
+
         return redirect()->route('dashboard');
     }
 
@@ -84,15 +89,20 @@ class AuthController extends Controller
             '/test-cache',
         ];
         foreach ($apiPaths as $p) {
-            if (str_starts_with($path, $p)) return false;
+            if (str_starts_with($path, $p)) {
+                return false;
+            }
         }
-        if (str_starts_with($path, '/api/')) return false;
+        if (str_starts_with($path, '/api/')) {
+            return false;
+        }
+
         return true;
     }
 
     public function logout(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user) {

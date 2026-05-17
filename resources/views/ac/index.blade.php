@@ -1225,11 +1225,11 @@
                             </div>
                             <div class="field">
                                 <label class="field-label">Nama AC</label>
-                                <input class="input" type="text" name="name" placeholder="Unit A" required>
+                                <input class="input" type="text" name="name" placeholder="unit_a" required>
                             </div>
                             <div class="field">
                                 <label class="field-label">Brand</label>
-                                <input class="input" type="text" name="brand" placeholder="Daikin" required>
+                                <input class="input" type="text" name="brand" placeholder="daikin" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -1722,5 +1722,4 @@
 </body>
 
 </html>
-
 
