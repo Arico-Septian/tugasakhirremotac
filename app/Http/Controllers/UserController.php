@@ -198,12 +198,24 @@ class UserController extends Controller
 
     public function changePassword(Request $request)
     {
-        $request->validate([
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
         /** @var User $user */
         $user = Auth::user();
+
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6', 'confirmed', 'different:current_password'],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.different' => 'Password baru harus berbeda dari password saat ini.',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini salah.']);
+        }
+
         $user->password = Hash::make($request->password);
         $user->save();
 
