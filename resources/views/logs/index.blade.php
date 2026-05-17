@@ -707,11 +707,11 @@
                                 <table class="tbl tbl-log">
                                     <thead>
                                         <tr>
-                                            <th style="width:24%;" class="sortable" data-sort="user_name" onclick="handleSort('user_name')">USER</th>
-                                            <th style="width:18%;" class="sortable" data-sort="room" onclick="handleSort('room')">ROOM</th>
+                                            <th style="width:20%;" class="sortable" data-sort="user_name" onclick="handleSort('user_name')">USER</th>
+                                            <th style="width:20%;" class="sortable" data-sort="room" onclick="handleSort('room')">ROOM</th>
                                             <th style="width:20%;">DETAIL</th>
-                                            <th style="width:22%;" class="sortable" data-sort="activity" onclick="handleSort('activity')">ACTIVITY</th>
-                                            <th style="width:16%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
+                                            <th style="width:20%;" class="sortable" data-sort="activity" onclick="handleSort('activity')">ACTIVITY</th>
+                                            <th style="width:20%;" class="whitespace-nowrap sortable" data-sort="created_at" onclick="handleSort('created_at')">TIME</th>
                                         </tr>
                                     </thead>
                                     <tbody id="logsTbody">
