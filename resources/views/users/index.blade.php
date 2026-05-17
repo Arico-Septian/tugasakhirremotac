@@ -179,8 +179,7 @@
             font-size: 13px;
             line-height: 1;
             color: var(--ink-2);
-            min-width: 80px;
-            justify-content: flex-start;
+            justify-content: center;
             vertical-align: middle;
         }
 
