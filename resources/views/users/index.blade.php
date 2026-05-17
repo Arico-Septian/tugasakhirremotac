@@ -737,7 +737,7 @@
                                                     </div>
                                                 @endif
                                                 <div class="user-card-name">
-                                                    <span class="user-card-name-text">{{ $user->name }}</span>
+                                                    <span class="user-card-name-text">{{ ucfirst($user->name) }}</span>
                                                     <span class="user-card-handle">{{ $handle }}</span>
                                                     @if ($user->email)
                                                         <span style="font-size:11px;color:var(--ink-4);margin-top:2px;display:block;">{{ $user->email }}</span>
@@ -809,7 +809,7 @@
                                         </div>
                                     @endif
                                                     <div class="user-info">
-                                                        <p class="user-name">{{ $user->name }}</p>
+                                                        <p class="user-name">{{ ucfirst($user->name) }}</p>
                                                         <p class="user-handle">{{ $handle }}</p>
                                                         @if ($user->email)
                                                             <p class="user-email">{{ $user->email }}</p>
@@ -940,7 +940,7 @@
                     <div class="field">
                         <label class="field-label">Username</label>
                         <input class="input" type="text" name="name" id="newUserName"
-                            placeholder="johndoe (huruf kecil, tanpa spasi)"
+                            placeholder="username"
                             pattern="[A-Za-z]\S*" title="Username tidak boleh ada spasi dan akan disimpan huruf kecil"
                             autocomplete="off" required>
                         <p class="field-hint" style="font-size:11px;color:var(--ink-3);margin-top:4px;">Disimpan huruf kecil, tanpa spasi</p>
@@ -954,9 +954,9 @@
                     <div class="field">
                         <label class="field-label">Role</label>
                         <select class="input select" name="role">
-                            <option value="admin">Admin — full system access</option>
-                            <option value="operator">Operator — manage rooms &amp; AC</option>
-                            <option value="user" selected>User — view only</option>
+                            <option value="admin">Admin</option>
+                            <option value="operator">Operator</option>
+                            <option value="user" selected>User</option>
                         </select>
                     </div>
                 </div>
@@ -1010,6 +1010,114 @@
             document.getElementById('modal')?.classList.remove('is-open');
             document.querySelector('#modal form')?.reset();
         }
+
+        const normalizeFormValue = value => (value || '').trim().toLowerCase();
+
+        function blockDuplicateInput(input, message) {
+            input.setCustomValidity(message);
+            setFieldFeedback(input, message, true);
+            input.reportValidity();
+            window.smToast?.(message, 'error');
+            input.focus();
+        }
+
+        function clearInputValidity(input) {
+            input.setCustomValidity('');
+            setFieldFeedback(input);
+        }
+
+        function setFieldFeedback(input, message = null, isError = false) {
+            const help = input.closest('.field')?.querySelector('.field-help, .field-hint');
+            if (!help) return;
+
+            help.dataset.defaultText ??= help.textContent;
+            help.textContent = message || help.dataset.defaultText;
+            help.style.color = isError ? 'var(--coral)' : '';
+        }
+
+        function validateNoSpaces(input, label) {
+            if (/\s/.test(input.value)) {
+                input.setCustomValidity(`${label} tidak boleh mengandung spasi`);
+                setFieldFeedback(input, `${label} tidak boleh mengandung spasi`, true);
+                return false;
+            }
+
+            clearInputValidity(input);
+            return true;
+        }
+
+        function visibleUserNames() {
+            return new Set(
+                Array.from(document.querySelectorAll('.user-name, .user-card-name-text'))
+                    .map(el => normalizeFormValue(el.textContent))
+                    .filter(Boolean)
+            );
+        }
+
+        async function usernameExists(username) {
+            if (visibleUserNames().has(username)) {
+                return true;
+            }
+
+            try {
+                const response = await fetch(`/users?search=${encodeURIComponent(username)}&sort=name&order=asc`, {
+                    headers: {
+                        'Accept': 'text/html'
+                    },
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    return false;
+                }
+
+                const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+
+                return Array.from(doc.querySelectorAll('.user-name, .user-card-name-text'))
+                    .some(el => normalizeFormValue(el.textContent) === username);
+            } catch (error) {
+                return false;
+            }
+        }
+
+        document.getElementById('newUserName')?.addEventListener('input', e => validateNoSpaces(e.currentTarget, 'Username'));
+
+        document.getElementById('addUserForm')?.addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const form = e.currentTarget;
+            const nameInput = form.querySelector('[name="name"]');
+            const submitButton = form.querySelector('[type="submit"]');
+            const username = normalizeFormValue(nameInput.value);
+            nameInput.value = username;
+
+            if (!validateNoSpaces(nameInput, 'Username')) {
+                nameInput.reportValidity();
+                return;
+            }
+
+            if (!username) {
+                form.reportValidity();
+                return;
+            }
+
+            if (submitButton) {
+                submitButton.disabled = true;
+            }
+
+            const exists = await usernameExists(username);
+
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+
+            if (exists) {
+                blockDuplicateInput(nameInput, 'Username sudah ada');
+                return;
+            }
+
+            HTMLFormElement.prototype.submit.call(form);
+        });
 
         function openEditModal(userId, currentRole) {
             document.getElementById('edit_user_id').value = userId;
@@ -1178,4 +1286,3 @@
 </body>
 
 </html>
-

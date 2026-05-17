@@ -306,7 +306,7 @@
                                         <div class="floor-section-header">
                                             <i class="fa-solid fa-layer-group text-[10px]"
                                                 style="color:var(--lavender);"></i>
-                                            <span class="floor-label"><?php echo e($floorName); ?></span>
+                                            <span class="floor-label"><?php echo e(ucfirst($floorName)); ?></span>
                                             <div class="floor-divider"></div>
                                             <span class="floor-count"><?php echo e($floorRooms->count()); ?> ruangan</span>
                                         </div>
@@ -333,10 +333,12 @@
                                                         ->count();
                                                 ?>
                                                 <div class="room-card" data-room-id="<?php echo e($room->id); ?>"
+                                                    data-room-name="<?php echo e($room->name); ?>"
+                                                    data-device-id="<?php echo e($room->device_id); ?>"
                                                     data-status="<?php echo e($online ? 'online' : 'offline'); ?>">
                                                     <div class="flex items-start justify-between gap-2">
                                                         <h2 class="font-semibold text-tight truncate"
-                                                            style="color:var(--ink-0);font-size:16px;line-height:1.25;"><?php echo e($room->name); ?></h2>
+                                                            style="color:var(--ink-0);font-size:16px;line-height:1.25;"><?php echo e(ucfirst($room->name)); ?></h2>
                                                         <span class="pill room-status-pill <?php echo e($online ? 'pill-online' : 'pill-offline'); ?>"
                                                             style="padding:3px 8px;font-size:10px;flex-shrink:0;">
                                                             <span class="dot"></span><span class="room-status-text"><?php echo e($online ? 'Online' : 'Offline'); ?></span>
@@ -498,21 +500,27 @@
                         <div class="modal-body space-y-3">
                             <div class="field">
                                 <label class="field-label">Nama Ruangan</label>
-                                <input class="input text-mono" type="text" name="name" placeholder="Server_Room_1"
+                                <input class="input text-mono" type="text" name="name" placeholder="server_1"
+                                    pattern="[A-Za-z0-9_]+"
+                                    title="Nama ruangan tidak boleh mengandung spasi"
                                     required>
-                                <p class="field-help">Huruf, angka, dan underscore (tidak boleh spasi)</p>
+                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, dan underscore (tidak boleh spasi)</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">ESP Device ID</label>
-                                <input class="input text-mono" type="text" name="device_id" placeholder="ESP32_01"
+                                <input class="input text-mono" type="text" name="device_id" placeholder="esp32_01"
+                                    pattern="[A-Za-z0-9_-]+"
+                                    title="ESP Device ID tidak boleh mengandung spasi"
                                     required>
-                                <p class="field-help">Huruf, angka, underscore, dan strip</p>
+                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, underscore, dan strip</p>
                             </div>
                             <div class="field">
                                 <label class="field-label">Lantai / Zona <span
                                         style="color:var(--ink-4);font-weight:400;">(opsional)</span></label>
-                                <input class="input text-mono" type="text" name="floor" placeholder="Lantai_1, Zona_A">
-                                <p class="field-help">Huruf, angka, dan underscore. Digunakan untuk pengelompokan</p>
+                                <input class="input text-mono" type="text" name="floor" placeholder="lantai_1"
+                                    pattern="[A-Za-z0-9_]*"
+                                    title="Lantai atau zona tidak boleh mengandung spasi">
+                                <p class="field-help">Disimpan huruf kecil. Huruf, angka, dan underscore. Digunakan untuk pengelompokan</p>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -552,6 +560,87 @@
         const roomFilterEmpty = document.getElementById('roomFilterEmpty');
         const roomCount = document.getElementById('roomCount');
         let activeRoomFilter = 'all';
+        const normalizeFormValue = value => (value || '').trim().toLowerCase();
+
+        function blockDuplicateInput(input, message) {
+            input.setCustomValidity(message);
+            setFieldFeedback(input, message, true);
+            input.reportValidity();
+            window.smToast?.(message, 'error');
+            input.focus();
+        }
+
+        function clearInputValidity(input) {
+            input.setCustomValidity('');
+            setFieldFeedback(input);
+        }
+
+        function setFieldFeedback(input, message = null, isError = false) {
+            const help = input.closest('.field')?.querySelector('.field-help, .field-hint');
+            if (!help) return;
+
+            help.dataset.defaultText ??= help.textContent;
+            help.textContent = message || help.dataset.defaultText;
+            help.style.color = isError ? 'var(--coral)' : '';
+        }
+
+        function validateNoSpaces(input, label) {
+            if (/\s/.test(input.value)) {
+                input.setCustomValidity(`${label} tidak boleh mengandung spasi`);
+                setFieldFeedback(input, `${label} tidak boleh mengandung spasi`, true);
+                return false;
+            }
+
+            clearInputValidity(input);
+            return true;
+        }
+
+        document.querySelectorAll('#addRoomForm input').forEach(input => {
+            input.addEventListener('input', () => validateNoSpaces(input, input.closest('.field')?.querySelector('.field-label')?.textContent?.trim() || 'Input'));
+        });
+
+        document.getElementById('addRoomForm')?.addEventListener('submit', e => {
+            const form = e.currentTarget;
+            const nameInput = form.querySelector('[name="name"]');
+            const deviceInput = form.querySelector('[name="device_id"]');
+            const floorInput = form.querySelector('[name="floor"]');
+
+            nameInput.value = normalizeFormValue(nameInput.value);
+            deviceInput.value = normalizeFormValue(deviceInput.value);
+            floorInput.value = normalizeFormValue(floorInput.value);
+
+            if (!validateNoSpaces(nameInput, 'Nama ruangan')) {
+                e.preventDefault();
+                nameInput.reportValidity();
+                return;
+            }
+
+            if (!validateNoSpaces(deviceInput, 'ESP Device ID')) {
+                e.preventDefault();
+                deviceInput.reportValidity();
+                return;
+            }
+
+            if (!validateNoSpaces(floorInput, 'Lantai atau zona')) {
+                e.preventDefault();
+                floorInput.reportValidity();
+                return;
+            }
+
+            const roomNames = new Set(roomCards.map(card => normalizeFormValue(card.dataset.roomName)));
+            const deviceIds = new Set(roomCards.map(card => normalizeFormValue(card.dataset.deviceId)).filter(Boolean));
+
+            if (roomNames.has(nameInput.value)) {
+                e.preventDefault();
+                blockDuplicateInput(nameInput, 'Nama ruangan sudah ada');
+                return;
+            }
+
+            if (deviceIds.has(deviceInput.value)) {
+                e.preventDefault();
+                blockDuplicateInput(deviceInput, 'ESP Device ID sudah terdaftar');
+            }
+        });
 
         function applyRoomFilter() {
             let visible = 0;
@@ -752,6 +841,4 @@
 </body>
 
 </html>
-
-
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/rooms/index.blade.php ENDPATH**/ ?>
