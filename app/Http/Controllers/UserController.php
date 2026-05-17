@@ -153,37 +153,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        // Recent activities
-        $recentActivities = UserLog::where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
-
-        // Total activities this month
-        $activitiesThisMonth = UserLog::where('user_id', $user->id)
-            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->count();
-
-        // Role-based stats
-        $stats = [];
-
-        if ($user->isAdmin()) {
-            $stats['total_users'] = User::count();
-            $stats['total_rooms'] = Room::count();
-            $stats['total_ac_units'] = AcUnit::count();
-        } elseif ($user->isOperator()) {
-            $stats['total_activities'] = UserLog::where('user_id', $user->id)->count();
-            $stats['unique_rooms'] = UserLog::where('user_id', $user->id)
-                ->distinct('room')
-                ->count('room');
-        } else {
-            $stats['total_activities'] = UserLog::where('user_id', $user->id)->count();
-            $stats['unique_rooms'] = UserLog::where('user_id', $user->id)
-                ->distinct('room')
-                ->count('room');
-        }
-
-        return view('profile.index', compact('user', 'recentActivities', 'activitiesThisMonth', 'stats'));
+        return view('profile.index', compact('user'));
     }
 
     public function uploadAvatar(Request $request)
