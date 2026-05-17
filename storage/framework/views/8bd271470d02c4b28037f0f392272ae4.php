@@ -83,6 +83,34 @@
                     </form>
 
                     
+                    <div id="avatarPreviewModal"
+                         style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(7,16,31,0.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+                        <div style="max-width:360px;width:100%;background:var(--panel-1);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);">
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                                <span style="width:34px;height:34px;border-radius:10px;background:var(--cyan-soft);border:1px solid var(--cyan-soft-2);display:inline-flex;align-items:center;justify-content:center;color:var(--cyan);">
+                                    <i class="fa-solid fa-camera"></i>
+                                </span>
+                                <div>
+                                    <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--ink-0);">Konfirmasi Foto Profil</h3>
+                                    <p style="margin:2px 0 0;font-size:12px;color:var(--ink-3);">Cek preview di bawah sebelum upload</p>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:center;margin-bottom:14px;">
+                                <img id="avatarPreviewImg" alt="Preview"
+                                     style="width:160px;height:160px;border-radius:14px;object-fit:cover;border:1px solid var(--line);background:var(--panel-2);">
+                            </div>
+                            <p id="avatarPreviewMeta" style="margin:0 0 14px;font-size:12px;color:var(--ink-3);text-align:center;"></p>
+                            <div style="display:flex;gap:8px;">
+                                <button type="button" id="avatarPreviewCancel" class="btn btn-ghost" style="flex:1;">Batal</button>
+                                <button type="button" id="avatarPreviewConfirm" class="btn btn-primary" style="flex:1;">
+                                    <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
+                                    <span>Upload</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                     <div class="panel panel-lg mt-4">
                         <div class="panel-header" style="margin-bottom:16px;">
                             <p class="eyebrow"><i class="fa-solid fa-user-circle"></i> Account Information</p>
@@ -122,23 +150,69 @@
 <?php echo $__env->make('components.bottom-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
-function handleAvatarSelect(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Ukuran file maksimal 2 MB.');
-        input.value = '';
-        return;
-    }
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) {
-        alert('Format yang didukung: JPG, PNG, WEBP.');
-        input.value = '';
-        return;
-    }
-    document.getElementById('avatarForm').submit();
-}
+(function () {
+    const modal      = document.getElementById('avatarPreviewModal');
+    const previewImg = document.getElementById('avatarPreviewImg');
+    const previewMeta= document.getElementById('avatarPreviewMeta');
+    const cancelBtn  = document.getElementById('avatarPreviewCancel');
+    const confirmBtn = document.getElementById('avatarPreviewConfirm');
+    const form       = document.getElementById('avatarForm');
+    const input      = document.getElementById('avatarInput');
+    let currentObjectUrl = null;
 
+    function openModal() {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal({ clearInput = true } = {}) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        if (currentObjectUrl) {
+            URL.revokeObjectURL(currentObjectUrl);
+            currentObjectUrl = null;
+        }
+        previewImg.src = '';
+        if (clearInput) input.value = '';
+    }
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+        return (b / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    window.handleAvatarSelect = function (el) {
+        const file = el.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            (window.smToast || alert)('Ukuran file maksimal 2 MB.', 'error');
+            el.value = '';
+            return;
+        }
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowed.includes(file.type)) {
+            (window.smToast || alert)('Format yang didukung: JPG, PNG, WEBP.', 'error');
+            el.value = '';
+            return;
+        }
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = URL.createObjectURL(file);
+        previewImg.src = currentObjectUrl;
+        previewMeta.textContent = `${file.name} · ${formatBytes(file.size)}`;
+        openModal();
+    };
+
+    cancelBtn.addEventListener('click', () => closeModal());
+    confirmBtn.addEventListener('click', () => {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[11px]"></i><span>Mengupload...</span>';
+        closeModal({ clearInput: false });
+        form.submit();
+    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+    });
+})();
 </script>
 <?php echo $__env->make('components.sidebar-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>

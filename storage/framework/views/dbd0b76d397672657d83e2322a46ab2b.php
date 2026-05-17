@@ -258,5 +258,25 @@ window.smToast = function (msg, type = 'info') {
     document.body.appendChild(t);
     setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 240); }, 2800);
 };
+
+/* ===== Auto-fire toast from Laravel session flash ===== */
+<?php
+    $smFlash = [
+        'success' => session('success'),
+        'error'   => session('error'),
+        'warning' => session('warning'),
+        'info'    => session('info'),
+    ];
+?>
+(function () {
+    const flash = <?php echo json_encode($smFlash, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    const typeMap = { success: 'success', error: 'error', warning: 'warn', info: 'info' };
+    for (const key of ['success', 'error', 'warning', 'info']) {
+        if (flash[key]) {
+            setTimeout(() => window.smToast(flash[key], typeMap[key]), 100);
+            break;
+        }
+    }
+})();
 </script>
 <?php /**PATH C:\laragon\www\tugasakhirremotac\resources\views/components/sidebar-scripts.blade.php ENDPATH**/ ?>
